@@ -1,0 +1,14 @@
+*DS_Store
+*.pyc
+/.project
+/.pydevproject
+/dist/
+/pydub.egg-info/
+.DS_Store
+.env
+*.swp
+.idea
+
+/build/
+/backup/
+/.python-version
