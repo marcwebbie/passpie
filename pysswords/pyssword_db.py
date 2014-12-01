@@ -6,13 +6,23 @@ try:
     input = raw_input
 except NameError:
     pass
+try:
+    from collections import namedtuple
+except ImportError:
+    from namedtuple import namedtuple
 
+Credential = namedtuple(
+    "Credential",
+    ["name", "login", "password", "login_url", "description"]
+)
 
 class PysswordDB(object):
     """Passwords database"""
 
     def __init__(self, db_path, password, verbose=False):
         self._file_path = db_path
+        self.password = password
+        self.credentials = []
 
         with open(db_path, "w") as db_file:
             scrypt_file = ScryptFile(db_file, password, N=1024, r=1, p=1)
@@ -28,3 +38,11 @@ class PysswordDB(object):
                 return True
             except: # TODO: Patch pyscrypt for raising specific exception
                 return False
+
+    def count(self, password):
+        """Count the number of credentials registered"""
+        return len(self.credentials)
+
+    def add_credential(self, credential, password):
+        """Add new credential to database"""
+        self.credentials.append(credential)

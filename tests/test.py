@@ -32,6 +32,20 @@ class PysswordsTests(unittest.TestCase):
         wrong_password = "something-else"
         self.assertFalse(db.is_valid(wrong_password))
 
+    def test_add_new_credential(self):
+        db_path = self.tmp_db_file.name
+        db = pysswords.PysswordDB(db_path=db_path, password=self.password)
+        self.assertEqual(db.count(self.password), 0)
+
+        credential = pysswords.Credential(
+            name="example",
+            login="john",
+            password="my-great-password",
+            login_url="http://example.org/login",
+            description="This is login credentials for example"
+        )
+        db.add_credential(credential, self.password)
+        self.assertEqual(db.count(self.password), 1)
 
 if __name__ == "__main__":
     unittest.main()
