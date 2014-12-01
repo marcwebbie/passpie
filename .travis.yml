@@ -1,7 +1,5 @@
 before_install:
   - sudo apt-get update --fix-missing
-install:
-  -  pip install -r requirements.txt
 
 language: python
 python:
@@ -16,5 +14,4 @@ allow_failures:
     # - python: "3.2"
     # - python: "3.3"
     # - python: "3.4"
-script:
-  - python tests/test.py
+script: "{envpython} setup.py develop && python tests/test.py"
