@@ -1,13 +1,13 @@
-############
+#########
 Pysswords
-############
+#########
 
 Pysswords encrypt your login credentials in a local file using the scrypt encryption.
 
 
-**********
+************
 Quickstart
-**********
+************
 
 .. code-block:: bash
 
