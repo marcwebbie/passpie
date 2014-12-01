@@ -25,6 +25,9 @@ setup(
     download_url='https://pypi.python.org/pypi/pysswords',
     packages=['pysswords'],
     install_requires=["pyscrypt"],
+    dependency_links=[
+        "https://github.com/marcwebbie/pyscrypt/tarball/master#egg-pyscrypt"
+    ],
     test_suite='tests.test',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
