@@ -8,15 +8,12 @@ Pysswords encrypt your login credentials in a local file using the scrypt encryp
 Installation
 ************
 
-```bash
-pip install pysswords
-```
+    pip install pysswords
 
 **********
 Quickstart
 **********
 
-... code-block:: shell
     # create a new credentials database
     pysswords --create /path/to/password/file
 
