@@ -4,8 +4,12 @@ Pysswords
 
 .. |Travis| image:: https://travis-ci.org/marcwebbie/pysswords.svg
     :target: https://travis-ci.org/marcwebbie/pysswords
+.. |Coveralls| image:: https://coveralls.io/repos/marcwebbie/pysswords/badge.png
+  :target: https://coveralls.io/r/marcwebbie/pysswords
+
 
 |Travis|
+|Coveralls|
 
 Pysswords encrypt your login credentials in a local file using the scrypt encryption.
 
