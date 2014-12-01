@@ -21,7 +21,7 @@ setup(
     install_requires=open('requirements.txt').readlines(),
     test_suite='tests.test',
     classifiers=[
-        'Development Status :: Alpha',
+        'Development Status :: 2 - Pre-Alpha',
         'Environment :: Console',
         'Intended Audience :: End Users/Desktop',
         'Natural Language :: English',
