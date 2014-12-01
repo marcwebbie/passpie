@@ -16,4 +16,4 @@ allow_failures:
     - python: "3.3"
     - python: "3.4"
 script:
-  - python test/test.py
+  - python tests/test.py
