@@ -22,8 +22,9 @@ setup(
     author='Marc Webbie',
     author_email='marcwebbie@gmail.com',
     url='https://github.com/marcwebbie/pysswords',
+    download_url='https://pypi.python.org/pypi/pysswords',
     packages=['pysswords'],
-    install_requires=requirements,
+    install_requires=["pyscrypt"],
     test_suite='tests.test',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
