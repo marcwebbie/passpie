@@ -57,7 +57,5 @@ class PysswordsTests(unittest.TestCase):
 
         self.assertEqual(credential, found_credential)
 
-
-
 if __name__ == "__main__":
     unittest.main()
