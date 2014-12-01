@@ -25,24 +25,26 @@ class PysswordDB(object):
         self.credentials = []
 
         with open(db_path, "w") as db_file:
-            scrypt_file = ScryptFile(db_file, password, N=1024, r=1, p=1)
+            scrypt_file = ScryptFile(db_file, self.password, N=1024, r=1, p=1)
             scrypt_file.close()
 
             if verbose:
                 print("Pysswords database created: '{}'".format(db_path))
 
-    def is_valid(self, password):
+    @property
+    def valid(self):
         with open(self._file_path) as db_file:
             try:
-                ScryptFile.verify_file(db_file, password)
+                ScryptFile.verify_file(db_file, self.password)
                 return True
             except: # TODO: Patch pyscrypt for raising specific exception
                 return False
 
-    def count(self, password):
+    @property
+    def count(self):
         """Count the number of credentials registered"""
         return len(self.credentials)
 
-    def add_credential(self, credential, password):
+    def add_credential(self, credential):
         """Add new credential to database"""
         self.credentials.append(credential)

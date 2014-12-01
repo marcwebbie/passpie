@@ -24,18 +24,12 @@ class PysswordsTests(unittest.TestCase):
     def test_create_valid_pyssword_dabatase_file(self):
         db_path = self.tmp_db_file.name
         db = pysswords.PysswordDB(db_path=db_path, password=self.password)
-        self.assertTrue(db.is_valid(self.password))
-
-    def test_is_valid_returns_false_if_wrong_password_is_given(self):
-        db_path = self.tmp_db_file.name
-        db = pysswords.PysswordDB(db_path=db_path, password=self.password)
-        wrong_password = "something-else"
-        self.assertFalse(db.is_valid(wrong_password))
+        self.assertTrue(db.valid)
 
     def test_add_new_credential(self):
         db_path = self.tmp_db_file.name
         db = pysswords.PysswordDB(db_path=db_path, password=self.password)
-        self.assertEqual(db.count(self.password), 0)
+        self.assertEqual(db.count, 0)
 
         credential = pysswords.Credential(
             name="example",
@@ -44,8 +38,8 @@ class PysswordsTests(unittest.TestCase):
             login_url="http://example.org/login",
             description="This is login credentials for example"
         )
-        db.add_credential(credential, self.password)
-        self.assertEqual(db.count(self.password), 1)
+        db.add_credential(credential)
+        self.assertEqual(db.count, 1)
 
 if __name__ == "__main__":
     unittest.main()
