@@ -9,7 +9,7 @@ Pysswords encrypt your login credentials in a local file using the scrypt encryp
 '''
 
 setup(
-    name='pyscrypt',
+    name='pysswords',
     version=__version__,
     license='License :: OSI Approved :: MIT License',
     description=LONG_DESCRIPTION,
