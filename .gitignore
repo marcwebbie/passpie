@@ -12,3 +12,4 @@
 /build/
 /backup/
 /.python-version
+/env/
