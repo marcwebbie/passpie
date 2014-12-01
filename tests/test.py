@@ -41,5 +41,23 @@ class PysswordsTests(unittest.TestCase):
         db.add_credential(credential)
         self.assertEqual(db.count, 1)
 
+    def test_get_credentials_by_name(self):
+        db_path = self.tmp_db_file.name
+        db = pysswords.PysswordDB(db_path=db_path, password=self.password)
+
+        credential = pysswords.Credential(
+            name="example",
+            login="john",
+            password="my-great-password",
+            login_url="http://example.org/login",
+            description="This is login credentials for example"
+        )
+        db.add_credential(credential)
+        found_credential = db.get_credential(name="example")
+
+        self.assertEqual(credential, found_credential)
+
+
+
 if __name__ == "__main__":
     unittest.main()

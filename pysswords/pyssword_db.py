@@ -48,3 +48,11 @@ class PysswordDB(object):
     def add_credential(self, credential):
         """Add new credential to database"""
         self.credentials.append(credential)
+
+    def get_credential(self, name):
+        """Get credential"""
+        for credential in self.credentials:
+            if credential.name == name:
+                return credential
+        else:
+            return None
