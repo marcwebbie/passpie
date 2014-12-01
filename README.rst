@@ -20,7 +20,10 @@ Quickstart
     # add new credentials
     pysswords --add /path/to/password/file
 
-    # search credentials
+    # get credential with name "example"
+    pysswords --get "example" /path/to/password/file
+
+    # search credentials with query "gmail"
     pysswords --search "gmail" /path/to/password/file
 
 *************
