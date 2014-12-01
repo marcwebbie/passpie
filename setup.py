@@ -1,19 +1,24 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
-__version__ = "0.0.1-dev1"
 
-LONG_DESCRIPTION = '''
-Pysswords encrypt your login credentials in a local file using the scrypt encryption.
-'''
+__version__ = "0.0.2"
+
+with open("README.rst") as f:
+    long_description = f.read()
+    ind = long_description.find("\n")
+    long_description = long_description[ind + 1:]
 
 setup(
     name='pysswords',
     version=__version__,
     license='License :: OSI Approved :: MIT License',
-    description=LONG_DESCRIPTION,
-    long_description=LONG_DESCRIPTION,
+    description="Pysswords encrypt your login credentials in a local file using the scrypt encryption.",
+    long_description=long_description,
     author='Marc Webbie',
     author_email='marcwebbie@gmail.com',
     url='https://github.com/marcwebbie/pysswords',
