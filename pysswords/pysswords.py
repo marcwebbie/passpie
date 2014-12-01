@@ -23,7 +23,8 @@ class PysswordDB(object):
 
     def is_valid(self, password):
         with open(self._file_path) as db_file:
-            if ScryptFile.verify_file(db_file, password):
+            try:
+                ScryptFile.verify_file(db_file, password)
                 return True
-            else:
+            except: # TODO: Patch pyscrypt for raising specific exception
                 return False

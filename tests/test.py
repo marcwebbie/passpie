@@ -27,6 +27,13 @@ class PysswordsTests(unittest.TestCase):
         db = pysswords.PysswordDB(db_path=db_path, password=password)
         self.assertTrue(db.is_valid(password))
 
+    def test_is_valid_returns_false_if_wrong_password_is_given(self):
+        db_path = self.tmp_db_file.name
+        password = "=Sup3rh4rdp4ssw0rdt0cr4ck"
+        db = pysswords.PysswordDB(db_path=db_path, password=password)
+        wrong_password = "something-else"
+        self.assertFalse(db.is_valid(wrong_password))
+
 
 if __name__ == "__main__":
     unittest.main()
