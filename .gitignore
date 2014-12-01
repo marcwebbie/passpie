@@ -9,6 +9,7 @@
 *.swp
 .idea
 
+*.egg
 /build/
 /backup/
 /.python-version
