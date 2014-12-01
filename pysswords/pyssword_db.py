@@ -1,6 +1,3 @@
-from pyscrypt import ScryptFile
-from pyscrypt.file import InvalidScryptFileFormat
-
 # support python2
 try:
     input = raw_input
@@ -11,10 +8,15 @@ try:
 except ImportError:
     from namedtuple import namedtuple
 
+from pyscrypt import ScryptFile
+from pyscrypt.file import InvalidScryptFileFormat
+
+
 Credential = namedtuple(
     "Credential",
     ["name", "login", "password", "login_url", "description"]
 )
+
 
 class PysswordDB(object):
     """Passwords database"""
