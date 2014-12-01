@@ -21,6 +21,12 @@ class PysswordsTests(unittest.TestCase):
         db = pysswords.PysswordDB(db_path=db_path, password=password)
         self.assertIsNotNone(db)
 
+    def test_create_valid_pyssword_dabatase_file(self):
+        db_path = self.tmp_db_file.name
+        password = "=Sup3rh4rdp4ssw0rdt0cr4ck"
+        db = pysswords.PysswordDB(db_path=db_path, password=password)
+        self.assertTrue(db.is_valid(password))
+
 
 if __name__ == "__main__":
     unittest.main()
