@@ -6,7 +6,7 @@ except ImportError:
     from distutils.core import setup
 
 
-__version__ = "0.0.4"
+__version__ = "0.0.4.1"
 
 with open("README.rst") as f:
     long_description = f.read()
