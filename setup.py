@@ -8,10 +8,10 @@ except ImportError:
 
 __version__ = "0.0.4.2"
 
+requirements = [pkg.strip() for pkg in open('requirements.txt').readlines()]
+
 with open("README.rst") as f:
     long_description = f.read()
-    ind = long_description.find("\n")
-    long_description = long_description[ind + 1:]
 
 setup(
     name='pysswords',
@@ -23,7 +23,7 @@ setup(
     author_email='marcwebbie@gmail.com',
     url='https://github.com/marcwebbie/pysswords',
     packages=['pysswords'],
-    install_requires=open('requirements.txt').readlines(),
+    install_requires=requirements,
     test_suite='tests.test',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
