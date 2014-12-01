@@ -9,7 +9,8 @@ allow_failures:
     - python: "pypy"
 install:
   # - "pip install ."
-  - "pip install -r requirements.txt"
+  # - "pip install -r requirements.txt"
+  - "pip install git+https://github.com/marcwebbie/pyscrypt"
   - "pip install coveralls"
 script:
   - "python setup.py develop"
