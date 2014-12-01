@@ -14,4 +14,4 @@ allow_failures:
     # - python: "3.2"
     # - python: "3.3"
     # - python: "3.4"
-script: "{envpython} setup.py develop && python tests/test.py"
+script: "python setup.py develop && python tests/test.py"
