@@ -26,6 +26,10 @@ Quickstart
     # search credentials with query "gmail"
     pysswords --search "gmail" /path/to/password/file
 
+    # print all credentials as a table
+    pysswords /path/to/password/file
+
+
 *************
 License (MIT)
 *************
