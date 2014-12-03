@@ -1,3 +1,3 @@
-from __future__ import print_function
+import json
 
 from .pyssword_db import PysswordDB, Credential
