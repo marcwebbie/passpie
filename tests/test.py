@@ -55,6 +55,18 @@ class PysswordsTests(unittest.TestCase):
         self.db.add_credential(credential)
         self.assertEqual(len(self.db.credentials), 1)
 
+    def test_delete_credential_by_name(self):
+        credential = Credential(
+            name="example",
+            login="john",
+            password="my-great-password",
+            login_url="http://example.org/login",
+            description="This is login credentials for example"
+        )
+        self.db.add_credential(credential)
+        self.db.delete_credential(name="example")
+        self.assertEqual(len(self.db.credentials), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

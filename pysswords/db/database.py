@@ -54,3 +54,6 @@ class Database(object):
 
     def add_credential(self, credential):
         self.credentials.append(credential)
+
+    def delete_credential(self, name):
+        self.credentials = [c for c in self.credentials if not c.name == name]
