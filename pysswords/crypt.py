@@ -1,7 +1,7 @@
-import base64
-import functools
-import json
-import sys
+# import base64
+# import functools
+# import json
+# import sys
 from collections import namedtuple
 
 from Crypto.Cipher import AES
@@ -36,7 +36,7 @@ def make_keys(password, salt=None, iterations=100000):
         salt = Random.new().read(8)
 
     # Generate a 32-byte (256-bit) key from the password
-    prf = lambda p, s: HMAC.new(p, s, SHA256).digest()
+    # prf = lambda p, s: HMAC.new(p, s, SHA256).digest()
     key = PBKDF2(password, salt, 32, iterations)
 
     # Split the key into two 16-byte (128-bit) keys
