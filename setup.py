@@ -3,7 +3,7 @@
 from setuptools import setup
 
 
-__version__ = "0.0.4.2"
+__version__ = "0.0.5-dev1"
 
 requirements = [pkg.strip() for pkg in open('requirements.txt').readlines()]
 
@@ -34,6 +34,9 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.4',
     ],
 )
