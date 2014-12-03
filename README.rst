@@ -3,9 +3,20 @@ Pysswords: Manage your passwords from the terminal
 #########
 
 .. image:: https://travis-ci.org/marcwebbie/pysswords.svg
-    :target: https://travis-ci.org/marcwebbie/pysswords
+   :target: https://travis-ci.org/marcwebbie/pysswords
+   :alt: Build
 .. image:: https://coveralls.io/repos/marcwebbie/pysswords/badge.png
-  :target: https://coveralls.io/r/marcwebbie/pysswords
+   :target: https://coveralls.io/r/marcwebbie/pysswords
+   :alt: Test Coverage
+.. image:: https://pypip.in/version/pysswords/badge.svg
+    :target: https://pypi.python.org/pypi/pysswords/
+    :alt: Latest Version
+.. image:: https://pypip.in/download/passwords/badge.svg
+   :target: https://pypi.python.org/pypi/pysswords
+   :alt: Downloads
+.. image:: https://pypip.in/py_versions/pysswords/badge.svg
+   :target: https://pypi.python.org/pypi/pysswords/
+   :alt: Supported Python versions
 
 
 Pysswords lets you manage your login credentials from the terminal. All passwords are saved into an encrypted file. Only with the password you used to created you can view the file contents. If you want to know more about the encryption used, check the `Under the Hood`_ section.
