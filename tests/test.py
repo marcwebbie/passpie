@@ -23,6 +23,11 @@ class PysswordsTests(unittest.TestCase):
     def tearDown(self):
         os.remove(self.db_path)
 
+    def test_database_default_content(self):
+        import json
+        expected_content = json.dumps([{}])
+        self.assertEqual(Database.DEFAULT_CONTENT, expected_content)
+
     def test_create_credential_database(self):
         database = Database.create(
             db_path=self.db_path,

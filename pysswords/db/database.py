@@ -7,6 +7,8 @@ from pysswords import crypt
 class Database(object):
     """Represents json encrypted files on the database"""
 
+    DEFAULT_CONTENT = '[{}]'
+
     @staticmethod
     def create(db_path, password, salt=None, iterations=100000):
         """Create a new db file pointing to `db_path`
