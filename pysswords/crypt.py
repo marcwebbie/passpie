@@ -2,6 +2,7 @@ import base64
 import functools
 import json
 import sys
+from collections import namedtuple
 
 from Crypto.Cipher import AES
 from Crypto.Hash import HMAC, SHA256
@@ -13,11 +14,7 @@ BAD_HMAC = 1
 BAD_ARGS = 2
 
 
-class CryptOptions(object):
-    def __init__(self, password, salt=None, iterations=100000):
-        self.password = password
-        self.salt = salt
-        self.iterations = iterations
+CryptOptions = namedtuple("CryptOptions", ["password", "salt", "iterations"])
 
 
 def make_keys(password, salt=None, iterations=100000):
