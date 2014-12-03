@@ -7,7 +7,8 @@ Pysswords: Manage your passwords from the terminal
 .. image:: https://coveralls.io/repos/marcwebbie/pysswords/badge.png
   :target: https://coveralls.io/r/marcwebbie/pysswords
 
-Manage your login credentials from the console. Pysswords encrypt your login credentials in a local file using the `<PBKDF2 http://en.wikipedia.org/wiki/PBKDF2>`_  derivation function and `<SHA256 http://en.wikipedia.org/wiki/SHA-2>`_ hashing.
+
+Pysswords lets you manage your login credentials from the terminal. All passwords are saved into an encrypted file. Only with the password you used to created you can view the file contents. If you want to know more about the encryption used, check the `Under the Hood`_ section.
 
 
 **********
@@ -53,8 +54,17 @@ Contributing
 + if everything is OK. push your changes and make a pull request. ;)
 
 
+**************
+Under The Hood
+**************
+
+Encryption is done using the `PBKDF2 <http://en.wikipedia.org/wiki/PBKDF2>`_  derivation function and `SHA256 <http://en.wikipedia.org/wiki/SHA-2>`_ hashing by default.
+
+Take a look at `pysswords.crypt <https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py>`_ module to know more.
+
+
 *************
-License (`<MIT License http://choosealicense.com/licenses/mit/>`_)
+License (`MIT License <http://choosealicense.com/licenses/mit/>`_)
 *************
 
 
