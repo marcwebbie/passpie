@@ -14,6 +14,7 @@ class Database(object):
         self.credentials = credentials
         self.crypt_options = crypt_options
 
+    @staticmethod
     def create(path, crypt_options):
         """Create a new empty Database at `path`
         `crypt_options` is an instance of pysswords.crypt.CryptOptions
