@@ -13,6 +13,13 @@ BAD_HMAC = 1
 BAD_ARGS = 2
 
 
+class CryptOptions(object):
+    def __init__(self, password, salt=None, iterations=100000):
+        self.password = password
+        self.salt = salt
+        self.iterations = iterations
+
+
 def make_keys(password, salt=None, iterations=100000):
     """Generates two 128-bit keys from the given password using
        PBKDF2-SHA256.
