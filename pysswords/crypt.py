@@ -5,7 +5,8 @@
 from collections import namedtuple
 
 from Crypto.Cipher import AES
-from Crypto.Hash import HMAC, SHA256
+from Crypto.Hash import HMAC
+# from Crypto.Hash import SHA256
 from Crypto.Protocol.KDF import PBKDF2
 from Crypto import Random
 
