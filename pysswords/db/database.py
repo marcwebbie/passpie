@@ -56,5 +56,12 @@ class Database(object):
     def add_credential(self, credential):
         self.credentials.append(credential)
 
-    def delete_credential(self, name):
-        self.credentials = [c for c in self.credentials if not c.name == name]
+    def delete_credential(self, **kwargs):
+        if kwargs.get("login"):
+            login = kwargs["login"]
+            credentials = [c for c in self.credentials if not c.login == login]
+        elif kwargs.get("name"):
+            name = kwargs["name"]
+            credentials = [c for c in self.credentials if not c.name == name]
+
+        self.credentials = credentials
