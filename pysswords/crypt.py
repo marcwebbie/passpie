@@ -22,16 +22,17 @@ class CryptOptions(object):
 
 def make_keys(password, salt=None, iterations=100000):
     """Generates two 128-bit keys from the given password using
-       PBKDF2-SHA256.
-       We use PBKDF2-SHA256 because we want the native output of PBKDF2 to be
-       256 bits. If we stayed at the default of PBKDF2-SHA1, then the entire
-       algorithm would run twice, which is slow for normal users, but doesn't
-       slow things down for attackers.
-       password - The password.
-       salt - The salt to use. If not given, a new 8-byte salt will be generated.
-       iterations - The number of iterations of PBKDF2 (default=100000).
+    PBKDF2-SHA256.
+    We use PBKDF2-SHA256 because we want the native output of PBKDF2 to be
+    256 bits. If we stayed at the default of PBKDF2-SHA1, then the entire
+    algorithm would run twice, which is slow for normal users, but doesn't
+    slow things down for attackers.
+    password - The password.
+    salt - The salt to use. If not given, a new 8-byte salt will be
+    generated.
+    iterations - The number of iterations of PBKDF2 (default=100000).
 
-       returns (k1, k2, salt, interations)
+    returns (k1, k2, salt, iterations)
     """
     if salt is None:
         # Generate a random 8-byte salt
