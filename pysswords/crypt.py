@@ -39,30 +39,32 @@ def make_keys(password, salt=None, iterations=100000):
         salt = Random.new().read(8)
 
     # Generate a 32-byte (256-bit) key from the password
-    prf = lambda p,s: HMAC.new(p, s, SHA256).digest()
+    prf = lambda p, s: HMAC.new(p, s, SHA256).digest()
     key = PBKDF2(password, salt, 32, iterations)
 
     # Split the key into two 16-byte (128-bit) keys
     return key[:16], key[16:], salt, iterations
 
+
 def make_hmac(message, key):
     """Creates an HMAC from the given message, using the given key. Uses
-       HMAC-MD5.
-       message - The message to create an HMAC of.
-       key - The key to use for the HMAC (at least 16 bytes).
+    HMAC-MD5.
+    message - The message to create an HMAC of.
+    key - The key to use for the HMAC (at least 16 bytes).
 
-       returns A hex string of the HMAC.
+    returns A hex string of the HMAC.
     """
     h = HMAC.new(key)
     h.update(message)
     return h.hexdigest()
 
+
 def encrypt(message, key):
     """Encrypts a given message with the given key, using AES-CFB.
-       message - The message to encrypt (byte string).
-       key - The AES key (16 bytes).
+    message - The message to encrypt (byte string).
+    key - The AES key (16 bytes).
 
-       returns (ciphertext, iv). Both values are byte strings.
+    returns (ciphertext, iv). Both values are byte strings.
     """
     # The IV should always be random
     iv = Random.new().read(AES.block_size)
