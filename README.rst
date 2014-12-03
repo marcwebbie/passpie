@@ -1,6 +1,6 @@
-#########
+##################################################
 Pysswords: Manage your passwords from the terminal
-#########
+##################################################
 
 .. image:: https://travis-ci.org/marcwebbie/pysswords.svg
    :target: https://travis-ci.org/marcwebbie/pysswords
@@ -8,23 +8,16 @@ Pysswords: Manage your passwords from the terminal
 .. image:: https://coveralls.io/repos/marcwebbie/pysswords/badge.png
    :target: https://coveralls.io/r/marcwebbie/pysswords
    :alt: Test Coverage
-.. image:: https://pypip.in/version/pysswords/badge.svg
-    :target: https://pypi.python.org/pypi/pysswords/
-    :alt: Latest Version
-.. image:: https://pypip.in/download/passwords/badge.svg
-   :target: https://pypi.python.org/pypi/pysswords
-   :alt: Downloads
-.. image:: https://pypip.in/py_versions/pysswords/badge.svg
-   :target: https://pypi.python.org/pypi/pysswords/
-   :alt: Supported Python versions
-
+.. image:: https://landscape.io/github/marcwebbie/pysswords/master/landscape.svg
+   :target: https://landscape.io/github/marcwebbie/pysswords/master
+   :alt: Code Health
 
 Pysswords lets you manage your login credentials from the terminal. All passwords are saved into an encrypted file. Only with the password you used to created you can view the file contents. If you want to know more about the encryption used, check the `Under the Hood`_ section.
 
 
-**********
+************
 Installation
-**********
+************
 
 .. code-block:: bash
 
@@ -56,13 +49,28 @@ Quickstart
     pysswords /path/to/password/file
 
 
-************
+**************
 Contributing
-************
+**************
 
 + fork the repository `<https://github.com/marcwebbie/pysswords/fork>`_
-+ write your tests on :code:`tests/test.py`
++ write your tests on `tests/test.py`
 + if everything is OK. push your changes and make a pull request. ;)
+
+
+******************
+Development status
+******************
+
+.. image:: https://pypip.in/version/pysswords/badge.svg
+    :target: https://pypi.python.org/pypi/pysswords/
+    :alt: Latest Version
+.. image:: https://pypip.in/download/passwords/badge.svg
+   :target: https://pypi.python.org/pypi/pysswords
+   :alt: Downloads
+.. image:: https://pypip.in/py_versions/pysswords/badge.svg
+   :target: https://pypi.python.org/pypi/pysswords/
+   :alt: Supported Python versions
 
 
 **************
@@ -74,9 +82,9 @@ Encryption is done using the `PBKDF2 <http://en.wikipedia.org/wiki/PBKDF2>`_  de
 Take a look at `pysswords.crypt <https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py>`_ module to know more.
 
 
-*************
+******************************************************************
 License (`MIT License <http://choosealicense.com/licenses/mit/>`_)
-*************
+******************************************************************
 
 
 The MIT License (MIT)
