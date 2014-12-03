@@ -17,3 +17,4 @@
 /pysswords.egg-info/
 /testing.py
 *.bak
+/.coverage
