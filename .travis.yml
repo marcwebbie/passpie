@@ -9,6 +9,7 @@ allow_failures:
   - python: pypy
 install:
   - pip install -r requirements.txt
+  - pip install coveralls
 script:
   coverage run tests/test.py
 after_success:
