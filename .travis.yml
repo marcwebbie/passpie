@@ -9,7 +9,5 @@ allow_failures:
     - python: "pypy"
 install:
   - "pip install -r requirements.txt"
-  - "pip install coveralls"
 script:
-  - "python setup.py develop"
   - "python tests/test.py"
