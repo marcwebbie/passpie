@@ -80,5 +80,31 @@ class PysswordsTests(unittest.TestCase):
         self.assertEqual(len(self.db.credentials), 0, "Couldn't delete credential")
 
 
+    def test_delete_credential_by_name_and_login(self):
+        credential = Credential(
+            name="example",
+            login="john",
+            password="my-great-password",
+            login_url="http://example.org/login",
+            description="This is login credentials for example"
+        )
+
+        credential2 = Credential(
+            name="github",
+            login="john",
+            password="my-great-password",
+            login_url="http://example.org/login",
+            description="This is login credentials for example"
+        )
+
+        self.db.add_credential(credential)
+        self.db.add_credential(credential2)
+        self.db.delete_credential(name=credential2.name, login=credential2.login)
+
+        self.assertIn(credential, self.db.credentials)
+        self.assertNotIn(credential2, self.db.credentials)
+
+
+
 if __name__ == "__main__":
     unittest.main()
