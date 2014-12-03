@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup
 
 
 __version__ = "0.0.4.2"
@@ -11,23 +8,20 @@ __version__ = "0.0.4.2"
 requirements = [pkg.strip() for pkg in open('requirements.txt').readlines()]
 
 with open("README.rst") as f:
-    long_description = f.read()
+    long_description = f.read() + '\n'
 
 setup(
     name='pysswords',
     version=__version__,
     license='License :: OSI Approved :: MIT License',
-    description="Pysswords encrypt your login credentials in a local file using the scrypt encryption.",
+    description="Manage your login credentials from the terminal painlessly.",
     long_description=long_description,
     author='Marc Webbie',
     author_email='marcwebbie@gmail.com',
     url='https://github.com/marcwebbie/pysswords',
     download_url='https://pypi.python.org/pypi/pysswords',
     packages=['pysswords'],
-    install_requires=["pyscrypt"],
-    dependency_links=[
-        "https://github.com/marcwebbie/pyscrypt/tarball/master#egg-pyscrypt"
-    ],
+    install_requires=requirements,
     test_suite='tests.test',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
