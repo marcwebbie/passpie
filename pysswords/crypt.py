@@ -12,7 +12,8 @@ from Crypto import Random
 BAD_HMAC = 1
 BAD_ARGS = 2
 
-def _make_keys(password, salt=None, iterations=100000):
+
+def make_keys(password, salt=None, iterations=100000):
     """Generates two 128-bit keys from the given password using
        PBKDF2-SHA256.
        We use PBKDF2-SHA256 because we want the native output of PBKDF2 to be
@@ -36,7 +37,7 @@ def _make_keys(password, salt=None, iterations=100000):
     # Split the key into two 16-byte (128-bit) keys
     return key[:16], key[16:], salt, iterations
 
-def _make_hmac(message, key):
+def make_hmac(message, key):
     """Creates an HMAC from the given message, using the given key. Uses
        HMAC-MD5.
        message - The message to create an HMAC of.
@@ -48,7 +49,7 @@ def _make_hmac(message, key):
     h.update(message)
     return h.hexdigest()
 
-def _encrypt(message, key):
+def encrypt(message, key):
     """Encrypts a given message with the given key, using AES-CFB.
        message - The message to encrypt (byte string).
        key - The AES key (16 bytes).
@@ -60,32 +61,3 @@ def _encrypt(message, key):
     cipher = AES.new(key, AES.MODE_CFB, iv)
     ciphertext = cipher.encrypt(message)
     return (ciphertext, iv)
-
-def create(db_path, password, salt=None, iterations=100000):
-    # create default file
-    with open(db_path, "w") as default_file:
-        default_file.write(json.dumps([{}]))
-
-    with open(db_path, "rb") as f:
-        file_contents = f.read()
-
-    aes_key, hmac_key, salt, iterations = _make_keys(
-        password=password,
-        salt=salt,
-        iterations=iterations
-    )
-    ciphertext, iv = _encrypt(file_contents, aes_key)
-    hmac = _make_hmac(ciphertext, hmac_key)
-
-    output = {
-        "hmac": hmac,
-        "iterations": iterations
-    }
-    for key, value in ("ciphertext", ciphertext), ("iv", iv), ("salt", salt):
-        output[key] = base64.b64encode(value).decode("utf-8")
-    output_data = json.dumps(output).encode("utf-8")
-
-    with open(db_path, "wb") as f:
-        f.write(output_data)
-
-    return db_path
