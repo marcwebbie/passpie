@@ -51,3 +51,7 @@ class Database(object):
             crypt_options=crypt_options
         )
         return database
+
+
+    def add_credential(self, credential):
+        self.credentials.append(credential)
