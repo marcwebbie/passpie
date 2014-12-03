@@ -52,6 +52,5 @@ class Database(object):
         )
         return database
 
-
     def add_credential(self, credential):
         self.credentials.append(credential)
