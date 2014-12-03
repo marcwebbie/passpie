@@ -1,17 +1,22 @@
 #########
-Pysswords
+Pysswords: Manage your passwords from the terminal
 #########
 
-.. |Travis| image:: https://travis-ci.org/marcwebbie/pysswords.svg
+.. image:: https://travis-ci.org/marcwebbie/pysswords.svg
     :target: https://travis-ci.org/marcwebbie/pysswords
-.. |Coveralls| image:: https://coveralls.io/repos/marcwebbie/pysswords/badge.png
+.. image:: https://coveralls.io/repos/marcwebbie/pysswords/badge.png
   :target: https://coveralls.io/r/marcwebbie/pysswords
 
+Manage your login credentials from the console. Pysswords encrypt your login credentials in a local file using the `<PBKDF2 http://en.wikipedia.org/wiki/PBKDF2>`_  derivation function and `<SHA256 http://en.wikipedia.org/wiki/SHA-2>`_ hashing.
 
-|Travis|
-|Coveralls|
 
-Pysswords encrypt your login credentials in a local file using the scrypt encryption.
+**********
+Installation
+**********
+
+.. code-block:: bash
+
+    pip install pysswords
 
 
 ************
@@ -19,9 +24,6 @@ Quickstart
 ************
 
 .. code-block:: bash
-
-    # Install pysswords
-    pip install pysswords
 
     # create a new credentials database
     pysswords --create /path/to/password/file
@@ -32,6 +34,9 @@ Quickstart
     # get credential with name "example"
     pysswords --get "example" /path/to/password/file
 
+    # delete credential with name "example"
+    pysswords --delete "example" /path/to/password/file
+
     # search credentials with query "gmail"
     pysswords --search "gmail" /path/to/password/file
 
@@ -39,27 +44,38 @@ Quickstart
     pysswords /path/to/password/file
 
 
+************
+Contributing
+************
+
++ fork the repository `<https://github.com/marcwebbie/pysswords/fork>`_
++ write your tests on :code:`tests/test.py`
++ if everything is OK. push your changes and make a pull request. ;)
+
+
 *************
-License (MIT)
+License (`<MIT License http://choosealicense.com/licenses/mit/>`_)
 *************
 
-| Copyright © 2014 Marcwebbie, http://github.com/marcwebbie
-|
-| Permission is hereby granted, free of charge, to any person obtaining
-| a copy of this software and associated documentation files (the
-| "Software"), to deal in the Software without restriction, including
-| without limitation the rights to use, copy, modify, merge, publish,
-| distribute, sublicense, and/or sell copies of the Software, and to
-| permit persons to whom the Software is furnished to do so, subject to
-| the following conditions:
-|
-| The above copyright notice and this permission notice shall be
-| included in all copies or substantial portions of the Software.
-|
-| THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-| EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-| MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-| NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-| LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-| OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-| WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+The MIT License (MIT)
+
+Copyright © 2014 Marc Webbie, http://github.com/marcwebbie
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
