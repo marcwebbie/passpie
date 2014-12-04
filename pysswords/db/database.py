@@ -58,5 +58,5 @@ class Database(object):
 
     def delete_credential(self, **kwargs):
         creds = [c for c in self.credentials
-                 if not dict(c._asdict().items() & kwargs.items()) == kwargs]
+                 if not {k: vars(c)[k] for k in vars(c).keys() if k in kwargs.keys()} == kwargs]
         self.credentials = creds
