@@ -2,7 +2,7 @@ import base64
 import json
 
 from pysswords import crypt
-
+from credential import Credential
 
 class Database(object):
     """Represents json encrypted files on the database"""
@@ -56,5 +56,17 @@ class Database(object):
     def add_credential(self, credential):
         self.credentials.append(credential)
 
-    def delete_credential(self, name):
-        self.credentials = [c for c in self.credentials if not c.name == name]
+    def delete_credential(self, **kwargs):
+        new_credentials = []
+        for cred in self.credentials:
+            credential_to_delete = Credential(
+                name=kwargs.get("name", cred.name),
+                login=kwargs.get("login", cred.login),
+                password=kwargs.get("password", cred.password),
+                login_url=kwargs.get("login_url", cred.login_url),
+                description=kwargs.get("description", cred.description),
+            )
+            if not credential_to_delete == cred:
+                new_credentials.append(cred)
+
+        self.credentials = new_credentials
