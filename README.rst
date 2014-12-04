@@ -12,7 +12,7 @@ Pysswords: Manage your passwords from the terminal
    :target: https://landscape.io/github/marcwebbie/pysswords/master
    :alt: Code Health
 
-Pysswords lets you manage your login credentials from the terminal. All passwords are saved into an encrypted file. Only with the password you used to created you can view the file contents. If you want to know more about the encryption used, check the `Under the Hood`_ section.
+`Pysswords <https://github.com/marcwebbie/pysswords>`_ lets you manage your login credentials from the terminal. All passwords are saved into an encrypted file. Only with the password you used to created you can view the file contents. If you want to know more about the encryption used, check the `Under the Hood`_ section.
 
 
 ************
@@ -27,6 +27,8 @@ Installation
 ************
 Quickstart
 ************
+
+Check the implemented features on the `Features`_ section.
 
 .. code-block:: bash
 
@@ -72,6 +74,18 @@ Development status
    :target: https://pypi.python.org/pypi/pysswords/
    :alt: Supported Python versions
 
+
+********
+Features
+********
+
+In order of priority [#]_:
+
+- **[ ]** Database module
+- **[ ]** Encryption module
+- **[ ]** Console interface
+
+.. [#] **[ ]** for not implemented feature, **[x]** for already implemented feature
 
 **************
 Under The Hood
