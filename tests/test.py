@@ -28,6 +28,15 @@ class PysswordsTests(unittest.TestCase):
             crypt_options=self.crypt_options
         )
 
+    def some_credential(self, **kwargs):
+        return Credential(
+            name=kwargs.get("name", "example"),
+            login=kwargs.get("login", "john"),
+            password=kwargs.get("password", "my-great-password"),
+            login_url=kwargs.get("login_url", "http://example.org/login"),
+            description=kwargs.get("description", "This is login credentials for example"),
+        )
+
     def tearDown(self):
         os.remove(self.db_path)
 
@@ -44,57 +53,23 @@ class PysswordsTests(unittest.TestCase):
         self.assertEqual(len(database.credentials), 0)
 
     def test_add_new_credential(self):
-        credential = Credential(
-            name="example",
-            login="john",
-            password="my-great-password",
-            login_url="http://example.org/login",
-            description="This is login credentials for example"
-        )
         self.assertEqual(len(self.db.credentials), 0)
-        self.db.add_credential(credential)
+        self.db.add_credential(self.some_credential())
         self.assertEqual(len(self.db.credentials), 1)
 
     def test_delete_credential_by_name(self):
-        credential = Credential(
-            name="example",
-            login="john",
-            password="my-great-password",
-            login_url="http://example.org/login",
-            description="This is login credentials for example"
-        )
-        self.db.add_credential(credential)
+        self.db.add_credential(self.some_credential(name="example"))
         self.db.delete_credential(name="example")
         self.assertEqual(len(self.db.credentials), 0)
 
     def test_delete_credential_by_login(self):
-        credential = Credential(
-            name="example",
-            login="john",
-            password="my-great-password",
-            login_url="http://example.org/login",
-            description="This is login credentials for example"
-        )
-        self.db.add_credential(credential)
+        self.db.add_credential(self.some_credential(login="john"))
         self.db.delete_credential(login="john")
-        self.assertEqual(len(self.db.credentials), 0)
+        self.assertEqual(len(self.db.credentials), 0, "Couldn't delete credential")
 
     def test_delete_credential_by_name_and_login(self):
-        credential = Credential(
-            name="example",
-            login="john",
-            password="my-great-password",
-            login_url="http://example.org/login",
-            description="This is login credentials for example"
-        )
-
-        credential2 = Credential(
-            name="github",
-            login="john",
-            password="my-great-password",
-            login_url="http://example.org/login",
-            description="This is login credentials for example"
-        )
+        credential = self.some_credential(name="github", login="example")
+        credential2 = self.some_credential(name="github", login="john")
 
         self.db.add_credential(credential)
         self.db.add_credential(credential2)
@@ -104,6 +79,8 @@ class PysswordsTests(unittest.TestCase):
 
         self.assertIn(credential, self.db.credentials)
         self.assertNotIn(credential2, self.db.credentials)
+
+
 
 
 
