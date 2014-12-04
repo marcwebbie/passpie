@@ -58,9 +58,11 @@ class Database(object):
 
     def delete_credential(self, **kwargs):
         creds = [c for c in self.credentials
-                 if not {k: vars(c)[k] for k in vars(c).keys() if k in kwargs.keys()} == kwargs]
+                 if not {k: vars(c)[k] for k in vars(c).keys()
+                         if k in kwargs.keys()} == kwargs]
         self.credentials = creds
 
     def find_credentials(self, **kwargs):
         return [c for c in self.credentials
-                 if {k: vars(c)[k] for k in vars(c).keys() if k in kwargs.keys()} == kwargs]
+                if {k: vars(c)[k] for k in vars(c).keys()
+                    if k in kwargs.keys()} == kwargs]
