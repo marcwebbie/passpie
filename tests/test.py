@@ -80,6 +80,35 @@ class PysswordsTests(unittest.TestCase):
         self.assertIn(credential, self.db.credentials)
         self.assertNotIn(credential2, self.db.credentials)
 
+    def test_find_credentials_by_name(self):
+        credential = self.some_credential(name="Amazing Name")
+        self.db.add_credential(credential)
+        self.db.add_credential(credential)
+        self.db.find_credentials(name=credential.name)
+
+        self.assertIn(credential, self.db.credentials)
+        self.assertEqual(len(self.db.credentials), 2)
+
+    def test_find_credentials_by_login(self):
+        credential = self.some_credential(login="john")
+        self.db.add_credential(credential)
+        self.db.find_credentials(login=credential.login)
+
+        self.assertIn(credential, self.db.credentials)
+        self.assertEqual(len(self.db.credentials), 1)
+
+    def test_find_credentials_by_name_and_login(self):
+        credential = self.some_credential(name="github", login="example")
+        credential2 = self.some_credential(name="github", login="john")
+
+        self.db.add_credential(credential)
+        self.db.add_credential(credential2)
+        credentials = self.db.find_credentials(name=credential.name, login=credential.login)
+
+        self.assertIn(credential, self.db.credentials)
+        self.assertEqual(len(credentials), 1)
+
+
 
 
 
