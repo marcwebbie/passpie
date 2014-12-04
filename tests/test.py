@@ -1,4 +1,5 @@
 import json
+from collections import namedtuple
 import os
 import sys
 from tempfile import NamedTemporaryFile
@@ -7,6 +8,7 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from pysswords.db import Database, Credential
 from pysswords.crypt import CryptOptions
+import pysswords.__main__
 
 
 class PysswordsTests(unittest.TestCase):
@@ -111,6 +113,32 @@ class PysswordsTests(unittest.TestCase):
 
 
 
+
+class ConsoleInterfaceTests(unittest.TestCase):
+
+    Args = namedtuple("Args", ["path", "create"])
+
+    def setUp(self):
+        self.args = ConsoleInterfaceTests.Args(
+            path=None,
+            create=None
+        )
+        self.path = "tests/data/testing.db"
+
+    def tearDown(self):
+        try:
+            os.remove(self.path)
+        except FileNotFoundError:
+            pass
+
+    def test_create_database_creates_file_on_given_path(self):
+        args = ConsoleInterfaceTests.Args(
+            path=self.path,
+            create=True
+        )
+        self.assertFalse(os.path.exists(self.path))
+        pysswords.__main__.main(args)
+        self.assertTrue(os.path.exists(self.path))
 
 
 if __name__ == "__main__":
