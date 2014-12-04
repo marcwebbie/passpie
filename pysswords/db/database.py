@@ -2,7 +2,7 @@ import base64
 import json
 
 from pysswords import crypt
-from credential import Credential
+from .credential import Credential
 
 class Database(object):
     """Represents json encrypted files on the database"""
