@@ -81,7 +81,7 @@ class PysswordsTests(unittest.TestCase):
     def test_delete_credential_by_login(self):
         self.db.add_credential(self.some_credential(login="john"))
         self.db.delete_credential(login="john")
-        self.assertEqual(len(self.db.credentials), 0, "Couldn't delete credential")
+        self.assertEqual(len(self.db.credentials), 0)
 
     def test_delete_credential_by_name_and_login(self):
         credential = self.some_credential(name="github", login="example")
