@@ -111,9 +111,6 @@ class PysswordsTests(unittest.TestCase):
         self.assertEqual(len(credentials), 1)
 
 
-
-
-
 class ConsoleInterfaceTests(unittest.TestCase):
 
     Args = namedtuple("Args", ["path", "create"])
