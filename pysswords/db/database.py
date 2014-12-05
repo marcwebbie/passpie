@@ -53,6 +53,24 @@ class Database(object):
         )
         return database
 
+    @staticmethod
+    def verify(database_path, password):
+        with open(database_path, "rb") as f:
+            file_contents = f.read()
+
+        data = json.loads(file_contents.decode("utf-8"))
+        ciphertext = base64.b64decode(data["ciphertext"])
+        iterations = data["iterations"]
+        salt = base64.b64decode(data["salt"])
+
+        aes_key, hmac_key, _, _ = crypt.make_keys(password, salt, iterations)
+        hmac = crypt.make_hmac(ciphertext, hmac_key)
+        if hmac != data["hmac"]:
+            # TODO: logging
+            return False
+        else:
+            return True
+
     def add_credential(self, credential):
         self.credentials.append(credential)
 

@@ -10,11 +10,16 @@ from pysswords.db import Database, Credential
 from pysswords.crypt import CryptOptions
 import pysswords.__main__
 
+TEST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+
 
 class PysswordsTests(unittest.TestCase):
     def setUp(self):
         self.db_file = NamedTemporaryFile(mode='w', delete=False)
         self.db_path = self.db_file.name
+        self.testing_path = os.path.join(TEST_DIR,
+                                         "data",
+                                         "testing_database.db")
         self.db_file.close()
         self.password = "=Sup3rh4rdp4ssw0rdt0cr4ck"
         self.default_iterations = 1000
@@ -30,17 +35,26 @@ class PysswordsTests(unittest.TestCase):
             crypt_options=self.crypt_options
         )
 
+    def tearDown(self):
+        try:
+            os.remove(self.db_path)
+        except FileNotFoundError:
+            pass
+
+        try:
+            os.remove(self.testing_path)
+        except FileNotFoundError:
+            pass
+
     def some_credential(self, **kwargs):
         return Credential(
             name=kwargs.get("name", "example"),
             login=kwargs.get("login", "john"),
             password=kwargs.get("password", "my-great-password"),
             login_url=kwargs.get("login_url", "http://example.org/login"),
-            description=kwargs.get("description", "This is login credentials for example"),
+            description=kwargs.get("description",
+                                   "This is login credentials for example"),
         )
-
-    def tearDown(self):
-        os.remove(self.db_path)
 
     def test_database_default_content(self):
         expected_content = json.dumps([{}])
@@ -111,6 +125,18 @@ class PysswordsTests(unittest.TestCase):
         self.assertIn(credential, self.db.credentials)
         self.assertEqual(len(credentials), 1)
 
+    def test_verify_creates_valid_database_with_password(self):
+        database_path = self.testing_path
+        database = Database.create(
+            path=database_path,
+            crypt_options=self.crypt_options
+        )
+
+        verify_result = Database.verify(database.path, self.password)
+        self.assertTrue(verify_result)
+        bad_password = "notvalidpasswordfordatabase"
+        verify_bad_result = Database.verify(database.path, bad_password)
+        self.assertFalse(verify_bad_result)
 
 
 class ConsoleInterfaceTests(unittest.TestCase):
