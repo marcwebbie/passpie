@@ -105,10 +105,12 @@ class PysswordsTests(unittest.TestCase):
 
         self.db.add_credential(credential)
         self.db.add_credential(credential2)
-        credentials = self.db.find_credentials(name=credential.name, login=credential.login)
+        credentials = self.db.find_credentials(name=credential.name,
+                                               login=credential.login)
 
         self.assertIn(credential, self.db.credentials)
         self.assertEqual(len(credentials), 1)
+
 
 
 class ConsoleInterfaceTests(unittest.TestCase):
