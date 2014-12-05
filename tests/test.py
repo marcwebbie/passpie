@@ -10,6 +10,11 @@ from pysswords.db import Database, Credential
 from pysswords.crypt import CryptOptions
 import pysswords.__main__
 
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = EnvironmentError
+
 TEST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
 
