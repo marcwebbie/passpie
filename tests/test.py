@@ -153,7 +153,9 @@ class ConsoleInterfaceTests(unittest.TestCase):
             path=None,
             create=None
         )
-        self.path = "tests/data/testing.db"
+        self.path = os.path.join(TEST_DIR,
+                                 "data",
+                                 "testing_database.db")
 
     def tearDown(self):
         try:
