@@ -59,11 +59,11 @@ class Database(object):
             file_contents = f.read()
 
         data = json.loads(file_contents.decode("utf-8"))
-        ciphertext = base64.b64decode(data["ciphertext"])
+        ciphertext = base64.b64decode(data["ciphertext"].encode("ascii"))
         iterations = data["iterations"]
         salt = base64.b64decode(data["salt"])
 
-        aes_key, hmac_key, _, _ = crypt.make_keys(password, salt, iterations)
+        _, hmac_key, _, _ = crypt.make_keys(password, salt, iterations)
         hmac = crypt.make_hmac(ciphertext, hmac_key)
         if hmac != data["hmac"]:
             # TODO: logging
