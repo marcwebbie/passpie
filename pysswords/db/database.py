@@ -61,7 +61,7 @@ class Database(object):
         data = json.loads(file_contents.decode("utf-8"))
         ciphertext = base64.b64decode(data["ciphertext"].encode("ascii"))
         iterations = data["iterations"]
-        salt = base64.b64decode(data["salt"])
+        salt = base64.b64decode(data["salt"].encode("ascii"))
 
         _, hmac_key, _, _ = crypt.make_keys(password, salt, iterations)
         hmac = crypt.make_hmac(ciphertext, hmac_key)
