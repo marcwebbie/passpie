@@ -6,11 +6,18 @@ from pysswords.crypt import CryptOptions
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path')
-    parser.add_argument('--create', action='store_true')
-    parser.add_argument('--password', default=None)
-    parser.add_argument('--salt', default=None)
-    parser.add_argument('--iterations', default=100000)
+    main_group = parser.add_argument_group('Main options')
+    main_group.add_argument('path', help='Path to database file')
+    main_group.add_argument('--create', action='store_true',
+                            help='Create a new encrypted password database')
+
+    crypt_group = parser.add_argument_group('Encryption options')
+    crypt_group.add_argument('--password', default=None,
+                             help='Password to open database')
+    crypt_group.add_argument('--salt', default=None,
+                             help='Salt for encryption')
+    crypt_group.add_argument('--iterations', default=100000,
+                             help='Number of iterations for encryption')
 
     return parser.parse_args()
 
