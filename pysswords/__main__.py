@@ -8,11 +8,11 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('path')
     parser.add_argument('--create', action='store_true')
-    parser.add_argument('--password', action='store_true')
+    parser.add_argument('--password', default=None)
     parser.add_argument('--salt', default=None)
     parser.add_argument('--iterations', default=100000)
 
-    parser.parse_args()
+    return parser.parse_args()
 
 
 def main(args=None):
@@ -20,12 +20,12 @@ def main(args=None):
         args = get_args()
 
     if not args.password:
-        getpass()
+        args.password = getpass()
 
     crypt_options = CryptOptions(
         password=args.password,
-        salt=None,
-        iterations=100000
+        salt=args.salt,
+        iterations=args.iterations
     )
 
     if args.create:
