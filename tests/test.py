@@ -199,7 +199,6 @@ class ConsoleInterfaceTests(unittest.TestCase):
     def test_interface_calls_add_credential_when_add_args_is_passed(self, _):
         self.args.add = True
         pysswords.__main__.main(args=self.args)
-        import pdb; pdb.set_trace()
         self.assertTrue(pysswords.__main__.Database.add_credential.called)
 
     @patch("pysswords.__main__.Database")
