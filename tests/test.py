@@ -160,7 +160,9 @@ class ConsoleInterfaceTests(unittest.TestCase):
             path=self.path,
             create=False,
             add=False,
-            password="password"
+            password="password",
+            iterations=1000,
+            salt=None
         )
         self.PatcherDatabase = patch(
             "pysswords.__main__.Database"
