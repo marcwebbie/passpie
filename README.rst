@@ -85,7 +85,7 @@ In order of priority [#]_:
 - **[ ]** Encryption module
 - **[ ]** Console interface
 
-.. [#] **[ ]** for not implemented feature, **[x]** for already implemented feature
+.. [#] **[ ]** not yet implemented feature, **[x]** implemented feature
 
 **************
 Under The Hood
