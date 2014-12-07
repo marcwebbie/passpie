@@ -1,5 +1,8 @@
+from __future__ import print_function
+
 import argparse
 from getpass import getpass
+import sys
 from pysswords.db import Database, Credential
 from pysswords.crypt import CryptOptions
 
@@ -30,23 +33,22 @@ def get_args():
     return parser.parse_args()
 
 
-def get_credential():
-    name = input("Name : ")
-    login = input("Login : ")
-
-    # Password
-    passwords_match = False
-    for i in range(3):
+def create_password():
+    for i in range(2):
         password = getpass("Credential password : ")
         password_retype = getpass("Enter Credential password again: ")
         if password == password_retype:
-            passwords_match = True
-            break
+            return password
         else:
-            print("Passwords don't match. Try again")
-    if not passwords_match:
-        raise ValueError("Passwords for credential don't match")
+            print("[error] Passwords don't match. Try again", file=sys.stderr)
 
+    raise ValueError("Passwords for credential don't match")
+
+
+def get_credential():
+    name = input("Name : ")
+    login = input("Login : ")
+    password = create_password()
     login_url = input("Login url [optional]: ")
     description = input("Description [optional] : ")
 
@@ -75,11 +77,14 @@ def main(args=None):
 
     if args.create:
         Database.create(args.path, crypt_options)
-    else:
+    elif Database.verify(args.path, args.password):
         if args.add:
             database = Database(args.path, crypt_options)
             credential = get_credential()
             database.add_credential(credential)
+    else:
+        # couldn't verify database
+        pass
 
 
 if __name__ == "__main__":

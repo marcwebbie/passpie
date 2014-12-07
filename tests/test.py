@@ -232,15 +232,25 @@ class ConsoleInterfaceTests(unittest.TestCase):
                 pysswords.__main__.main(args=self.args)
                 self.assertTrue(mock_input.called)
 
+    def test_main_get_password_raises_value_error_password_dont_match(self):
+        self.args.add = True
+        mock_passwords = ["password", "p4ssw0rd"] * 3
+        with patch("pysswords.__main__.getpass", side_effect=mock_passwords):
+            with open(os.devnull, 'w') as devnull:
+                with patch("sys.stderr", devnull):
+                    with self.assertRaises(ValueError):
+                        pysswords.__main__.create_password()
+
     def test_interface_calls_add_credential_when_add_args_true(self):
         self.args.add = True
 
         func_mock = "pysswords.__main__.get_credential"
         with patch(func_mock, return_value=self.MockCredential()):
-            pysswords.__main__.main(args=self.args)
-            self.MockDatabase().add_credential.assert_called_with(
-                self.MockCredential()
-            )
+            with patch("pysswords.__main__.getpass", return_value=""):
+                pysswords.__main__.main(args=self.args)
+                self.MockDatabase().add_credential.assert_called_with(
+                    self.MockCredential()
+                )
 
     def test_console_interface_asks_for_password_when_no_password(self):
         self.args.password = None
