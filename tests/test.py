@@ -187,6 +187,7 @@ class ConsoleInterfaceTests(unittest.TestCase):
         args = argparse.Namespace(
             path=self.path,
             create=True,
+            add=False,
             password="password"
         )
 
@@ -196,10 +197,24 @@ class ConsoleInterfaceTests(unittest.TestCase):
                 pysswords.__main__.main()
                 self.assertTrue(patched_db.create.called)
 
+    def test_interface_calls_add_credential_when_add_args_is_passed(self):
+        args = argparse.Namespace(
+            path=self.path,
+            create=False,
+            add=True,
+            password="password"
+        )
+
+        with patch("pysswords.__main__.Database") as patched_db:
+            self.assertFalse(patched_db.add_credential.called)
+            pysswords.__main__.main(args)
+            self.assertTrue(patched_db.add_credential.called)
+
     def test_console_interface_asks_for_password_when_no_password(self):
         args = argparse.Namespace(
             path=self.path,
             create=False,
+            add=False,
             password=None
         )
         with patch('pysswords.__main__.getpass') as patched:
@@ -207,6 +222,8 @@ class ConsoleInterfaceTests(unittest.TestCase):
             self.assertFalse(patched.called)
             pysswords.__main__.main(args)
             self.assertTrue(patched.called)
+
+
 
 if __name__ == "__main__":
     unittest.main()

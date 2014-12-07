@@ -27,7 +27,9 @@ def main(args=None):
     )
 
     if args.create:
-        database_created = Database.create()
+        Database.create()
+    elif args.add:
+        Database.add_credential()
 
 
 if __name__ == "__main__":
