@@ -150,12 +150,6 @@ class PysswordsTests(unittest.TestCase):
         self.assertFalse(verify_bad_result)
 
 
-class MockDatabase(MagicMock):
-    @classmethod
-    def create(cls, *args, **kwargs):
-        print("testando")
-
-
 class ConsoleInterfaceTests(unittest.TestCase):
 
     def setUp(self):
@@ -168,12 +162,28 @@ class ConsoleInterfaceTests(unittest.TestCase):
             add=False,
             password="password"
         )
+        self.PatcherDatabase = patch(
+            "pysswords.__main__.Database"
+        )
+        self.PatcherCryptOptions = patch(
+            "pysswords.__main__.CryptOptions",
+            return_value=CryptOptions(
+                password=self.args.password,
+                salt=None,
+                iterations=1000
+            )
+        )
+        self.MockCryptOptions = self.PatcherCryptOptions.start()
+        self.MockDatabase = self.PatcherDatabase.start()
 
     def tearDown(self):
         try:
             os.remove(self.path)
         except FileNotFoundError:
             pass
+
+        self.PatcherCryptOptions.stop()
+        self.PatcherDatabase.stop()
 
     def test_get_args_throw_errors_when_no_argument_is_set(self):
         with open(os.devnull, 'w') as devnull:
@@ -187,20 +197,24 @@ class ConsoleInterfaceTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     runpy._run_module_as_main("pysswords.__main__")
 
-    @patch("pysswords.__main__.Database")
-    def test_interface_calls_create_when_create_args_is_passed(self, _):
+    def test_interface_calls_create_when_create_args_is_passed(self):
         self.args.create = True
         pysswords.__main__.main(args=self.args)
-        self.assertTrue(pysswords.__main__.Database.create.called)
+        self.MockDatabase.create.assert_called_with(
+            self.path,
+            self.MockCryptOptions()
+        )
 
-    @patch("pysswords.__main__.Database")
-    def test_interface_calls_add_credential_when_add_args_is_passed(self, _):
+    def test_interface_calls_add_credential_when_add_args_true(self):
         self.args.add = True
         pysswords.__main__.main(args=self.args)
-        self.assertTrue(pysswords.__main__.Database.add_credential.called)
 
-    @patch("pysswords.__main__.Database")
-    def test_console_interface_asks_for_password_when_no_password(self, _):
+        self.MockDatabase().add_credential.assert_called_with(
+            self.path,
+            self.MockCryptOptions()
+        )
+
+    def test_console_interface_asks_for_password_when_no_password(self):
         self.args.password = None
         with patch('pysswords.__main__.getpass') as patched_getpass:
             pysswords.__main__.main(args=self.args)

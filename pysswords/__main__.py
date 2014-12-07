@@ -9,6 +9,8 @@ def get_args():
     parser.add_argument('path')
     parser.add_argument('--create', action='store_true')
     parser.add_argument('--password', action='store_true')
+    parser.add_argument('--salt', default=None)
+    parser.add_argument('--iterations', default=100000)
 
     parser.parse_args()
 
@@ -23,13 +25,14 @@ def main(args=None):
     crypt_options = CryptOptions(
         password=args.password,
         salt=None,
-        iterations=1000
+        iterations=100000
     )
 
     if args.create:
-        Database.create()
+        Database.create(args.path, crypt_options)
     elif args.add:
-        Database.add_credential()
+        database = Database(args.path, crypt_options)
+        database.add_credential(args.path, crypt_options)
 
 
 if __name__ == "__main__":
