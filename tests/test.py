@@ -1,13 +1,21 @@
+import argparse
 import json
 from collections import namedtuple
 import os
+import runpy
 import sys
 from tempfile import NamedTemporaryFile
 import unittest
 
+try:
+    from unittest.mock import patch, MagicMock
+except ImportError:
+    from mock import patch, MagicMock
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from pysswords.db import Database, Credential
 from pysswords.crypt import CryptOptions
+import pysswords
 import pysswords.__main__
 
 try:
@@ -144,15 +152,15 @@ class PysswordsTests(unittest.TestCase):
         self.assertFalse(verify_bad_result)
 
 
+class MockDatabase(MagicMock):
+    @classmethod
+    def create(cls, *args, **kwargs):
+        print("testando")
+
+
 class ConsoleInterfaceTests(unittest.TestCase):
 
-    Args = namedtuple("Args", ["path", "create"])
-
     def setUp(self):
-        self.args = ConsoleInterfaceTests.Args(
-            path=None,
-            create=None
-        )
         self.path = os.path.join(TEST_DIR,
                                  "data",
                                  "testing_database.db")
@@ -163,15 +171,42 @@ class ConsoleInterfaceTests(unittest.TestCase):
         except FileNotFoundError:
             pass
 
-    def test_create_database_creates_file_on_given_path(self):
-        args = ConsoleInterfaceTests.Args(
-            path=self.path,
-            create=True
-        )
-        self.assertFalse(os.path.exists(self.path))
-        pysswords.__main__.main(args)
-        self.assertTrue(os.path.exists(self.path))
+    def test_get_args_throw_errors_when_no_argument_is_set(self):
+        with open(os.devnull, 'w') as devnull:
+            with patch('sys.stderr', devnull):
+                with self.assertRaises(SystemExit):
+                    pysswords.__main__.get_args()
 
+    def test_main_is_called_when_main_module_is_run_as_main(self):
+        with open(os.devnull, 'w') as devnull:
+            with patch('sys.stderr', devnull):
+                with self.assertRaises(SystemExit):
+                    runpy._run_module_as_main("pysswords.__main__")
+
+    def test_interface_calls_create_when_create_args_is_passed(self):
+        args = argparse.Namespace(
+            path=self.path,
+            create=True,
+            password="password"
+        )
+
+        with patch('pysswords.__main__.get_args', return_value=args):
+            with patch("pysswords.__main__.Database") as patched_db:
+                self.assertFalse(patched_db.create.called)
+                pysswords.__main__.main()
+                self.assertTrue(patched_db.create.called)
+
+    def test_console_interface_asks_for_password_when_no_password(self):
+        args = argparse.Namespace(
+            path=self.path,
+            create=False,
+            password=None
+        )
+        with patch('pysswords.__main__.getpass') as patched:
+            # import pdb; pdb.set_trace()
+            self.assertFalse(patched.called)
+            pysswords.__main__.main(args)
+            self.assertTrue(patched.called)
 
 if __name__ == "__main__":
     unittest.main()

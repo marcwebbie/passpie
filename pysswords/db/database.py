@@ -14,8 +14,8 @@ class Database(object):
         self.credentials = credentials
         self.crypt_options = crypt_options
 
-    @staticmethod
-    def create(path, crypt_options):
+    @classmethod
+    def create(cls, path, crypt_options):
         """Create a new empty Database at `path`
         `crypt_options` is an instance of pysswords.crypt.CryptOptions
 
@@ -53,8 +53,8 @@ class Database(object):
         )
         return database
 
-    @staticmethod
-    def verify(database_path, password):
+    @classmethod
+    def verify(cls, database_path, password):
         with open(database_path, "rb") as f:
             file_contents = f.read()
 
