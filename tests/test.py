@@ -164,6 +164,12 @@ class ConsoleInterfaceTests(unittest.TestCase):
         self.path = os.path.join(TEST_DIR,
                                  "data",
                                  "testing_database.db")
+        self.args = argparse.Namespace(
+            path=self.path,
+            create=False,
+            add=False,
+            password="password"
+        )
 
     def tearDown(self):
         try:
@@ -183,45 +189,25 @@ class ConsoleInterfaceTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     runpy._run_module_as_main("pysswords.__main__")
 
-    def test_interface_calls_create_when_create_args_is_passed(self):
-        args = argparse.Namespace(
-            path=self.path,
-            create=True,
-            add=False,
-            password="password"
-        )
+    @patch("pysswords.__main__.Database")
+    def test_interface_calls_create_when_create_args_is_passed(self, patched_db):
+        self.args.create = True
+        self.assertFalse(patched_db.create.called)
+        pysswords.__main__.main(args=self.args)
+        self.assertTrue(patched_db.create.called)
 
-        with patch('pysswords.__main__.get_args', return_value=args):
-            with patch("pysswords.__main__.Database") as patched_db:
-                self.assertFalse(patched_db.create.called)
-                pysswords.__main__.main()
-                self.assertTrue(patched_db.create.called)
+    @patch("pysswords.__main__.Database")
+    def test_interface_calls_add_credential_when_add_args_is_passed(self, patched_db):
+        self.args.add = True
+        pysswords.__main__.main(args=self.args)
+        self.assertTrue(patched_db.add_credential.called)
 
-    def test_interface_calls_add_credential_when_add_args_is_passed(self):
-        args = argparse.Namespace(
-            path=self.path,
-            create=False,
-            add=True,
-            password="password"
-        )
-
-        with patch("pysswords.__main__.Database") as patched_db:
-            self.assertFalse(patched_db.add_credential.called)
-            pysswords.__main__.main(args)
-            self.assertTrue(patched_db.add_credential.called)
-
-    def test_console_interface_asks_for_password_when_no_password(self):
-        args = argparse.Namespace(
-            path=self.path,
-            create=False,
-            add=False,
-            password=None
-        )
-        with patch('pysswords.__main__.getpass') as patched:
-            # import pdb; pdb.set_trace()
-            self.assertFalse(patched.called)
-            pysswords.__main__.main(args)
-            self.assertTrue(patched.called)
+    @patch("pysswords.__main__.Database")
+    def test_console_interface_asks_for_password_when_no_password(self, patched_db):
+        self.args.password = None
+        with patch('pysswords.__main__.getpass') as patched_getpass:
+            pysswords.__main__.main(args=self.args)
+            self.assertTrue(patched_getpass.called)
 
 
 
