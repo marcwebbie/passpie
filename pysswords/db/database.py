@@ -9,10 +9,10 @@ class Database(object):
 
     DEFAULT_CONTENT = '[{}]'
 
-    def __init__(self, path, credentials, crypt_options):
+    def __init__(self, path, crypt_options):
         self.path = path
-        self.credentials = credentials
         self.crypt_options = crypt_options
+        self.credentials = []
 
     @classmethod
     def create(cls, path, crypt_options):
@@ -48,7 +48,6 @@ class Database(object):
 
         database = Database(
             path=path,
-            credentials=[],  # empty credentials
             crypt_options=crypt_options
         )
         return database
