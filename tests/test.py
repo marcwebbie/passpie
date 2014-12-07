@@ -190,20 +190,20 @@ class ConsoleInterfaceTests(unittest.TestCase):
                     runpy._run_module_as_main("pysswords.__main__")
 
     @patch("pysswords.__main__.Database")
-    def test_interface_calls_create_when_create_args_is_passed(self, patched_db):
+    def test_interface_calls_create_when_create_args_is_passed(self, _):
         self.args.create = True
-        self.assertFalse(patched_db.create.called)
         pysswords.__main__.main(args=self.args)
-        self.assertTrue(patched_db.create.called)
+        self.assertTrue(pysswords.__main__.Database.create.called)
 
     @patch("pysswords.__main__.Database")
-    def test_interface_calls_add_credential_when_add_args_is_passed(self, patched_db):
+    def test_interface_calls_add_credential_when_add_args_is_passed(self, _):
         self.args.add = True
         pysswords.__main__.main(args=self.args)
-        self.assertTrue(patched_db.add_credential.called)
+        import pdb; pdb.set_trace()
+        self.assertTrue(pysswords.__main__.Database.add_credential.called)
 
     @patch("pysswords.__main__.Database")
-    def test_console_interface_asks_for_password_when_no_password(self, patched_db):
+    def test_console_interface_asks_for_password_when_no_password(self, _):
         self.args.password = None
         with patch('pysswords.__main__.getpass') as patched_getpass:
             pysswords.__main__.main(args=self.args)
