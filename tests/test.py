@@ -175,8 +175,19 @@ class ConsoleInterfaceTests(unittest.TestCase):
                 iterations=1000
             )
         )
+        self.PatcherCredential = patch(
+            "pysswords.__main__.Credential",
+            return_value=Credential(
+                name="example",
+                login="john",
+                password="great-password",
+                login_url="https://example.com/login",
+                description="Credentials to example.com",
+            )
+        )
         self.MockCryptOptions = self.PatcherCryptOptions.start()
         self.MockDatabase = self.PatcherDatabase.start()
+        self.MockCredential = self.PatcherCredential.start()
 
     def tearDown(self):
         try:
@@ -207,14 +218,29 @@ class ConsoleInterfaceTests(unittest.TestCase):
             self.MockCryptOptions()
         )
 
+    def test_main_get_credential_is_called_when_add_arg_passed(self):
+        self.args.add = True
+
+        # with patch('__builtin__.input') as mock_input:
+        if sys.version_info < (3,):
+            input_function = "pysswords.__main__.input"
+        else:
+            input_function = "builtins.input"
+
+        with patch(input_function) as mock_input:
+            with patch("pysswords.__main__.getpass"):
+                pysswords.__main__.main(args=self.args)
+                self.assertTrue(mock_input.called)
+
     def test_interface_calls_add_credential_when_add_args_true(self):
         self.args.add = True
-        pysswords.__main__.main(args=self.args)
 
-        self.MockDatabase().add_credential.assert_called_with(
-            self.path,
-            self.MockCryptOptions()
-        )
+        func_mock = "pysswords.__main__.get_credential"
+        with patch(func_mock, return_value=self.MockCredential()):
+            pysswords.__main__.main(args=self.args)
+            self.MockDatabase().add_credential.assert_called_with(
+                self.MockCredential()
+            )
 
     def test_console_interface_asks_for_password_when_no_password(self):
         self.args.password = None
