@@ -1,6 +1,5 @@
 import argparse
 import json
-from collections import namedtuple
 import os
 import runpy
 import sys
@@ -15,7 +14,6 @@ except ImportError:
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from pysswords.db import Database, Credential
 from pysswords.crypt import CryptOptions
-import pysswords
 import pysswords.__main__
 
 try:
@@ -207,8 +205,6 @@ class ConsoleInterfaceTests(unittest.TestCase):
         with patch('pysswords.__main__.getpass') as patched_getpass:
             pysswords.__main__.main(args=self.args)
             self.assertTrue(patched_getpass.called)
-
-
 
 if __name__ == "__main__":
     unittest.main()
