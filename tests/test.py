@@ -258,5 +258,16 @@ class ConsoleInterfaceTests(unittest.TestCase):
             pysswords.__main__.main(args=self.args)
             self.assertTrue(patched_getpass.called)
 
+    def test_error_message_when_couldnt_verify_database(self):
+        from io import StringIO
+        self.args.create = False
+        self.args.add = True
+
+        with patch('sys.stderr', new_callable=StringIO) as mocked_stderr:
+            self.MockDatabase.verify.return_value = False
+            pysswords.__main__.main(args=self.args)
+            self.assertIn("[error] Couldn't verify database.",
+                          mocked_stderr.getvalue())
+
 if __name__ == "__main__":
     unittest.main()

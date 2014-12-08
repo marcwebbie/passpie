@@ -77,14 +77,16 @@ def main(args=None):
 
     if args.create:
         Database.create(args.path, crypt_options)
-    elif Database.verify(args.path, args.password):
-        if args.add:
-            database = Database(args.path, crypt_options)
-            credential = get_credential()
-            database.add_credential(credential)
     else:
-        # couldn't verify database
-        pass
+        if Database.verify(args.path, args.password):
+            if args.add:
+                database = Database(args.path, crypt_options)
+                credential = get_credential()
+                database.add_credential(credential)
+        else:
+            print("[error] Couldn't verify database. "
+                  "Either password is wrong, or file is corrupted",
+                  file=sys.stderr)
 
 
 if __name__ == "__main__":
