@@ -107,3 +107,26 @@ class Database(object):
         return [c for c in self.credentials
                 if {k: vars(c)[k] for k in vars(c).keys()
                     if k in kwargs.keys()} == kwargs]
+
+    def save(self):
+        credentials_json = json.dumps([vars(c) for c in self.credentials])
+
+        aes_key, hmac_key, salt, iterations = crypt.make_keys(
+            password=self.crypt_options.password,
+            iterations=self.crypt_options.iterations
+        )
+        ciphertext, iv = crypt.encrypt(credentials_json, aes_key)
+        hmac = crypt.make_hmac(ciphertext, hmac_key)
+
+        output = {
+            "hmac": hmac,
+            "iterations": iterations
+        }
+        for key, value in ("ciphertext", ciphertext), ("iv", iv), ("salt", salt):
+            output[key] = base64.b64encode(value).decode("utf-8")
+
+        with open(self.path, "wb") as f:
+            output_data = json.dumps(output).encode("utf-8")
+            f.write(output_data)
+
+        return self

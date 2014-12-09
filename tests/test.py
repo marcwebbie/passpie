@@ -149,6 +149,38 @@ class PysswordsTests(unittest.TestCase):
         verify_bad_result = Database.verify(database.path, bad_password)
         self.assertFalse(verify_bad_result)
 
+    def test_save_credentials_database_path(self):
+        credential = self.some_credential(name="test", login="doe")
+        self.db.add_credential(credential)
+        self.db.save()
+
+        test_db = Database(self.db.path, self.db.crypt_options)
+        self.assertEqual(self.db.credentials, test_db.credentials)
+
+    def test_save_encrypted_credentials_into_passwords_file(self):
+        credential = self.some_credential(name="test", login="doe")
+        self.db.add_credential(credential)
+        self.db.save()
+
+        with open(self.db.path, "r") as f:
+            file_content = f.read()
+            for elem in credential:
+                self.assertNotIn(elem, file_content)
+
+
+    # def test_instantiate_database_load_credentials_from_file(self):
+    #     raise NotImplementedError(
+    #         "Should test that database decrypt credentials "
+    #         "return expected credentials saved encrypted in path")
+    #     credential = self.some_credential(login="john")
+    #     credential2 = self.some_credential(name="github")
+    #     credential3 = self.some_credential(description="my other account")
+    #     self.db.add_credential(credential)
+    #     self.db.add_credential(credential2)
+    #     self.db.add_credential(credential3)
+    #     credentials = Database.decrypt_credentials(self.db.path,
+    #                                                self.crypt_options.password)
+
 
 class ConsoleInterfaceTests(unittest.TestCase):
 
