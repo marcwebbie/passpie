@@ -68,7 +68,7 @@ class PysswordsTests(unittest.TestCase):
         )
 
     def test_database_default_content(self):
-        expected_content = json.dumps([{}])
+        expected_content = json.dumps([])
         self.assertEqual(Database.DEFAULT_CONTENT, expected_content)
 
     def test_create_credential_database(self):

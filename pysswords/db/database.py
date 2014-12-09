@@ -7,7 +7,7 @@ from pysswords import crypt
 class Database(object):
     """Represents json encrypted files on the database"""
 
-    DEFAULT_CONTENT = '[{}]'
+    DEFAULT_CONTENT = '[]'
 
     def __init__(self, path, crypt_options):
         self.path = path
