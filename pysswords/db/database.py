@@ -2,17 +2,22 @@ import base64
 import json
 
 from pysswords import crypt
-
+from .credential import Credential
 
 class Database(object):
     """Represents json encrypted files on the database"""
 
     DEFAULT_CONTENT = '[]'
 
-    def __init__(self, path, crypt_options):
+    def __init__(self, path, crypt_options, credentials=None):
         self.path = path
         self.crypt_options = crypt_options
-        self.credentials = []
+        if credentials == None:
+            decrypted_credentials = Database.decrypt_credentials(
+                path=path,
+                password=crypt_options.password
+            )
+            self.credentials = decrypted_credentials
 
     @classmethod
     def create(cls, path, crypt_options):
@@ -69,6 +74,25 @@ class Database(object):
             return False
         else:
             return True
+
+    @classmethod
+    def decrypt_credentials(cls, path, password):
+        with open(path, "rb") as f:
+            file_contents = f.read()
+
+        data = json.loads(file_contents.decode("utf-8"))
+        ciphertext = base64.b64decode(data["ciphertext"])
+        iv = base64.b64decode(data["iv"])
+        iterations = data["iterations"]
+        salt = base64.b64decode(data["salt"])
+
+        aes_key, hmac_key, _, _ = crypt.make_keys(password, salt, iterations)
+        output_data = crypt.decrypt(ciphertext, aes_key, iv)
+
+        decrypted_credentials = [
+            Credential(**c) for c in json.loads(output_data.decode('utf-8'))]
+
+        return decrypted_credentials
 
     def add_credential(self, credential):
         self.credentials.append(credential)

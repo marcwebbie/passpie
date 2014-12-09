@@ -69,3 +69,16 @@ def encrypt(message, key):
     cipher = AES.new(key, AES.MODE_CFB, iv)
     ciphertext = cipher.encrypt(message)
     return (ciphertext, iv)
+
+
+def decrypt(ciphertext, key, iv):
+    """Decrypts a given ciphertext with the given key, using AES-CFB.
+       message - The ciphertext to decrypt (byte string).
+       key - The AES key (16 bytes).
+       iv - The original IV used for encryption.
+
+       returns The cleartext (byte string)
+    """
+    cipher = AES.new(key, AES.MODE_CFB, iv)
+    msg = cipher.decrypt(ciphertext)
+    return msg
