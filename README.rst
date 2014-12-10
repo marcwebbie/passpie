@@ -84,6 +84,7 @@ In order of priority [#]_:
 - **[ ]** Database module
 - **[ ]** Encryption module
 - **[ ]** Console interface
+- **[ ]** Group credentials with a password for each group
 
 .. [#] **[ ]** not yet implemented feature, **[x]** implemented feature
 
