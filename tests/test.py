@@ -6,11 +6,13 @@ import unittest
 TEST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pysswords.db
+import pysswords.crypt
 
 
 class PysswordsTests(unittest.TestCase):
     def setUp(self):
-        self.database_path = os.path.join(TEST_DIR, "data")
+        self.database_path = os.path.join(TEST_DIR, ".pysswords")
+        self.gnupg_path = os.path.join(self.database_path, ".gnupg")
         pysswords.db.init(database_path=self.database_path)
 
     def tearDown(self):
@@ -27,9 +29,28 @@ class PysswordsTests(unittest.TestCase):
         }
 
     def test_init_database_creates_gnupg_hidden_directory(self):
-        gnupg_path = os.path.join(self.database_path, ".gnupg")
         self.assertTrue(os.path.exists(self.database_path))
-        self.assertTrue(os.path.exists(gnupg_path))
+        self.assertTrue(os.path.exists(self.gnupg_path))
+
+
+class PysswordsCryptTests(unittest.TestCase):
+    def setUp(self):
+        self.database_path = os.path.join(TEST_DIR, ".pysswords")
+        self.gnupg_path = os.path.join(self.database_path, ".gnupg")
+        os.makedirs(self.database_path)
+        self.gpg = pysswords.crypt.get_gpg(self.gnupg_path)
+
+    def tearDown(self):
+        shutil.rmtree(self.database_path)
+
+    def test_get_gpg_creates_keyrings_in_database_path(self):
+        pysswords.crypt.get_gpg(self.gnupg_path)
+        self.assertIn("pubring.gpg", os.listdir(self.gnupg_path))
+        self.assertIn("secring.gpg", os.listdir(self.gnupg_path))
+
 
 if __name__ == "__main__":
-    unittest.main()
+    if sys.version_info >= (3, 1):
+        unittest.main(warnings="ignore")
+    else:
+        unittest.main()
