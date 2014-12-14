@@ -2,6 +2,7 @@ import os
 import shutil
 import sys
 import unittest
+import gnupg
 
 TEST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -48,6 +49,9 @@ class PysswordsCryptTests(unittest.TestCase):
         self.assertIn("pubring.gpg", os.listdir(self.gnupg_path))
         self.assertIn("secring.gpg", os.listdir(self.gnupg_path))
 
+    def test_get_gpg_return_valid_gpg_object(self):
+        gpg = pysswords.crypt.get_gpg(self.gnupg_path)
+        self.assertIsInstance(gpg, gnupg.GPG)
 
 if __name__ == "__main__":
     if sys.version_info >= (3, 1):
