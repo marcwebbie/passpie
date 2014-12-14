@@ -38,6 +38,27 @@ class PysswordsTests(unittest.TestCase):
         credential_name = "email"
         self.assertIn(credential_name, os.listdir(self.database_path))
 
+    def test_get_credential_returns_expected_credential_dictionary(self):
+        credential_name = "email"
+        credential_login = "email@example.com"
+        credential_password = "p4ssw0rd"
+        credential_comments = "email"
+        credential_path = os.path.join(self.database_path, credential_name)
+        os.makedirs(credential_path)
+        with open(credential_path + "/login", "w") as f:
+            f.write(credential_login)
+        with open(credential_path + "/password", "w") as f:
+            f.write(credential_password)
+        with open(credential_path + "/comments", "w") as f:
+            f.write(credential_comments)
+
+        credential = pysswords.db.get_credential(credential_path)
+        self.assertIsInstance(credential, dict)
+        self.assertEqual(credential.get('name'), credential_name)
+        self.assertEqual(credential.get('login'), credential_login)
+        self.assertEqual(credential.get('password'), credential_password)
+        self.assertEqual(credential.get('comments'), credential_comments)
+
     def test_list_credentials_return_credentials_from_database_dir(self):
         credential_name = "email"
         credential_login = "email@example.com"
