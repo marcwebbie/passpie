@@ -8,6 +8,7 @@ TEST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pysswords.db
 import pysswords.crypt
+from pysswords.utils import touch
 
 
 class PysswordsTests(unittest.TestCase):
@@ -36,6 +37,29 @@ class PysswordsTests(unittest.TestCase):
     def test_add_credential_creates_directory_with_credential_name(self):
         credential_name = "email"
         self.assertIn(credential_name, os.listdir(self.database_path))
+
+    def test_list_credentials_return_credentials_from_database_dir(self):
+        credential_name = "email"
+        credential_login = "email@example.com"
+        credential_password = "p4ssw0rd"
+        credential_comments = "email"
+        credential_path = os.path.join(self.database_path, credential_name)
+        os.makedirs(credential_path)
+        with open(credential_path + "/login", "w") as f:
+            f.write(credential_login)
+        with open(credential_path + "/password", "w") as f:
+            f.write(credential_password)
+        with open(credential_path + "/comments", "w") as f:
+            f.write(credential_comments)
+
+        credentials = pysswords.db.list_credentials(self.database_path)
+        self.assertIn(credential_name, (c["name"] for c in credentials))
+        self.assertIn(credential_login, (c["login"] for c in credentials))
+        self.assertIn(credential_password,
+                      (c["password"] for c in credentials))
+        self.assertIn(credential_comments,
+                      (c["comments"] for c in credentials))
+
 
 
 class PysswordsCryptTests(unittest.TestCase):
