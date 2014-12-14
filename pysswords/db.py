@@ -1,6 +1,5 @@
-import os
+from . import crypt
 
 
 def init(database_path):
-    gnupg_path = os.path.join(database_path, ".gnupg")
-    os.makedirs(gnupg_path)
+    gpg = crypt.get_gpg(database_path)

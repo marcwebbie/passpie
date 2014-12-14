@@ -33,6 +33,10 @@ class PysswordsTests(unittest.TestCase):
         self.assertTrue(os.path.exists(self.database_path))
         self.assertTrue(os.path.exists(self.gnupg_path))
 
+    def test_add_credential_creates_directory_with_credential_name(self):
+        credential_name = "email"
+        self.assertIn(credential_name, os.listdir(self.database_path))
+
 
 class PysswordsCryptTests(unittest.TestCase):
     def setUp(self):
@@ -45,12 +49,12 @@ class PysswordsCryptTests(unittest.TestCase):
         shutil.rmtree(self.database_path)
 
     def test_get_gpg_creates_keyrings_in_database_path(self):
-        pysswords.crypt.get_gpg(self.gnupg_path)
+        pysswords.crypt.get_gpg(self.database_path)
         self.assertIn("pubring.gpg", os.listdir(self.gnupg_path))
         self.assertIn("secring.gpg", os.listdir(self.gnupg_path))
 
     def test_get_gpg_return_valid_gpg_object(self):
-        gpg = pysswords.crypt.get_gpg(self.gnupg_path)
+        gpg = pysswords.crypt.get_gpg(self.database_path)
         self.assertIsInstance(gpg, gnupg.GPG)
 
 if __name__ == "__main__":
