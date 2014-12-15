@@ -3,31 +3,53 @@ import shutil
 import sys
 import unittest
 import gnupg
+from functools import partial
+from unittest import mock
 
 TEST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import pysswords.db
-import pysswords.crypt
-from pysswords.utils import touch
+from pysswords.db import Database
+from pysswords.utils import touch, which
+
+
+def mock_gpg(binary, database_path, passphrase):
+    gnupg_path = os.path.join(database_path, ".gnupg")
+    gpg = gnupg.GPG(which(binary), homedir=gnupg_path)
+    with open(TEST_DIR + "/testkey.pub") as f:
+        gpg.import_keys(f.read())
+    with open(TEST_DIR + "/testkey.sec") as f:
+        gpg.import_keys(f.read())
+    return gpg
 
 
 class PysswordsTests(unittest.TestCase):
+
     def setUp(self):
+        self.patcher_gpg = mock.patch(
+            "pysswords.db.Database._create_gpg", new=mock_gpg)
+        self.patcher_gpg.start()
+
         self.database_path = os.path.join(TEST_DIR, ".pysswords")
         self.gnupg_path = os.path.join(self.database_path, ".gnupg")
-        pysswords.db.init(database_path=self.database_path)
+        self.database = Database(
+            path=self.database_path,
+            passphrase="dummy"
+        )
 
     def tearDown(self):
+        self.patcher_gpg.stop()
         shutil.rmtree(self.database_path)
+
+    def test(self):
+        pass
 
     def some_credential(self, **kwargs):
         return {
             "name": kwargs.get("name", "example"),
             "login": kwargs.get("login", "john"),
             "password": kwargs.get("password", "my-great-password"),
-            "login_url": kwargs.get("login_url", "http://example.org/login"),
-            "description": kwargs.get("description",
-                                      "This is login credentials for example"),
+            "comments": kwargs.get("comments",
+                                   "This is login credentials for example"),
         }
 
     def test_init_database_creates_gnupg_hidden_directory(self):
@@ -35,12 +57,14 @@ class PysswordsTests(unittest.TestCase):
         self.assertTrue(os.path.exists(self.gnupg_path))
 
     def test_add_credential_creates_directory_with_credential_name(self):
-        credential_name = "email"
-        self.assertIn(credential_name, os.listdir(self.database_path))
+        credential = self.some_credential()
+        self.database.add(credential)
+        credentials = self.database.credentials
+        self.assertIn(credential["name"], (c["name"] for c in credentials))
 
     def test_get_credential_returns_expected_credential_dictionary(self):
         credential_name = "email"
-        credential_login = "email@example.com"
+        credential_login = "email@example.co[]m"
         credential_password = "p4ssw0rd"
         credential_comments = "email"
         credential_path = os.path.join(self.database_path, credential_name)
@@ -52,7 +76,7 @@ class PysswordsTests(unittest.TestCase):
         with open(credential_path + "/comments", "w") as f:
             f.write(credential_comments)
 
-        credential = pysswords.db.get_credential(credential_path)
+        credential = self.database.credential(credential_name)
         self.assertIsInstance(credential, dict)
         self.assertEqual(credential.get('name'), credential_name)
         self.assertEqual(credential.get('login'), credential_login)
@@ -67,28 +91,81 @@ class PysswordsTests(unittest.TestCase):
         touch(credential_path + "/password")
         touch(credential_path + "/comments")
 
-        credentials = pysswords.db.list_credentials(self.database_path)
+        credentials = self.database.credentials
         self.assertIn(credential_name, (c["name"] for c in credentials))
 
-
-class PysswordsCryptTests(unittest.TestCase):
-    def setUp(self):
-        self.database_path = os.path.join(TEST_DIR, ".pysswords")
-        self.gnupg_path = os.path.join(self.database_path, ".gnupg")
-        os.makedirs(self.database_path)
-        self.gpg = pysswords.crypt.get_gpg(self.gnupg_path)
-
-    def tearDown(self):
-        shutil.rmtree(self.database_path)
-
     def test_get_gpg_creates_keyrings_in_database_path(self):
-        pysswords.crypt.get_gpg(self.database_path)
+        Database._create_gpg(
+            binary="gpg2",
+            database_path=self.database_path,
+            passphrase="sup3rp4ss0rd"
+        )
         self.assertIn("pubring.gpg", os.listdir(self.gnupg_path))
         self.assertIn("secring.gpg", os.listdir(self.gnupg_path))
 
     def test_get_gpg_return_valid_gpg_object(self):
-        gpg = pysswords.crypt.get_gpg(self.database_path)
+        gpg = Database._create_gpg(
+            binary="gpg2",
+            database_path=self.database_path,
+            passphrase="dummy"
+        )
         self.assertIsInstance(gpg, gnupg.GPG)
+
+    def test_database_key_input_returns_gpg_key_input_string(self):
+        gpg = mock.Mock()
+        gpg.gen_key_input = mock.Mock()
+        passphrase = "dummy"
+        testing = False
+        Database._key_input(gpg, passphrase, testing)
+        gpg.gen_key_input.assert_called_once_with(
+            name_real='Pysswords',
+            name_email='pysswords@pysswords',
+            name_comment='Autogenerated by Pysswords',
+            passphrase=passphrase,
+            testing=testing
+        )
+
+    def test_database_create_gpg_creates_gpg_instance(self):
+        binary = "gpg2"
+        database_path = "/tmp"
+        passphrase = "dummy"
+        gnupg_path = os.path.join(database_path, ".gnupg")
+        with mock.patch("pysswords.db.gnupg.GPG") as mocked_GPG:
+            Database._create_gpg(binary, database_path, passphrase)
+            mocked_GPG.assert_called_once_with(
+                which(binary),
+                homedir=gnupg_path,
+            )
+
+
+class PysswordsUtilsTests(unittest.TestCase):
+    def setUp(self):
+        os.makedirs(TEST_DIR + "/data")
+
+    def tearDown(self):
+        shutil.rmtree(TEST_DIR + "/data")
+
+    def test_touch_function(self):
+        touched_file = os.path.join(TEST_DIR, "data", "touched.txt")
+        with mock.patch("builtins.open") as mocker:
+            touch(touched_file)
+            mocker.assert_called_once_with(touched_file, "a")
+
+    def test_which_function_returns_expected_binary_path(self):
+        python_path = which("python")
+        self.assertEqual(os.path.basename(python_path), "python")
+
+    def test_which_function_appends_exe_when_os_name_is_nt(self):
+        with mock.patch("pysswords.utils.os") as mocker:
+            mocker.name = "nt"
+            mocker.environ = {"PATH": "/"}
+            mocker.pathsep = ":"
+            mocked_join = mock.Mock()
+            mocker.path.join = mocked_join
+            which("python")
+            mocked_join.assert_any_call("/", "python.exe")
+
+
 
 if __name__ == "__main__":
     if sys.version_info >= (3, 1):

@@ -1,8 +1,18 @@
 import os
 
 
-def touch(fname, mode=0o666, dir_fd=None, **kwargs):
-    flags = os.O_CREAT | os.O_APPEND
-    with os.fdopen(os.open(fname, flags=flags, mode=mode, dir_fd=dir_fd)) as f:
-        os.utime(f.fileno() if os.utime in os.supports_fd else fname,
-            dir_fd=None if os.supports_fd else dir_fd, **kwargs)
+def touch(fname):
+    """Mimics behavior of Unix touch command"""
+    open(fname, "a").close()
+
+
+def which(program):
+    """Mimics behavior of UNIX which command. """
+    # Add .exe program extension for windows support
+    if os.name == "nt" and not program.endswith(".exe"):
+        program += ".exe"
+
+    for envdir in os.environ["PATH"].split(os.pathsep):
+        program_path = os.path.join(envdir, program)
+        if os.path.isfile(program_path) and os.access(program_path, os.X_OK):
+            return program_path
