@@ -61,26 +61,14 @@ class PysswordsTests(unittest.TestCase):
 
     def test_list_credentials_return_credentials_from_database_dir(self):
         credential_name = "email"
-        credential_login = "email@example.com"
-        credential_password = "p4ssw0rd"
-        credential_comments = "email"
         credential_path = os.path.join(self.database_path, credential_name)
         os.makedirs(credential_path)
-        with open(credential_path + "/login", "w") as f:
-            f.write(credential_login)
-        with open(credential_path + "/password", "w") as f:
-            f.write(credential_password)
-        with open(credential_path + "/comments", "w") as f:
-            f.write(credential_comments)
+        touch(credential_path + "/login")
+        touch(credential_path + "/password")
+        touch(credential_path + "/comments")
 
         credentials = pysswords.db.list_credentials(self.database_path)
         self.assertIn(credential_name, (c["name"] for c in credentials))
-        self.assertIn(credential_login, (c["login"] for c in credentials))
-        self.assertIn(credential_password,
-                      (c["password"] for c in credentials))
-        self.assertIn(credential_comments,
-                      (c["comments"] for c in credentials))
-
 
 
 class PysswordsCryptTests(unittest.TestCase):
