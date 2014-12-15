@@ -3,7 +3,6 @@ import shutil
 import sys
 import unittest
 import gnupg
-from functools import partial
 from unittest import mock
 
 TEST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
