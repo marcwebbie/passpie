@@ -11,7 +11,7 @@ from pysswords.db import Database
 from pysswords.utils import touch, which
 
 
-def mock_gpg(binary, database_path, passphrase):
+def create_gpg(binary, database_path, passphrase):
     gnupg_path = os.path.join(database_path, ".gnupg")
     gpg = gnupg.GPG(which(binary), homedir=gnupg_path)
     with open(TEST_DIR + "/testkey.pub") as f:
@@ -25,7 +25,7 @@ class PysswordsTests(unittest.TestCase):
 
     def setUp(self):
         self.patcher_gpg = mock.patch(
-            "pysswords.db.Database._create_gpg", new=mock_gpg)
+            "pysswords.db.Database._create_gpg", new=create_gpg)
         self.patcher_gpg.start()
 
         self.database_path = os.path.join(TEST_DIR, ".pysswords")
