@@ -17,7 +17,6 @@ from pysswords.credential import Credential
 
 
 def mock_create_gpg(binary, database_path, passphrase):
-    print("mocking")
     gnupg_path = os.path.join(database_path, ".gnupg")
     gpg = gnupg.GPG(which(binary), homedir=gnupg_path)
     with open(TEST_DIR + "/testkey.pub") as f:
