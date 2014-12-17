@@ -24,9 +24,9 @@ Installation
     pip install pysswords
 
 
-************
+**********
 Quickstart
-************
+**********
 
 Check the implemented features on the `Features`_ section.
 
@@ -51,9 +51,9 @@ Check the implemented features on the `Features`_ section.
     pysswords /path/to/password/file
 
 
-**************
+************
 Contributing
-**************
+************
 
 + fork the repository `<https://github.com/marcwebbie/pysswords/fork>`_
 + write your tests on `tests/test.py`
