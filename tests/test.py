@@ -11,10 +11,13 @@ except ImportError:
 TEST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from pysswords.db import Database
+from pysswords.crypt import create_key_input
 from pysswords.utils import touch, which
+from pysswords.credential import Credential
 
 
-def create_gpg(binary, database_path, passphrase):
+def mock_create_gpg(binary, database_path, passphrase):
+    print("mocking")
     gnupg_path = os.path.join(database_path, ".gnupg")
     gpg = gnupg.GPG(which(binary), homedir=gnupg_path)
     with open(TEST_DIR + "/testkey.pub") as f:
@@ -28,7 +31,7 @@ class PysswordsTests(unittest.TestCase):
 
     def setUp(self):
         self.patcher_gpg = mock.patch(
-            "pysswords.db.Database._create_gpg", new=create_gpg)
+            "pysswords.db.create_gpg", new=mock_create_gpg)
         self.patcher_gpg.start()
 
         self.database_path = os.path.join(TEST_DIR, ".pysswords")
@@ -46,44 +49,66 @@ class PysswordsTests(unittest.TestCase):
         pass
 
     def some_credential(self, **kwargs):
-        return {
-            "name": kwargs.get("name", "example"),
-            "login": kwargs.get("login", "john"),
-            "password": kwargs.get("password", "my-great-password"),
-            "comments": kwargs.get("comments",
-                                   "This is login credentials for example"),
-        }
+        credential = Credential(
+            name=kwargs.get("name", "example"),
+            login=kwargs.get("login", "john"),
+            password=kwargs.get("password", "my-great-password"),
+            comments=kwargs.get("comments",
+                                "This is login credentials for example")
+        )
+        return credential
 
     def test_init_database_creates_gnupg_hidden_directory(self):
         self.assertTrue(os.path.exists(self.database_path))
         self.assertTrue(os.path.exists(self.gnupg_path))
 
+    def test_credentials_are_a_list_of_credential_instances(self):
+        self.database.add(self.some_credential(name="John1"))
+        self.database.add(self.some_credential(name="John2"))
+        self.database.add(self.some_credential(name="John3"))
+
+        for credential in self.database.credentials:
+            self.assertIsInstance(credential, Credential)
+
     def test_add_credential_creates_directory_with_credential_name(self):
         credential = self.some_credential()
         self.database.add(credential)
         credentials = self.database.credentials
-        self.assertIn(credential["name"], (c["name"] for c in credentials))
+        self.assertIn(credential.name, (c.name for c in credentials))
 
-    def test_get_credential_returns_expected_credential_dictionary(self):
-        credential_name = "email"
-        credential_login = "email@example.co[]m"
-        credential_password = "p4ssw0rd"
-        credential_comments = "email"
-        credential_path = os.path.join(self.database_path, credential_name)
-        os.makedirs(credential_path)
-        with open(credential_path + "/login", "w") as f:
-            f.write(credential_login)
-        with open(credential_path + "/password", "w") as f:
-            f.write(credential_password)
-        with open(credential_path + "/comments", "w") as f:
-            f.write(credential_comments)
+    def test_save_credential_creates_dir_with_cred_name_on_given_path(self):
+        credential = self.some_credential()
+        credential.save(database_path=self.database_path)
+        credential_path = os.path.join(self.database_path, credential.name)
+        self.assertTrue(os.path.exists(credential_path))
+        self.assertTrue(os.path.isdir(credential_path))
 
-        credential = self.database.credential(credential_name)
-        self.assertIsInstance(credential, dict)
-        self.assertEqual(credential.get('name'), credential_name)
-        self.assertEqual(credential.get('login'), credential_login)
-        self.assertEqual(credential.get('password'), credential_password)
-        self.assertEqual(credential.get('comments'), credential_comments)
+    def test_credential_method_returns_expected_credential_object(self):
+        name = "email"
+        login = "email@example.com"
+        password = "p4ssw0rd"
+        comments = "email"
+        # credential_path = os.path.join(self.database_path, credential_name)
+        # os.makedirs(credential_path)
+        # with open(credential_path + "/login", "w") as f:
+        #     f.write(credential_login)
+        # with open(credential_path + "/password", "w") as f:
+        #     f.write(credential_password)
+        # with open(credential_path + "/comments", "w") as f:
+        #     f.write(credential_comments)
+        credential = Credential(
+            name=name,
+            login=login,
+            password=password,
+            comments=comments
+        )
+        self.database.add(credential)
+        encrypted_password = str(self.database.gpg.encrypt(password))
+        expected_credential = self.database.credential(name=name)
+        self.assertEqual(expected_credential.name, name)
+        self.assertEqual(expected_credential.login, login)
+        self.assertEqual(expected_credential.password, encrypted_password)
+        self.assertEqual(expected_credential.comments, comments)
 
     def test_list_credentials_return_credentials_from_database_dir(self):
         credential_name = "email"
@@ -94,10 +119,10 @@ class PysswordsTests(unittest.TestCase):
         touch(credential_path + "/comments")
 
         credentials = self.database.credentials
-        self.assertIn(credential_name, (c["name"] for c in credentials))
+        self.assertIn(credential_name, (c.name for c in credentials))
 
     def test_get_gpg_creates_keyrings_in_database_path(self):
-        Database._create_gpg(
+        mock_create_gpg(
             binary="gpg2",
             database_path=self.database_path,
             passphrase="sup3rp4ss0rd"
@@ -106,7 +131,7 @@ class PysswordsTests(unittest.TestCase):
         self.assertIn("secring.gpg", os.listdir(self.gnupg_path))
 
     def test_get_gpg_return_valid_gpg_object(self):
-        gpg = Database._create_gpg(
+        gpg = mock_create_gpg(
             binary="gpg2",
             database_path=self.database_path,
             passphrase="dummy"
@@ -118,7 +143,7 @@ class PysswordsTests(unittest.TestCase):
         gpg.gen_key_input = mock.Mock()
         passphrase = "dummy"
         testing = False
-        Database._key_input(gpg, passphrase, testing)
+        create_key_input(gpg, passphrase, testing)
         gpg.gen_key_input.assert_called_once_with(
             name_real='Pysswords',
             name_email='pysswords@pysswords',
@@ -132,8 +157,8 @@ class PysswordsTests(unittest.TestCase):
         database_path = "/tmp"
         passphrase = "dummy"
         gnupg_path = os.path.join(database_path, ".gnupg")
-        with mock.patch("pysswords.db.gnupg.GPG") as mocked_GPG:
-            Database._create_gpg(binary, database_path, passphrase)
+        with mock.patch("pysswords.crypt.gnupg.GPG") as mocked_GPG:
+            mock_create_gpg(binary, database_path, passphrase)
             mocked_GPG.assert_called_once_with(
                 which(binary),
                 homedir=gnupg_path,
