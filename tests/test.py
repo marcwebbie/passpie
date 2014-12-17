@@ -173,7 +173,6 @@ class PysswordsUtilsTests(unittest.TestCase):
             mocked_join.assert_any_call("/", "python.exe")
 
 
-
 if __name__ == "__main__":
     if sys.version_info >= (3, 1):
         unittest.main(warnings="ignore")
