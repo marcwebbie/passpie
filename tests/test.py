@@ -87,14 +87,6 @@ class PysswordsTests(unittest.TestCase):
         login = "email@example.com"
         password = "p4ssw0rd"
         comments = "email"
-        # credential_path = os.path.join(self.database_path, credential_name)
-        # os.makedirs(credential_path)
-        # with open(credential_path + "/login", "w") as f:
-        #     f.write(credential_login)
-        # with open(credential_path + "/password", "w") as f:
-        #     f.write(credential_password)
-        # with open(credential_path + "/comments", "w") as f:
-        #     f.write(credential_comments)
         credential = Credential(
             name=name,
             login=login,
