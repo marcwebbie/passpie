@@ -8,8 +8,8 @@ from .utils import which
 
 class Database(object):
 
-    @staticmethod
-    def _key_input(gpg, passphrase, testing=False):
+    @classmethod
+    def _key_input(cls, gpg, passphrase, testing=False):
         key_input = gpg.gen_key_input(
             name_real='Pysswords',
             name_email='pysswords@pysswords',
@@ -19,8 +19,8 @@ class Database(object):
         )
         return key_input
 
-    @staticmethod
-    def _create_gpg(binary, database_path, passphrase):
+    @classmethod
+    def _create_gpg(cls, binary, database_path, passphrase):
         gnupg_path = os.path.join(database_path, ".gnupg")
         gpg = gnupg.GPG(which(binary), homedir=gnupg_path)
 

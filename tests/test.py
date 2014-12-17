@@ -3,7 +3,10 @@ import shutil
 import sys
 import unittest
 import gnupg
-from unittest import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 TEST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -146,7 +149,12 @@ class PysswordsUtilsTests(unittest.TestCase):
 
     def test_touch_function(self):
         touched_file = os.path.join(TEST_DIR, "data", "touched.txt")
-        with mock.patch("builtins.open") as mocker:
+        if sys.version_info < (3,):
+            builtin_open = "__builtin__.open"
+        else:
+            builtin_open = "builtins.open"
+
+        with mock.patch(builtin_open) as mocker:
             touch(touched_file)
             mocker.assert_called_once_with(touched_file, "a")
 
