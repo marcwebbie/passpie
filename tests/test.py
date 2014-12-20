@@ -38,7 +38,7 @@ class PysswordsTests(unittest.TestCase):
 
         self.database_path = os.path.join(TEST_DIR, ".pysswords")
         self.gnupg_path = os.path.join(self.database_path, ".gnupg")
-        self.database = Database(
+        self.database = Database.create(
             path=self.database_path,
             passphrase="dummy"
         )

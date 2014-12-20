@@ -7,9 +7,14 @@ from .crypt import create_gpg
 
 class Database(object):
 
-    def __init__(self, path, passphrase, gpg_bin="gpg2"):
+    def __init__(self, path, passphrase, gpg):
         self.path = path
-        self.gpg = create_gpg(gpg_bin, self.path, passphrase)
+        self.gpg = gpg
+
+    @classmethod
+    def create(cls, path, passphrase, gpg_bin="gpg"):
+        gpg = create_gpg(gpg_bin, path, passphrase)
+        return Database(path, passphrase, gpg)
 
     @property
     def gpg_key(self, secret=False):
