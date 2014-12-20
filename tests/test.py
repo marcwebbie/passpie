@@ -1,3 +1,4 @@
+import inspect
 import os
 import shutil
 import sys
@@ -7,6 +8,8 @@ try:
     from unittest import mock
 except ImportError:
     import mock
+
+__file__ = os.path.abspath(inspect.getsourcefile(lambda _: None))
 
 TEST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -154,6 +157,24 @@ class PysswordsTests(unittest.TestCase):
                 which(binary),
                 homedir=gnupg_path,
             )
+
+
+class PysswordsCredentialTests(unittest.TestCase):
+    def setUp(self):
+        self.credential = Credential(
+            name="email",
+            login="john@example.com",
+            password="p4ssword",
+            comments="Some comments",
+        )
+
+    def tearDown(self):
+        pass
+
+    def test_credential_str_magic_methods_has_shows_name_login(self):
+        self.assertIn(self.credential.name, str(self.credential))
+        self.assertIn(self.credential.login, str(self.credential))
+        self.assertIn(self.credential.comments, str(self.credential))
 
 
 class PysswordsUtilsTests(unittest.TestCase):

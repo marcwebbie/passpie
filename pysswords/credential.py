@@ -29,3 +29,10 @@ class Credential(object):
             password=open(path + "/password").read(),
             comments=open(path + "/comments").read()
         )
+
+    def __str__(self):
+        return "<Credential: {}, {}, {}>".format(
+            self.name,
+            self.login,
+            self.comments
+        )
