@@ -5,15 +5,17 @@ import os
 from .db import Database
 
 
+DEFAULT_DATABASE_PATH = os.path.join(
+    os.path.expanduser("~"),
+    ".pysswords"
+)
+
+
 def get_args(command_args=None):
     """Return args from command line"""
-    default_database_path = os.path.join(
-        os.path.expanduser("~"),
-        ".pysswords"
-    )
     parser = argparse.ArgumentParser()
     parser.add_argument("--init", action="store_true")
-    parser.add_argument("--database", default=default_database_path)
+    parser.add_argument("--database", default=DEFAULT_DATABASE_PATH)
     args = parser.parse_args(command_args)
     return args
 
