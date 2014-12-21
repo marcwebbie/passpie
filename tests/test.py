@@ -218,6 +218,14 @@ class PysswordsConsoleInterfaceTests(unittest.TestCase):
             os.path.expanduser("~"),
             ".pysswords"
         )
+        self.mocked_passphrase = "mocked_passphrase"
+        self.patcher_getpassphrase = mock.patch(
+            "pysswords.__main__.getpass",
+            return_value=self.mocked_passphrase)
+        self.patcher_getpassphrase.start()
+
+    def tearDown(self):
+        self.patcher_getpassphrase.stop()
 
     def test_args_init_without_path_uses_home_user_dotpysswords(self):
         command_args = ["--init"]
@@ -228,15 +236,12 @@ class PysswordsConsoleInterfaceTests(unittest.TestCase):
         command_args = ["--init"]
         args = __main__.get_args(command_args)
         with mock.patch("pysswords.__main__.Database.create") as mocked:
-            mocked_passphrase = "mocked_passphrase"
-            with mock.patch("pysswords.__main__.get_passphrase",
-                            return_value=mocked_passphrase):
-                __main__.run(args)
-                mocked.assert_called_once_with(
-                    path=self.default_database_path,
-                    passphrase=mocked_passphrase,
-                    gpg_bin=__main__.DEFAULT_GPG_BINARY
-                )
+            __main__.run(args)
+            mocked.assert_called_once_with(
+                path=self.default_database_path,
+                passphrase=self.mocked_passphrase,
+                gpg_bin=__main__.DEFAULT_GPG_BINARY
+            )
 
     def test_getpassphrase_raises_value_error_when_passwords_didnt_match(self):
         with mock.patch("builtins.print"):
@@ -247,34 +252,29 @@ class PysswordsConsoleInterfaceTests(unittest.TestCase):
 
     def test_interface_handles_gpg_binary_argument(self):
         gpg_binary = "gpg_binary"
-        command_args = ["--init", "--gpg", gpg_binary]
-        args = __main__.get_args(command_args)
+        args = __main__.get_args(command_args=["--init", "--gpg", gpg_binary])
         with mock.patch("pysswords.__main__.Database.create") as mocked:
-            mocked_passphrase = "mocked_passphrase"
-            with mock.patch("pysswords.__main__.get_passphrase",
-                            return_value=mocked_passphrase):
-                __main__.run(args)
-                mocked.assert_called_once_with(
-                    path=self.default_database_path,
-                    passphrase=mocked_passphrase,
-                    gpg_bin=gpg_binary
-                )
+            __main__.run(args)
+            mocked.assert_called_once_with(
+                path=self.default_database_path,
+                passphrase=self.mocked_passphrase,
+                gpg_bin=gpg_binary
+            )
 
     def test_console_inteface_init_logs_path_to_database(self):
-        mocked_database = mock.Mock()
-        mocked_database.path = "/tmp/dummy/path"
+        mocked_db = mock.Mock()
+        mocked_db.path = "/tmp/dummy/path"
+        args = __main__.get_args(command_args=["--init"])
         with mock.patch("pysswords.__main__.Database.create",
-                        return_value=mocked_database) as mocked:
-            mocked_passphrase = "mocked_passphrase"
-            with mock.patch("pysswords.__main__.get_passphrase",
-                            return_value=mocked_passphrase):
-                command_args = ["--init"]
-                args = __main__.get_args(command_args)
-                with mock.patch("pysswords.__main__.logging.info") as mock_log:
-                    __main__.run(args)
-                    mock_log.assert_any_call(
-                        "Database created at '{}'".format(mocked_database.path)
-                    )
+                        return_value=mocked_db):
+            with mock.patch("pysswords.__main__.logging.info") as mock_log:
+                __main__.run(args)
+                log_message = "Database created at '{}'".format(
+                    mocked_db.path
+                )
+                mock_log.assert_any_call(
+                    log_message
+                )
 
 
 if __name__ == "__main__":
