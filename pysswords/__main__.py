@@ -19,8 +19,9 @@ def get_args(command_args=None):
     """Return args from command line"""
     parser = argparse.ArgumentParser()
     parser.add_argument("--init", action="store_true")
-    parser.add_argument("--database", default=DEFAULT_DATABASE_PATH)
+    parser.add_argument("-d", "--database", default=DEFAULT_DATABASE_PATH)
     parser.add_argument("--gpg", default=DEFAULT_GPG_BINARY)
+    parser.add_argument("task", choices=['init', 'add', 'search'])
     args = parser.parse_args(command_args)
     return args
 
@@ -41,7 +42,7 @@ def get_passphrase():
 def run(args=None):
     args = get_args() if args is None else args
 
-    if args.init:
+    if args.task == "init":
         database = Database.create(
             path=args.database,
             passphrase=get_passphrase(),
