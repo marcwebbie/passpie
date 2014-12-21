@@ -2,19 +2,24 @@ from glob import glob
 import os
 
 from .credential import Credential
-from .crypt import create_gpg
+from .crypt import create_gpg, load_gpg
 
 
 class Database(object):
 
-    def __init__(self, path, passphrase, gpg):
+    def __init__(self, path, gpg):
         self.path = path
         self.gpg = gpg
 
     @classmethod
     def create(cls, path, passphrase, gpg_bin="gpg"):
         gpg = create_gpg(gpg_bin, path, passphrase)
-        return Database(path, passphrase, gpg)
+        return Database(path, gpg)
+
+    @classmethod
+    def from_path(cls, path, gpg_bin="gpg"):
+        gpg = load_gpg(binary=gpg_bin, database_path=path)
+        return Database(path, gpg)
 
     @property
     def gpg_key(self, secret=False):

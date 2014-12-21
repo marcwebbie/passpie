@@ -5,6 +5,7 @@ import logging
 import os
 
 from .db import Database
+from .credential import Credential
 
 
 DEFAULT_DATABASE_PATH = os.path.join(
@@ -49,6 +50,22 @@ def run(args=None):
             gpg_bin=args.gpg
         )
         logging.info("Database created at '{}'".format(database.path))
+    elif args.task == "add":
+        credential_name = input("Name: ")
+        credential_login = input("Login: ")
+        credential_password = input("Password: ")
+        credential_comments = input("Comments [optional]: ")
+        credential = Credential(
+            name=credential_name,
+            login=credential_login,
+            password=credential_password,
+            comments=credential_comments,
+        )
+        database = Database.from_path(
+            path=args.database,
+            gpg_bin=args.gpg
+        )
+        database.add(credential)
 
 
 if __name__ == "__main__":
