@@ -234,7 +234,8 @@ class PysswordsConsoleInterfaceTests(unittest.TestCase):
                 __main__.run(args)
                 mocked.assert_called_once_with(
                     path=self.default_database_path,
-                    passphrase=mocked_passphrase
+                    passphrase=mocked_passphrase,
+                    gpg_binary=__main__.DEFAULT_GPG_BINARY
                 )
 
     def test_getpassphrase_raises_value_error_when_passwords_didnt_match(self):
@@ -244,6 +245,20 @@ class PysswordsConsoleInterfaceTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     __main__.get_passphrase()
 
+    def test_interface_handles_gpg_binary_argument(self):
+        gpg_binary = "gpg_binary"
+        command_args = ["--init", "--gpg", gpg_binary]
+        args = __main__.get_args(command_args)
+        with mock.patch("pysswords.__main__.Database.create") as mocked:
+            mocked_passphrase = "mocked_passphrase"
+            with mock.patch("pysswords.__main__.get_passphrase",
+                            return_value=mocked_passphrase):
+                __main__.run(args)
+                mocked.assert_called_once_with(
+                    path=self.default_database_path,
+                    passphrase=mocked_passphrase,
+                    gpg_bin=gpg_binary
+                )
 
 if __name__ == "__main__":
     if sys.version_info >= (3, 1):

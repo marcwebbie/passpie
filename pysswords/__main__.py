@@ -11,12 +11,15 @@ DEFAULT_DATABASE_PATH = os.path.join(
     ".pysswords"
 )
 
+DEFAULT_GPG_BINARY = "gpg2"
+
 
 def get_args(command_args=None):
     """Return args from command line"""
     parser = argparse.ArgumentParser()
     parser.add_argument("--init", action="store_true")
     parser.add_argument("--database", default=DEFAULT_DATABASE_PATH)
+    parser.add_argument("--gpg", default=DEFAULT_GPG_BINARY)
     args = parser.parse_args(command_args)
     return args
 
@@ -40,7 +43,9 @@ def run(args=None):
     if args.init:
         database = Database.create(
             path=args.database,
-            passphrase=get_passphrase())
+            passphrase=get_passphrase(),
+            gpg_bin=args.gpg
+        )
 
 
 if __name__ == "__main__":
