@@ -17,7 +17,7 @@ from pysswords.db import Database
 from pysswords.crypt import create_key_input
 from pysswords.utils import touch, which
 from pysswords.credential import Credential
-from pysswords.__main__ import get_args
+from pysswords import __main__
 
 
 def mock_create_gpg(binary, database_path, passphrase):
@@ -212,16 +212,30 @@ class PysswordsUtilsTests(unittest.TestCase):
 
 
 class PysswordsConsoleInterfaceTests(unittest.TestCase):
+
+    def setUp(self):
+        self.default_database_path = os.path.join(
+            os.path.expanduser("~"),
+            ".pysswords"
+        )
+
     def test_args_init_without_path_uses_home_user_dotpysswords(self):
         command_args = ["--init"]
-        args = get_args(command_args=command_args)
-        self.assertEqual(os.path.basename(args.init), ".pysswords")
+        args = __main__.get_args(command_args=command_args)
+        self.assertEqual(args.database, self.default_database_path)
 
-    def test_args_init_with_path_uses_path_as_dotpysswords(self):
-        init_path = "mypysswords"
-        command_args = ["--init", init_path]
-        args = get_args(command_args=command_args)
-        self.assertEqual(os.path.basename(args.init), "mypysswords")
+    def test_run_with_init_args_creates_new_database(self):
+        command_args = ["--init"]
+        args = __main__.get_args(command_args)
+        with mock.patch("pysswords.__main__.Database.create") as mocked:
+            mocked_passphrase = "mocked_passphrase"
+            with mock.patch("pysswords.__main__.get_passphrase",
+                            return_value=mocked_passphrase):
+                __main__.run(args)
+                mocked.assert_called_once_with(
+                    path=self.default_database_path,
+                    passphrase=mocked_passphrase
+                )
 
 if __name__ == "__main__":
     if sys.version_info >= (3, 1):
