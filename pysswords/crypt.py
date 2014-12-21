@@ -20,6 +20,4 @@ def create_gpg(binary, database_path, passphrase):
     gnupg_path = os.path.join(database_path, ".gnupg")
     gpg = gnupg.GPG(which(binary), homedir=gnupg_path)
     gpg.gen_key(create_key_input(gpg, passphrase))
-    logging.info("Pysswords database initialized at `{}`".format(
-        database_path))
     return gpg
