@@ -21,3 +21,9 @@ def create_gpg(binary, database_path, passphrase):
     gpg = gnupg.GPG(which(binary), homedir=gnupg_path)
     gpg.gen_key(create_key_input(gpg, passphrase))
     return gpg
+
+
+def load_gpg(binary, database_path):
+    gnupg_path = os.path.join(database_path, ".gnupg")
+    gpg = gnupg.GPG(which(binary), homedir=gnupg_path)
+    return gpg
