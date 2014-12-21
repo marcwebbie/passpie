@@ -1,6 +1,7 @@
 from __future__ import print_function
 import argparse
 from getpass import getpass
+import logging
 import os
 
 from .db import Database
@@ -46,6 +47,7 @@ def run(args=None):
             passphrase=get_passphrase(),
             gpg_bin=args.gpg
         )
+        logging.info("Database created at '{}'".format(database.path))
 
 
 if __name__ == "__main__":
