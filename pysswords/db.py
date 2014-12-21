@@ -22,8 +22,8 @@ class Database(object):
         return Database(path, gpg)
 
     @property
-    def gpg_key(self, secret=False):
-        return self.gpg.list_keys(secret=secret)[0]
+    def gpg_key(self):
+        return self.gpg.list_keys(secret=True)[0]["fingerprint"]
 
     def add(self, credential):
         encrypted_password = self.gpg.encrypt(
