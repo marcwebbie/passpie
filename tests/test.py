@@ -237,6 +237,14 @@ class PysswordsConsoleInterfaceTests(unittest.TestCase):
                     passphrase=mocked_passphrase
                 )
 
+    def test_getpassphrase_raises_value_error_when_passwords_didnt_match(self):
+        with mock.patch("builtins.print"):
+            with mock.patch("pysswords.__main__.getpass") as mocked:
+                mocked.side_effect = ["pass", "wrong"] * 3
+                with self.assertRaises(ValueError):
+                    __main__.get_passphrase()
+
+
 if __name__ == "__main__":
     if sys.version_info >= (3, 1):
         unittest.main(warnings="ignore")
