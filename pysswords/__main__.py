@@ -139,6 +139,8 @@ def run(args=None):
                 database=database,
                 credential_name=args.clipboard
             )
+        elif args.delete:
+            raise NotImplementedError("delete credential is not implemented")
         else:
             list_credentials(
                 database=database,
