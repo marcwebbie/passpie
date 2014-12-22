@@ -19,6 +19,7 @@ setup(
     author='Marc Webbie',
     author_email='marcwebbie@gmail.com',
     url='https://github.com/marcwebbie/pysswords',
+    scripts=["bin/pysswords"],
     download_url='https://pypi.python.org/pypi/pysswords',
     packages=['pysswords'],
     install_requires=requirements,
