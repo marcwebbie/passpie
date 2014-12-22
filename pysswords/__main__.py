@@ -34,6 +34,8 @@ def get_args(command_args=None):
                         help="delete credential")
     parser.add_argument("-s", "--search", metavar="<QUERY>",
                         help="search credential")
+    parser.add_argument("-g", "--get", metavar="<CREDENTIAL NAME>",
+                        help="print credential")
     parser.add_argument("-l", "--list", action="store_true",
                         help="print all credentials as a table")
     parser.add_argument("-c", "--clipboard", metavar="<CREDENTIAL NAME>",
@@ -129,6 +131,9 @@ def run(args=None):
         )
         if args.add:
             add_credential(database)
+        elif args.get:
+            credential = database.credential(name=args.get)
+            print(credential)
         elif args.clipboard:
             copy_password_to_clipboard(
                 database=database,
