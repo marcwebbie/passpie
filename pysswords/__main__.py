@@ -21,13 +21,25 @@ DEFAULT_GPG_BINARY = "gpg2"
 def get_args(command_args=None):
     """Return args from command line"""
     parser = argparse.ArgumentParser(prog="pysswords")
-    parser.add_argument("--init", action="store_true")
-    parser.add_argument("--show-password", action="store_true")
-    parser.add_argument("-a", "--add", action="store_true")
-    parser.add_argument("-l", "--list", action="store_true")
-    parser.add_argument("-c", "--clipboard")
-    parser.add_argument("-d", "--database", default=DEFAULT_DATABASE_PATH)
-    parser.add_argument("--gpg", default=DEFAULT_GPG_BINARY)
+    parser.add_argument("-I", "--init", action="store_true",
+                        help="create a new Pysswords database")
+    parser.add_argument("--database", default=DEFAULT_DATABASE_PATH,
+                        metavar="<DATABASE PATH>",
+                        help="specify path to database")
+    parser.add_argument("--show-password", action="store_true",
+                        help="show password as plain text when print")
+    parser.add_argument("-a", "--add", action="store_true",
+                        help="add new credential")
+    parser.add_argument("-d", "--delete", metavar="<CREDENTIAL NAME>",
+                        help="delete credential")
+    parser.add_argument("-s", "--search", metavar="<QUERY>",
+                        help="search credential")
+    parser.add_argument("-l", "--list", action="store_true",
+                        help="print all credentials as a table")
+    parser.add_argument("-c", "--clipboard", metavar="<CREDENTIAL NAME>",
+                        help="copy credential password to clipboard")
+    parser.add_argument("--gpg", metavar="<gpg>", default=DEFAULT_GPG_BINARY,
+                        help="gpg binary name")
     args = parser.parse_args(command_args)
     return args
 
