@@ -3,7 +3,7 @@
 from setuptools import setup
 
 
-__version__ = "0.0.5-dev3"
+__version__ = "0.0.6.1"
 
 requirements = [pkg.strip() for pkg in open('requirements.txt').readlines()]
 
@@ -16,7 +16,7 @@ setup(
     license='License :: OSI Approved :: MIT License',
     description="Manage your login credentials from the terminal painlessly.",
     long_description=long_description,
-    author='Marc Webbie',
+    author='Marcwebbie',
     author_email='marcwebbie@gmail.com',
     url='https://github.com/marcwebbie/pysswords',
     scripts=["bin/pysswords"],
