@@ -1,6 +1,5 @@
 import os
 import gnupg
-import logging
 
 from .utils import which
 
