@@ -1,3 +1,5 @@
+before_install:
+  sudo apt-get install xclip
 language: python
 python:
   - 2.7
