@@ -226,12 +226,12 @@ class PysswordsConsoleInterfaceTests(unittest.TestCase):
         self.patcher_getpassphrase.stop()
 
     def test_args_init_without_path_uses_home_user_dotpysswords(self):
-        command_args = ["init"]
+        command_args = ["--init"]
         args = __main__.get_args(command_args=command_args)
         self.assertEqual(args.database, self.default_database_path)
 
     def test_run_with_init_args_creates_new_database(self):
-        command_args = ["init"]
+        command_args = ["--init"]
         args = __main__.get_args(command_args)
         with mock.patch("pysswords.__main__.Database.create") as mocked:
             __main__.run(args)
@@ -242,15 +242,19 @@ class PysswordsConsoleInterfaceTests(unittest.TestCase):
             )
 
     def test_getpassphrase_raises_value_error_when_passwords_didnt_match(self):
-        with mock.patch("builtins.print"):
+        if sys.version_info < (3,):
+            builtin_print = "__builtin__.print"
+        else:
+            builtin_print = "builtins.print"
+        with mock.patch(builtin_print):
             with mock.patch("pysswords.__main__.getpass") as mocked:
                 mocked.side_effect = ["pass", "wrong"] * 3
                 with self.assertRaises(ValueError):
-                    __main__.get_passphrase()
+                    __main__.get_password()
 
     def test_interface_handles_gpg_binary_argument(self):
         gpg_binary = "gpg_binary"
-        command_args = ["--gpg", gpg_binary, "init"]
+        command_args = ["--gpg", gpg_binary, "--init"]
         args = __main__.get_args(command_args=command_args)
         with mock.patch("pysswords.__main__.Database.create") as mocked:
             __main__.run(args)
@@ -263,7 +267,7 @@ class PysswordsConsoleInterfaceTests(unittest.TestCase):
     def test_console_inteface_init_logs_path_to_database(self):
         mocked_db = mock.Mock()
         mocked_db.path = "/tmp/dummy/path"
-        command_args = ["init"]
+        command_args = ["--init"]
         args = __main__.get_args(command_args=command_args)
         with mock.patch("pysswords.__main__.Database.create",
                         return_value=mocked_db):
