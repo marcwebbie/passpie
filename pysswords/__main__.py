@@ -22,7 +22,7 @@ def get_args(command_args=None):
     parser.add_argument("--init", action="store_true")
     parser.add_argument("-d", "--database", default=DEFAULT_DATABASE_PATH)
     parser.add_argument("--gpg", default=DEFAULT_GPG_BINARY)
-    parser.add_argument("task", choices=['init', 'add', 'search'])
+    parser.add_argument("task", choices=['init', 'add', 'search', 'list'])
     args = parser.parse_args(command_args)
     return args
 
@@ -66,6 +66,13 @@ def run(args=None):
             gpg_bin=args.gpg
         )
         database.add(credential)
+    elif args.task == "list":
+        database = Database.from_path(
+            path=args.database,
+            gpg_bin=args.gpg
+        )
+        for credential in database.credentials:
+            print(credential)
 
 
 if __name__ == "__main__":

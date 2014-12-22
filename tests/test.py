@@ -98,11 +98,9 @@ class PysswordsTests(unittest.TestCase):
             comments=comments
         )
         self.database.add(credential)
-        encrypted_password = str(self.database.gpg.encrypt(password))
         expected_credential = self.database.credential(name=name)
         self.assertEqual(expected_credential.name, name)
         self.assertEqual(expected_credential.login, login)
-        self.assertEqual(expected_credential.password, encrypted_password)
         self.assertEqual(expected_credential.comments, comments)
 
     def test_list_credentials_return_credentials_from_database_dir(self):
