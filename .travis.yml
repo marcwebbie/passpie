@@ -1,5 +1,9 @@
+os:
+  - linux
+  - osx
 before_install:
-  sudo apt-get install xclip
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install xclip; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo easy_install pip; fi
 language: python
 python:
   - 2.7
