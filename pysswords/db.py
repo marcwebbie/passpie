@@ -26,6 +26,11 @@ class Database(object):
     def gpg_key(self):
         return self.gpg.list_keys(secret=True)[0]["fingerprint"]
 
+    @property
+    def credentials(self):
+        return [self.credential(os.path.basename(c))
+                for c in glob(self.path + "/**")]
+
     def add(self, credential):
         encrypted_password = self.gpg.encrypt(
             credential.password,
@@ -45,8 +50,3 @@ class Database(object):
 
     def search(self, query):
         return [c for c in self.credentials if query in str(c)]
-
-    @property
-    def credentials(self):
-        return [self.credential(os.path.basename(c))
-                for c in glob(self.path + "/**")]
