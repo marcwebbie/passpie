@@ -12,12 +12,14 @@ Pysswords: Manage your passwords from the terminal
    :target: https://landscape.io/github/marcwebbie/pysswords/master
    :alt: Code Health
 
-`Pysswords <https://github.com/marcwebbie/pysswords>`_ lets you manage your login credentials from the terminal. All passwords are saved into an encrypted file. Only with the password you used to created you can view the file contents. If you want to know more about the encryption used, check the `Under the Hood`_ section.
+`Pysswords <https://github.com/marcwebbie/pysswords>`_ lets you manage your login credentials from the terminal. Password files are saved into GPG encrypted files into the `database path`_. Only with the passphrase used to create the pyssword database you can decrypt password file. If you want to know more about how pysswords works, check the `Under the Hood`_ section.
 
 
 ************
 Installation
 ************
+
+Make sure you have `GnuGPG <https://www.gnupg.org/>`_ installed.
 
 .. code-block:: bash
 
@@ -32,23 +34,30 @@ Check the implemented features on the `Features`_ section.
 
 .. code-block:: bash
 
-    # create a new credentials database
-    pysswords --create /path/to/password/file
+    # create a new credentials database. Option: `-I` or `--init`
+    pysswords --init
 
-    # add new credentials
-    pysswords --add /path/to/password/file
+    # add new credentials. Option: `-a` or `--add`
+    pysswords -a
 
-    # get credential with name "example"
-    pysswords --get "example" /path/to/password/file
+    # get credential with name "github". Option: `-g` or `--get`
+    pysswords -g github
 
-    # delete credential with name "example"
-    pysswords --delete "example" /path/to/password/file
+    # delete credential with name "github". Option: `-d` or `--delete`
+    pysswords -d github
 
-    # search credentials with query "gmail"
-    pysswords --search "gmail" /path/to/password/file
+    # search credentials with query "github". Option: `-s` or `--search`
+    pysswords -s github
 
-    # print all credentials as a table
-    pysswords /path/to/password/file
+    # copy password from credential named "github" into clipboard. Option: `-c` or `--clipboard`
+    pysswords -c
+
+    # print all credentials as a table with hidden passwords
+    pysswords
+
+    # print all credentials as a table shows password in plain text. Option: `--show-password`
+    pysswords --show-password
+
 
 
 ************
@@ -92,9 +101,61 @@ In order of priority [#]_:
 Under The Hood
 **************
 
-Encryption is done using the `PBKDF2 <http://en.wikipedia.org/wiki/PBKDF2>`_  derivation function and `SHA256 <http://en.wikipedia.org/wiki/SHA-2>`_ hashing by default.
+Encryption
+==========
 
-Take a look at `pysswords.crypt <https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py>`_ module to know more.
+Encryption is done using GPG. Take a look at `pysswords.crypt <https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py>`_ module to know more.
+
+Database path
+===============
+
+The default database path is at `~/.pysswords`. If you want to change the database path at database creation pass the --database option to pysswords
+
+.. code-block:: bash
+
+    pysswords --init --database "/path/to/database/"
+
+Database structure
+==================
+
+Pysswords database is structured in a directory hierachy. Every credential is a directory named with credential name inside the database path.
+
+An empty database would look like this:
+
+.. code-block:: bash
+
+   pysswords --database /tmp/pysswords --init
+
+   tree /tmp/pysswords -la
+   # /tmp/pysswords
+   # └── .gnupg
+   #     ├── pubring.gpg
+   #     ├── random_seed
+   #     ├── secring.gpg
+   #     └── trustdb.gpg
+
+After adding a new credential the database would look like this:
+
+.. code-block:: bash
+
+    pysswords --database /tmp/pysswords -a
+    #Name: github
+    #Login: octocat
+    #Password: **********
+    #Comments [optional]:
+
+    tree /tmp/pysswords -la
+    #/tmp/pysswords
+    #├── .gnupg
+    #│   ├── pubring.gpg
+    #│   ├── random_seed
+    #│   ├── secring.gpg
+    #│   └── trustdb.gpg
+    #└── github
+    #    ├── comments
+    #    ├── login
+    #    └── password
+
 
 
 ******************************************************************
