@@ -50,7 +50,7 @@ Check the implemented features on the `Features`_ section.
     pysswords -s github
 
     # copy password from credential named "github" into clipboard. Option: `-c` or `--clipboard`
-    pysswords -c
+    pysswords -c github
 
     # print all credentials as a table with hidden passwords
     pysswords
