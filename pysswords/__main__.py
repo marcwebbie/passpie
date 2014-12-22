@@ -9,6 +9,10 @@ import pyperclip
 from .db import Database
 from .credential import Credential
 
+try:
+    input = raw_input
+except NameError:
+    pass
 
 DEFAULT_DATABASE_PATH = os.path.join(
     os.path.expanduser("~"),
@@ -92,7 +96,7 @@ def list_credentials(database, show_password=False):
 def add_credential(database):
     credential_name = input("Name: ")
     credential_login = input("Login: ")
-    credential_password = input("Password: ")
+    credential_password = getpass("Credential password: ")
     credential_comments = input("Comments [optional]: ")
     credential = Credential(
         name=credential_name,
@@ -112,6 +116,18 @@ def copy_password_to_clipboard(database, credential_name):
             database.gpg.decrypt(credential.password, passphrase=passphrase)
         )
         print("Password for '{}' copied to clipboard".format(credential.name))
+
+
+def delete_credential(database, name):
+    credential = database.credential(name=name)
+    try:
+        prompt = "Delete credential `{}` (y|n): ".format(credential)
+        answer = input(prompt)
+    except KeyboardInterrupt:
+        print("")
+
+    if answer and answer.lower()[0] == "y":
+        database.delete(name=name)
 
 
 def run(args=None):
@@ -140,7 +156,7 @@ def run(args=None):
                 credential_name=args.clipboard
             )
         elif args.delete:
-            raise NotImplementedError("delete credential is not implemented")
+            delete_credential(database, name=args.delete)
         else:
             list_credentials(
                 database=database,

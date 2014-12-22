@@ -1,5 +1,6 @@
 from glob import glob
 import os
+import shutil
 
 from .credential import Credential
 from .crypt import create_gpg, load_gpg
@@ -32,6 +33,10 @@ class Database(object):
         )
         credential.password = str(encrypted_password)
         credential.save(database_path=self.path)
+
+    def delete(self, name):
+        credential_path = os.path.join(self.path, name)
+        shutil.rmtree(credential_path)
 
     def credential(self, name):
         credential_path = os.path.join(self.path, name)
