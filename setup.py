@@ -3,7 +3,7 @@
 from setuptools import setup
 
 
-__version__ = "0.0.5-dev2"
+__version__ = "0.0.5-dev3"
 
 requirements = [pkg.strip() for pkg in open('requirements.txt').readlines()]
 
