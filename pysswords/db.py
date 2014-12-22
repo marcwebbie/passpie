@@ -43,6 +43,9 @@ class Database(object):
         credential = Credential.from_path(credential_path)
         return credential
 
+    def search(self, query):
+        return [c for c in self.credentials if query in str(c)]
+
     @property
     def credentials(self):
         return [self.credential(os.path.basename(c))
