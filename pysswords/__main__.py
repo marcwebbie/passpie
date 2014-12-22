@@ -75,11 +75,12 @@ def check_passphrase(database, passphrase):
     return sig
 
 
-def list_credentials(database, show_password=False):
+def list_credentials(database, search=None, show_password=False):
     if show_password:
         passphrase = getpass("Database passphrase: ")
         check_passphrase(database, passphrase)
-    for idx, credential in enumerate(database.credentials):
+    credentials = database.search(search) if search else database.credentials
+    for idx, credential in enumerate(credentials):
         cred_string = "[{0}] {1}: login={2}, password={3}, {4}".format(
             idx,
             credential.name,
@@ -157,6 +158,13 @@ def run(args=None):
             )
         elif args.delete:
             delete_credential(database, name=args.delete)
+        elif args.search:
+            query = args.search
+            list_credentials(
+                database=database,
+                search=query,
+                show_password=args.show_password
+            )
         else:
             list_credentials(
                 database=database,
