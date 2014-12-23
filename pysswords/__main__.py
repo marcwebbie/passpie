@@ -18,7 +18,6 @@ DEFAULT_DATABASE_PATH = os.path.join(
     os.path.expanduser("~"),
     ".pysswords"
 )
-
 DEFAULT_GPG_BINARY = "gpg"
 
 
@@ -36,6 +35,8 @@ def get_args(command_args=None):
                         help="add new credential")
     parser.add_argument("-r", "--remove", metavar="<CREDENTIAL NAME>",
                         help="delete credential")
+    parser.add_argument("-e", "--edit", metavar="<CREDENTIAL NAME>",
+                        help="edit credential")
     parser.add_argument("-s", "--search", metavar="<QUERY>",
                         help="search credential")
     parser.add_argument("-g", "--get", metavar="<CREDENTIAL NAME>",
@@ -97,17 +98,21 @@ def list_credentials(database, query=None, show_password=False):
         print(cred_string)
 
 
-def add_credential(database):
+def prompt_credential(**defaults):
     credential_name = input("Name: ")
     credential_login = input("Login: ")
-    credential_password = getpass("Credential password: ")
+    credential_password = get_password("Credential password: ")
     credential_comments = input("Comments [optional]: ")
-    credential = Credential(
+    return Credential(
         name=credential_name,
         login=credential_login,
         password=credential_password,
         comments=credential_comments,
     )
+
+
+def add_credential(database):
+    credential = prompt_credential()
     database.add(credential)
 
 
@@ -122,13 +127,15 @@ def copy_password_to_clipboard(database, credential_name):
         print("Password for '{}' copied to clipboard".format(credential.name))
 
 
+def get_confirmation(prompt):
+    prompt = "{} (y|n): ".format(prompt)
+    return input(prompt)
+
+
 def remove_credential(database, name):
     credential = database.credential(name=name)
-    try:
-        prompt = "Delete credential `{}` (y|n): ".format(credential)
-        answer = input(prompt)
-    except KeyboardInterrupt:
-        print("")
+    prompt = "Remove `{}`".format(credential)
+    answer = get_confirmation(prompt)
     if answer and answer.lower()[0] == "y":
         database.remove(name=name)
 
@@ -143,6 +150,21 @@ def get_credential(database, name, to_clipboard=False):
             print(credential)
     except CredentialNotFoundError:
         logging.info("Credential was not found")
+
+
+def edit_credential(database, name):
+    credential = database.credential(name=name)
+    prompt = "Edit `{}`".format(credential)
+    answer = get_confirmation(prompt)
+    if answer and answer.lower()[0] == "y":
+        edited_credential = prompt_credential()
+        values = {
+            "name": edited_credential.name,
+            "login": edited_credential.login,
+            "password": edited_credential.password,
+            "comments": edited_credential.comments,
+        }
+        database.edit(name=name, values=values)
 
 
 def run(args=None):
@@ -166,6 +188,8 @@ def run(args=None):
                            to_clipboard=args.clipboard)
         elif args.remove:
             remove_credential(database, name=args.remove)
+        elif args.edit:
+            edit_credential(database, name=args.edit)
         elif args.search:
             list_credentials(database=database,
                              query=args.search,
