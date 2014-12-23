@@ -23,9 +23,9 @@ from pysswords import __main__, crypt
 def mock_create_gpg(binary, database_path, passphrase):
     gnupg_path = os.path.join(database_path, ".gnupg")
     gpg = gnupg.GPG(which(binary), homedir=gnupg_path)
-    with open(TEST_DIR + "/testkey.pub") as f:
+    with open(os.path.join(TEST_DIR, "testkey.pub")) as f:
         gpg.import_keys(f.read())
-    with open(TEST_DIR + "/testkey.sec") as f:
+    with open(os.path.join(TEST_DIR, "testkey.sec")) as f:
         gpg.import_keys(f.read())
     return gpg
 
@@ -139,9 +139,9 @@ class PysswordsTests(unittest.TestCase):
         credential_name = "email"
         credential_path = os.path.join(self.database_path, credential_name)
         os.makedirs(credential_path)
-        touch(credential_path + "/login")
-        touch(credential_path + "/password")
-        touch(credential_path + "/comments")
+        touch(os.path.join(credential_path, "login"))
+        touch(os.path.join(credential_path, "password"))
+        touch(os.path.join(credential_path, "comments"))
 
         credentials = self.database.credentials
         self.assertIn(credential_name, (c.name for c in credentials))

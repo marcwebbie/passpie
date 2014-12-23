@@ -29,9 +29,9 @@ class Credential(object):
     def from_path(cls, path):
         return Credential(
             name=os.path.basename(path),
-            login=open(path + "/login").read(),
-            password=open(path + "/password").read(),
-            comments=open(path + "/comments").read()
+            login=open(os.path.join(path, "login")).read(),
+            password=open(os.path.join(path, "password")).read(),
+            comments=open(os.path.join(path, "comments")).read()
         )
 
     def __str__(self):
