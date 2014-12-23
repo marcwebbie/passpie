@@ -5,6 +5,11 @@ import shutil
 from .credential import Credential, CredentialNotFoundError
 from .crypt import create_gpg, load_gpg
 
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
+
 
 class Database(object):
 
