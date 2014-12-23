@@ -18,9 +18,8 @@ Make sure you have `GnuGPG <https://www.gnupg.org/>`_ installed.
 
     pip install pysswords
 
--------------------
 Development version
--------------------
+===================
 
 =============  =============
 Mac/Linux      Windows
@@ -34,7 +33,10 @@ The **latest development version** can be installed directly from GitHub:
     # Universal
     $ pip install --upgrade https://github.com/marcwebbie/pysswords/tarball/master
 
-|coverage| |health|
+
+Code quality |coverage| |health|
+--------------------------------
+
 
 **********
 Quickstart
