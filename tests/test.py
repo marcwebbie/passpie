@@ -79,6 +79,18 @@ class PysswordsTests(unittest.TestCase):
         credentials = self.database.credentials
         self.assertIn(credential.name, (c.name for c in credentials))
 
+    def test_add_credential_uses_cipher_algo_aes256_to_encrypt(self):
+        fingerprint = "fingerprint"
+        mock_gpg = mock.Mock()
+        mock_gpg.list_keys.return_value = [{"fingerprint": fingerprint}]
+        path = "path"
+        database = Database(path, mock_gpg)
+        credential = mock.Mock()
+        database.add(credential)
+        self.assertTrue(database.gpg.encrypt.called)
+        args, kwargs = database.gpg.encrypt.call_args
+        self.assertEqual(kwargs.get("cipher_algo"), "AES256")
+
     def test_save_credential_creates_dir_with_cred_name_on_given_path(self):
         credential = self.some_credential()
         credential.save(database_path=self.database_path)
