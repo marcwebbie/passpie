@@ -5,6 +5,16 @@ Pysswords: Manage your passwords from the terminal
 `Pysswords <https://github.com/marcwebbie/pysswords>`_ lets you manage your login credentials from the terminal. Password files are saved into `GnuGPG <http://en.wikipedia.org/wiki/GNU_Privacy_Guard>`_ encrypted files into the `Database Path`_. Only with the passphrase used to create the pyssword database you can decrypt password files. If you want to know more about how pysswords works internally, check the `Under the Hood`_ section.
 
 
+.. image:: https://github.com/marcwebbie/pysswords/raw/master/images/pysswords.png
+    :alt: Pysswords console interface
+    :width: 800
+    :height: 600
+    :align: center
+
+
+------
+
+
 ************
 Installation
 ************
