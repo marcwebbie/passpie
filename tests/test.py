@@ -17,7 +17,7 @@ from pysswords.db import Database
 from pysswords.crypt import create_key_input
 from pysswords.utils import touch, which
 from pysswords.credential import Credential
-from pysswords import __main__, crypt
+from pysswords import __main__, crypt, db
 
 
 def mock_create_gpg(binary, database_path, passphrase):
@@ -113,6 +113,23 @@ class PysswordsTests(unittest.TestCase):
 
         credentials = self.database.credentials
         self.assertIn(credential_name, (c.name for c in credentials))
+
+    def test_database_from_path_method_calls_load_gpg(self):
+        path = "/tmp/pysswords"
+        gpg_bin = "/usr/bin/gpg"
+        with mock.patch("pysswords.db.load_gpg") as mocked_load_gpg:
+            Database.from_path(path, gpg_bin)
+            mocked_load_gpg.assert_called_once_with(
+                binary=gpg_bin,
+                database_path=path
+            )
+
+    def test_database_from_path_method_returns_database_instance(self):
+        path = "/tmp/pysswords"
+        gpg_bin = "/usr/bin/gpg"
+        with mock.patch("pysswords.db.load_gpg") as mocked_load_gpg:
+            database = Database.from_path(path, gpg_bin)
+            self.assertIsInstance(database, Database)
 
     def test_get_gpg_creates_keyrings_in_database_path(self):
         mock_create_gpg(
