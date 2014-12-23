@@ -46,35 +46,35 @@ Check the implemented features on the `Features`_ section.
 
 .. code-block:: bash
 
-    # create a new credentials database. Option: ``-I`` or ``--init``
+    # create a new credentials database. Option: `-I` or `--init`
     pysswords --init
 
-    # add new credentials. Option: ``-a`` or ``--add``
+    # add new credentials. Option: `-a` or `--add`
     pysswords -a
 
-    # get credential "github". Option: ``-g`` or ``--get``
+    # get credential "github". Option: `-g` or `--get`
     pysswords -g github
 
-    # remove credential "github". Option: ``-r`` or ``--remove``
+    # remove credential "github". Option: `-r` or `--remove`
     pysswords -d github
 
-    # edit credential "github". Option: ``-e`` or ``--edit``
+    # edit credential "github". Option: `-e` or `--edit`
     pysswords -e github
 
-    # search credentials with query "octocat". Option: ``-s`` or ``--search``
+    # search credentials with query "octocat". Option: `-s` or `--search`
     pysswords -s octocat
 
-    # copy password from credential "github" into clipboard. Option: ``-c`` or ``--clipboard``
+    # copy password from credential "github" into clipboard. Option: `-c` or `--clipboard`
     # this option have to be used with --get|-g option
     pysswords -c -g github
 
     # print all credentials as a table with hidden passwords
     pysswords
 
-    # print all credentials and show passwords in plain text. Option: ``--show-password``
+    # print all credentials and show passwords in plain text. Option: `--show-password`
     pysswords --show-password
 
-    # shows help. Option ``-h`` or ``--help``
+    # shows help. Option `-h` or `--help`
     pysswords --help
 
 
@@ -103,7 +103,7 @@ Encryption is done using `GnuGPG <http://en.wikipedia.org/wiki/GNU_Privacy_Guard
 Database path
 ===============
 
-The default database path is at `~/.pysswords`. If you want to change the database path, add --database option to pysswords together with --init.
+The default database path is at ``~/.pysswords``. If you want to change the database path, add ``--database`` option to pysswords together with ``--init``.
 
 .. code-block:: bash
 
@@ -156,7 +156,7 @@ Contributing
 ************
 
 + fork the repository `<https://github.com/marcwebbie/pysswords/fork>`_
-+ write your tests on `tests/test.py`
++ write your tests on ``tests/test.py``
 + if everything is OK. push your changes and make a pull request. ;)
 
 
