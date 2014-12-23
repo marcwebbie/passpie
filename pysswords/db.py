@@ -2,7 +2,7 @@ from glob import glob
 import os
 import shutil
 
-from .credential import Credential
+from .credential import Credential, CredentialNotFoundError
 from .crypt import create_gpg, load_gpg
 
 
@@ -46,7 +46,11 @@ class Database(object):
 
     def credential(self, name):
         credential_path = os.path.join(self.path, name)
-        credential = Credential.from_path(credential_path)
+        try:
+            credential = Credential.from_path(credential_path)
+        except FileNotFoundError:
+            raise CredentialNotFoundError(
+                "Credential was not found in the database")
         return credential
 
     def search(self, query):
