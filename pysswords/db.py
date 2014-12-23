@@ -65,4 +65,7 @@ class Database(object):
         return credential
 
     def search(self, query):
-        return [c for c in self.credentials if query in str(c)]
+        return [c for c in self.credentials
+                if (query in c.name) or
+                (query in c.login) or
+                (query in c.comments)]
