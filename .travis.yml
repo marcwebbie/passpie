@@ -14,8 +14,8 @@ allow_failures:
   - python: pypy
 install:
   - pip install -r requirements.txt
+  - pip install -r requirements_dev.txt
   - pip install coveralls
-  - pip install mock
 script:
   coverage run --source=pysswords tests/test.py
 after_success:
