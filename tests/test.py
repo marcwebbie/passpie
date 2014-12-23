@@ -403,6 +403,18 @@ class PysswordsConsoleInterfaceTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     __main__.get_args("-c".split())
 
+    def test_check_passphrase_raises_value_error_for_wrong_passphrase(self):
+        mock_db = mock.Mock()
+        mock_db.gpg.sign.return_value = False
+        passphrase = "dummy"
+        with self.assertRaises(ValueError):
+            __main__.check_passphrase(mock_db, passphrase)
+
+    def test_check_passphrase_returns_true_when_good_passphrase(self):
+        mock_db = mock.Mock()
+        mock_db.gpg.sign.return_value = True
+        passphrase = "dummy"
+        self.assertTrue(__main__.check_passphrase(mock_db, passphrase))
 
 if __name__ == "__main__":
     if sys.version_info >= (3, 1):

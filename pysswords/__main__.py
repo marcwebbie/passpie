@@ -72,15 +72,15 @@ def get_password(prompt="Password: "):
 
 
 def check_passphrase(database, passphrase):
-    sig = database.gpg.sign(
+    signed = database.gpg.sign(
         'testing',
         default_key=database.gpg_key,
         passphrase=passphrase
     )
-    if not sig:
+    if not signed:
         msg = "Wrong passphrase for database at '{}'".format(database.path)
         raise ValueError(msg)
-    return sig
+    return True
 
 
 def list_credentials(database, query=None, show_password=False):
