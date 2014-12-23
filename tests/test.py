@@ -119,6 +119,22 @@ class PysswordsTests(unittest.TestCase):
         with self.assertRaises(CredentialNotFoundError):
             self.database.credential(name="None")
 
+    def test_edit_credential_in_database_saves_new_values(self):
+        credential = self.some_credential()
+        self.database.add(credential)
+        new_name = "new_name"
+        new_login = "new_login@example.com"
+        new_comments = "new comments"
+        values = {
+            "name": new_name,
+            "login": new_login,
+            "comments": new_comments,
+        }
+        self.database.edit(name=credential.name, values=values)
+        edited_credential = self.database.credential(name=new_name)
+        self.assertEqual(edited_credential.login, new_login)
+        self.assertEqual(edited_credential.comments, new_comments)
+
     def test_list_credentials_return_credentials_from_database_dir(self):
         credential_name = "email"
         credential_path = os.path.join(self.database_path, credential_name)

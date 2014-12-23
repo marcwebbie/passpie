@@ -44,6 +44,17 @@ class Database(object):
         credential_path = os.path.join(self.path, name)
         shutil.rmtree(credential_path)
 
+    def edit(self, name, values):
+        credential = self.credential(name)
+        new_credential = Credential(
+            name=values.get("name", credential.name),
+            login=values.get("login", credential.login),
+            password=values.get("password", credential.password),
+            comments=values.get("comments", credential.comments),
+        )
+        self.remove(name=name)
+        new_credential.save(database_path=self.path)
+
     def credential(self, name):
         credential_path = os.path.join(self.path, name)
         try:
