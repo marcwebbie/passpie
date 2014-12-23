@@ -280,6 +280,11 @@ class PysswordsConsoleInterfaceTests(unittest.TestCase):
                     log_message
                 )
 
+    def test_interface_check_passphrase_throws_error_wrong_passphrase(self):
+        mocked_db = mock.Mock()
+        mocked_db.gpg.sign.return_value = False
+        with self.assertRaises(ValueError):
+            __main__.check_passphrase(database=mocked_db, passphrase="dummy")
 
 if __name__ == "__main__":
     if sys.version_info >= (3, 1):
