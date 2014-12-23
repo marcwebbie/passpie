@@ -4,6 +4,7 @@ from getpass import getpass
 import logging
 import os
 
+import colorama
 import pyperclip
 from tabulate import tabulate
 
@@ -20,6 +21,8 @@ DEFAULT_DATABASE_PATH = os.path.join(
     ".pysswords"
 )
 DEFAULT_GPG_BINARY = "gpg"
+
+colorama.init(autoreset=True)
 
 
 def get_args(command_args=None):
@@ -88,7 +91,7 @@ def list_credentials(database, query=None, show_password=False):
     table = []
     for credential in database.credentials:
         row = [
-            credential.name,
+            colorama.Fore.GREEN + credential.name + colorama.Fore.RESET,
             credential.login,
             "..." if not show_password else database.gpg.decrypt(
                 credential.password,

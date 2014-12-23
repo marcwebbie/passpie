@@ -1,3 +1,4 @@
 gnupg==1.4.0
 pyperclip==1.5.7
 tabulate==0.7.3
+colorama==0.3.2
