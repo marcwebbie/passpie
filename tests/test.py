@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from pysswords.db import Database
 from pysswords.crypt import create_key_input
 from pysswords.utils import touch, which
-from pysswords.credential import Credential
+from pysswords.credential import Credential, CredentialNotFoundError
 from pysswords import __main__, crypt, db
 
 
@@ -114,6 +114,10 @@ class PysswordsTests(unittest.TestCase):
         self.assertEqual(expected_credential.name, name)
         self.assertEqual(expected_credential.login, login)
         self.assertEqual(expected_credential.comments, comments)
+
+    def test_get_credential_raises_expected_exception_when_not_found(self):
+        with self.assertRaises(CredentialNotFoundError):
+            self.database.credential(name="None")
 
     def test_list_credentials_return_credentials_from_database_dir(self):
         credential_name = "email"
