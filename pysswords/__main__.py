@@ -5,6 +5,7 @@ import logging
 import os
 
 import pyperclip
+from tabulate import tabulate
 
 from .db import Database
 from .credential import Credential, CredentialNotFoundError
@@ -83,10 +84,10 @@ def list_credentials(database, query=None, show_password=False):
     if show_password:
         passphrase = getpass("Database passphrase: ")
         check_passphrase(database, passphrase)
-    credentials = database.search(query) if query else database.credentials
-    for idx, credential in enumerate(credentials):
-        cred_string = "[{0}] {1}: login={2}, password={3}, {4}".format(
-            idx,
+    headers = ["name", "login", "password", "comments"]
+    table = []
+    for credential in database.credentials:
+        row = [
             credential.name,
             credential.login,
             "..." if not show_password else database.gpg.decrypt(
@@ -94,8 +95,9 @@ def list_credentials(database, query=None, show_password=False):
                 passphrase=passphrase
             ),
             credential.comments
-        )
-        print(cred_string)
+        ]
+        table.append(row)
+    print(tabulate(table, headers, tablefmt="orgtbl"))
 
 
 def prompt_credential(**defaults):
