@@ -2,6 +2,9 @@
 Pysswords: Manage your passwords from the terminal
 ##################################################
 
+.. image:: https://pypip.in/version/pysswords/badge.svg
+    :target: https://pypi.python.org/pypi/pysswords/
+    :alt: Latest Version
 .. image:: https://travis-ci.org/marcwebbie/pysswords.svg
    :target: https://travis-ci.org/marcwebbie/pysswords
    :alt: Build
@@ -12,7 +15,7 @@ Pysswords: Manage your passwords from the terminal
    :target: https://landscape.io/github/marcwebbie/pysswords/master
    :alt: Code Health
 
-`Pysswords <https://github.com/marcwebbie/pysswords>`_ lets you manage your login credentials from the terminal. Password files are saved into GPG encrypted files into the `database path`_. Only with the passphrase used to create the pyssword database you can decrypt password file. If you want to know more about how pysswords works, check the `Under the Hood`_ section.
+`Pysswords <https://github.com/marcwebbie/pysswords>`_ lets you manage your login credentials from the terminal. Password files are saved into `GnuGPG <http://en.wikipedia.org/wiki/GNU_Privacy_Guard>`_ encrypted files into the `database path`_. Only with the passphrase used to create the pyssword database you can decrypt password files. If you want to know more about how pysswords works internally, check the `Under the Hood`_ section.
 
 
 ************
@@ -43,20 +46,27 @@ Check the implemented features on the `Features`_ section.
     # get credential "github". Option: `-g` or `--get`
     pysswords -g github
 
-    # delete credential "github". Option: `-r` or `--remove`
+    # remove credential "github". Option: `-r` or `--remove`
     pysswords -d github
 
-    # search credentials with query "github". Option: `-s` or `--search`
-    pysswords -s github
+    # edit credential "github". Option: `-e` or `--edit`
+    pysswords -e github
+
+    # search credentials with query "octocat". Option: `-s` or `--search`
+    pysswords -s octocat
 
     # copy password from credential "github" into clipboard. Option: `-c` or `--clipboard`
-    pysswords -c github
+    # this option have to be used with --get|-g option
+    pysswords -c -g github
 
     # print all credentials as a table with hidden passwords
     pysswords
 
     # print all credentials and show passwords in plain text. Option: `--show-password`
     pysswords --show-password
+
+    # shows help. Option `-h` or `--help`
+    pysswords --help
 
 
 ************
@@ -68,33 +78,17 @@ Contributing
 + if everything is OK. push your changes and make a pull request. ;)
 
 
-******************
-Development status
-******************
-
-.. image:: https://pypip.in/version/pysswords/badge.svg
-    :target: https://pypi.python.org/pypi/pysswords/
-    :alt: Latest Version
-.. image:: https://pypip.in/download/passwords/badge.svg
-   :target: https://pypi.python.org/pypi/pysswords
-   :alt: Downloads
-.. image:: https://pypip.in/py_versions/pysswords/badge.svg
-   :target: https://pypi.python.org/pypi/pysswords/
-   :alt: Supported Python versions
-
-
 ********
 Features
 ********
 
 In order of priority [#]_:
 
-- **[ ]** Database module
-- **[ ]** Encryption module
-- **[ ]** Console interface
-- **[ ]** Group credentials with a password for each group
+- **[X]** Database module
+- **[X]** Encryption module
+- **[-]** Console interface
 
-.. [#] **[ ]** not yet implemented feature, **[x]** implemented feature
+.. [#] **[ ]** not yet implemented feature, **[x]** implemented feature, **[-]** partially implemented.
 
 **************
 Under The Hood
@@ -103,7 +97,7 @@ Under The Hood
 Encryption
 ==========
 
-Encryption is done using GPG. Take a look at `pysswords.crypt <https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py>`_ module to know more.
+Encryption is done using `GnuGPG <http://en.wikipedia.org/wiki/GNU_Privacy_Guard>`_ using `AES256 <http://en.wikipedia.org/wiki/Advanced_Encryption_Standard>`_. Take a look at `pysswords.crypt <https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py>`_ module to know more.
 
 Database path
 ===============
@@ -138,29 +132,27 @@ After adding a new credential the database would look like this:
 .. code-block:: bash
 
     pysswords --database /tmp/pysswords -a
-    #Name: github
-    #Login: octocat
-    #Password: **********
-    #Comments [optional]:
+    # Name: github
+    # Login: octocat
+    # Password: **********
+    # Comments [optional]:
 
     tree /tmp/pysswords -la
-    #/tmp/pysswords
-    #├── .gnupg
-    #│   ├── pubring.gpg
-    #│   ├── random_seed
-    #│   ├── secring.gpg
-    #│   └── trustdb.gpg
-    #└── github
-    #    ├── comments
-    #    ├── login
-    #    └── password
-
+    # /tmp/pysswords
+    # ├── .gnupg
+    # │   ├── pubring.gpg
+    # │   ├── random_seed
+    # │   ├── secring.gpg
+    # │   └── trustdb.gpg
+    # └── github
+    #     ├── comments
+    #     ├── login
+    #     └── password
 
 
 ******************************************************************
 License (`MIT License <http://choosealicense.com/licenses/mit/>`_)
 ******************************************************************
-
 
 The MIT License (MIT)
 
