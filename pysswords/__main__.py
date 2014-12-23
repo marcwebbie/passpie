@@ -91,7 +91,7 @@ def list_credentials(database, query=None, show_password=False):
     table = []
     for credential in database.credentials:
         row = [
-            colorama.Fore.GREEN + credential.name + colorama.Fore.RESET,
+            colorama.Fore.YELLOW + credential.name + colorama.Fore.RESET,
             credential.login,
             "..." if not show_password else database.gpg.decrypt(
                 credential.password,
