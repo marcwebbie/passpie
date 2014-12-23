@@ -39,9 +39,10 @@ class PysswordsTests(unittest.TestCase):
 
         self.database_path = os.path.join(TEST_DIR, ".pysswords")
         self.gnupg_path = os.path.join(self.database_path, ".gnupg")
+        self.database_passphrase = "dummy_passphrase"
         self.database = Database.create(
             path=self.database_path,
-            passphrase="dummy"
+            passphrase=self.database_passphrase
         )
 
     def tearDown(self):
@@ -325,7 +326,7 @@ class PysswordsUtilsTests(unittest.TestCase):
             mocked_join.assert_any_call("/", "python.exe")
 
 
-class PysswordsConsoleInterfaceTests(unittest.TestCase):
+class PysswordsConsoleInterfaceTests(PysswordsTests):
 
     def setUp(self):
         self.default_database_path = os.path.join(
@@ -337,9 +338,11 @@ class PysswordsConsoleInterfaceTests(unittest.TestCase):
             "pysswords.__main__.getpass",
             return_value=self.mocked_passphrase)
         self.patcher_getpassphrase.start()
+        super().setUp()
 
     def tearDown(self):
         self.patcher_getpassphrase.stop()
+        super().tearDown()
 
     def test_args_init_without_path_uses_home_user_dotpysswords(self):
         command_args = ["--init"]
