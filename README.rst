@@ -26,6 +26,7 @@ Main Features [#]_
 | ☐ Search with regular expression
 | ☐ Importing credentials from other applications
 | ☐ Undo/Redo modifications to the database
+|
 
 .. [#]  ``☑`` implemented feature, ``☐`` not implemented feature.
 
