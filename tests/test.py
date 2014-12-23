@@ -17,7 +17,7 @@ from pysswords.db import Database
 from pysswords.crypt import create_key_input
 from pysswords.utils import touch, which
 from pysswords.credential import Credential
-from pysswords import __main__
+from pysswords import __main__, crypt
 
 
 def mock_create_gpg(binary, database_path, passphrase):
@@ -156,6 +156,28 @@ class PysswordsTests(unittest.TestCase):
                 which(binary),
                 homedir=gnupg_path,
             )
+
+    def test_crypt_create_gpg_generates_gpg_key(self):
+        binary = "gpg"
+        database_path = "/tmp/dummydb"
+        passphrase = "dummypass"
+        with mock.patch("pysswords.crypt.gnupg.GPG") as mocked_gpg:
+            crypt.create_gpg(binary, database_path, passphrase)
+            self.assertTrue(mocked_gpg().gen_key.called)
+
+    def test_crypt_create_gpg_creates_GPG_instance(self):
+        binary = "gpg"
+        database_path = "/tmp/dummydb"
+        gnupg_path = os.path.join(database_path, ".gnupg")
+        passphrase = "dummypass"
+        with mock.patch("pysswords.crypt.gnupg.GPG") as mocked_GPG:
+            with mock.patch("pysswords.crypt.which") as mocked_which:
+                mocked_which.return_value = "/usr/bin/gpg"
+                crypt.create_gpg(binary, database_path, passphrase)
+                mocked_GPG.assert_called_once_with(
+                    mocked_which.return_value,
+                    homedir=gnupg_path
+                )
 
 
 class PysswordsCredentialTests(unittest.TestCase):
