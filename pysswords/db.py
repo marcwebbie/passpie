@@ -58,7 +58,7 @@ class Database(object):
             comments=values.get("comments", credential.comments),
         )
         self.remove(name=name)
-        new_credential.save(database_path=self.path)
+        self.add(new_credential)
 
     def credential(self, name):
         credential_path = os.path.join(self.path, name)
