@@ -17,7 +17,7 @@ from pysswords.db import Database
 from pysswords.crypt import create_key_input
 from pysswords.utils import touch, which
 from pysswords.credential import Credential, CredentialNotFoundError
-from pysswords import __main__, crypt, db
+from pysswords import __main__, crypt
 
 
 def mock_create_gpg(binary, database_path, passphrase):
