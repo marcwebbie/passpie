@@ -397,6 +397,13 @@ class PysswordsConsoleInterfaceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             __main__.check_passphrase(database=mocked_db, passphrase="dummy")
 
+    def test_get_args_raise_parser_error_when_arg_clipboard_without_get(self):
+        with open(os.devnull, 'w') as devnull:
+            with mock.patch("sys.stderr", devnull):
+                with self.assertRaises(SystemExit):
+                    __main__.get_args("-c".split())
+
+
 if __name__ == "__main__":
     if sys.version_info >= (3, 1):
         unittest.main(warnings="ignore")
