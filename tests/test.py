@@ -126,6 +126,13 @@ class PysswordsTests(unittest.TestCase):
         credentials = self.database.credentials
         self.assertIn(credential_name, (c.name for c in credentials))
 
+    def test_remove_credential_deletes_files_credential_dir(self):
+        credential = self.some_credential()
+        self.database.add(credential)
+        self.assertIn(credential.name, os.listdir(self.database_path))
+        self.database.remove(name=credential.name)
+        self.assertNotIn(credential.name, os.listdir(self.database_path))
+
     def test_database_from_path_method_calls_load_gpg(self):
         path = "/tmp/pysswords"
         gpg_bin = "/usr/bin/gpg"
