@@ -43,10 +43,8 @@ Make sure you have `GPG <https://www.gnupg.org/>`_ and `pip <http://pip.readthed
 
     pip install pysswords
 
-Development version
-===================
-
-|coverage| |health|
+Development version |coverage| |health|
+=======================================
 
 =============  =============
 Mac/Linux      Windows
@@ -214,3 +212,5 @@ SOFTWARE.
 .. |health| image:: https://landscape.io/github/marcwebbie/pysswords/master/landscape.svg
    :target: https://landscape.io/github/marcwebbie/pysswords/master
    :alt: Code Health
+
+---
