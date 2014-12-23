@@ -162,9 +162,9 @@ After adding a new credential the database would look like this:
 Contributing
 ************
 
-+ fork the repository `<https://github.com/marcwebbie/pysswords/fork>`_
-+ write your tests on ``tests/test.py``
-+ if everything is OK. push your changes and make a pull request. ;)
++ Fork the repository `<https://github.com/marcwebbie/pysswords/fork>`_
++ Write your tests on ``tests/test.py``
++ If everything is OK. push your changes and make a pull request. ;)
 
 
 ******************************************************************
