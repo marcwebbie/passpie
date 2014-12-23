@@ -7,7 +7,7 @@ import os
 import pyperclip
 
 from .db import Database
-from .credential import Credential
+from .credential import Credential, CredentialNotFoundError
 
 try:
     input = raw_input
@@ -22,21 +22,9 @@ DEFAULT_DATABASE_PATH = os.path.join(
 DEFAULT_GPG_BINARY = "gpg"
 
 
-class FooAction(argparse.Action):
-    # def __init__(self, option_strings, dest, **kwargs):
-    #     super(FooAction, self).__init__(option_strings, dest, **kwargs)
-
-    # def __call__(self, parser, namespace, *args, **kwargs):
-    def __call__(self, parser, namespace, values, option_string=None):
-        import pdb; pdb.set_trace()
-        # print('%r %r %r' % (namespace, values, option_string))
-        setattr(namespace, self.dest, values)
-
-
 def get_args(command_args=None):
     """Return args from command line"""
-    parser = argparse.ArgumentParser(prog="pysswords",
-                                     conflict_handler="resolve")
+    parser = argparse.ArgumentParser(prog="pysswords")
     parser.add_argument("-I", "--init", action="store_true",
                         help="create a new Pysswords database")
     parser.add_argument("-d", "--database", default=DEFAULT_DATABASE_PATH,
@@ -54,11 +42,14 @@ def get_args(command_args=None):
                         help="print credential")
     parser.add_argument("-l", "--list", action="store_true",
                         help="print all credentials as a table")
-    parser.add_argument("-c", "--clipboard", metavar="<CREDENTIAL NAME>",
+    parser.add_argument("-c", "--clipboard", action="store_true",
                         help="copy credential password to clipboard")
-    parser.add_argument("--gpg", metavar="<gpg>", default=DEFAULT_GPG_BINARY,
+    parser.add_argument("--gpg", metavar="<GPG>", default=DEFAULT_GPG_BINARY,
                         help="gpg binary name")
     args = parser.parse_args(command_args)
+
+    if args.clipboard and not args.get:
+        parser.error('-g argument is required in when using -c')
     return args
 
 
@@ -87,11 +78,11 @@ def check_passphrase(database, passphrase):
     return sig
 
 
-def list_credentials(database, search=None, show_password=False):
+def list_credentials(database, query=None, show_password=False):
     if show_password:
         passphrase = getpass("Database passphrase: ")
         check_passphrase(database, passphrase)
-    credentials = database.search(search) if search else database.credentials
+    credentials = database.search(query) if query else database.credentials
     for idx, credential in enumerate(credentials):
         cred_string = "[{0}] {1}: login={2}, password={3}, {4}".format(
             idx,
@@ -131,16 +122,27 @@ def copy_password_to_clipboard(database, credential_name):
         print("Password for '{}' copied to clipboard".format(credential.name))
 
 
-def delete_credential(database, name):
+def remove_credential(database, name):
     credential = database.credential(name=name)
     try:
         prompt = "Delete credential `{}` (y|n): ".format(credential)
         answer = input(prompt)
     except KeyboardInterrupt:
         print("")
-
     if answer and answer.lower()[0] == "y":
         database.delete(name=name)
+
+
+def get_credential(database, name, to_clipboard=False):
+    try:
+        credential = database.credential(name=name)
+        if to_clipboard:
+            copy_password_to_clipboard(database=database,
+                                       credential_name=name)
+        else:
+            print(credential)
+    except CredentialNotFoundError:
+        logging.info("Credential was not found")
 
 
 def run(args=None):
@@ -154,34 +156,23 @@ def run(args=None):
         )
         logging.info("Database created at '{}'".format(database.path))
     else:
-        database = Database.from_path(
-            path=args.database,
-            gpg_bin=args.gpg
-        )
+        database = Database.from_path(path=args.database,
+                                      gpg_bin=args.gpg)
         if args.add:
             add_credential(database)
         elif args.get:
-            credential = database.credential(name=args.get)
-            print(credential)
-        elif args.clipboard:
-            copy_password_to_clipboard(
-                database=database,
-                credential_name=args.clipboard
-            )
-        elif args.delete:
-            delete_credential(database, name=args.delete)
+            get_credential(database,
+                           name=args.get,
+                           to_clipboard=args.clipboard)
+        elif args.remove:
+            remove_credential(database, name=args.remove)
         elif args.search:
-            query = args.search
-            list_credentials(
-                database=database,
-                search=query,
-                show_password=args.show_password
-            )
+            list_credentials(database=database,
+                             query=args.search,
+                             show_password=args.show_password)
         else:
-            list_credentials(
-                database=database,
-                show_password=args.show_password
-            )
+            list_credentials(database=database,
+                             show_password=args.show_password)
 
 
 if __name__ == "__main__":
