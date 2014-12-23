@@ -153,6 +153,20 @@ class PysswordsTests(unittest.TestCase):
         self.database.remove(name=credential.name)
         self.assertNotIn(credential.name, os.listdir(self.database_path))
 
+    def test_search_database_returns_expected_credentials(self):
+        credential = self.some_credential(
+            name="twitter", login="pysswords")
+        credential2 = self.some_credential(
+            name="wikipedia", comments="nothing")
+        self.database.add(credential)
+        self.database.add(credential2)
+
+        self.assertEqual(2, len(self.database.search("wi")))
+        self.assertEqual(1, len(self.database.search("twitter")))
+        self.assertEqual(1, len(self.database.search("nothing")))
+        self.assertEqual(1, len(self.database.search("pysswords")))
+        self.assertEqual(0, len(self.database.search("unknown")))
+
     def test_database_from_path_method_calls_load_gpg(self):
         path = "/tmp/pysswords"
         gpg_bin = "/usr/bin/gpg"
