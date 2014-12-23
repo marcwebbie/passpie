@@ -130,7 +130,7 @@ def remove_credential(database, name):
     except KeyboardInterrupt:
         print("")
     if answer and answer.lower()[0] == "y":
-        database.delete(name=name)
+        database.remove(name=name)
 
 
 def get_credential(database, name, to_clipboard=False):
