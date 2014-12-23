@@ -179,6 +179,26 @@ class PysswordsTests(unittest.TestCase):
                     homedir=gnupg_path
                 )
 
+    def test_crypt_load_gpg_creates_GPG_instance(self):
+        binary = "gpg"
+        database_path = "/tmp/dummydb"
+        gnupg_path = os.path.join(database_path, ".gnupg")
+        with mock.patch("pysswords.crypt.gnupg.GPG") as mocked_GPG:
+            with mock.patch("pysswords.crypt.which") as mocked_which:
+                mocked_which.return_value = "/usr/bin/gpg"
+                crypt.load_gpg(binary, database_path)
+                mocked_GPG.assert_called_once_with(
+                    mocked_which.return_value,
+                    homedir=gnupg_path
+                )
+
+    def test_crypt_create_gpg_does_not_generates_gpg_key(self):
+        binary = "gpg"
+        database_path = "/tmp/dummydb"
+        with mock.patch("pysswords.crypt.gnupg.GPG") as mocked_gpg:
+            crypt.load_gpg(binary, database_path)
+            self.assertFalse(mocked_gpg().gen_key.called)
+
 
 class PysswordsCredentialTests(unittest.TestCase):
     def setUp(self):
