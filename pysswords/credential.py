@@ -35,8 +35,7 @@ class Credential(object):
         )
 
     def __str__(self):
-        return "<name={}, login={}, password='...', {}>".format(
+        return "<name={}, login={}>".format(
             self.name,
-            self.login,
-            self.comments
+            self.login
         )
