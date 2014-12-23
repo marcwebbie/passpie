@@ -12,4 +12,4 @@ install:
   - "%PYTHON%/python.exe C:/get-pip.py"
   - "%PYTHON%/Scripts/pip.exe install -e ."
 test_script:
-  - "%PYTHON%/python.exe setup.py test"
+  - "%PYTHON%/python.exe tests/test.py"
