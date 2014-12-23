@@ -2,19 +2,6 @@
 Pysswords: Manage your passwords from the terminal
 ##################################################
 
-.. image:: https://pypip.in/version/pysswords/badge.svg
-    :target: https://pypi.python.org/pypi/pysswords/
-    :alt: Latest Version
-.. image:: https://travis-ci.org/marcwebbie/pysswords.svg
-   :target: https://travis-ci.org/marcwebbie/pysswords
-   :alt: Build
-.. image:: https://coveralls.io/repos/marcwebbie/pysswords/badge.png
-   :target: https://coveralls.io/r/marcwebbie/pysswords
-   :alt: Test Coverage
-.. image:: https://landscape.io/github/marcwebbie/pysswords/master/landscape.svg
-   :target: https://landscape.io/github/marcwebbie/pysswords/master
-   :alt: Code Health
-
 `Pysswords <https://github.com/marcwebbie/pysswords>`_ lets you manage your login credentials from the terminal. Password files are saved into `GnuGPG <http://en.wikipedia.org/wiki/GNU_Privacy_Guard>`_ encrypted files into the `database path`_. Only with the passphrase used to create the pyssword database you can decrypt password files. If you want to know more about how pysswords works internally, check the `Under the Hood`_ section.
 
 
@@ -22,12 +9,32 @@ Pysswords: Manage your passwords from the terminal
 Installation
 ************
 
+Stable version |version|
+========================
+
 Make sure you have `GnuGPG <https://www.gnupg.org/>`_ installed.
 
 .. code-block:: bash
 
     pip install pysswords
 
+-------------------
+Development version
+-------------------
+
+=============  =============
+Mac/Linux      Windows
+|unix|         |windows|
+=============  =============
+
+The **latest development version** can be installed directly from GitHub:
+
+.. code-block:: bash
+
+    # Universal
+    $ pip install --upgrade https://github.com/marcwebbie/pysswords/tarball/master
+
+|coverage| |health|
 
 **********
 Quickstart
@@ -37,45 +44,36 @@ Check the implemented features on the `Features`_ section.
 
 .. code-block:: bash
 
-    # create a new credentials database. Option: `-I` or `--init`
+    # create a new credentials database. Option: ``-I`` or ``--init``
     pysswords --init
 
-    # add new credentials. Option: `-a` or `--add`
+    # add new credentials. Option: ``-a`` or ``--add``
     pysswords -a
 
-    # get credential "github". Option: `-g` or `--get`
+    # get credential "github". Option: ``-g`` or ``--get``
     pysswords -g github
 
-    # remove credential "github". Option: `-r` or `--remove`
+    # remove credential "github". Option: ``-r`` or ``--remove``
     pysswords -d github
 
-    # edit credential "github". Option: `-e` or `--edit`
+    # edit credential "github". Option: ``-e`` or ``--edit``
     pysswords -e github
 
-    # search credentials with query "octocat". Option: `-s` or `--search`
+    # search credentials with query "octocat". Option: ``-s`` or ``--search``
     pysswords -s octocat
 
-    # copy password from credential "github" into clipboard. Option: `-c` or `--clipboard`
+    # copy password from credential "github" into clipboard. Option: ``-c`` or ``--clipboard``
     # this option have to be used with --get|-g option
     pysswords -c -g github
 
     # print all credentials as a table with hidden passwords
     pysswords
 
-    # print all credentials and show passwords in plain text. Option: `--show-password`
+    # print all credentials and show passwords in plain text. Option: ``--show-password``
     pysswords --show-password
 
-    # shows help. Option `-h` or `--help`
+    # shows help. Option ``-h`` or ``--help``
     pysswords --help
-
-
-************
-Contributing
-************
-
-+ fork the repository `<https://github.com/marcwebbie/pysswords/fork>`_
-+ write your tests on `tests/test.py`
-+ if everything is OK. push your changes and make a pull request. ;)
 
 
 ********
@@ -90,6 +88,7 @@ In order of priority [#]_:
 
 .. [#] **[ ]** not yet implemented feature, **[x]** implemented feature, **[-]** partially implemented.
 
+
 **************
 Under The Hood
 **************
@@ -102,7 +101,7 @@ Encryption is done using `GnuGPG <http://en.wikipedia.org/wiki/GNU_Privacy_Guard
 Database path
 ===============
 
-The default database path is at `~/.pysswords`. If you want to change the database path at database creation pass the --database option to pysswords
+The default database path is at `~/.pysswords`. If you want to change the database path, add --database option to pysswords together with --init.
 
 .. code-block:: bash
 
@@ -150,6 +149,15 @@ After adding a new credential the database would look like this:
     #     └── password
 
 
+************
+Contributing
+************
+
++ fork the repository `<https://github.com/marcwebbie/pysswords/fork>`_
++ write your tests on `tests/test.py`
++ if everything is OK. push your changes and make a pull request. ;)
+
+
 ******************************************************************
 License (`MIT License <http://choosealicense.com/licenses/mit/>`_)
 ******************************************************************
@@ -175,3 +183,24 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+.. |version| image:: https://badge.fury.io/py/pysswords.svg
+   :target: http://badge.fury.io/py/pysswords
+   :alt: pypi versiomn
+
+.. |unix| image:: https://travis-ci.org/marcwebbie/pysswords.svg
+   :target: https://travis-ci.org/marcwebbie/pysswords
+   :alt: Build
+
+.. |windows| image:: https://ci.appveyor.com/api/projects/status/5b7p1vo3y9x3y35t?svg=true
+   :target: https://ci.appveyor.com/project/marcwebbie/pysswords
+   :alt: Build on windows
+
+.. |coverage| image:: https://coveralls.io/repos/marcwebbie/pysswords/badge.png
+   :target: https://coveralls.io/r/marcwebbie/pysswords
+   :alt: Test Coverage
+
+.. |health| image:: https://landscape.io/github/marcwebbie/pysswords/master/landscape.svg
+   :target: https://landscape.io/github/marcwebbie/pysswords/master
+   :alt: Code Health
