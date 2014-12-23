@@ -18,15 +18,16 @@ Pysswords: Manage your passwords from the terminal
 Main Features [#]_
 ******************
 
-| ☑ Console interface
-| ☑ Manage multiple databases
-| ☑ Add, edit, remove credentials
-| ☑ Copy passwords to clipboard
-| ☑ Search credentials by name, login or comments
-| ☐ Search with regular expression
-| ☐ Importing credentials from other applications
-| ☐ Undo/Redo modifications to the database
-| ☐ Pysswords emacs mode
+| **☑** Console interface
+| **☑** Manage multiple databases
+| **☑** Add, edit, remove credentials
+| **☑** Copy passwords to clipboard
+| **☑** Search credentials by name, login or comments
+| **☑** List credentials as a table
+| **☐** Search with regular expression
+| **☐** Importing credentials from other applications
+| **☐** Undo/Redo modifications to the database
+| **☐** Pysswords emacs mode
 |
 
 .. [#]  ``☑`` implemented feature, ``☐`` not implemented feature.
