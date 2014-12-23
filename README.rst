@@ -14,6 +14,21 @@ Pysswords: Manage your passwords from the terminal
 
 ------
 
+******************
+Main Features [#]_
+******************
+
++ ☑ Console interface
++ ☑ Manage multiple databases
++ ☑ Add, edit, remove credentials
++ ☑ Copy passwords to clipboard
++ ☑ Search credentials by name, login or comments
++ ☐ Search with regular expression
++ ☐ Importing credentials from other applications
++ ☐ Undo/Redo modifications to the database
+
+.. [#]  ``☑`` implemented feature, ``☐`` not implemented feature.
+
 
 ************
 Installation
@@ -22,7 +37,7 @@ Installation
 Stable version |version|
 ========================
 
-Make sure you have `GnuGPG <https://www.gnupg.org/>`_ installed.
+Make sure you have `GPG <https://www.gnupg.org/>`_ and `pip <http://pip.readthedocs.org/en/latest/installing.html>`_ installed.
 
 .. code-block:: bash
 
@@ -44,15 +59,15 @@ The **latest development version** can be installed directly from GitHub:
     $ pip install --upgrade https://github.com/marcwebbie/pysswords/tarball/master
 
 
-Code quality |coverage| |health|
---------------------------------
+Code quality
+------------
+
+|coverage| |health|
 
 
 **********
 Quickstart
 **********
-
-Check implemented features on the `Features`_ section.
 
 .. code-block:: bash
 
@@ -88,19 +103,6 @@ Check implemented features on the `Features`_ section.
     pysswords --help
 
 
-********
-Features
-********
-
-In order of priority [#]_:
-
-- **[X]** Database module
-- **[X]** Encryption module
-- **[-]** Console interface
-
-.. [#] **[ ]** not yet implemented feature, **[x]** implemented feature, **[-]** partially implemented.
-
-
 **************
 Under The Hood
 **************
@@ -108,10 +110,10 @@ Under The Hood
 Encryption
 ==========
 
-Encryption is done with `GnuGPG <http://en.wikipedia.org/wiki/GNU_Privacy_Guard>`_ and `AES256 <http://en.wikipedia.org/wiki/Advanced_Encryption_Standard>`_. Take a look at `pysswords.crypt <https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py>`_ module to know more.
+Encryption is done with **GnuGPG** using `AES256 <http://en.wikipedia.org/wiki/Advanced_Encryption_Standard>`_. Take a look at `pysswords.crypt <https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py>`_ module to know more.
 
-Database path
-===============
+Database Path
+=============
 
 The default database path is at ``~/.pysswords``. If you want to change the database path, add ``--database`` option to pysswords together with ``--init``.
 
@@ -199,7 +201,7 @@ SOFTWARE.
 
 .. |version| image:: https://badge.fury.io/py/pysswords.svg
    :target: http://badge.fury.io/py/pysswords
-   :alt: pypi versiomn
+   :alt: pypi version
 
 .. |unix| image:: https://travis-ci.org/marcwebbie/pysswords.svg
    :target: https://travis-ci.org/marcwebbie/pysswords
