@@ -1,6 +1,10 @@
 import os
 
 
+class CredentialNotFoundError(ValueError):
+    pass
+
+
 class Credential(object):
     def __init__(self, name, login, password, comments):
         self.name = name

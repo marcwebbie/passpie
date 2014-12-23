@@ -19,22 +19,34 @@ DEFAULT_DATABASE_PATH = os.path.join(
     ".pysswords"
 )
 
-DEFAULT_GPG_BINARY = "gpg2"
+DEFAULT_GPG_BINARY = "gpg"
+
+
+class FooAction(argparse.Action):
+    # def __init__(self, option_strings, dest, **kwargs):
+    #     super(FooAction, self).__init__(option_strings, dest, **kwargs)
+
+    # def __call__(self, parser, namespace, *args, **kwargs):
+    def __call__(self, parser, namespace, values, option_string=None):
+        import pdb; pdb.set_trace()
+        # print('%r %r %r' % (namespace, values, option_string))
+        setattr(namespace, self.dest, values)
 
 
 def get_args(command_args=None):
     """Return args from command line"""
-    parser = argparse.ArgumentParser(prog="pysswords")
+    parser = argparse.ArgumentParser(prog="pysswords",
+                                     conflict_handler="resolve")
     parser.add_argument("-I", "--init", action="store_true",
                         help="create a new Pysswords database")
-    parser.add_argument("--database", default=DEFAULT_DATABASE_PATH,
+    parser.add_argument("-d", "--database", default=DEFAULT_DATABASE_PATH,
                         metavar="<DATABASE PATH>",
                         help="specify path to database")
     parser.add_argument("--show-password", action="store_true",
                         help="show password as plain text when print")
     parser.add_argument("-a", "--add", action="store_true",
                         help="add new credential")
-    parser.add_argument("-d", "--delete", metavar="<CREDENTIAL NAME>",
+    parser.add_argument("-r", "--remove", metavar="<CREDENTIAL NAME>",
                         help="delete credential")
     parser.add_argument("-s", "--search", metavar="<QUERY>",
                         help="search credential")
