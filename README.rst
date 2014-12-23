@@ -2,7 +2,7 @@
 Pysswords: Manage your passwords from the terminal
 ##################################################
 
-`Pysswords <https://github.com/marcwebbie/pysswords>`_ lets you manage your login credentials from the terminal. Password files are saved into `GnuGPG <http://en.wikipedia.org/wiki/GNU_Privacy_Guard>`_ encrypted files into the `database path`_. Only with the passphrase used to create the pyssword database you can decrypt password files. If you want to know more about how pysswords works internally, check the `Under the Hood`_ section.
+`Pysswords <https://github.com/marcwebbie/pysswords>`_ lets you manage your login credentials from the terminal. Password files are saved into `GnuGPG <http://en.wikipedia.org/wiki/GNU_Privacy_Guard>`_ encrypted files into the `Database Path`_. Only with the passphrase used to create the pyssword database you can decrypt password files. If you want to know more about how pysswords works internally, check the `Under the Hood`_ section.
 
 
 ************
@@ -42,7 +42,7 @@ Code quality |coverage| |health|
 Quickstart
 **********
 
-Check the implemented features on the `Features`_ section.
+Check implemented features on the `Features`_ section.
 
 .. code-block:: bash
 
@@ -98,7 +98,7 @@ Under The Hood
 Encryption
 ==========
 
-Encryption is done using `GnuGPG <http://en.wikipedia.org/wiki/GNU_Privacy_Guard>`_ using `AES256 <http://en.wikipedia.org/wiki/Advanced_Encryption_Standard>`_. Take a look at `pysswords.crypt <https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py>`_ module to know more.
+Encryption is done with `GnuGPG <http://en.wikipedia.org/wiki/GNU_Privacy_Guard>`_ and `AES256 <http://en.wikipedia.org/wiki/Advanced_Encryption_Standard>`_. Take a look at `pysswords.crypt <https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py>`_ module to know more.
 
 Database path
 ===============
