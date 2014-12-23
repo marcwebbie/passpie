@@ -167,6 +167,11 @@ class PysswordsTests(unittest.TestCase):
         self.assertEqual(1, len(self.database.search("pysswords")))
         self.assertEqual(0, len(self.database.search("unknown")))
 
+    def test_database_encrypt_returns_encrypted_text(self):
+        encrypted = self.database.encrypt("testing text")
+        self.assertIn("-----BEGIN PGP MESSAGE-----", encrypted)
+        self.assertIn("-----END PGP MESSAGE-----", encrypted)
+
     def test_database_from_path_method_calls_load_gpg(self):
         path = "/tmp/pysswords"
         gpg_bin = "/usr/bin/gpg"

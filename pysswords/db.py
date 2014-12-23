@@ -36,6 +36,11 @@ class Database(object):
         return [self.credential(os.path.basename(c))
                 for c in glob(self.path + "/**")]
 
+    def encrypt(self, text):
+        key = self.gpg_key
+        encrypted = self.gpg.encrypt(text, key, cipher_algo="AES256")
+        return str(encrypted)
+
     def add(self, credential):
         encrypted_password = self.gpg.encrypt(
             credential.password,
