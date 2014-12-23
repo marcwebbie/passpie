@@ -46,6 +46,8 @@ Make sure you have `GPG <https://www.gnupg.org/>`_ and `pip <http://pip.readthed
 Development version
 ===================
 
+|coverage| |health|
+
 =============  =============
 Mac/Linux      Windows
 |unix|         |windows|
@@ -57,12 +59,6 @@ The **latest development version** can be installed directly from GitHub:
 
     # Universal
     $ pip install --upgrade https://github.com/marcwebbie/pysswords/tarball/master
-
-
-Code quality
-------------
-
-|coverage| |health|
 
 
 **********
