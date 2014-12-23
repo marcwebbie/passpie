@@ -285,7 +285,6 @@ class PysswordsCredentialTests(unittest.TestCase):
     def test_credential_str_magic_methods_has_shows_name_login(self):
         self.assertIn(self.credential.name, str(self.credential))
         self.assertIn(self.credential.login, str(self.credential))
-        self.assertIn(self.credential.comments, str(self.credential))
 
 
 class PysswordsUtilsTests(unittest.TestCase):
