@@ -5,9 +5,10 @@ import sys
 import unittest
 import gnupg
 try:
-    from unittest import mock
+    from unittest.mock import patch, Mock
 except ImportError:
-    import mock
+    # python2
+    from mock import patch, Mock
 
 __file__ = os.path.abspath(inspect.getsourcefile(lambda _: None))
 
@@ -30,10 +31,21 @@ def mock_create_gpg(binary, database_path, passphrase):
     return gpg
 
 
+def build_credential(**kwargs):
+    credential = Credential(
+        name=kwargs.get("name", "example"),
+        login=kwargs.get("login", "john"),
+        password=kwargs.get("password", "my-great-password"),
+        comments=kwargs.get("comments",
+                            "This is login credentials for example")
+    )
+    return credential
+
+
 class PysswordsTests(unittest.TestCase):
 
     def setUp(self):
-        self.patcher_gpg = mock.patch(
+        self.patcher_gpg = patch(
             "pysswords.db.create_gpg", new=mock_create_gpg)
         self.patcher_gpg.start()
 
@@ -52,47 +64,33 @@ class PysswordsTests(unittest.TestCase):
     def test(self):
         pass
 
-    def some_credential(self, **kwargs):
-        credential = Credential(
-            name=kwargs.get("name", "example"),
-            login=kwargs.get("login", "john"),
-            password=kwargs.get("password", "my-great-password"),
-            comments=kwargs.get("comments",
-                                "This is login credentials for example")
-        )
-        return credential
-
     def test_init_database_creates_gnupg_hidden_directory(self):
         self.assertTrue(os.path.exists(self.database_path))
         self.assertTrue(os.path.exists(self.gnupg_path))
 
     def test_credentials_are_a_list_of_credential_instances(self):
-        self.database.add(self.some_credential(name="John1"))
-        self.database.add(self.some_credential(name="John2"))
-        self.database.add(self.some_credential(name="John3"))
+        self.database.add(build_credential(name="John1"))
+        self.database.add(build_credential(name="John2"))
+        self.database.add(build_credential(name="John3"))
 
         for credential in self.database.credentials:
             self.assertIsInstance(credential, Credential)
 
     def test_add_credential_creates_directory_with_credential_name(self):
-        credential = self.some_credential()
+        credential = build_credential()
         self.database.add(credential)
         credentials = self.database.credentials
         self.assertIn(credential.name, (c.name for c in credentials))
 
     def test_database_encrypt_uses_cipher_algo_aes256(self):
-        fingerprint = "fingerprint"
-        mock_gpg = mock.Mock()
-        mock_gpg.list_keys.return_value = [{"fingerprint": fingerprint}]
-        path = "path"
-        database = Database(path, mock_gpg)
-        database.encrypt("text")
-        self.assertTrue(database.gpg.encrypt.called)
-        _, call_kwargs = database.gpg.encrypt.call_args
+        self.database.gpg.encrypt = Mock()
+        self.database.encrypt("text")
+        self.assertTrue(self.database.gpg.encrypt.called)
+        _, call_kwargs = self.database.gpg.encrypt.call_args
         self.assertEqual(call_kwargs.get("cipher_algo"), "AES256")
 
     def test_save_credential_creates_dir_with_cred_name_on_given_path(self):
-        credential = self.some_credential()
+        credential = build_credential()
         credential.save(database_path=self.database_path)
         credential_path = os.path.join(self.database_path, credential.name)
         self.assertTrue(os.path.exists(credential_path))
@@ -120,7 +118,7 @@ class PysswordsTests(unittest.TestCase):
             self.database.credential(name="None")
 
     def test_edit_credential_in_database_saves_new_values(self):
-        credential = self.some_credential()
+        credential = build_credential()
         self.database.add(credential)
         new_name = "new_name"
         new_login = "new_login@example.com"
@@ -147,16 +145,16 @@ class PysswordsTests(unittest.TestCase):
         self.assertIn(credential_name, (c.name for c in credentials))
 
     def test_remove_credential_deletes_files_credential_dir(self):
-        credential = self.some_credential()
+        credential = build_credential()
         self.database.add(credential)
         self.assertIn(credential.name, os.listdir(self.database_path))
         self.database.remove(name=credential.name)
         self.assertNotIn(credential.name, os.listdir(self.database_path))
 
     def test_search_database_returns_expected_credentials(self):
-        credential = self.some_credential(
+        credential = build_credential(
             name="twitter", login="pysswords")
-        credential2 = self.some_credential(
+        credential2 = build_credential(
             name="wikipedia", comments="nothing")
         self.database.add(credential)
         self.database.add(credential2)
@@ -175,7 +173,7 @@ class PysswordsTests(unittest.TestCase):
     def test_database_from_path_method_calls_load_gpg(self):
         path = "/tmp/pysswords"
         gpg_bin = "/usr/bin/gpg"
-        with mock.patch("pysswords.db.load_gpg") as mocked_load_gpg:
+        with patch("pysswords.db.load_gpg") as mocked_load_gpg:
             Database.from_path(path, gpg_bin)
             mocked_load_gpg.assert_called_once_with(
                 binary=gpg_bin,
@@ -185,7 +183,7 @@ class PysswordsTests(unittest.TestCase):
     def test_database_from_path_method_returns_database_instance(self):
         path = "/tmp/pysswords"
         gpg_bin = "/usr/bin/gpg"
-        with mock.patch("pysswords.db.load_gpg") as mocked_load_gpg:
+        with patch("pysswords.db.load_gpg"):
             database = Database.from_path(path, gpg_bin)
             self.assertIsInstance(database, Database)
 
@@ -207,8 +205,8 @@ class PysswordsTests(unittest.TestCase):
         self.assertIsInstance(gpg, gnupg.GPG)
 
     def test_database_key_input_returns_gpg_key_input_string(self):
-        gpg = mock.Mock()
-        gpg.gen_key_input = mock.Mock()
+        gpg = Mock()
+        gpg.gen_key_input = Mock()
         passphrase = "dummy"
         testing = False
         create_key_input(gpg, passphrase, testing)
@@ -225,7 +223,7 @@ class PysswordsTests(unittest.TestCase):
         database_path = "/tmp"
         passphrase = "dummy"
         gnupg_path = os.path.join(database_path, ".gnupg")
-        with mock.patch("pysswords.crypt.gnupg.GPG") as mocked_GPG:
+        with patch("pysswords.crypt.gnupg.GPG") as mocked_GPG:
             mock_create_gpg(binary, database_path, passphrase)
             mocked_GPG.assert_called_once_with(
                 which(binary),
@@ -236,7 +234,7 @@ class PysswordsTests(unittest.TestCase):
         binary = "gpg"
         database_path = "/tmp/dummydb"
         passphrase = "dummypass"
-        with mock.patch("pysswords.crypt.gnupg.GPG") as mocked_gpg:
+        with patch("pysswords.crypt.gnupg.GPG") as mocked_gpg:
             crypt.create_gpg(binary, database_path, passphrase)
             self.assertTrue(mocked_gpg().gen_key.called)
 
@@ -245,8 +243,8 @@ class PysswordsTests(unittest.TestCase):
         database_path = "/tmp/dummydb"
         gnupg_path = os.path.join(database_path, ".gnupg")
         passphrase = "dummypass"
-        with mock.patch("pysswords.crypt.gnupg.GPG") as mocked_GPG:
-            with mock.patch("pysswords.crypt.which") as mocked_which:
+        with patch("pysswords.crypt.gnupg.GPG") as mocked_GPG:
+            with patch("pysswords.crypt.which") as mocked_which:
                 mocked_which.return_value = "/usr/bin/gpg"
                 crypt.create_gpg(binary, database_path, passphrase)
                 mocked_GPG.assert_called_once_with(
@@ -258,8 +256,8 @@ class PysswordsTests(unittest.TestCase):
         binary = "gpg"
         database_path = "/tmp/dummydb"
         gnupg_path = os.path.join(database_path, ".gnupg")
-        with mock.patch("pysswords.crypt.gnupg.GPG") as mocked_GPG:
-            with mock.patch("pysswords.crypt.which") as mocked_which:
+        with patch("pysswords.crypt.gnupg.GPG") as mocked_GPG:
+            with patch("pysswords.crypt.which") as mocked_which:
                 mocked_which.return_value = "/usr/bin/gpg"
                 crypt.load_gpg(binary, database_path)
                 mocked_GPG.assert_called_once_with(
@@ -270,7 +268,7 @@ class PysswordsTests(unittest.TestCase):
     def test_crypt_create_gpg_does_not_generates_gpg_key(self):
         binary = "gpg"
         database_path = "/tmp/dummydb"
-        with mock.patch("pysswords.crypt.gnupg.GPG") as mocked_gpg:
+        with patch("pysswords.crypt.gnupg.GPG") as mocked_gpg:
             crypt.load_gpg(binary, database_path)
             self.assertFalse(mocked_gpg().gen_key.called)
 
@@ -306,7 +304,7 @@ class PysswordsUtilsTests(unittest.TestCase):
         else:
             builtin_open = "builtins.open"
 
-        with mock.patch(builtin_open) as mocker:
+        with patch(builtin_open) as mocker:
             touch(touched_file)
             mocker.assert_called_once_with(touched_file, "a")
 
@@ -315,57 +313,59 @@ class PysswordsUtilsTests(unittest.TestCase):
         self.assertEqual(os.path.basename(python_path), "python")
 
     def test_which_function_appends_exe_when_os_name_is_nt(self):
-        with mock.patch("pysswords.utils.os") as mocker:
+        with patch("pysswords.utils.os") as mocker:
             mocker.name = "nt"
             mocker.environ = {"PATH": "/"}
             mocker.pathsep = ":"
-            mocked_join = mock.Mock()
+            mocked_join = Mock()
             mocker.path.join = mocked_join
             which("python")
             mocked_join.assert_any_call("/", "python.exe")
 
 
-class PysswordsConsoleInterfaceTests(PysswordsTests):
+class PysswordsConsoleInterfaceTests(unittest.TestCase):
 
     def setUp(self):
-        self.default_database_path = os.path.join(
-            os.path.expanduser("~"),
-            ".pysswords"
+        self.patcher_gpg = patch(
+            "pysswords.db.create_gpg", new=mock_create_gpg)
+        self.patcher_gpg.start()
+
+        self.database_path = os.path.join(TEST_DIR, ".pysswords")
+        self.gnupg_path = os.path.join(self.database_path, ".gnupg")
+        self.db_passphrase = "dummy_passphrase"
+        self.database = Database.create(
+            path=self.database_path,
+            passphrase=self.db_passphrase
         )
-        self.mocked_passphrase = "mocked_passphrase"
-        self.patcher_getpassphrase = mock.patch(
-            "pysswords.__main__.getpass",
-            return_value=self.mocked_passphrase)
-        self.patcher_getpassphrase.start()
-        super().setUp()
 
     def tearDown(self):
-        self.patcher_getpassphrase.stop()
-        super().tearDown()
+        self.patcher_gpg.stop()
+        shutil.rmtree(self.database_path)
 
     def test_args_init_without_path_uses_home_user_dotpysswords(self):
         command_args = ["--init"]
         args = __main__.get_args(command_args=command_args)
-        self.assertEqual(args.database, self.default_database_path)
+        self.assertEqual(args.database, __main__.default_database_path())
 
     def test_run_with_init_args_creates_new_database(self):
-        command_args = ["--init"]
-        args = __main__.get_args(command_args)
-        with mock.patch("pysswords.__main__.Database.create") as mocked:
-            __main__.run(args)
-            mocked.assert_called_once_with(
-                path=self.default_database_path,
-                passphrase=self.mocked_passphrase,
-                gpg_bin=__main__.DEFAULT_GPG_BINARY
-            )
+        args = __main__.get_args("--init".split())
+        pwd = self.db_passphrase
+        with patch("pysswords.__main__.get_password", return_value=pwd):
+            with patch("pysswords.__main__.Database.create") as mocked:
+                __main__.run(args)
+                mocked.assert_called_once_with(
+                    path=__main__.default_database_path(),
+                    passphrase=pwd,
+                    gpg_bin=__main__.default_gpg_binary()
+                )
 
     def test_getpassphrase_raises_value_error_when_passwords_didnt_match(self):
         if sys.version_info < (3,):
             builtin_print = "__builtin__.print"
         else:
             builtin_print = "builtins.print"
-        with mock.patch(builtin_print):
-            with mock.patch("pysswords.__main__.getpass") as mocked:
+        with patch(builtin_print):
+            with patch("pysswords.__main__.getpass") as mocked:
                 mocked.side_effect = ["pass", "wrong"] * 3
                 with self.assertRaises(ValueError):
                     __main__.get_password()
@@ -374,54 +374,73 @@ class PysswordsConsoleInterfaceTests(PysswordsTests):
         gpg_binary = "gpg_binary"
         command_args = ["--gpg", gpg_binary, "--init"]
         args = __main__.get_args(command_args=command_args)
-        with mock.patch("pysswords.__main__.Database.create") as mocked:
-            __main__.run(args)
-            mocked.assert_called_once_with(
-                path=self.default_database_path,
-                passphrase=self.mocked_passphrase,
-                gpg_bin=gpg_binary
-            )
+        pwd = self.db_passphrase
+        with patch("pysswords.__main__.get_password", return_value=pwd):
+            with patch("pysswords.__main__.Database.create") as mocked:
+                __main__.run(args)
+                mocked.assert_called_once_with(
+                    path=__main__.default_database_path(),
+                    passphrase=self.db_passphrase,
+                    gpg_bin=gpg_binary
+                )
 
     def test_console_inteface_init_logs_path_to_database(self):
-        mocked_db = mock.Mock()
-        mocked_db.path = "/tmp/dummy/path"
-        command_args = ["--init"]
-        args = __main__.get_args(command_args=command_args)
-        with mock.patch("pysswords.__main__.Database.create",
-                        return_value=mocked_db):
-            with mock.patch("pysswords.__main__.logging.info") as mock_log:
+        args = __main__.get_args("--init".split())
+        mockdb = Mock()
+        mockdb.path = "path"
+        with patch("pysswords.__main__.init_database", return_value=mockdb):
+            with patch("pysswords.__main__.logging") as mocklog:
                 __main__.run(args)
-                log_message = "Database created at '{}'".format(
-                    mocked_db.path
-                )
-                mock_log.assert_any_call(
-                    log_message
-                )
+                log_message = "Database created at '{}'".format(mockdb.path)
+                mocklog.info.assert_called_once_with(log_message)
 
     def test_interface_check_passphrase_throws_error_wrong_passphrase(self):
-        mocked_db = mock.Mock()
+        mocked_db = Mock()
         mocked_db.gpg.sign.return_value = False
         with self.assertRaises(ValueError):
             __main__.check_passphrase(database=mocked_db, passphrase="dummy")
 
     def test_get_args_raise_parser_error_when_arg_clipboard_without_get(self):
         with open(os.devnull, 'w') as devnull:
-            with mock.patch("sys.stderr", devnull):
+            with patch("sys.stderr", devnull):
                 with self.assertRaises(SystemExit):
                     __main__.get_args("-c".split())
 
     def test_check_passphrase_raises_value_error_for_wrong_passphrase(self):
-        mock_db = mock.Mock()
-        mock_db.gpg.sign.return_value = False
+        mockdb = Mock()
+        mockdb.gpg.sign.return_value = False
         passphrase = "dummy"
         with self.assertRaises(ValueError):
-            __main__.check_passphrase(mock_db, passphrase)
+            __main__.check_passphrase(mockdb, passphrase)
 
-    def test_check_passphrase_returns_true_when_good_passphrase(self):
-        mock_db = mock.Mock()
-        mock_db.gpg.sign.return_value = True
-        passphrase = "dummy"
-        self.assertTrue(__main__.check_passphrase(mock_db, passphrase))
+    # def test_build_row_with_show_password_false_has_hidden_password(self):
+    #     credential = build_credential()
+    #     self.database.add(credential)
+    #     name, login, password, comments = __main__.build_row(
+    #         database=self.database,
+    #         credential=credential,
+    #         show_password=False
+    #     )
+    #     expected_password = "***"
+    #     self.assertEqual(expected_password, password)
+
+    # def test_build_row_with_show_password_true_writes_plaintext_password(self):
+    #     credential = build_credential()
+    #     self.database.add(credential)
+    #     name, login, password, comments = __main__.build_row(
+    #         self.database,
+    #         credential,
+    #         show_password=False
+    #     )
+    #     decrypted_password = self.database.gpg.decrypt(
+    #         credential.password,
+    #         passphrase=self.database_passphrase
+    #     )
+    #     self.assertIn(credential.name, name)
+    #     self.assertEqual(credential.login, login)
+    #     self.assertEqual(decrypted_password, password)
+    #     self.assertEqual(credential.comments, comments)
+
 
 if __name__ == "__main__":
     if sys.version_info >= (3, 1):
