@@ -40,24 +40,23 @@ Check the implemented features on the `Features`_ section.
     # add new credentials. Option: `-a` or `--add`
     pysswords -a
 
-    # get credential with name "github". Option: `-g` or `--get`
+    # get credential "github". Option: `-g` or `--get`
     pysswords -g github
 
-    # delete credential with name "github". Option: `-d` or `--delete`
+    # delete credential "github". Option: `-r` or `--remove`
     pysswords -d github
 
     # search credentials with query "github". Option: `-s` or `--search`
     pysswords -s github
 
-    # copy password from credential named "github" into clipboard. Option: `-c` or `--clipboard`
+    # copy password from credential "github" into clipboard. Option: `-c` or `--clipboard`
     pysswords -c github
 
     # print all credentials as a table with hidden passwords
     pysswords
 
-    # print all credentials as a table shows password in plain text. Option: `--show-password`
+    # print all credentials and show passwords in plain text. Option: `--show-password`
     pysswords --show-password
-
 
 
 ************
