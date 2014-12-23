@@ -24,6 +24,7 @@ Main Features [#]_
 | **☑** Copy passwords to clipboard
 | **☑** Search credentials by name, login or comments
 | **☑** List credentials as a table
+| **☑** Colored output
 | **☐** Search with regular expression
 | **☐** Importing credentials from other applications
 | **☐** Undo/Redo modifications to the database
