@@ -68,13 +68,14 @@ def import_keys(binary, database_path, ascfile="key.asc"):
 
 
 def setup_database():
+    binary = "gpg"
     database_path = os.path.join(TEST_DIR, "database")
+    gnupg_path = os.path.join(database_path, ".gnupg")
+    gpg = gnupg.GPG(which(binary), homedir=gnupg_path)
+
     keyfile = os.path.join(TEST_DIR, "key.asc")
-    if os.path.exists(database_path):
-        shutil.rmtree(database_path)
-    if os.path.exists(keyfile):
-        os.remove(keyfile)
-    gpg = export_keys("gpg", database_path, keyfile)
+    if not os.path.exists(keyfile):
+        export_keys("gpg", database_path, keyfile)
     return gpg
 
 
@@ -100,11 +101,6 @@ def build_credential(**kwargs):
 
 def clean_credentials(database_path):
     for credential_dir in glob(database_path + "/**"):
-        # print("------")
-        # print(credential_dir)
-        # print(os.path.realpath(credential_dir))
-        # print(os.path.relpath(credential_dir))
-        # print("------")
         shutil.rmtree(os.path.relpath(credential_dir))
 
 
