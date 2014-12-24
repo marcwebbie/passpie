@@ -16,13 +16,18 @@ try:
 except NameError:
     pass
 
-DEFAULT_DATABASE_PATH = os.path.join(
-    os.path.expanduser("~"),
-    ".pysswords"
-)
-DEFAULT_GPG_BINARY = "gpg"
-
 colorama.init(autoreset=True)
+
+
+def default_database_path():
+    return os.path.join(
+        os.path.expanduser("~"),
+        ".pysswords"
+    )
+
+
+def default_gpg_binary():
+    return "gpg"
 
 
 def get_args(command_args=None):
@@ -30,7 +35,7 @@ def get_args(command_args=None):
     parser = argparse.ArgumentParser(prog="pysswords")
     parser.add_argument("-I", "--init", action="store_true",
                         help="create a new Pysswords database")
-    parser.add_argument("-d", "--database", default=DEFAULT_DATABASE_PATH,
+    parser.add_argument("-d", "--database", default=default_database_path(),
                         metavar="<DATABASE PATH>",
                         help="specify path to database")
     parser.add_argument("--show-password", action="store_true",
@@ -49,7 +54,7 @@ def get_args(command_args=None):
                         help="print all credentials as a table")
     parser.add_argument("-c", "--clipboard", action="store_true",
                         help="copy credential password to clipboard")
-    parser.add_argument("--gpg", metavar="<GPG>", default=DEFAULT_GPG_BINARY,
+    parser.add_argument("--gpg", metavar="<GPG>", default=default_gpg_binary(),
                         help="gpg binary name")
     args = parser.parse_args(command_args)
 
@@ -83,22 +88,28 @@ def check_passphrase(database, passphrase):
     return True
 
 
-def list_credentials(database, query=None, show_password=False):
+def build_row(database, credential, show_password, hidden_password="****"):
+    credential_password = hidden_password
     if show_password:
         passphrase = getpass("Database passphrase: ")
         check_passphrase(database, passphrase)
+        credential_password = database.decrypt(
+            text=credential.password,
+            passphrase=passphrase
+        )
+    row = [
+        colorama.Fore.YELLOW + credential.name + colorama.Fore.RESET,
+        credential.login,
+        credential_password,
+        credential.comments
+    ]
+    return row
+
+
+def list_credentials(database, query=None, show_password=False):
     headers = ["name", "login", "password", "comments"]
     table = []
     for credential in database.credentials:
-        row = [
-            colorama.Fore.YELLOW + credential.name + colorama.Fore.RESET,
-            credential.login,
-            "..." if not show_password else database.gpg.decrypt(
-                credential.password,
-                passphrase=passphrase
-            ),
-            credential.comments
-        ]
         table.append(row)
     print(tabulate(table, headers, tablefmt="orgtbl"))
 
@@ -172,15 +183,19 @@ def edit_credential(database, name):
         database.edit(name=name, values=values)
 
 
+def init_database(path, gpg):
+    return Database.create(
+        path=path,
+        passphrase=get_password("Database passphrase: "),
+        gpg_bin=gpg
+    )
+
+
 def run(args=None):
     args = get_args() if args is None else args
 
     if args.init:
-        database = Database.create(
-            path=args.database,
-            passphrase=get_password("Database passphrase: "),
-            gpg_bin=args.gpg
-        )
+        database = init_database(path=args.database, gpg=args.gpg)
         logging.info("Database created at '{}'".format(database.path))
     else:
         database = Database.from_path(path=args.database,
