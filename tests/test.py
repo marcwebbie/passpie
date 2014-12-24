@@ -501,6 +501,15 @@ class ConsoleInterfaceTests(unittest.TestCase):
                 credential = __main__.prompt_credential()
                 self.assertIsInstance(credential, Credential)
 
+    def test_cli_add_credential_adds_credential_to_database(self):
+        cred = build_credential()
+        with patch("pysswords.__main__.prompt_credential", return_value=cred):
+            self.assertEqual(0, len(self.database.credentials))
+            __main__.add_credential(self.database)
+            self.assertEqual(1, len(self.database.credentials))
+            self.assertIn(cred.name, [c.name
+                                      for c in self.database.credentials])
+
 
 if __name__ == "__main__":
     if sys.version_info >= (3, 1):
