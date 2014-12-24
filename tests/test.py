@@ -464,6 +464,12 @@ class ConsoleInterfaceTests(unittest.TestCase):
             )
             self.assertEqual(decrypted_password, password)
 
+    def test_get_password_returns_password_when_passwords_match(self):
+        password = "password"
+        with patch("pysswords.__main__.getpass") as mocked_getpass:
+            mocked_getpass.side_effect = [password, password]
+            result = __main__.get_password()
+            self.assertEqual(result, password)
 
 if __name__ == "__main__":
     if sys.version_info >= (3, 1):
