@@ -12,9 +12,9 @@ try:
 except ImportError:
     from mock import patch, Mock
 if sys.version_info >= (3,):
-    BUILTIN_NAME = "builtins"
+    BUILTINS_NAME = "builtins"
 else:
-    BUILTIN_NAME = "__builtins__"
+    BUILTINS_NAME = "__builtin__"
 
 __file__ = os.path.abspath(inspect.getsourcefile(lambda _: None))
 
@@ -333,7 +333,7 @@ class UtilsTests(unittest.TestCase):
 
     def test_touch_function(self):
         touched_file = os.path.join(TEST_DIR, "data", "touched.txt")
-        with patch("{}.open".format(BUILTIN_NAME)) as mocker:
+        with patch("{}.open".format(BUILTINS_NAME)) as mocker:
             touch(touched_file)
             mocker.assert_called_once_with(touched_file, "a")
 
@@ -386,7 +386,7 @@ class ConsoleInterfaceTests(unittest.TestCase):
                 )
 
     def test_getpassphrase_raises_value_error_when_passwords_didnt_match(self):
-        with patch("{}.print".format(BUILTIN_NAME)):
+        with patch("{}.print".format(BUILTINS_NAME)):
             with patch("pysswords.__main__.getpass") as mocked:
                 mocked.side_effect = ["pass", "wrong"] * 3
                 with self.assertRaises(ValueError):
@@ -492,6 +492,14 @@ class ConsoleInterfaceTests(unittest.TestCase):
         self.assertIn(credential_two.name, output)
         self.assertIn(credential_two.login, output)
         self.assertIn(credential_two.comments, output)
+
+    def test_prompt_credential_returns_credential_instance(self):
+        py3 = sys.version_info >= (3,)
+        to_patch = "builtins.input" if py3 else "pysswords.__main__.input"
+        with patch(to_patch, return_value="x"):
+            with patch("pysswords.__main__.get_password", return_value="y"):
+                credential = __main__.prompt_credential()
+                self.assertIsInstance(credential, Credential)
 
 
 if __name__ == "__main__":

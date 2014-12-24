@@ -115,7 +115,7 @@ def list_credentials(database, query=None, show_password=False):
     print(tabulate(table, headers, tablefmt="orgtbl"))
 
 
-def prompt_credential(**defaults):
+def prompt_credential():
     credential_name = input("Name: ")
     credential_login = input("Login: ")
     credential_password = get_password("Credential password: ")
