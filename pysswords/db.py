@@ -41,6 +41,9 @@ class Database(object):
         encrypted = self.gpg.encrypt(text, key, cipher_algo="AES256")
         return str(encrypted)
 
+    def decrypt(self, text, passphrase):
+        return str(self.gpg.decrypt(text, passphrase=passphrase))
+
     def add(self, credential):
         credential.save(database_path=self.path)
 
