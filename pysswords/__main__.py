@@ -135,13 +135,12 @@ def add_credential(database):
 
 def copy_password_to_clipboard(database, credential_name):
     credential = database.credential(name=credential_name)
-    if credential:
-        passphrase = getpass("Database passphrase: ")
-        check_passphrase(database, passphrase)
-        pyperclip.copy(
-            database.gpg.decrypt(credential.password, passphrase=passphrase)
-        )
-        print("Password for '{}' copied to clipboard".format(credential.name))
+    passphrase = getpass("Database passphrase: ")
+    check_passphrase(database, passphrase)
+    pyperclip.copy(
+        database.gpg.decrypt(credential.password, passphrase=passphrase)
+    )
+    print("Password for '{}' copied to clipboard".format(credential.name))
 
 
 def get_confirmation(prompt):

@@ -510,6 +510,33 @@ class ConsoleInterfaceTests(unittest.TestCase):
             self.assertIn(cred.name, [c.name
                                       for c in self.database.credentials])
 
+    def test_cli_copy_password_to_clipboard_asks_database_passphrase(self):
+        credential = build_credential()
+        self.database.add(credential)
+        with patch("pysswords.__main__.getpass",
+                   return_value=self.db_passphrase) as mocked_getpass:
+            with patch("sys.stdout"):
+                __main__.copy_password_to_clipboard(
+                    self.database,
+                    credential.name
+                )
+                mocked_getpass.assert_called_once_with(
+                    "Database passphrase: "
+                )
+
+    def test_cli_copy_password_to_clipboard_calls_puperclip_copy(self):
+        credential = build_credential()
+        self.database.add(credential)
+        with patch("pysswords.__main__.getpass",
+                   return_value=self.db_passphrase) as mocked_getpass:
+            with patch("pysswords.__main__.pyperclip") as mocked_pyperclip:
+                with patch("sys.stdout"):
+                    __main__.copy_password_to_clipboard(
+                        self.database,
+                        credential.name
+                    )
+                    self.assertTrue(mocked_pyperclip.copy.called)
+
 
 if __name__ == "__main__":
     if sys.version_info >= (3, 1):
