@@ -528,7 +528,7 @@ class ConsoleInterfaceTests(unittest.TestCase):
         credential = build_credential()
         self.database.add(credential)
         with patch("pysswords.__main__.getpass",
-                   return_value=self.db_passphrase) as mocked_getpass:
+                   return_value=self.db_passphrase):
             with patch("pysswords.__main__.pyperclip") as mocked_pyperclip:
                 with patch("sys.stdout"):
                     __main__.copy_password_to_clipboard(
