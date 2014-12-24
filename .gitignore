@@ -19,3 +19,5 @@
 *.bak
 /.coverage
 *~
+/tests/key.asc
+/tests/database/.gnupg/*
