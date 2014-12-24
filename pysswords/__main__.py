@@ -79,7 +79,7 @@ def get_password(prompt="Password: "):
 def check_passphrase(database, passphrase):
     signed = database.gpg.sign(
         'testing',
-        default_key=database.gpg_key,
+        default_key=database.key,
         passphrase=passphrase
     )
     if not signed:
