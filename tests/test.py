@@ -471,6 +471,33 @@ class ConsoleInterfaceTests(unittest.TestCase):
             result = __main__.get_password()
             self.assertEqual(result, password)
 
+    def test_list_credentials_print_all_credentials(self):
+        credential_one = build_credential(
+            name="example",
+            login="py@example",
+            comments="example account"
+        )
+        self.database.add(credential_one)
+
+        credential_two = build_credential(
+            name="bank",
+            login="None",
+            comments="Credit card"
+        )
+        self.database.add(credential_two)
+
+        from io import StringIO
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            __main__.list_credentials(self.database)
+            output = mock_stdout.getvalue()
+        self.assertIn(credential_one.name, output)
+        self.assertIn(credential_one.login, output)
+        self.assertIn(credential_one.comments, output)
+        self.assertIn(credential_two.name, output)
+        self.assertIn(credential_two.login, output)
+        self.assertIn(credential_two.comments, output)
+
+
 if __name__ == "__main__":
     if sys.version_info >= (3, 1):
         unittest.main(warnings="ignore")

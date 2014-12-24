@@ -110,6 +110,7 @@ def list_credentials(database, query=None, show_password=False):
     headers = ["name", "login", "password", "comments"]
     table = []
     for credential in database.credentials:
+        row = build_row(database, credential, show_password)
         table.append(row)
     print(tabulate(table, headers, tablefmt="orgtbl"))
 
