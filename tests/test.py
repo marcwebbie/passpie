@@ -67,7 +67,7 @@ def import_keys(binary, database_path, ascfile="key.asc"):
     print(import_result.results)
 
 
-def setup_database():
+def setup_testing_database():
     binary = "gpg"
     database_path = os.path.join(TEST_DIR, "database")
     gnupg_path = os.path.join(database_path, ".gnupg")
@@ -104,7 +104,7 @@ def clean_credentials(database_path):
         shutil.rmtree(os.path.relpath(credential_dir))
 
 
-setup_database()
+setup_testing_database()
 
 
 @patch("pysswords.db.create_gpg", new=mock_create_gpg)
