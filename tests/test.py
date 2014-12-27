@@ -8,8 +8,10 @@ import gnupg
 
 # compat
 try:
+    from io import StringIO
     from unittest.mock import patch, Mock
 except ImportError:
+    import StringIO
     from mock import patch, Mock
 if sys.version_info >= (3,):
     BUILTINS_NAME = "builtins"
@@ -109,7 +111,6 @@ setup_testing_database()
 
 @patch("pysswords.db.create_gpg", new=mock_create_gpg)
 class PysswordsTests(unittest.TestCase):
-
     def setUp(self):
         self.database_path = os.path.join(TEST_DIR, "database")
         self.gnupg_path = os.path.join(self.database_path, ".gnupg")
@@ -482,7 +483,6 @@ class ConsoleInterfaceTests(unittest.TestCase):
         )
         self.database.add(credential_two)
 
-        from io import StringIO
         with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
             __main__.list_credentials(self.database)
             output = mock_stdout.getvalue()
@@ -536,6 +536,13 @@ class ConsoleInterfaceTests(unittest.TestCase):
                         credential.name
                     )
                     self.assertTrue(mocked_pyperclip.copy.called)
+
+    def test_cli_get_confirmation_asks_yes_or_no(self):
+        py3 = sys.version_info >= (3,)
+        to_patch = "builtins.input" if py3 else "pysswords.__main__.input"
+        with patch(to_patch, new_callable=StringIO) as mocked_input:
+            __main__.get_confirmation(prompt="")
+            self.assertIn("y|n", mocked_input.return_value())
 
 
 if __name__ == "__main__":
