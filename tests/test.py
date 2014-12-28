@@ -8,12 +8,12 @@ from unittest.mock import patch
 import gnupg
 
 
-__file__ = os.path.abspath(inspect.getsourcefile(lambda _: None))
+__file__ = os.path.relpath(inspect.getsourcefile(lambda _: None))
 
-TEST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+TEST_DIR = os.path.join(os.path.dirname(os.path.relpath(__file__)))
 TEST_DATA_DIR = os.path.join(TEST_DIR, "data")
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.relpath(__file__))))
 import pysswords
 
 
