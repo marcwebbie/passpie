@@ -17,16 +17,14 @@ def keys_path(path):
     return os.path.join(path, ".keys")
 
 
-def create_keys(path, passphrase):
-    gpg = gnupg.GPG(homedir=path)
+def create_keys(keyring_path, passphrase):
+    gpg = gnupg.GPG(homedir=keyring_path)
     key = gpg.gen_key(key_input(passphrase))
     return key
 
 
 def create_keyring(path, passphrase):
-    os.makedirs(path)
-    keys_path = os.path.join(path, ".keys")
-    create_keys(keys_path, passphrase)
+    create_keys(keys_path(path), passphrase)
 
 
 def create(path):
