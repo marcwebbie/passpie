@@ -19,9 +19,13 @@ setup(
     author='Marcwebbie',
     author_email='marcwebbie@gmail.com',
     url='https://github.com/marcwebbie/pysswords',
-    scripts=["bin/pysswords"],
     download_url='https://pypi.python.org/pypi/pysswords',
     packages=['pysswords'],
+    entry_points={
+        'console_scripts': [
+            'pysswords = pysswords.__main__:main',
+        ]
+    },
     install_requires=requirements,
     test_suite='tests.test',
     classifiers=[
