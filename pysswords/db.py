@@ -24,5 +24,6 @@ def create_keys(path, passphrase):
 
 
 def create_keyring(path, passphrase):
-    gnupg.GPG(homedir=path)
-    create_keys(path, passphrase)
+    os.makedirs(path)
+    keys_path = os.path.join(path, ".keys")
+    create_keys(keys_path, passphrase)

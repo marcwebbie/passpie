@@ -30,7 +30,10 @@ def mock_create_keys(path, *args, **kwargs):
 class DBTests(unittest.TestCase):
     def setUp(self):
         self.path = os.path.join(TEST_DATA_DIR, "database")
+        self.keys_path = os.path.join(self.path, ".keys")
         self.passphrase = "dummy_passphrase"
+        if os.path.exists(self.path):
+            shutil.rmtree(self.path)
 
     def tearDown(self):
         if os.path.exists(self.path):
@@ -45,17 +48,17 @@ class DBTests(unittest.TestCase):
         pysswords.db.create_keyring(
             path=self.path,
             passphrase=self.passphrase)
-        pubring = os.path.join(self.path, "pubring.gpg")
-        secring = os.path.join(self.path, "secring.gpg")
-        self.assertTrue(os.path.exists(pubring))
-        self.assertTrue(os.path.exists(secring))
+        pubring = os.path.join(self.path, ".keys", "pubring.gpg")
+        secring = os.path.join(self.path, ".keys", "secring.gpg")
+        self.assertTrue(os.path.isfile(pubring))
+        self.assertTrue(os.path.isfile(secring))
 
     def test_create_keyring_adds_key_to_keyring(self):
-        self.assertEqual(0, len(gnupg.GPG(homedir=self.path).list_keys()))
         pysswords.db.create_keyring(
             path=self.path,
             passphrase=self.passphrase)
-        self.assertEqual(1, len(gnupg.GPG(homedir=self.path).list_keys()))
+        gpg = gnupg.GPG(homedir=self.keys_path)
+        self.assertEqual(1, len(gpg.list_keys()))
 
     def test_create_keys_return_valid_key(self):
         key = pysswords.db.create_keys(self.path, self.passphrase)
