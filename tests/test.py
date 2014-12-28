@@ -3,6 +3,7 @@ import os
 import shutil
 import sys
 import unittest
+from unittest.mock import patch
 
 import gnupg
 
@@ -16,6 +17,16 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pysswords
 
 
+def mock_create_keys(path, *args, **kwargs):
+    """Import key.asc instead of generating new key
+    passphrase used to create the key was 'dummy_database'"""
+    gpg = gnupg.GPG(homedir=path)
+    with open(os.path.join(TEST_DATA_DIR, "key.asc")) as keyfile:
+        gpg.import_keys(keyfile.read())
+    return gpg.list_keys()[0]
+
+
+@patch("pysswords.db.create_keys", new=mock_create_keys)
 class DBTests(unittest.TestCase):
     def setUp(self):
         self.path = os.path.join(TEST_DATA_DIR, "database")
