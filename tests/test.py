@@ -68,6 +68,10 @@ class DBTests(unittest.TestCase):
         batch = pysswords.db.key_input(self.passphrase)
         self.assertIn("\nPassphrase: {}".format(self.passphrase), batch)
 
+    def test_keys_path_returns_database_path_joined_with_dot_keys(self):
+        keys_path = pysswords.db.keys_path(self.path)
+        self.assertEqual(keys_path, os.path.join(self.path, ".keys"))
+
 
 if __name__ == "__main__":
     unittest.main(warnings=False)

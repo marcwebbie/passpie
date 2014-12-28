@@ -2,10 +2,6 @@ import os
 import gnupg
 
 
-def create(path):
-    os.makedirs(path)
-
-
 def key_input(passphrase):
     return gnupg.GPG().gen_key_input(
         name_real="Pysswords",
@@ -15,6 +11,10 @@ def key_input(passphrase):
         expire_date=0,
         passphrase=passphrase
     )
+
+
+def keys_path(path):
+    return os.path.join(path, ".keys")
 
 
 def create_keys(path, passphrase):
@@ -27,3 +27,7 @@ def create_keyring(path, passphrase):
     os.makedirs(path)
     keys_path = os.path.join(path, ".keys")
     create_keys(keys_path, passphrase)
+
+
+def create(path):
+    os.makedirs(path)
