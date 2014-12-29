@@ -12,6 +12,16 @@ def getgpg(path):
     return gnupg.GPG(binary=shutil.which("gpg"), homedir=keys_path(path))
 
 
+def pyssword_content(name, login, password, comment):
+    credential = {
+        "name": name,
+        "login": login,
+        "password": password,
+        "comment": comment
+    }
+    return yaml.dump(credential)
+
+
 def key_input(path, passphrase):
     return getgpg(path).gen_key_input(
         name_real="Pysswords",
@@ -33,12 +43,18 @@ def create_keyring(path, passphrase):
     return keys_path
 
 
-def create_credential(path, name, login, password):
+def create_credential(path, name, login, password, comment):
     credential_dir = os.path.join(path, name)
     os.makedirs(credential_dir)
     credential_file = "{}.pyssword".format(login)
     with open(os.path.join(credential_dir, credential_file), "w") as f:
-        f.write(password)
+        credential = {
+            "name": name,
+            "login": login,
+            "password": password,
+            "comment": comment
+        }
+        f.write(pyssword_content(**credential))
 
 
 def create(path):
