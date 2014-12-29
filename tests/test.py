@@ -65,13 +65,44 @@ class DBTests(unittest.TestCase):
         self.assertIsNotNone(key)
 
     def test_key_input_returns_batch_string_with_passphrase(self):
-        batch = pysswords.db.key_input(self.passphrase)
+        batch = pysswords.db.key_input(self.path, self.passphrase)
         self.assertIn("\nPassphrase: {}".format(self.passphrase), batch)
 
     def test_keys_path_returns_database_path_joined_with_dot_keys(self):
         keys_path = pysswords.db.keys_path(self.path)
         self.assertEqual(keys_path, os.path.join(self.path, ".keys"))
 
+    def test_create_credential_make_dir_in_dbpath_with_credential_name(self):
+        credential = {
+            "name": "example.com",
+            "login": "john.doe",
+            "password": "great password"
+        }
+
+        pysswords.db.create_credential(self.path, **credential)
+        credential_dir = os.path.join(self.path, credential["name"])
+        self.assertTrue(os.path.exists(credential_dir))
+        self.assertTrue(os.path.isdir(credential_dir))
+
+    def test_create_credential_creates_pyssword_file_named_after_login(self):
+        credential = {
+            "name": "example.com",
+            "login": "john.doe",
+            "password": "great password"
+        }
+
+        pysswords.db.create_credential(self.path, **credential)
+        credential_dir = os.path.join(self.path, credential["name"])
+        credential_filename = "{}.pyssword".format(credential["login"])
+        credential_file = os.path.join(credential_dir, credential_filename)
+        self.assertTrue(os.path.isfile(credential_file))
+        with open(credential_file) as f:
+            self.assertEqual(credential["password"], f.read())
+
+
+    def test_getgpg_returns_valid_gnupg_gpg_object(self):
+        gpg = pysswords.db.getgpg(self.path)
+        self.assertIsInstance(gpg, pysswords.db.gnupg.GPG)
 
 if __name__ == "__main__":
     unittest.main(warnings=False)
