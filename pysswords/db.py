@@ -1,7 +1,11 @@
+from collections import namedtuple
 import os
 import gnupg
 import shutil
 import yaml
+
+
+Credential = namedtuple("Credential", "name login password comment")
 
 
 def keys_path(path):
@@ -12,13 +16,7 @@ def getgpg(path):
     return gnupg.GPG(binary=shutil.which("gpg"), homedir=keys_path(path))
 
 
-def pyssword_content(name, login, password, comment):
-    credential = {
-        "name": name,
-        "login": login,
-        "password": password,
-        "comment": comment
-    }
+def pyssword_content(credential):
     return yaml.dump(credential)
 
 
@@ -43,18 +41,12 @@ def create_keyring(path, passphrase):
     return keys_path
 
 
-def create_credential(path, name, login, password, comment):
-    credential_dir = os.path.join(path, name)
+def add_credential(path, credential):
+    credential_dir = os.path.join(path, credential.name)
     os.makedirs(credential_dir)
-    credential_file = "{}.pyssword".format(login)
+    credential_file = "{}.pyssword".format(credential.login)
     with open(os.path.join(credential_dir, credential_file), "w") as f:
-        credential = {
-            "name": name,
-            "login": login,
-            "password": password,
-            "comment": comment
-        }
-        f.write(pyssword_content(**credential))
+        f.write(pyssword_content(credential))
 
 
 def create(path):

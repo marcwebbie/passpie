@@ -33,12 +33,12 @@ class DBTests(unittest.TestCase):
         self.path = os.path.join(TEST_DATA_DIR, "database")
         self.keys_path = os.path.join(self.path, ".keys")
         self.passphrase = "dummy_passphrase"
-        self.credential = {
-            "name": "example.com",
-            "login": "john.doe",
-            "password": "great password",
-            "comment": "Main email"
-        }
+        self.credential = pysswords.db.Credential(
+            name="example.com",
+            login="john.doe",
+            password="--BEGIN GPG-- something --END GPG--",
+            comment="Main email"
+        )
         if os.path.exists(self.path):
             shutil.rmtree(self.path)
 
@@ -79,16 +79,16 @@ class DBTests(unittest.TestCase):
         keys_path = pysswords.db.keys_path(self.path)
         self.assertEqual(keys_path, os.path.join(self.path, ".keys"))
 
-    def test_create_credential_make_dir_in_dbpath_with_credential_name(self):
-        pysswords.db.create_credential(self.path, **self.credential)
-        credential_dir = os.path.join(self.path, self.credential["name"])
+    def test_add_credential_make_dir_in_dbpath_with_credential_name(self):
+        pysswords.db.add_credential(self.path, self.credential)
+        credential_dir = os.path.join(self.path, self.credential.name)
         self.assertTrue(os.path.exists(credential_dir))
         self.assertTrue(os.path.isdir(credential_dir))
 
-    def test_create_credential_creates_pyssword_file_named_after_login(self):
-        pysswords.db.create_credential(self.path, **self.credential)
-        credential_dir = os.path.join(self.path, self.credential["name"])
-        credential_filename = "{}.pyssword".format(self.credential["login"])
+    def test_add_credential_creates_pyssword_file_named_after_login(self):
+        pysswords.db.add_credential(self.path, self.credential)
+        credential_dir = os.path.join(self.path, self.credential.name)
+        credential_filename = "{}.pyssword".format(self.credential.login)
         credential_file = os.path.join(credential_dir, credential_filename)
         self.assertTrue(os.path.isfile(credential_file))
         with open(credential_file) as f:
@@ -99,7 +99,7 @@ class DBTests(unittest.TestCase):
         self.assertIsInstance(gpg, pysswords.db.gnupg.GPG)
 
     def test_pyssword_content_returns_yaml_content_parseble_to_dict(self):
-        content = pysswords.db.pyssword_content(**self.credential)
+        content = pysswords.db.pyssword_content(self.credential)
         self.assertEqual(yaml.load(content), self.credential)
 
 
