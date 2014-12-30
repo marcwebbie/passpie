@@ -110,4 +110,7 @@ class DBTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main(warnings=False)
+    if sys.version_info >= (3,):
+        unittest.main(warnings=False)
+    else:
+        unittest.main()

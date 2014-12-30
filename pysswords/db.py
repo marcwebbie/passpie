@@ -1,9 +1,9 @@
 from collections import namedtuple
 import os
 import gnupg
-import shutil
 import yaml
 
+from .utils import which
 
 Credential = namedtuple("Credential", "name login password comment")
 
@@ -13,7 +13,7 @@ def keys_path(path):
 
 
 def getgpg(path):
-    return gnupg.GPG(binary=shutil.which("gpg"), homedir=keys_path(path))
+    return gnupg.GPG(binary=which("gpg"), homedir=keys_path(path))
 
 
 def pyssword_content(credential):

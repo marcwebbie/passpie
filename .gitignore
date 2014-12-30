@@ -21,3 +21,4 @@
 *~
 /tests/key.asc
 /tests/database/.gnupg/*
+/.eggs/
