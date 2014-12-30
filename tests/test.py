@@ -8,7 +8,7 @@ try:
     from unittest.mock import patch
 except ImportError:
     try:
-        import mock
+        from mock import patch
     except ImportError:
         exit("mock not found. Run: `pip install mock`")
 
