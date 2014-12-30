@@ -4,7 +4,13 @@ import shutil
 import sys
 import unittest
 import yaml
-from unittest.mock import patch
+try:
+    from unittest.mock import patch
+except ImportError:
+    try:
+        import mock
+    except ImportError:
+        exit("mock not found. Run: `pip install mock`")
 
 import gnupg
 
