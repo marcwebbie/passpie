@@ -7,7 +7,7 @@ __version__ = "0.0.7"
 
 requirements = [pkg.strip() for pkg in open('requirements.txt').readlines()]
 
-with open("README.rst") as f:
+with open("README.md") as f:
     long_description = f.read() + '\n'
 
 setup(
