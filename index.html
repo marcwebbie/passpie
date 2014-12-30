@@ -1,0 +1,246 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Pysswords by marcwebbie</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Pysswords</h1>
+        <p>Pysswords manages login credentials in a local encrypted database</p>
+
+        <p class="view"><a href="https://github.com/marcwebbie/pysswords">View the Project on GitHub <small>marcwebbie/pysswords</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/marcwebbie/pysswords/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/marcwebbie/pysswords/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/marcwebbie/pysswords">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="pysswords-manage-your-passwords-from-the-terminal" class="anchor" href="#pysswords-manage-your-passwords-from-the-terminal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pysswords: Manage your passwords from the terminal</h1>
+
+<p><a href="https://github.com/marcwebbie/pysswords">Pysswords</a> lets you manage
+your login credentials from the terminal. Password files are saved into
+<a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard">GnuGPG</a> encrypted files
+into the Database Path_. Only with the passphrase used to create the
+pyssword database you can decrypt password files. If you want to know
+more about how pysswords works internally, check the Under the Hood_
+section.</p>
+
+<p><img src="https://github.com/marcwebbie/pysswords/raw/master/images/pysswords.png" alt="Pysswords console interface"></p>
+
+<hr>
+
+<h2>
+<a id="main-features" class="anchor" href="#main-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Main Features</h2>
+
+<ul>
+<li>
+<code>☑</code> Console interface</li>
+<li>
+<code>☑</code> Manage multiple databases</li>
+<li>
+<code>☑</code> Add, edit, remove credentials</li>
+<li>
+<code>☑</code> Copy passwords to clipboard</li>
+<li>
+<code>☑</code> Search credentials by name, login or comments</li>
+<li>
+<code>☑</code> List credentials as a table</li>
+<li>
+<code>☑</code> Colored output</li>
+<li>
+<code>☐</code> Search with regular expression</li>
+<li>
+<code>☐</code> Importing credentials from other applications</li>
+<li>
+<code>☐</code> Undo/Redo modifications to the database</li>
+<li>
+<code>☐</code> Pysswords emacs mode</li>
+</ul>
+
+<blockquote>
+<p><code>☑</code> implemented feature, <code>☐</code> not implemented feature.</p>
+</blockquote>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<h3>
+<a id="stable-version-" class="anchor" href="#stable-version-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stable version <img src="https://badge.fury.io/py/pysswords.svg" alt="pypi version">
+</h3>
+
+<p>Make sure you have <a href="https://www.gnupg.org/">GPG</a> and <a href="http://pip.readthedocs.org/en/latest/installing.html">pip</a> installed.</p>
+
+<div class="highlight highlight-bash"><pre>pip install pysswords</pre></div>
+
+<h3>
+<a id="development-version--" class="anchor" href="#development-version--" aria-hidden="true"><span class="octicon octicon-link"></span></a>Development version <a href="https://coveralls.io/r/marcwebbie/pysswords"><img src="https://coveralls.io/repos/marcwebbie/pysswords/badge.png" alt="Test Coverage"></a> <a href="https://landscape.io/github/marcwebbie/pysswords/master"><img src="https://landscape.io/github/marcwebbie/pysswords/master/landscape.svg" alt="Code Health"></a>
+</h3>
+
+<table>
+<thead>
+<tr>
+<th>Mac/linux</th>
+<th>Windows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://travis-ci.org/marcwebbie/pysswords"><img src="https://travis-ci.org/marcwebbie/pysswords.svg" alt="Build"></a></td>
+<td><a href="https://ci.appveyor.com/project/marcwebbie/pysswords"><img src="https://ci.appveyor.com/api/projects/status/5b7p1vo3y9x3y35t?svg=true" alt="Build on windows"></a></td>
+</tr>
+</tbody>
+</table>
+
+<p>The <strong>latest development version</strong> can be installed directly from GitHub:</p>
+
+<div class="highlight highlight-bash"><pre><span class="pl-c"># Universal</span>
+$ pip install --upgrade https://github.com/marcwebbie/pysswords/tarball/master</pre></div>
+
+<h2>
+<a id="quickstart" class="anchor" href="#quickstart" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quickstart</h2>
+
+<div class="highlight highlight-bash"><pre><span class="pl-c"># create a new credentials database. Option: `-I` or `--init`</span>
+pysswords --init
+
+<span class="pl-c"># add new credentials. Option: `-a` or `--add`</span>
+pysswords -a
+
+<span class="pl-c"># get credential "github". Option: `-g` or `--get`</span>
+pysswords -g github
+
+<span class="pl-c"># remove credential "github". Option: `-r` or `--remove`</span>
+pysswords -d github
+
+<span class="pl-c"># edit credential "github". Option: `-e` or `--edit`</span>
+pysswords -e github
+
+<span class="pl-c"># search credentials with query "octocat". Option: `-s` or `--search`</span>
+pysswords -s octocat
+
+<span class="pl-c"># copy password from credential "github" into clipboard. Option: `-c` or `--clipboard`</span>
+<span class="pl-c"># this option have to be used with --get|-g option</span>
+pysswords -c -g github
+
+<span class="pl-c"># print all credentials as a table with hidden passwords</span>
+pysswords
+
+<span class="pl-c"># print all credentials and show passwords in plain text. Option: `--show-password`</span>
+pysswords --show-password
+
+<span class="pl-c"># shows help. Option `-h` or `--help`</span>
+pysswords --help</pre></div>
+
+<h2>
+<a id="under-the-hood" class="anchor" href="#under-the-hood" aria-hidden="true"><span class="octicon octicon-link"></span></a>Under The Hood</h2>
+
+<h3>
+<a id="encryption" class="anchor" href="#encryption" aria-hidden="true"><span class="octicon octicon-link"></span></a>Encryption</h3>
+
+<p>Encryption is done with <strong>GnuGPG</strong> using <a href="http://en.wikipedia.org/wiki/Advanced_Encryption_Standard">AES256</a>. Take a look at <a href="https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py">pysswords.crypt</a> module to know more.</p>
+
+<h3>
+<a id="database-path" class="anchor" href="#database-path" aria-hidden="true"><span class="octicon octicon-link"></span></a>Database Path</h3>
+
+<p>The default database path is at <code>~/.pysswords</code>. If you want to change the database path, add <code>--database</code> option to pysswords together with <code>--init</code>.</p>
+
+<div class="highlight highlight-bash"><pre>pysswords --init --database <span class="pl-s1"><span class="pl-pds">"</span>/path/to/database/<span class="pl-pds">"</span></span></pre></div>
+
+<h3>
+<a id="database-structure" class="anchor" href="#database-structure" aria-hidden="true"><span class="octicon octicon-link"></span></a>Database structure</h3>
+
+<p>Pysswords database is structured in a directory hierachy. Every
+credential is a directory named with credential name inside the database
+path.</p>
+
+<p>An empty database would look like this:</p>
+
+<div class="highlight highlight-bash"><pre>pysswords --database /tmp/pysswords --init
+
+tree /tmp/pysswords -la
+<span class="pl-c"># /tmp/pysswords</span>
+<span class="pl-c"># └── .gnupg</span>
+<span class="pl-c">#     ├── pubring.gpg</span>
+<span class="pl-c">#     ├── random_seed</span>
+<span class="pl-c">#     ├── secring.gpg</span>
+<span class="pl-c">#     └── trustdb.gpg</span></pre></div>
+
+<p>After adding a new credential the database would look like this:</p>
+
+<div class="highlight highlight-bash"><pre>pysswords --database /tmp/pysswords -a
+<span class="pl-c"># Name: github</span>
+<span class="pl-c"># Login: octocat</span>
+<span class="pl-c"># Password: **********</span>
+<span class="pl-c"># Comments [optional]:</span>
+
+tree /tmp/pysswords -la
+<span class="pl-c"># /tmp/pysswords</span>
+<span class="pl-c"># ├── .gnupg</span>
+<span class="pl-c"># │   ├── pubring.gpg</span>
+<span class="pl-c"># │   ├── random_seed</span>
+<span class="pl-c"># │   ├── secring.gpg</span>
+<span class="pl-c"># │   └── trustdb.gpg</span>
+<span class="pl-c"># └── github</span>
+<span class="pl-c">#     ├── comments</span>
+<span class="pl-c">#     ├── login</span>
+<span class="pl-c">#     └── password</span></pre></div>
+
+<h2>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<ul>
+<li>  Fork the repository <a href="https://github.com/marcwebbie/pysswords/fork">https://github.com/marcwebbie/pysswords/fork</a>
+</li>
+<li>  Write your tests on <code>tests/test.py</code>
+</li>
+<li>  If everything is OK. push your changes and make a pull request. ;)</li>
+</ul>
+
+<h2>
+<a id="license-mit-license" class="anchor" href="#license-mit-license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License (<a href="http://choosealicense.com/licenses/mit/">MIT License</a>)</h2>
+
+<p>The MIT License (MIT)</p>
+
+<p>Copyright (c) 2014 Marc Webbie, <a href="http://github.com/marcwebbie">http://github.com/marcwebbie</a></p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/marcwebbie">marcwebbie</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
