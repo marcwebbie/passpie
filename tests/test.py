@@ -109,6 +109,13 @@ class DBTests(unittest.TestCase):
         with open(credential_file) as f:
             self.assertEqual(yaml.load(f.read()), self.credential)
 
+    def test_add_credential_creates_dir_when_credential_name_is_a_valid_dir(self):
+        credential = some_credential(name="emails/example.com")
+        emails_dir = os.path.join(self.path, "emails")
+        self.assertFalse(os.path.isdir(emails_dir))
+        pysswords.db.add_credential(self.path, credential)
+        self.assertTrue(os.path.isdir(emails_dir))
+
     def test_getgpg_returns_valid_gnupg_gpg_object(self):
         gpg = pysswords.db.getgpg(self.path)
         self.assertIsInstance(gpg, pysswords.db.gnupg.GPG)
