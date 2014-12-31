@@ -33,6 +33,15 @@ def mock_create_keys(path, *args, **kwargs):
     return gpg.list_keys()[0]
 
 
+def some_credential(**kwargs):
+    return pysswords.db.Credential(
+        name=kwargs.get("name", "example.com"),
+        login=kwargs.get("login", "john.doe"),
+        password=kwargs.get("password", "--BEGIN GPG-- X --END GPG--"),
+        comment=kwargs.get("comment", "Some comments"),
+    )
+
+
 @patch("pysswords.db.create_keys", new=mock_create_keys)
 class DBTests(unittest.TestCase):
     def setUp(self):
