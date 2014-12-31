@@ -124,6 +124,15 @@ class DBTests(unittest.TestCase):
         content = pysswords.db.pyssword_content(self.credential)
         self.assertEqual(yaml.load(content), self.credential)
 
+    def test_credentials_returns_a_list_of_all_added_credentials(self):
+        pysswords.db.add_credential(self.path, some_credential(name="example.com"))
+        pysswords.db.add_credential(self.path, some_credential(name="example.org"))
+        credentials = pysswords.db.credentials(self.path)
+        self.assertIsInstance(credentials, list)
+        self.assertEqual(2, len(credentials))
+        for credential in credentials:
+            self.assertIsInstance(credential, pysswords.db.Credential)
+
 
 if __name__ == "__main__":
     if sys.version_info >= (3,):

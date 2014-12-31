@@ -1,4 +1,5 @@
 from collections import namedtuple
+import fnmatch
 import os
 import gnupg
 import yaml
@@ -41,9 +42,19 @@ def create_keyring(path, passphrase):
     return keys_path
 
 
+def credentials(path):
+    creds = []
+    for root, dirnames, filenames in os.walk(path):
+        for filename in fnmatch.filter(filenames, '*.pyssword'):
+            with open(os.path.join(root, filename)) as f:
+                creds.append(yaml.load(f))
+    return creds
+
+
 def add_credential(path, credential):
     credential_dir = os.path.join(path, credential.name)
     os.makedirs(credential_dir)
+
     credential_file = "{}.pyssword".format(credential.login)
     with open(os.path.join(credential_dir, credential_file), "w") as f:
         f.write(pyssword_content(credential))
