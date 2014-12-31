@@ -48,7 +48,7 @@ class DBTests(unittest.TestCase):
         self.path = os.path.join(TEST_DATA_DIR, "database")
         self.keys_path = os.path.join(self.path, ".keys")
         self.passphrase = "dummy_passphrase"
-        self.database = pysswords.db.Database(self.path)
+        self.database = pysswords.db.Database.create(self.path)
         if os.path.exists(self.path):
             shutil.rmtree(self.path)
 
