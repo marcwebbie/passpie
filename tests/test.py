@@ -188,6 +188,28 @@ class DatabaseTests(unittest.TestCase):
         with self.assertRaises(pysswords.db.CredentialExistsError):
             database.add(credential)
 
+    def test_remove_deletes_pysswords_file(self):
+        database = Database.create(self.path, self.passphrase)
+        credential = some_credential()
+        credential_path = pysswords.db.credential.expandpath(
+            self.path,
+            credential)
+        database.add(credential)
+        self.assertTrue(os.path.isfile(credential_path))
+        database.remove(credential)
+        self.assertFalse(os.path.isfile(credential_path))
+
+    def test_remove_deletes_pyssword_dir_if_empty_after_deletion(self):
+        database = Database.create(self.path, self.passphrase)
+        credential = some_credential()
+        credential_path = pysswords.db.credential.expandpath(
+            self.path,
+            credential)
+        database.add(credential)
+        self.assertTrue(os.path.exists(os.path.dirname(credential_path)))
+        database.remove(credential)
+        self.assertFalse(os.path.exists(os.path.dirname(credential_path)))
+
 
 class CredentialTests(unittest.TestCase):
 

@@ -1,6 +1,7 @@
 import fnmatch
 import os
 import gnupg
+import shutil
 import yaml
 
 from pysswords.utils import which
@@ -40,6 +41,13 @@ class Database(object):
                 with open(os.path.join(root, filename)) as f:
                     creds.append(yaml.load(f))
         return creds
+
+    def remove(self, credential):
+        credential_path = expandpath(self.path, credential)
+        credential_dir = os.path.dirname(credential_path)
+        os.remove(credential_path)
+        if not os.listdir(credential_dir):
+            shutil.rmtree(credential_dir)
 
     def add(self, credential):
         cred_path = expandpath(self.path, credential)
