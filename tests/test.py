@@ -104,7 +104,7 @@ class DBTests(unittest.TestCase):
         gpg = pysswords.db.getgpg(self.path)
         self.assertIsInstance(gpg, pysswords.db.gnupg.GPG)
 
-    def test_pyssword_content_returns_yaml_content_parseble_to_dict(self):
+    def test_pyssword_content_returns_yaml_content_parseable_to_dict(self):
         content = pysswords.db.pyssword_content(self.credential)
         self.assertEqual(yaml.load(content), self.credential)
 
