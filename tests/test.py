@@ -90,6 +90,7 @@ class CryptTests(unittest.TestCase):
         self.assertIn("\nPassphrase: {}".format(self.passphrase), batch)
 
     def test_create_keyring_generate_keys(self):
+        self.cleanup()
         with patch("pysswords.crypt.generate_keys") as mocked_generate:
             pysswords.crypt.create_keyring(self.path, self.passphrase)
             self.assertTrue(mocked_generate.called)
