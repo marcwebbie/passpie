@@ -7,6 +7,7 @@ import yaml
 from pysswords.utils import which
 from pysswords.crypt import create_keyring
 from .credential import (
+    Credential,
     CredentialExistsError,
     content,
     expandpath
@@ -57,3 +58,6 @@ class Database(object):
         with open(cred_path, "w") as f:
             f.write(content(credential))
         return cred_path
+
+    def credential(self, name):
+        return next(c for c in self.credentials if c.name == name)

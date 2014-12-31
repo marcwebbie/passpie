@@ -210,6 +210,14 @@ class DatabaseTests(unittest.TestCase):
         database.remove(credential)
         self.assertFalse(os.path.exists(os.path.dirname(credential_path)))
 
+    def test_get_credential_by_name_returns_expected_credential(self):
+        database = Database.create(self.path, self.passphrase)
+        credential = some_credential(name="example.com")
+        database.add(credential)
+        found = database.credential(name=credential.name)
+        self.assertIsInstance(found, pysswords.db.Credential)
+        self.assertEqual(found, credential)
+
 
 class CredentialTests(unittest.TestCase):
 
