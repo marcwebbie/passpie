@@ -1,7 +1,7 @@
 Pysswords: Manage your passwords from the terminal
 ==================================================
 
-[Pysswords](https://github.com/marcwebbie/pysswords) lets you manage
+[Pysswords](https://marcwebbie.github.io/pysswords) lets you manage
 your login credentials from the terminal. Password files are saved into
 [GnuGPG](http://en.wikipedia.org/wiki/GNU_Privacy_Guard) encrypted files
 into the Database Path\_. Only with the passphrase used to create the
@@ -43,8 +43,7 @@ Make sure you have [GPG](https://www.gnupg.org/) and [pip](http://pip.readthedoc
 pip install pysswords
 ```
 
-### Development version [![Test Coverage](https://coveralls.io/repos/marcwebbie/pysswords/badge.png)](https://coveralls.io/r/marcwebbie/pysswords) [![Code Health](https://landscape.io/github/marcwebbie/pysswords/master/landscape.svg)](https://landscape.io/github/marcwebbie/pysswords/master)
-
+### Development version [![Test Coverage](https://coveralls.io/repos/marcwebbie/pysswords/badge.png)](https://coveralls.io/r/marcwebbie/pysswords) [![Code Health](https://landscape.io/github/marcwebbie/pysswords/master/landscape.svg)](https://landscape.io/github/marcwebbie/pysswords/master).
 
 Mac/linux | Windows
 ----------|---------
