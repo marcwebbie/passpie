@@ -42,6 +42,13 @@ class Database(object):
                     creds.append(yaml.load(f))
         return creds
 
+    def _credential_path(self, credential):
+        return os.path.join(
+            self.path,
+            credential.name,
+            "{}.pyssword".format(credential.login)
+        )
+
     def key_input(self, passphrase):
         return gnupg.GPG().gen_key_input(
             name_real="Pysswords",
@@ -59,12 +66,10 @@ class Database(object):
         self.create_keys(self.keys_path, passphrase)
         return self.keys_path
 
-    def add(self, credential):
-        credential_dir = os.path.join(self.path, credential.name)
-        credential_file = "{}.pyssword".format(credential.login)
-        credential_path = os.path.join(credential_dir, credential_file)
 
-        os.makedirs(credential_dir)
-        with open(credential_path, "w") as f:
+    def add(self, credential):
+        cred_path = self._credential_path(credential)
+        os.makedirs(os.path.dirname(cred_path))
+        with open(cred_path, "w") as f:
             f.write(self.content(credential))
-        return credential_path
+        return cred_path

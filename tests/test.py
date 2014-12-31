@@ -106,11 +106,12 @@ class DBTests(unittest.TestCase):
             self.assertEqual(yaml.load(f.read()), credential)
 
     def test_add_credential_creates_dir_when_credential_name_is_a_valid_dir(self):
-        credential = some_credential(name="emails/example.com")
+        credential = some_credential(name="emails/misc/example.com")
         emails_dir = os.path.join(self.path, "emails")
-        self.assertFalse(os.path.isdir(emails_dir))
+        misc_dir = os.path.join(emails_dir, "misc")
         self.database.add(credential)
         self.assertTrue(os.path.isdir(emails_dir))
+        self.assertTrue(os.path.isdir(misc_dir))
 
     def test_add_credential_returns_credential_path(self):
         credential = some_credential()
@@ -139,6 +140,15 @@ class DBTests(unittest.TestCase):
         for credential in credentials:
             self.assertIsInstance(credential, pysswords.db.Credential)
 
+    def test_credential_path_returns_expected_path_to_credential(self):
+        credential = some_credential()
+        credential_path = self.database._credential_path(credential)
+        expected_path = os.path.join(
+            self.path,
+            os.path.basename(credential.name),
+            "{}.pyssword".format(credential.login)
+        )
+        self.assertEqual(credential_path, expected_path)
 
 if __name__ == "__main__":
     if sys.version_info >= (3,):
