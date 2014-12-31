@@ -1,11 +1,6 @@
 import os
 
 
-def touch(fname):
-    """Mimics behavior of Unix touch command"""
-    open(fname, "a").close()
-
-
 def which(program):
     """Mimics behavior of UNIX which command. """
     # Add .exe program extension for windows support
