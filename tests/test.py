@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.relpath(__file__))))
 import pysswords
 
 
-def mock_create_keys(path, *args, **kwargs):
+def mock_create_keys(self, path, *args, **kwargs):
     """Import key.asc instead of generating new key
     passphrase used to create the key was 'dummy_database'"""
     gpg = gnupg.GPG(homedir=path)
@@ -42,18 +42,13 @@ def some_credential(**kwargs):
     )
 
 
-@patch("pysswords.db.create_keys", new=mock_create_keys)
+@patch("pysswords.db.Database.create_keys", new=mock_create_keys)
 class DBTests(unittest.TestCase):
     def setUp(self):
         self.path = os.path.join(TEST_DATA_DIR, "database")
         self.keys_path = os.path.join(self.path, ".keys")
         self.passphrase = "dummy_passphrase"
-        self.credential = pysswords.db.Credential(
-            name="example.com",
-            login="john.doe",
-            password="--BEGIN GPG-- something --END GPG--",
-            comment="Main email"
-        )
+        self.database = pysswords.db.Database(self.path)
         if os.path.exists(self.path):
             shutil.rmtree(self.path)
 
@@ -63,71 +58,82 @@ class DBTests(unittest.TestCase):
 
     def test_create_makedirs_at_path(self):
         test_path = os.path.join(self.path, "creation")
-        pysswords.db.create(path=test_path)
+        pysswords.db.Database.create(path=test_path)
         self.assertTrue(os.path.exists(test_path))
 
+    def test_create_return_database_instance(self):
+        database = pysswords.db.Database.create(self.path)
+        self.assertIsInstance(database, pysswords.db.Database)
+
     def test_create_keyring_adds_gpg_keys_to_path(self):
-        pysswords.db.create_keyring(
-            path=self.path,
-            passphrase=self.passphrase)
+        self.database.create_keyring(passphrase=self.passphrase)
         pubring = os.path.join(self.path, ".keys", "pubring.gpg")
         secring = os.path.join(self.path, ".keys", "secring.gpg")
         self.assertTrue(os.path.isfile(pubring))
         self.assertTrue(os.path.isfile(secring))
 
     def test_create_keyring_adds_key_to_keyring(self):
-        pysswords.db.create_keyring(
-            path=self.path,
-            passphrase=self.passphrase)
+        self.database.create_keyring(passphrase=self.passphrase)
         gpg = gnupg.GPG(homedir=self.keys_path)
         self.assertEqual(1, len(gpg.list_keys()))
 
     def test_create_keys_return_valid_key(self):
-        key = pysswords.db.create_keys(self.path, self.passphrase)
+        key = self.database.create_keys(self.path, self.passphrase)
         self.assertIsNotNone(key)
 
     def test_key_input_returns_batch_string_with_passphrase(self):
-        batch = pysswords.db.key_input(self.path, self.passphrase)
+        batch = self.database.key_input(self.passphrase)
         self.assertIn("\nPassphrase: {}".format(self.passphrase), batch)
 
     def test_keys_path_returns_database_path_joined_with_dot_keys(self):
-        keys_path = pysswords.db.keys_path(self.path)
+        keys_path = self.database.keys_path
         self.assertEqual(keys_path, os.path.join(self.path, ".keys"))
 
     def test_add_credential_make_dir_in_dbpath_with_credential_name(self):
-        pysswords.db.add_credential(self.path, self.credential)
-        credential_dir = os.path.join(self.path, self.credential.name)
+        self.database.add(some_credential())
+        credential_dir = os.path.join(self.path, some_credential().name)
         self.assertTrue(os.path.exists(credential_dir))
         self.assertTrue(os.path.isdir(credential_dir))
 
-    def test_add_credential_creates_pyssword_file_named_after_login(self):
-        pysswords.db.add_credential(self.path, self.credential)
-        credential_dir = os.path.join(self.path, self.credential.name)
-        credential_filename = "{}.pyssword".format(self.credential.login)
+    def test_add_credential_createas_pyssword_file_named_after_login(self):
+        credential = some_credential()
+        self.database.add(credential)
+        credential_dir = os.path.join(self.path, credential.name)
+        credential_filename = "{}.pyssword".format(credential.login)
         credential_file = os.path.join(credential_dir, credential_filename)
         self.assertTrue(os.path.isfile(credential_file))
         with open(credential_file) as f:
-            self.assertEqual(yaml.load(f.read()), self.credential)
+            self.assertEqual(yaml.load(f.read()), credential)
 
     def test_add_credential_creates_dir_when_credential_name_is_a_valid_dir(self):
         credential = some_credential(name="emails/example.com")
         emails_dir = os.path.join(self.path, "emails")
         self.assertFalse(os.path.isdir(emails_dir))
-        pysswords.db.add_credential(self.path, credential)
+        self.database.add(credential)
         self.assertTrue(os.path.isdir(emails_dir))
 
-    def test_getgpg_returns_valid_gnupg_gpg_object(self):
-        gpg = pysswords.db.getgpg(self.path)
+    def test_add_credential_returns_credential_path(self):
+        credential = some_credential()
+        credential_path = self.database.add(credential)
+        expected_path = os.path.join(
+            self.path,
+            os.path.basename(credential.name),
+            "{}.pyssword".format(credential.login)
+        )
+        self.assertEqual(credential_path, expected_path)
+
+    def test_gpg_returns_valid_gnupg_gpg_object(self):
+        gpg = self.database.gpg
         self.assertIsInstance(gpg, pysswords.db.gnupg.GPG)
 
     def test_pyssword_content_returns_yaml_content_parseable_to_dict(self):
-        content = pysswords.db.pyssword_content(self.credential)
-        self.assertEqual(yaml.load(content), self.credential)
+        content = pysswords.db.Database.content(some_credential())
+        self.assertEqual(yaml.load(content), some_credential())
 
     def test_credentials_returns_a_list_of_all_added_credentials(self):
-        pysswords.db.add_credential(self.path, some_credential(name="example.com"))
-        pysswords.db.add_credential(self.path, some_credential(name="example.org"))
-        credentials = pysswords.db.credentials(self.path)
+        self.database.add(some_credential(name="example.com"))
+        self.database.add(some_credential(name="archive.org"))
+        credentials = self.database.credentials
         self.assertIsInstance(credentials, list)
         self.assertEqual(2, len(credentials))
         for credential in credentials:
