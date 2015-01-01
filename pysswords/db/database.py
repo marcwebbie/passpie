@@ -44,7 +44,8 @@ class Database(object):
         return creds
 
     def key(self, private=False):
-        return next(k for k in self.gpg.list_keys(secret=private)).get("fingerprint")
+        key = next(k for k in self.gpg.list_keys(secret=private))
+        return key.get("fingerprint")
 
     def remove(self, credential):
         credential_path = expandpath(self.path, credential)

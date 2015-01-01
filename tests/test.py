@@ -259,6 +259,7 @@ class DatabaseTests(unittest.TestCase):
             database.key(private=True),
             "0927E8F7C7794683AFABDED698894B2D11886DF4")
 
+
 class CredentialTests(unittest.TestCase):
 
     def setUp(self):
