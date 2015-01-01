@@ -31,10 +31,6 @@ class Database(object):
                          homedir=self.keys_path)
 
     @property
-    def public_key(self):
-        return next(k for k in self.gpg.list_keys()).get("fingerprint")
-
-    @property
     def keys_path(self):
         return os.path.join(self.path, ".keys")
 
@@ -46,6 +42,9 @@ class Database(object):
                 with open(os.path.join(root, filename)) as f:
                     creds.append(yaml.load(f))
         return creds
+
+    def key(self, private=False):
+        return next(k for k in self.gpg.list_keys(secret=private)).get("fingerprint")
 
     def remove(self, credential):
         credential_path = expandpath(self.path, credential)
@@ -73,6 +72,6 @@ class Database(object):
     def encrypt(self, text):
         encrypted = self.gpg.encrypt(
             text,
-            self.public_key,
+            self.key(),
             cipher_algo="AES256")
         return str(encrypted)
