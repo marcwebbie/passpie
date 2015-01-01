@@ -230,6 +230,19 @@ class DatabaseTests(unittest.TestCase):
         self.assertEqual(len(database.search("github")), 1)
         self.assertEqual(len(database.search("not there")), 0)
 
+    def test_encrypt_text_returns_valid_encryption_ascii_gpg(self):
+        database = Database.create(self.path, self.passphrase)
+        text = "secret"
+        encrypted = database.encrypt(text)
+        self.assertIn("-BEGIN PGP MESSAGE-", encrypted)
+        self.assertIn("-END PGP MESSAGE-", encrypted)
+
+    def test_public_key_returns_expected_key_fingerprint(self):
+        database = Database.create(self.path, self.passphrase)
+        self.assertEqual(database.public_key,
+                         "0927E8F7C7794683AFABDED698894B2D11886DF4")
+
+
 
 class CredentialTests(unittest.TestCase):
 

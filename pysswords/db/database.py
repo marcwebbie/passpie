@@ -24,10 +24,15 @@ class Database(object):
         os.makedirs(path)
         create_keyring(path, passphrase)
         return Database(path)
+
     @property
     def gpg(self):
         return gnupg.GPG(binary=which("gpg"),
                          homedir=self.keys_path)
+
+    @property
+    def public_key(self):
+        return next(k for k in self.gpg.list_keys()).get("fingerprint")
 
     @property
     def keys_path(self):
@@ -64,3 +69,10 @@ class Database(object):
     def search(self, query):
         return [cred for cred in self.credentials
                 if query in " ".join([v for v in cred])]
+
+    def encrypt(self, text):
+        encrypted = self.gpg.encrypt(
+            text,
+            self.public_key,
+            cipher_algo="AES256")
+        return str(encrypted)
