@@ -205,6 +205,7 @@ class DatabaseTests(unittest.TestCase):
         credential_path = pysswords.db.credential.expandpath(
             self.path,
             credential)
+
         database.add(credential)
         self.assertTrue(os.path.exists(os.path.dirname(credential_path)))
         database.remove(credential)
@@ -215,8 +216,19 @@ class DatabaseTests(unittest.TestCase):
         credential = some_credential(name="example.com")
         database.add(credential)
         found = database.credential(name=credential.name)
+
         self.assertIsInstance(found, pysswords.db.Credential)
         self.assertEqual(found, credential)
+
+    def test_search_database_returns_list_with_matched_credentials(self):
+        database = Database.create(self.path, self.passphrase)
+        database.add(some_credential(name="example.com"))
+        database.add(some_credential(name="github.com"))
+        database.add(some_credential(name="twitter.com"))
+
+        self.assertEqual(len(database.search("it")), 2)
+        self.assertEqual(len(database.search("github")), 1)
+        self.assertEqual(len(database.search("not there")), 0)
 
 
 class CredentialTests(unittest.TestCase):

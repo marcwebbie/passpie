@@ -24,7 +24,6 @@ class Database(object):
         os.makedirs(path)
         create_keyring(path, passphrase)
         return Database(path)
-
     @property
     def gpg(self):
         return gnupg.GPG(binary=which("gpg"),
@@ -61,3 +60,7 @@ class Database(object):
 
     def credential(self, name):
         return next(c for c in self.credentials if c.name == name)
+
+    def search(self, query):
+        return [cred for cred in self.credentials
+                if query in " ".join([v for v in cred])]
