@@ -99,6 +99,8 @@ class CryptTests(unittest.TestCase):
 @patch("pysswords.db.database.create_keyring", new=mock_create_keyring)
 class DatabaseTests(unittest.TestCase):
 
+    __name__ = "DatabaseTests"
+
     def setUp(self):
         self.path = os.path.join(TEST_DATA_DIR, "database")
         self.passphrase = "dummy_passphrase"
