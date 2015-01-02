@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 __version__ = "0.0.7"
@@ -20,13 +20,14 @@ setup(
     author_email='marcwebbie@gmail.com',
     url='https://github.com/marcwebbie/pysswords',
     download_url='https://pypi.python.org/pypi/pysswords',
-    packages=['pysswords'],
+    packages=find_packages(),
     entry_points={
         'console_scripts': [
             'pysswords = pysswords.__main__:main',
         ]
     },
     install_requires=requirements,
+    tests_require=['mock'],
     test_suite='tests.test',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
