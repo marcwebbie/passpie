@@ -7,7 +7,6 @@ import yaml
 from pysswords.utils import which
 from pysswords.crypt import create_keyring
 from .credential import (
-    Credential,
     CredentialExistsError,
     content,
     expandpath
