@@ -35,7 +35,7 @@ Main Features
 Installation
 ------------
 
-### Stable version ![pypi version](https://badge.fury.io/py/pysswords.svg)
+### Stable version ![pypi version](https://img.shields.io/pypi/v/pysswords.svg)
 
 Make sure you have [GPG](https://www.gnupg.org/) and [pip](http://pip.readthedocs.org/en/latest/installing.html) installed.
 
@@ -43,7 +43,7 @@ Make sure you have [GPG](https://www.gnupg.org/) and [pip](http://pip.readthedoc
 pip install pysswords
 ```
 
-### Development version [![Test Coverage](https://coveralls.io/repos/marcwebbie/pysswords/badge.png)](https://coveralls.io/r/marcwebbie/pysswords) [![Code Health](https://landscape.io/github/marcwebbie/pysswords/master/landscape.svg)](https://landscape.io/github/marcwebbie/pysswords/master).
+### Development version [![Test Coverage](https://img.shields.io/coveralls/marcwebbie/pysswords.svg)](https://coveralls.io/r/marcwebbie/pysswords) [![Code Health](https://landscape.io/github/marcwebbie/pysswords/master/landscape.svg)](https://landscape.io/github/marcwebbie/pysswords/master).
 
 Mac/linux | Windows
 ----------|---------
