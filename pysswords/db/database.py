@@ -12,6 +12,8 @@ from .credential import (
     expandpath
 )
 
+from pysswords.python_two import makedirs
+
 
 class Database(object):
 
@@ -57,7 +59,7 @@ class Database(object):
         cred_path = expandpath(self.path, credential)
         if os.path.isfile(cred_path):
             raise CredentialExistsError()
-        os.makedirs(os.path.dirname(cred_path))
+        makedirs(os.path.dirname(cred_path))
         with open(cred_path, "w") as f:
             f.write(content(credential))
         return cred_path
