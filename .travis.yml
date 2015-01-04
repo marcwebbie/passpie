@@ -7,6 +7,7 @@ before_install:
 language: python
 python:
   - 2.7
+  - 3.2
   - 3.3
   - 3.4
   - pypy
@@ -14,9 +15,8 @@ allow_failures:
   - python: pypy
 install:
   - pip install -r requirements.txt
-  - pip install mock
   - pip install coveralls
 script:
-  coverage run --source=pysswords tests/test.py
+  coverage run --source=pysswords setup.py test
 after_success:
   coveralls
