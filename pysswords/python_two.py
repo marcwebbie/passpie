@@ -5,7 +5,6 @@ from functools import partial
 
 
 if sys.version_info < (3,):
-    # from distutils.dir_util import mkpath as makedirs
     def makedirs(name, mode=0777, exist_ok=False):
         try:
             os.makedirs(name=name, mode=mode)
