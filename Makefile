@@ -50,8 +50,11 @@ wheel:
 	python setup.py bdist_wheel
 
 test:
+	python -W ignore setup.py -q test
+
+test-all:
 	tox
 
-all: test
+all: test-all
 
 .PHONY: clean coverage setup test wheel dist run install-python all
