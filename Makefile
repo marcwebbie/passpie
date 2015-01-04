@@ -6,15 +6,23 @@
 PACKAGE=pysswords
 
 PY27 = 2.7.9
+PY32 = 3.2.6
 PY33 = 3.3.6
 PY34 = 3.4.2
 PYPY = pypy-2.4.0
 
+
+set-python:
+	pyenv local $(PY27) $(PY32) $(PY33) $(PY34) $(PYPY)
+	pyenv rehash
+
 install-python:
 	- pyenv virtualenv $(PY27)
+	- pyenv virtualenv $(PY32)
 	- pyenv virtualenv $(PY33)
 	- pyenv virtualenv $(PY34)
 	- pyenv virtualenv $(PYPY)
+
 
 setup: install-python
 
@@ -49,12 +57,12 @@ run:
 wheel:
 	python setup.py bdist_wheel
 
-test:
+test: set-python
 	python -W ignore setup.py -q test
 
-test-all:
+tox: set-python
 	tox
 
-all: test-all
+all: set-python test-all
 
 .PHONY: clean coverage setup test wheel dist run install-python all
