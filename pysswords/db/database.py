@@ -62,8 +62,12 @@ class Database(object):
             f.write(content(credential))
         return cred_path
 
-    def credential(self, name):
-        return next(c for c in self.credentials if c.name == name)
+    def credential(self, name, login=None):
+        if login:
+            return [c for c in self.credentials
+                    if c.name == name and c.login == login]
+        else:
+            return [c for c in self.credentials if c.name == name]
 
     def search(self, query):
         return [cred for cred in self.credentials

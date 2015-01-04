@@ -219,8 +219,28 @@ class DatabaseTests(unittest.TestCase):
         database.add(credential)
         found = database.credential(name=credential.name)
 
-        self.assertIsInstance(found, pysswords.db.Credential)
-        self.assertEqual(found, credential)
+        self.assertIsInstance(found, list)
+        self.assertTrue(all(True for c in found
+                            if isinstance(c, pysswords.db.Credential)))
+        self.assertTrue(any(True for c in found
+                            if c == credential))
+
+    def test_get_returns_unique_credential_when_login_is_passed(self):
+        database = Database.create(self.path, self.passphrase)
+        credential = some_credential(name="example.com")
+        credential2 = some_credential(name="example.com", login="jonny.doe")
+        database.add(credential)
+        database.add(credential2)
+        found = database.credential(name=credential.name,
+                                    login=credential.login)
+        self.assertEqual(found, [credential])
+
+    def test_get_returns_no_element_when_name_not_found(self):
+        database = Database.create(self.path, self.passphrase)
+        credential = some_credential(name="example.com")
+        database.add(credential)
+        found = database.credential(name="not added")
+        self.assertListEqual(found, [])
 
     def test_search_database_returns_list_with_matched_credentials(self):
         database = Database.create(self.path, self.passphrase)
