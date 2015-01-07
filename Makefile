@@ -57,11 +57,13 @@ run:
 wheel:
 	python setup.py bdist_wheel
 
+tox: set-python
+	tox
+
 test:
 	python -W ignore setup.py -q test
 
-tox: set-python
-	tox
+test-all: tox
 
 all: set-python test-all
 
