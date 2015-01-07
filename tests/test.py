@@ -304,6 +304,22 @@ class DatabaseTests(unittest.TestCase):
         decrypted = database.decrypt(encrypted, passphrase=self.passphrase)
         self.assertEqual(decrypted, text)
 
+    def test_update_credential_updates_credential_values(self):
+        database = Database.create(self.path, self.passphrase)
+        values = {
+            "name": "example.com",
+            "login": "jonh.doe",
+            "password": "dummy",
+            "comment": "No Comments"
+        }
+        credential = some_credential(**values)
+        database.add(credential)
+        new_values = values
+        new_values["login"] = "doe.john"
+        database.update(credential, **new_values)
+        found = database.credential(name=values["name"])[0]
+        self.assertEqual(found._asdict(), new_values)
+
 
 class CredentialTests(unittest.TestCase):
 

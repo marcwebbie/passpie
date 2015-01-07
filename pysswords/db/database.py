@@ -7,6 +7,7 @@ import yaml
 from pysswords.utils import which
 from pysswords.crypt import create_keyring
 from .credential import (
+    Credential,
     CredentialExistsError,
     content,
     expandpath
@@ -63,6 +64,16 @@ class Database(object):
         with open(cred_path, "w") as f:
             f.write(content(credential))
         return cred_path
+
+    def update(self, credential, **values):
+        name = values.get("name", credential.name)
+        login = values.get("login", credential.login)
+        password = values.get("password", credential.password)
+        comment = values.get("comment", credential.comment)
+        self.remove(credential)
+        new_credential = Credential(name, login, password, comment)
+        self.add(new_credential)
+        return new_credential
 
     def credential(self, name, login=None):
         if login:
