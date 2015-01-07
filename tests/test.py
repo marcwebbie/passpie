@@ -389,6 +389,15 @@ class ConsoleInterfaceTests(unittest.TestCase):
         args_short = __main__.parse_args(["-I"])
         self.assertIn("init", args_short.__dict__)
 
+    def test_cli_parse_args_has_database_arg(self):
+        args = __main__.parse_args(["--database", "/tmp/pysswords"])
+        self.assertIn("database", args.__dict__)
+        args_short = __main__.parse_args(["-D", "/tmp/pysswords"])
+        self.assertIn("database", args_short.__dict__)
+
+    def test_cli_parse_args_has_database_default_value(self):
+        args = __main__.parse_args([])
+        self.assertEqual(args.database, __main__.default_db())
 
 if __name__ == "__main__":
     if sys.version_info >= (3,):
