@@ -57,7 +57,7 @@ run:
 wheel:
 	python setup.py bdist_wheel
 
-test: set-python
+test:
 	python -W ignore setup.py -q test
 
 tox: set-python
