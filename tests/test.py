@@ -264,20 +264,27 @@ class DatabaseTests(unittest.TestCase):
         database = Database.create(self.path, self.passphrase)
         self.assertEqual(
             database.key(),
-            "0927E8F7C7794683AFABDED698894B2D11886DF4")
+            "2B88BF1F03FC2E3871894966F77B7A363E2EAE61")
 
     def test_key_returns_private_key_when_private_is_true(self):
         to_patch = "pysswords.db.database.gnupg.GPG.list_keys"
         with patch(to_patch) as mocked_list_keys:
             mocked_list_keys.return_value = [
-                {"fingerprint": "0927E8F7C7794683AFABDED698894B2D11886DF4"}
+                {"fingerprint": "2B88BF1F03FC2E3871894966F77B7A363E2EAE61"}
             ]
             database = Database.create(self.path, self.passphrase)
             database.key(private=True)
             database.gpg.list_keys.assert_any_call_with(secret=True)
         self.assertEqual(
             database.key(private=True),
-            "0927E8F7C7794683AFABDED698894B2D11886DF4")
+            "2B88BF1F03FC2E3871894966F77B7A363E2EAE61")
+
+    def test_decrypt_returns_plain_text_data(self):
+        database = Database.create(self.path, self.passphrase)
+        text = "secret"
+        encrypted = database.encrypt(text)
+        decrypted = database.decrypt(encrypted, passphrase=self.passphrase)
+        self.assertEqual(decrypted, text)
 
 
 class CredentialTests(unittest.TestCase):

@@ -81,3 +81,7 @@ class Database(object):
             self.key(),
             cipher_algo="AES256")
         return str(encrypted)
+
+    def decrypt(self, text, passphrase):
+        decrypted = str(self.gpg.decrypt(text, passphrase=passphrase))
+        return decrypted
