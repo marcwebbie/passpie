@@ -1,3 +1,4 @@
+import argparse
 import inspect
 import os
 import shutil
@@ -22,6 +23,7 @@ TEST_DATA_DIR = os.path.join(TEST_DIR, "data")
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.relpath(__file__))))
 import pysswords
+from pysswords import __main__
 from pysswords.db import Database
 
 
@@ -363,6 +365,27 @@ class UtilsTests(unittest.TestCase):
             mocker.path.join = mocked_join
             pysswords.utils.which("python")
             mocked_join.assert_any_call("/", "python.exe")
+
+
+class ConsoleInterfaceTests(unittest.TestCase):
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_cli_parse_args_returns_argparse_namespace(self):
+        args = __main__.parse_args(["--init"])
+        self.assertIsInstance(args, argparse.Namespace)
+
+    def test_cli_parse_args_has_init_arg(self):
+        args = __main__.parse_args(["--init"])
+        self.assertIn("init", args.__dict__)
+
+    def test_cli_default_pyssword_dir(self):
+        pysswords_dir = os.path.join(os.path.expanduser("~"), "~/.pysswords")
+        self.assertEqual(pysswords_dir, __main__.default_db())
 
 
 if __name__ == "__main__":
