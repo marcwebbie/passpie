@@ -382,6 +382,8 @@ class ConsoleInterfaceTests(unittest.TestCase):
     def test_cli_parse_args_has_init_arg(self):
         args = __main__.parse_args(["--init"])
         self.assertIn("init", args.__dict__)
+        args_short = __main__.parse_args(["-I"])
+        self.assertIn("init", args_short.__dict__)
 
     def test_cli_default_pyssword_dir(self):
         pysswords_dir = os.path.join(os.path.expanduser("~"), "~/.pysswords")

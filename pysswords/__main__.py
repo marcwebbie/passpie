@@ -7,6 +7,6 @@ def default_db():
 
 
 def parse_args(args):
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--init", action="store_true")
+    parser = argparse.ArgumentParser(prog="Pysswords")
+    parser.add_argument("-I", "--init", action="store_true")
     return parser.parse_args(args)
