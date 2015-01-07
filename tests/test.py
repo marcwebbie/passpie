@@ -409,6 +409,16 @@ class ConsoleInterfaceTests(unittest.TestCase):
         args = __main__.parse_args(["--add"])
         self.assertTrue(args.add)
 
+    def test_cli_parse_args_has_remove_arg(self):
+        args = __main__.parse_args(["--remove"])
+        args_short = __main__.parse_args(["-r"])
+        self.assertIn("remove", args.__dict__)
+        self.assertIn("remove", args_short.__dict__)
+
+    def test_cli_parse_args_remove_arg_is_true_when_passed(self):
+        args = __main__.parse_args(["--remove"])
+        self.assertTrue(args.remove)
+
 if __name__ == "__main__":
     if sys.version_info >= (3,):
         unittest.main(warnings=False)
