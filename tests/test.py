@@ -399,6 +399,16 @@ class ConsoleInterfaceTests(unittest.TestCase):
         args = __main__.parse_args([])
         self.assertEqual(args.database, __main__.default_db())
 
+    def test_cli_parse_args_has_add_arg(self):
+        args = __main__.parse_args(["--add"])
+        self.assertIn("add", args.__dict__)
+        args_short = __main__.parse_args(["-a"])
+        self.assertIn("add", args_short.__dict__)
+
+    def test_cli_parse_args_add_arg_is_true_when_passed(self):
+        args = __main__.parse_args(["--add"])
+        self.assertTrue(args.add)
+
 if __name__ == "__main__":
     if sys.version_info >= (3,):
         unittest.main(warnings=False)
