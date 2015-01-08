@@ -13,6 +13,6 @@ def parse_args(args):
     group_init.add_argument("-D", "--database", default=default_db())
     group_cred = parser.add_argument_group("Credential options")
     group_cred.add_argument("-a", "--add", action="store_true")
-    group_cred.add_argument("-r", "--remove", action="store_true")
-    group_cred.add_argument("-u", "--update", action="store_true")
+    group_cred.add_argument("-r", "--remove")
+    group_cred.add_argument("-u", "--update")
     return parser.parse_args(args)

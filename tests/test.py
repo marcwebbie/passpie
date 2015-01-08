@@ -410,24 +410,28 @@ class ConsoleInterfaceTests(unittest.TestCase):
         self.assertTrue(args.add)
 
     def test_cli_parse_args_has_remove_arg(self):
-        args = __main__.parse_args(["--remove"])
-        args_short = __main__.parse_args(["-r"])
+        credential_name = "example.com"
+        args = __main__.parse_args(["--remove", credential_name])
+        args_short = __main__.parse_args(["-r", credential_name])
         self.assertIn("remove", args.__dict__)
         self.assertIn("remove", args_short.__dict__)
 
-    def test_cli_parse_args_remove_arg_is_true_when_passed(self):
-        args = __main__.parse_args(["--remove"])
-        self.assertTrue(args.remove)
+    def test_cli_parse_args_remove_arg_has_credential_name_passed(self):
+        credential_name = "example.com"
+        args = __main__.parse_args(["--remove", credential_name])
+        self.assertTrue(args.remove, credential_name)
 
     def test_cli_parse_args_has_update_arg(self):
-        args = __main__.parse_args(["--update"])
-        args_short = __main__.parse_args(["-u"])
+        credential_name = "example.com"
+        args = __main__.parse_args(["--update", credential_name])
+        args_short = __main__.parse_args(["-u", credential_name])
         self.assertIn("update", args.__dict__)
         self.assertIn("update", args_short.__dict__)
 
-    def test_cli_parse_args_update_arg_is_true_when_passed(self):
-        args = __main__.parse_args(["--update"])
-        self.assertTrue(args.update)
+    def test_cli_parse_args_update_arg_has_credential_name_passed(self):
+        credential_name = "example.com"
+        args = __main__.parse_args(["--update", credential_name])
+        self.assertEqual(args.update, credential_name)
 
 if __name__ == "__main__":
     if sys.version_info >= (3,):
