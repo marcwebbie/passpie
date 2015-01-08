@@ -5,6 +5,8 @@ import shutil
 import sys
 import unittest
 import yaml
+import time
+from functools import wraps
 try:
     from unittest.mock import patch, Mock
 except ImportError:
@@ -25,6 +27,23 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.relpath(__file__))))
 import pysswords
 from pysswords import __main__
 from pysswords.db import Database
+
+PROFILE = False
+
+def timethis(func):
+    ''' Decorator that reports the execution time.
+    '''
+    if PROFILE:
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            start = time.time()
+            result = func(*args, **kwargs)
+            end = time.time()
+            print("[{:.2f}]".format(end-start), func.__name__)
+            return result
+        return wrapper
+    else:
+        return func
 
 
 def build_keys():
@@ -83,6 +102,7 @@ class CryptTests(unittest.TestCase):
         if os.path.exists(self.path):
             shutil.rmtree(self.path)
 
+    @timethis
     @patch("pysswords.crypt.create_keyring", new=mock_create_keyring)
     def test_create_keyring_adds_gpg_keys_to_path(self):
         pysswords.crypt.create_keyring(self.path, self.passphrase)
@@ -91,6 +111,7 @@ class CryptTests(unittest.TestCase):
         self.assertTrue(os.path.isfile(pubring))
         self.assertTrue(os.path.isfile(secring))
 
+    @timethis
     @patch("pysswords.crypt.create_keyring", new=mock_create_keyring)
     def test_create_keyring_adds_key_to_keyring(self):
         database = Database(self.path)
@@ -98,17 +119,19 @@ class CryptTests(unittest.TestCase):
         gpg = gnupg.GPG(homedir=database.keys_path)
         self.assertEqual(1, len(gpg.list_keys()))
 
+    @timethis
     @patch("pysswords.crypt.gnupg.GPG.gen_key", new=mock_gen_key)
     def test_generate_keys_return_valid_key(self):
         key = pysswords.crypt.generate_keys(self.path, self.passphrase)
         self.assertIsNotNone(key)
         self.assertEqual(key["fingerprint"],
                          '2B88BF1F03FC2E3871894966F77B7A363E2EAE61')
-
+    @timethis
     def test_generate_key_input_returns_batch_string_with_passphrase(self):
         batch = pysswords.crypt.generate_key_input(self.path, self.passphrase)
         self.assertIn("\nPassphrase: {}".format(self.passphrase), batch)
 
+    @timethis
     def test_create_keyring_generate_keys(self):
         self.cleanup()
         with patch("pysswords.crypt.generate_keys") as mocked_generate:
@@ -132,7 +155,7 @@ class DatabaseTests(unittest.TestCase):
     def cleanup(self):
         if os.path.exists(self.path):
             shutil.rmtree(self.path)
-
+    @timethis
     def test_create_makedirs_at_path(self):
         test_path = os.path.join(self.path, "creation")
         if os.path.exists(self.path):
@@ -140,16 +163,19 @@ class DatabaseTests(unittest.TestCase):
         pysswords.db.Database.create(test_path, self.passphrase)
         self.assertTrue(os.path.exists(test_path))
 
+    @timethis
     def test_create_keyring(self):
         database = Database.create(self.path, self.passphrase)
         self.assertIsInstance(database, pysswords.db.Database)
         self.assertTrue(len(database.gpg.list_keys()) == 1)
 
+    @timethis
     def test_keys_path_returns_database_path_joined_with_dot_keys(self):
         database = Database.create(self.path, self.passphrase)
         keys_path = database.keys_path
         self.assertEqual(keys_path, os.path.join(self.path, ".keys"))
 
+    @timethis
     def test_add_credential_make_dir_in_dbpath_with_credential_name(self):
         database = Database.create(self.path, self.passphrase)
         database.add(some_credential())
@@ -157,6 +183,7 @@ class DatabaseTests(unittest.TestCase):
         self.assertTrue(os.path.exists(credential_dir))
         self.assertTrue(os.path.isdir(credential_dir))
 
+    @timethis
     def test_add_credential_createas_pyssword_file_named_after_login(self):
         database = Database.create(self.path, self.passphrase)
         credential = some_credential()
@@ -168,6 +195,7 @@ class DatabaseTests(unittest.TestCase):
         with open(credential_file) as f:
             self.assertEqual(yaml.load(f.read()), credential)
 
+    @timethis
     def test_add_credential_creates_dir_when_credential_name_is_a_dir(self):
         database = Database.create(self.path, self.passphrase)
         credential = some_credential(name="emails/misc/example.com")
@@ -177,6 +205,7 @@ class DatabaseTests(unittest.TestCase):
         self.assertTrue(os.path.isdir(emails_dir))
         self.assertTrue(os.path.isdir(misc_dir))
 
+    @timethis
     def test_add_credential_returns_credential_path(self):
         database = Database.create(self.path, self.passphrase)
         credential = some_credential()
@@ -188,11 +217,13 @@ class DatabaseTests(unittest.TestCase):
         )
         self.assertEqual(credential_path, expected_path)
 
+    @timethis
     def test_gpg_returns_valid_gnupg_gpg_object(self):
         database = Database.create(self.path, self.passphrase)
         gpg = database.gpg
         self.assertIsInstance(gpg, pysswords.db.database.gnupg.GPG)
 
+    @timethis
     def test_credentials_returns_a_list_of_all_added_credentials(self):
         database = Database.create(self.path, self.passphrase)
         database.add(some_credential(name="example.com"))
@@ -203,6 +234,7 @@ class DatabaseTests(unittest.TestCase):
         for credential in credentials:
             self.assertIsInstance(credential, pysswords.db.Credential)
 
+    @timethis
     def test_add_repeated_credential_without_overwrite_on_raises_error(self):
         database = Database.create(self.path, self.passphrase)
         credential = some_credential()
@@ -210,6 +242,7 @@ class DatabaseTests(unittest.TestCase):
         with self.assertRaises(pysswords.db.CredentialExistsError):
             database.add(credential)
 
+    @timethis
     def test_remove_deletes_pysswords_file(self):
         database = Database.create(self.path, self.passphrase)
         credential = some_credential()
@@ -221,6 +254,7 @@ class DatabaseTests(unittest.TestCase):
         database.remove(credential)
         self.assertFalse(os.path.isfile(credential_path))
 
+    @timethis
     def test_remove_deletes_pyssword_dir_if_empty_after_deletion(self):
         database = Database.create(self.path, self.passphrase)
         credential = some_credential()
@@ -233,6 +267,7 @@ class DatabaseTests(unittest.TestCase):
         database.remove(credential)
         self.assertFalse(os.path.exists(os.path.dirname(credential_path)))
 
+    @timethis
     def test_get_credential_by_name_returns_expected_credential(self):
         database = Database.create(self.path, self.passphrase)
         credential = some_credential(name="example.com")
@@ -245,6 +280,7 @@ class DatabaseTests(unittest.TestCase):
         self.assertTrue(any(True for c in found
                             if c == credential))
 
+    @timethis
     def test_get_returns_unique_credential_when_login_is_passed(self):
         database = Database.create(self.path, self.passphrase)
         credential = some_credential(name="example.com")
@@ -255,6 +291,7 @@ class DatabaseTests(unittest.TestCase):
                                     login=credential.login)
         self.assertEqual(found, [credential])
 
+    @timethis
     def test_get_returns_no_element_when_name_not_found(self):
         database = Database.create(self.path, self.passphrase)
         credential = some_credential(name="example.com")
@@ -262,6 +299,7 @@ class DatabaseTests(unittest.TestCase):
         found = database.credential(name="not added")
         self.assertListEqual(found, [])
 
+    @timethis
     def test_search_database_returns_list_with_matched_credentials(self):
         database = Database.create(self.path, self.passphrase)
         database.add(some_credential(name="example.com"))
@@ -272,6 +310,7 @@ class DatabaseTests(unittest.TestCase):
         self.assertEqual(len(database.search("github")), 1)
         self.assertEqual(len(database.search("not there")), 0)
 
+    @timethis
     def test_encrypt_text_returns_valid_encryption_ascii_gpg(self):
         database = Database.create(self.path, self.passphrase)
         text = "secret"
@@ -279,13 +318,14 @@ class DatabaseTests(unittest.TestCase):
         self.assertIn("-BEGIN PGP MESSAGE-", encrypted)
         self.assertIn("-END PGP MESSAGE-", encrypted)
 
-    @unittest.skip
+    @timethis
     def test_key_returns_expected_key_fingerprint(self):
         database = Database.create(self.path, self.passphrase)
         self.assertEqual(
             database.key(),
             "2B88BF1F03FC2E3871894966F77B7A363E2EAE61")
 
+    @timethis
     def test_key_returns_private_key_when_private_is_true(self):
         to_patch = "pysswords.db.database.gnupg.GPG.list_keys"
         with patch(to_patch) as mocked_list_keys:
@@ -299,6 +339,7 @@ class DatabaseTests(unittest.TestCase):
             database.key(private=True),
             "2B88BF1F03FC2E3871894966F77B7A363E2EAE61")
 
+    @timethis
     def test_decrypt_returns_plain_text_data(self):
         database = Database.create(self.path, self.passphrase)
         text = "secret"
@@ -306,6 +347,7 @@ class DatabaseTests(unittest.TestCase):
         decrypted = database.decrypt(encrypted, passphrase=self.passphrase)
         self.assertEqual(decrypted, text)
 
+    @timethis
     def test_update_credential_updates_credential_values(self):
         database = Database.create(self.path, self.passphrase)
         values = {
@@ -336,6 +378,7 @@ class CredentialTests(unittest.TestCase):
         if os.path.exists(self.path):
             shutil.rmtree(self.path)
 
+    @timethis
     def test_credential_expandpath_returns_expected_path_to_credential(self):
         credential = some_credential()
         credential_path = pysswords.db.credential.expandpath(
@@ -349,6 +392,7 @@ class CredentialTests(unittest.TestCase):
         )
         self.assertEqual(credential_path, expected_path)
 
+    @timethis
     def test_credential_content_returns_yaml_content_parseable_to_dict(self):
         content = pysswords.db.credential.content(some_credential())
         self.assertEqual(yaml.load(content), some_credential())
@@ -356,6 +400,7 @@ class CredentialTests(unittest.TestCase):
 
 class UtilsTests(unittest.TestCase):
 
+    @timethis
     def test_which_handle_windows_exe_extension_for_executables(self):
         with patch("pysswords.utils.os") as mocker:
             mocker.name = "nt"
@@ -375,40 +420,48 @@ class ConsoleInterfaceTests(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @timethis
     def test_cli_parse_args_returns_argparse_namespace(self):
         args = __main__.parse_args(["--init"])
         self.assertIsInstance(args, argparse.Namespace)
 
+    @timethis
     def test_cli_default_pyssword_dir(self):
         pysswords_dir = os.path.join(os.path.expanduser("~"), "~/.pysswords")
         self.assertEqual(pysswords_dir, __main__.default_db())
 
+    @timethis
     def test_cli_parse_args_has_init_arg(self):
         args = __main__.parse_args(["--init"])
         self.assertIn("init", args.__dict__)
         args_short = __main__.parse_args(["-I"])
         self.assertIn("init", args_short.__dict__)
 
+    @timethis
     def test_cli_parse_args_has_database_arg(self):
         args = __main__.parse_args(["--database", "/tmp/pysswords"])
         self.assertIn("database", args.__dict__)
         args_short = __main__.parse_args(["-D", "/tmp/pysswords"])
         self.assertIn("database", args_short.__dict__)
 
+    @timethis
     def test_cli_parse_args_has_database_default_value(self):
         args = __main__.parse_args([])
         self.assertEqual(args.database, __main__.default_db())
 
+    @timethis
     def test_cli_parse_args_has_add_arg(self):
         args = __main__.parse_args(["--add"])
         self.assertIn("add", args.__dict__)
         args_short = __main__.parse_args(["-a"])
         self.assertIn("add", args_short.__dict__)
 
+    @timethis
     def test_cli_parse_args_add_arg_is_true_when_passed(self):
         args = __main__.parse_args(["--add"])
         self.assertTrue(args.add)
 
+    @timethis
     def test_cli_parse_args_has_remove_arg(self):
         credential_name = "example.com"
         args = __main__.parse_args(["--remove", credential_name])
@@ -416,11 +469,13 @@ class ConsoleInterfaceTests(unittest.TestCase):
         self.assertIn("remove", args.__dict__)
         self.assertIn("remove", args_short.__dict__)
 
+    @timethis
     def test_cli_parse_args_remove_arg_has_credential_name_passed(self):
         credential_name = "example.com"
         args = __main__.parse_args(["--remove", credential_name])
         self.assertTrue(args.remove, credential_name)
 
+    @timethis
     def test_cli_parse_args_has_update_arg(self):
         credential_name = "example.com"
         args = __main__.parse_args(["--update", credential_name])
@@ -428,11 +483,13 @@ class ConsoleInterfaceTests(unittest.TestCase):
         self.assertIn("update", args.__dict__)
         self.assertIn("update", args_short.__dict__)
 
+    @timethis
     def test_cli_parse_args_update_arg_has_credential_name_passed(self):
         credential_name = "example.com"
         args = __main__.parse_args(["--update", credential_name])
         self.assertEqual(args.update, credential_name)
 
+    @timethis
     def test_cli_parse_args_has_get_arg(self):
         credential_name = "example.com"
         args = __main__.parse_args(["--get", credential_name])
@@ -440,11 +497,13 @@ class ConsoleInterfaceTests(unittest.TestCase):
         self.assertIn("get", args.__dict__)
         self.assertIn("get", args_short.__dict__)
 
+    @timethis
     def test_cli_parse_args_get_arg_has_credential_name_passed(self):
         credential_name = "example.com"
         args = __main__.parse_args(["--get", credential_name])
         self.assertEqual(args.get, credential_name)
 
+    @timethis
     def test_cli_parse_args_has_search_arg(self):
         credential_name = "example.com"
         args = __main__.parse_args(["--search", credential_name])
@@ -452,6 +511,7 @@ class ConsoleInterfaceTests(unittest.TestCase):
         self.assertIn("search", args.__dict__)
         self.assertIn("search", args_short.__dict__)
 
+    @timethis
     def test_cli_parse_args_search_arg_has_credential_name_passed(self):
         credential_name = "example.com"
         args = __main__.parse_args(["--search", credential_name])
