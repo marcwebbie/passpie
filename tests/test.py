@@ -433,6 +433,18 @@ class ConsoleInterfaceTests(unittest.TestCase):
         args = __main__.parse_args(["--update", credential_name])
         self.assertEqual(args.update, credential_name)
 
+    def test_cli_parse_args_has_get_arg(self):
+        credential_name = "example.com"
+        args = __main__.parse_args(["--get", credential_name])
+        args_short = __main__.parse_args(["-g", credential_name])
+        self.assertIn("get", args.__dict__)
+        self.assertIn("get", args_short.__dict__)
+
+    def test_cli_parse_args_get_arg_has_credential_name_passed(self):
+        credential_name = "example.com"
+        args = __main__.parse_args(["--get", credential_name])
+        self.assertEqual(args.get, credential_name)
+
 if __name__ == "__main__":
     if sys.version_info >= (3,):
         unittest.main(warnings=False)
