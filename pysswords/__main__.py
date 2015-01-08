@@ -18,5 +18,6 @@ def parse_args(args):
     group_cred.add_argument("-g", "--get")
     group_cred.add_argument("-u", "--update")
     group_cred.add_argument("-r", "--remove")
+    group_cred.add_argument("-s", "--search")
 
     return parser.parse_args(args)
