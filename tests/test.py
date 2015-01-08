@@ -30,7 +30,7 @@ TEST_DATA_DIR = os.path.join(TEST_DIR, "data")
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.relpath(__file__))))
 import pysswords
 from pysswords import __main__
-from pysswords.db import Database
+from pysswords.db import Database, Credential
 
 PROFILE = False
 
@@ -546,10 +546,24 @@ class ConsoleInterfaceTests(unittest.TestCase):
                 pysswords.__main__.main(["-I", "-D", tempdb_path])
                 self.assertTrue(mocked.create.called)
 
+    def create_database(self):
+        with patch("pysswords.db.database.create_keyring", new=mock_create_keyring):
+            return Database.create(self.tempdb_path, self.passphrase)
+
     @timethis
     def test_cli_main_add_credential_when_passed_add_arg(self):
-        with patch("pysswords.db.Database") as mocked:
-            pysswords.__main__.main(["-a"])
+        tmpdb = self.create_database()
+        args = ["-D", tmpdb.path, "-a"]
+        with patch("pysswords.__main__.Database.add") as mocked:
+            with patch("pysswords.__main__.prompt") as mocked_prompt:
+                mocked_prompt.side_effect = [
+                    "example.com",
+                    "doe",
+                    "pass",
+                    "No Comment"
+                ]
+                pysswords.__main__.main(args)
+                self.assertIsInstance(mocked.call_args[0][0], Credential)
 
     @timethis
     def test_prompt_input_uses_default_arg(self):

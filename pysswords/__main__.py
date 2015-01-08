@@ -2,7 +2,7 @@ import argparse
 from getpass import getpass
 import os
 
-from .db import Database
+from .db import Database, Credential
 
 
 def default_db():
@@ -52,11 +52,25 @@ def prompt(text, default="", password=False):
         return entry
 
 
+def prompt_credential(database, **defaults):
+    name = prompt("Name", defaults.get("name"))
+    login = prompt("Login", defaults.get("login"))
+    password = prompt("Password")
+    comment = prompt("Comment", defaults.get("comment"))
+    return Credential(name, login, database.encrypt(password), comment)
+
+
 def main(cli_args):
     args = parse_args(cli_args)
     if args.init:
         passphrase = prompt("Passhprase for database", password=True)
-        Database.create(args.database, passphrase)
+        database = Database.create(args.database, passphrase)
+    else:
+        database = Database(path=args.database)
+
+    if args.add:
+        credential = prompt_credential(database)
+        database.add(credential)
 
 if __name__ == "__main__":
     main()
