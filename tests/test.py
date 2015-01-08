@@ -430,6 +430,11 @@ class ConsoleInterfaceTests(unittest.TestCase):
         if os.path.exists(self.tempdb_path):
             shutil.rmtree(self.tempdb_path)
 
+    def create_database(self):
+        with patch("pysswords.db.database.create_keyring",
+                   new=mock_create_keyring):
+            return Database.create(self.tempdb_path, self.passphrase)
+
     @timethis
     def test_cli_parse_args_returns_argparse_namespace(self):
         args = pysswords.__main__.parse_args(["--init"])
@@ -545,10 +550,6 @@ class ConsoleInterfaceTests(unittest.TestCase):
             with patch("pysswords.__main__.prompt"):
                 pysswords.__main__.main(["-I", "-D", tempdb_path])
                 self.assertTrue(mocked.create.called)
-
-    def create_database(self):
-        with patch("pysswords.db.database.create_keyring", new=mock_create_keyring):
-            return Database.create(self.tempdb_path, self.passphrase)
 
     @timethis
     def test_cli_main_add_credential_when_passed_add_arg(self):
