@@ -36,7 +36,7 @@ clean:
 	rm -rf dist
 
 coverage:
-	coverage run --source=$(PACKAGE) setup.py test && coverage --report
+	coverage run --source=$(PACKAGE) --omit=$(PACKAGE)/python_two.py setup.py test
 	coverage report -m
 
 dist:
