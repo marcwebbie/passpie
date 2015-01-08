@@ -14,6 +14,10 @@ except ImportError:
         from mock import patch, Mock
     except ImportError:
         exit("mock not found. Run: `pip install mock`")
+if sys.version_info >= (3,):
+    BUILTINS_NAME = "builtins"
+else:
+    BUILTINS_NAME = "__builtin__"
 
 import gnupg
 
@@ -415,15 +419,16 @@ class UtilsTests(unittest.TestCase):
 class ConsoleInterfaceTests(unittest.TestCase):
 
     def setUp(self):
-        self.tempdb = os.path.join(TEST_DATA_DIR, "tmp")
+        self.tempdb_path = os.path.join(TEST_DATA_DIR, "tmp")
         self.cleanup()
+        self.passphrase = "dummy_passphrase"
 
     def tearDown(self):
         self.cleanup()
 
     def cleanup(self):
-        if os.path.exists(self.tempdb):
-            shutil.rmtree(self.tempdb)
+        if os.path.exists(self.tempdb_path):
+            shutil.rmtree(self.tempdb_path)
 
     @timethis
     def test_cli_parse_args_returns_argparse_namespace(self):
@@ -535,13 +540,47 @@ class ConsoleInterfaceTests(unittest.TestCase):
 
     @timethis
     def test_cli_main_handles_with_init_arg_create_database(self):
-        args = pysswords.__main__.parse_args(["-I", "-D", self.tempdb])
-        with patch("pysswords.__main__.parse_args", return_value=args):
-            pysswords.__main__.main()
+        tempdb_path = os.path.join(self.tempdb_path, "temp")
+        with patch("pysswords.__main__.Database") as mocked:
+            with patch("pysswords.__main__.prompt"):
+                pysswords.__main__.main(["-I", "-D", tempdb_path])
+                self.assertTrue(mocked.create.called)
 
-        self.assertTrue(os.path.exists(self.tempdb))
-        self.assertIn("pubring.gpg", os.listdir(self.tempdb))
-        self.assertIn("secring.gpg", os.listdir(self.tempdb))
+    @timethis
+    def test_cli_main_add_credential_when_passed_add_arg(self):
+        with patch("pysswords.db.Database") as mocked:
+            pysswords.__main__.main(["-a"])
+
+    @timethis
+    def test_prompt_input_uses_default_arg(self):
+        default = "123123123"
+        with patch(BUILTINS_NAME + ".input") as mocked:
+            __main__.prompt("Name", default)
+            call_args, _ = mocked.call_args
+            self.assertIn(default, call_args[0])
+
+    @timethis
+    def test_prompt_with_password_calls_prompt_password(self):
+        with patch("pysswords.__main__.prompt_password") as mocked:
+            pysswords.__main__.prompt("Pass:", password=True)
+            self.assertTrue(mocked.called)
+
+    @timethis
+    def test_promt_password_returns_entered_password(self):
+        with patch(BUILTINS_NAME + ".print"):
+            with patch("pysswords.__main__.getpass") as mocked:
+                entry = "entry"
+                mocked.return_value = entry
+                ret = pysswords.__main__.prompt_password("Pass:")
+                self.assertEqual(entry, ret)
+
+    @timethis
+    def test_getpassphrase_raises_value_error_when_passwords_didnt_match(self):
+        with patch(BUILTINS_NAME + ".print"):
+            with patch("pysswords.__main__.getpass") as mocked:
+                mocked.side_effect = ["pass", "wrong"] * 3
+                with self.assertRaises(ValueError):
+                    __main__.prompt_password("Password:")
 
 
 if __name__ == "pysswords.__main__":

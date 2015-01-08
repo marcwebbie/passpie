@@ -1,6 +1,8 @@
-import os
 import argparse
-import gnupg
+from getpass import getpass
+import os
+
+from .db import Database
 
 
 def default_db():
@@ -29,10 +31,32 @@ def parse_args(cli_args=None):
     return args
 
 
-def main():
-    args = parse_args()
-    gnupg.GPG(homedir=args.database)
+def prompt_password(text):
+    for _ in range(3):
+        password = getpass(text)
+        repeat_password = getpass("Type again: ")
 
+        if password == repeat_password:
+            return password
+        else:
+            print("Entries don't match!")
+    else:
+        raise ValueError("Entries didn't match")
+
+
+def prompt(text, default="", password=False):
+    if password:
+        prompt_password(text)
+    else:
+        entry = input("{} {}: ".format(text, "[{}]".format(default)))
+        return entry
+
+
+def main(cli_args):
+    args = parse_args(cli_args)
+    if args.init:
+        passphrase = prompt("Passhprase for database", password=True)
+        Database.create(args.database, passphrase)
 
 if __name__ == "__main__":
     main()
