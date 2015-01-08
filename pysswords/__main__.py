@@ -9,9 +9,9 @@ def default_db():
 def parse_args(args):
     parser = argparse.ArgumentParser(prog="Pysswords")
 
-    group_init = parser.add_argument_group("Init options")
-    group_init.add_argument("-I", "--init", action="store_true")
-    group_init.add_argument("-D", "--database", default=default_db())
+    group_db = parser.add_argument_group("Databse options")
+    group_db.add_argument("-I", "--init", action="store_true")
+    group_db.add_argument("-D", "--database", default=default_db())
 
     group_cred = parser.add_argument_group("Credential options")
     group_cred.add_argument("-a", "--add", action="store_true")
