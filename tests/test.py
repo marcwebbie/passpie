@@ -597,6 +597,50 @@ class ConsoleInterfaceTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     __main__.prompt_password("Password:")
 
+    @timethis
+    def test_get_credential_when_get_arg_passed(self):
+        tempdb = self.create_database()
+        credential_name = "example.com"
+        args = ["-D", tempdb.path, "--get", credential_name]
+        with patch("pysswords.db.Database.credential") as mocked:
+            pysswords.__main__.main(args)
+            self.assertTrue(mocked.called)
+            mocked.assert_called_once_with(
+                name=credential_name,
+                login=None
+            )
+
+    @timethis
+    def test_get_cedential_when_get_arg_passed_with_login(self):
+        tempdb = self.create_database()
+        credential = Credential("example.com", "doe", "_", "_")
+        fullname = "{}@{}".format(credential.login, credential.name)
+        args = ["-D", tempdb.path, "--get", fullname]
+        with patch("pysswords.db.Database.credential") as mocked:
+            pysswords.__main__.main(args)
+            self.assertTrue(mocked.called)
+            mocked.assert_called_once_with(
+                name=credential.name,
+                login=credential.login
+            )
+
+    @timethis
+    def test_split_name_returns_name_login_from_name(self):
+        cred_name = "example.org"
+        cred_login = "john.doe"
+        credential_full_name = "{}@{}".format(cred_login, cred_name)
+        name, login = pysswords.__main__.split_name(credential_full_name)
+        self.assertEqual(cred_name, name)
+        self.assertEqual(cred_login, login)
+
+    @timethis
+    def test_split_name_returns_login_none_when_not_loginname_passed(self):
+        cred_name = "@example.org"
+        name, login = pysswords.__main__.split_name(cred_name)
+        self.assertEqual(cred_name.strip("@"), name)
+        self.assertEqual(None, login)
+
+
 
 if __name__ == "pysswords.__main__":
     if sys.version_info >= (3,):

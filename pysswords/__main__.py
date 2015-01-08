@@ -1,6 +1,7 @@
 import argparse
 from getpass import getpass
 import os
+import re
 
 from .db import Database, Credential
 
@@ -60,6 +61,16 @@ def prompt_credential(database, **defaults):
     return Credential(name, login, database.encrypt(password), comment)
 
 
+def split_name(fullname):
+    rgx = re.compile(r"(?:(?P<login>.+)?@)?(?P<name>[\w\s\._-]+)")
+    if rgx.match(fullname):
+        name = rgx.match(fullname).group("name")
+        login = rgx.match(fullname).group("login")
+        return name, login
+    else:
+        raise ValueError("Not a valid name")
+
+
 def main(cli_args):
     args = parse_args(cli_args)
     if args.init:
@@ -72,5 +83,8 @@ def main(cli_args):
         credential = prompt_credential(database)
         database.add(credential)
 
+    if args.get:
+        name, login = split_name(args.get)
+        database.credential(name=name, login=login)
 if __name__ == "__main__":
     main()
