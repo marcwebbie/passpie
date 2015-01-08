@@ -6,7 +6,7 @@ def default_db():
     return os.path.join(os.path.expanduser("~"), "~/.pysswords")
 
 
-def parse_args(args):
+def parse_args(cli_args):
     parser = argparse.ArgumentParser(prog="Pysswords")
 
     group_db = parser.add_argument_group("Databse options")
@@ -19,5 +19,10 @@ def parse_args(args):
     group_cred.add_argument("-u", "--update")
     group_cred.add_argument("-r", "--remove")
     group_cred.add_argument("-s", "--search")
+    group_cred.add_argument("-c", "--clipboard", action="store_true")
 
-    return parser.parse_args(args)
+    args = parser.parse_args(cli_args)
+    if args.clipboard and not args.get:
+        parser.error('-g argument is required in when using -c')
+
+    return args

@@ -517,6 +517,17 @@ class ConsoleInterfaceTests(unittest.TestCase):
         args = __main__.parse_args(["--search", credential_name])
         self.assertEqual(args.search, credential_name)
 
+    @timethis
+    def test_cli_raises_error_when_clipboard_passed_without_get_args(self):
+        # __main__.parse_args(["--clipboard"])
+        with open(os.devnull, 'w') as devnull:
+            with patch("sys.stderr", devnull):
+                with self.assertRaises(SystemExit):
+                    __main__.parse_args(["--clipboard"])
+            with patch("sys.stderr", devnull):
+                with self.assertRaises(SystemExit):
+                    __main__.parse_args(["-c"])
+
 
 if __name__ == "__main__":
     if sys.version_info >= (3,):
