@@ -641,7 +641,6 @@ class ConsoleInterfaceTests(unittest.TestCase):
         self.assertEqual(None, login)
 
 
-
 if __name__ == "pysswords.__main__":
     if sys.version_info >= (3,):
         unittest.main(warnings=False)
