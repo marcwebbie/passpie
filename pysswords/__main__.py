@@ -1,12 +1,13 @@
 import os
 import argparse
+import gnupg
 
 
 def default_db():
-    return os.path.join(os.path.expanduser("~"), "~/.pysswords")
+    return os.path.join(os.path.expanduser("~"), ".pysswords")
 
 
-def parse_args(cli_args):
+def parse_args(cli_args=None):
     parser = argparse.ArgumentParser(prog="Pysswords")
 
     group_db = parser.add_argument_group("Databse options")
@@ -26,3 +27,12 @@ def parse_args(cli_args):
         parser.error('-g argument is required in when using -c')
 
     return args
+
+
+def main():
+    args = parse_args()
+    gnupg.GPG(homedir=args.database)
+
+
+if __name__ == "__main__":
+    main()

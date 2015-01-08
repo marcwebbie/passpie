@@ -415,121 +415,136 @@ class UtilsTests(unittest.TestCase):
 class ConsoleInterfaceTests(unittest.TestCase):
 
     def setUp(self):
-        pass
+        self.tempdb = os.path.join(TEST_DATA_DIR, "tmp")
+        self.cleanup()
 
     def tearDown(self):
-        pass
+        self.cleanup()
+
+    def cleanup(self):
+        if os.path.exists(self.tempdb):
+            shutil.rmtree(self.tempdb)
 
     @timethis
     def test_cli_parse_args_returns_argparse_namespace(self):
-        args = __main__.parse_args(["--init"])
+        args = pysswords.__main__.parse_args(["--init"])
         self.assertIsInstance(args, argparse.Namespace)
 
     @timethis
     def test_cli_default_pyssword_dir(self):
-        pysswords_dir = os.path.join(os.path.expanduser("~"), "~/.pysswords")
-        self.assertEqual(pysswords_dir, __main__.default_db())
+        pysswords_dir = os.path.join(os.path.expanduser("~"), ".pysswords")
+        self.assertEqual(pysswords_dir, pysswords.__main__.default_db())
 
     @timethis
     def test_cli_parse_args_has_init_arg(self):
-        args = __main__.parse_args(["--init"])
+        args = pysswords.__main__.parse_args(["--init"])
         self.assertIn("init", args.__dict__)
-        args_short = __main__.parse_args(["-I"])
+        args_short = pysswords.__main__.parse_args(["-I"])
         self.assertIn("init", args_short.__dict__)
 
     @timethis
     def test_cli_parse_args_has_database_arg(self):
-        args = __main__.parse_args(["--database", "/tmp/pysswords"])
+        args = pysswords.__main__.parse_args(["--database", "/tmp/pysswords"])
         self.assertIn("database", args.__dict__)
-        args_short = __main__.parse_args(["-D", "/tmp/pysswords"])
+        args_short = pysswords.__main__.parse_args(["-D", "/tmp/pysswords"])
         self.assertIn("database", args_short.__dict__)
 
     @timethis
     def test_cli_parse_args_has_database_default_value(self):
-        args = __main__.parse_args([])
-        self.assertEqual(args.database, __main__.default_db())
+        args = pysswords.__main__.parse_args([])
+        self.assertEqual(args.database, pysswords.__main__.default_db())
 
     @timethis
     def test_cli_parse_args_has_add_arg(self):
-        args = __main__.parse_args(["--add"])
+        args = pysswords.__main__.parse_args(["--add"])
         self.assertIn("add", args.__dict__)
-        args_short = __main__.parse_args(["-a"])
+        args_short = pysswords.__main__.parse_args(["-a"])
         self.assertIn("add", args_short.__dict__)
 
     @timethis
     def test_cli_parse_args_add_arg_is_true_when_passed(self):
-        args = __main__.parse_args(["--add"])
+        args = pysswords.__main__.parse_args(["--add"])
         self.assertTrue(args.add)
 
     @timethis
     def test_cli_parse_args_has_remove_arg(self):
         credential_name = "example.com"
-        args = __main__.parse_args(["--remove", credential_name])
-        args_short = __main__.parse_args(["-r", credential_name])
+        args = pysswords.__main__.parse_args(["--remove", credential_name])
+        args_short = pysswords.__main__.parse_args(["-r", credential_name])
         self.assertIn("remove", args.__dict__)
         self.assertIn("remove", args_short.__dict__)
 
     @timethis
     def test_cli_parse_args_remove_arg_has_credential_name_passed(self):
         credential_name = "example.com"
-        args = __main__.parse_args(["--remove", credential_name])
+        args = pysswords.__main__.parse_args(["--remove", credential_name])
         self.assertTrue(args.remove, credential_name)
 
     @timethis
     def test_cli_parse_args_has_update_arg(self):
         credential_name = "example.com"
-        args = __main__.parse_args(["--update", credential_name])
-        args_short = __main__.parse_args(["-u", credential_name])
+        args = pysswords.__main__.parse_args(["--update", credential_name])
+        args_short = pysswords.__main__.parse_args(["-u", credential_name])
         self.assertIn("update", args.__dict__)
         self.assertIn("update", args_short.__dict__)
 
     @timethis
     def test_cli_parse_args_update_arg_has_credential_name_passed(self):
         credential_name = "example.com"
-        args = __main__.parse_args(["--update", credential_name])
+        args = pysswords.__main__.parse_args(["--update", credential_name])
         self.assertEqual(args.update, credential_name)
 
     @timethis
     def test_cli_parse_args_has_get_arg(self):
         credential_name = "example.com"
-        args = __main__.parse_args(["--get", credential_name])
-        args_short = __main__.parse_args(["-g", credential_name])
+        args = pysswords.__main__.parse_args(["--get", credential_name])
+        args_short = pysswords.__main__.parse_args(["-g", credential_name])
         self.assertIn("get", args.__dict__)
         self.assertIn("get", args_short.__dict__)
 
     @timethis
     def test_cli_parse_args_get_arg_has_credential_name_passed(self):
         credential_name = "example.com"
-        args = __main__.parse_args(["--get", credential_name])
+        args = pysswords.__main__.parse_args(["--get", credential_name])
         self.assertEqual(args.get, credential_name)
 
     @timethis
     def test_cli_parse_args_has_search_arg(self):
         credential_name = "example.com"
-        args = __main__.parse_args(["--search", credential_name])
-        args_short = __main__.parse_args(["-s", credential_name])
+        args = pysswords.__main__.parse_args(["--search", credential_name])
+        args_short = pysswords.__main__.parse_args(["-s", credential_name])
         self.assertIn("search", args.__dict__)
         self.assertIn("search", args_short.__dict__)
 
     @timethis
     def test_cli_parse_args_search_arg_has_credential_name_passed(self):
         credential_name = "example.com"
-        args = __main__.parse_args(["--search", credential_name])
+        args = pysswords.__main__.parse_args(["--search", credential_name])
         self.assertEqual(args.search, credential_name)
 
     @timethis
     def test_cli_raises_error_when_clipboard_passed_without_get_args(self):
-        # __main__.parse_args(["--clipboard"])
+        # pysswords.__main__.parse_args(["--clipboard"])
         with open(os.devnull, 'w') as devnull:
             with patch("sys.stderr", devnull):
                 with self.assertRaises(SystemExit):
-                    __main__.parse_args(["--clipboard"])
+                    pysswords.__main__.parse_args(["--clipboard"])
             with patch("sys.stderr", devnull):
                 with self.assertRaises(SystemExit):
-                    __main__.parse_args(["-c"])
+                    pysswords.__main__.parse_args(["-c"])
+
+    @timethis
+    def test_cli_main_handles_with_init_arg_create_database(self):
+        args = pysswords.__main__.parse_args(["-I", "-D", self.tempdb])
+        with patch("pysswords.__main__.parse_args", return_value=args):
+            pysswords.__main__.main()
+
+        self.assertTrue(os.path.exists(self.tempdb))
+        self.assertIn("pubring.gpg", os.listdir(self.tempdb))
+        self.assertIn("secring.gpg", os.listdir(self.tempdb))
 
 
-if __name__ == "__main__":
+if __name__ == "pysswords.__main__":
     if sys.version_info >= (3,):
         unittest.main(warnings=False)
     else:
