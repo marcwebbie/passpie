@@ -86,5 +86,7 @@ def main(cli_args):
     if args.get:
         name, login = split_name(args.get)
         database.credential(name=name, login=login)
+
+
 if __name__ == "__main__":
     main()
