@@ -637,6 +637,12 @@ class ConsoleInterfaceTests(unittest.TestCase):
         self.assertEqual(cred_login, login)
 
     @timethis
+    def test_split_name_raises_value_error_when_not_valid_name_given(self):
+        invalid_name = ""
+        with self.assertRaises(ValueError):
+            pysswords.__main__.split_name(invalid_name)
+
+    @timethis
     def test_split_name_returns_login_none_when_not_loginname_passed(self):
         cred_name = "@example.org"
         name, login = pysswords.__main__.split_name(cred_name)
