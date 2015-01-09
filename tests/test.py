@@ -487,7 +487,7 @@ class ConsoleInterfaceTests(unittest.TestCase):
 
     @timethis
     def test_cli_parse_args_has_show_password_arg(self):
-        args = pysswords.__main__.parse_args(["--show_password"])
+        args = pysswords.__main__.parse_args(["--show-password"])
         args_short = pysswords.__main__.parse_args(["-P"])
         self.assertIn("show_password", args.__dict__)
         self.assertIn("show_password", args_short.__dict__)
@@ -660,6 +660,25 @@ class ConsoleInterfaceTests(unittest.TestCase):
             self.assertIn(plaintext, output)
             self.assertIn(credential.comment, output)
 
+    @timethis
+    @patch("pysswords.__main__.Database")
+    def test_with_arg_show_password_asks_for_passphrase(self, _):
+        args = ["-D", "/tmp/pysswords", "--show-password"]
+        with patch("pysswords.__main__.getpass") as mocked_getpass:
+            pysswords.__main__.main(args)
+            self.assertTrue(mocked_getpass.called)
+
+    @timethis
+    def test_with_arg_show_password_checks_for_passphrase(self):
+        args = ["-D", "/tmp/pysswords", "--show-password"]
+        passphrase = "dummy"
+        with patch("pysswords.__main__.getpass") as mocked_getpass:
+            mocked_getpass.return_value = passphrase
+            with patch("pysswords.__main__.Database") as mocked_db:
+                pysswords.__main__.main(args)
+                mocked_db().check.assert_called_once_with(
+                    passphrase
+                )
 
 if __name__ == "pysswords.__main__":
     if sys.version_info >= (3,):

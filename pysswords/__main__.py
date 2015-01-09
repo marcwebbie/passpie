@@ -24,6 +24,7 @@ def parse_args(cli_args=None):
     group_cred.add_argument("-r", "--remove")
     group_cred.add_argument("-s", "--search")
     group_cred.add_argument("-c", "--clipboard", action="store_true")
+    group_cred.add_argument("-P", "--show-password", action="store_true")
 
     args = parser.parse_args(cli_args)
     if args.clipboard and not args.get:
@@ -36,7 +37,6 @@ def prompt_password(text):
     for _ in range(3):
         password = getpass(text)
         repeat_password = getpass("Type again: ")
-
         if password == repeat_password:
             return password
         else:
@@ -45,19 +45,22 @@ def prompt_password(text):
         raise ValueError("Entries didn't match")
 
 
-def prompt(text, default="", password=False):
+def prompt(text, default=None, password=False):
     if password:
         prompt_password(text)
     else:
-        entry = input("{} {}: ".format(text, "[{}]".format(default)))
+        entry = input("{}{} ".format(
+            text,
+            "[{}]".format(default) if default else "")
+        )
         return entry
 
 
 def prompt_credential(database, **defaults):
-    name = prompt("Name", defaults.get("name"))
-    login = prompt("Login", defaults.get("login"))
-    password = prompt("Password")
-    comment = prompt("Comment", defaults.get("comment"))
+    name = prompt("Name: ", defaults.get("name"))
+    login = prompt("Login: ", defaults.get("login"))
+    password = prompt("Password: ")
+    comment = prompt("Comment: ", defaults.get("comment"))
     return Credential(name, login, database.encrypt(password), comment)
 
 
@@ -95,21 +98,35 @@ def print_plaintext(credentials, database, passphrase):
     return print_credentials(plaintext_credentials, True)
 
 
-def main(cli_args):
+def main(cli_args=None):
     args = parse_args(cli_args)
+
+    # get database
     if args.init:
         passphrase = prompt("Passhprase for database", password=True)
         database = Database.create(args.database, passphrase)
     else:
         database = Database(path=args.database)
 
+    # updating database
     if args.add:
         credential = prompt_credential(database)
         database.add(credential)
 
+    # selecting
     if args.get:
         name, login = split_name(args.get)
-        database.credential(name=name, login=login)
+        credentials = database.credential(name=name, login=login)
+    else:
+        credentials = database.credentials
+
+    # printing
+    if args.show_password:
+        passphrase = getpass("Passphrase: ")
+        if database.check(passphrase):
+            print_plaintext(credentials, database, passphrase)
+    else:
+        print_credentials(credentials)
 
 
 if __name__ == "__main__":
