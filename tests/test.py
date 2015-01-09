@@ -673,6 +673,15 @@ class ConsoleInterfaceTests(unittest.TestCase):
                     passphrase
                 )
 
+    @timethis
+    def test_print_credentials_when_no_arg_is_passed(self):
+        args = []
+        with patch("pysswords.__main__.print_credentials") as mocked:
+            with patch("pysswords.__main__.Database") as mocked_db:
+                pysswords.__main__.main(args)
+                mocked.assert_called_once_with(mocked_db().credentials)
+
+
 if __name__ == "pysswords.__main__":
     if sys.version_info >= (3,):
         unittest.main(warnings=False)
