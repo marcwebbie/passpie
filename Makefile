@@ -63,6 +63,9 @@ tox: set-python
 test:
 	python -W ignore setup.py -q test
 
+test-benchmark:
+	BENCHMARK=True python -W ignore setup.py -q test
+
 test-all: tox
 
 all: set-python test-all
