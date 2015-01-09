@@ -1,11 +1,9 @@
 import fnmatch
 import os
-import gnupg
 import shutil
 import yaml
 
-from pysswords.utils import which
-from pysswords.crypt import create_keyring
+from pysswords.crypt import create_keyring, getgpg
 from .credential import (
     Credential,
     CredentialExistsError,
@@ -20,21 +18,14 @@ class Database(object):
 
     def __init__(self, path):
         self.path = path
+        self.keys_path = os.path.join(self.path, ".keys")
+        self.gpg = getgpg(self.keys_path)
 
     @classmethod
     def create(cls, path, passphrase):
         os.makedirs(path)
-        create_keyring(path, passphrase)
+        create_keyring(os.path.join(path, ".keys"), passphrase)
         return Database(path)
-
-    @property
-    def gpg(self):
-        return gnupg.GPG(binary=which("gpg"),
-                         homedir=self.keys_path)
-
-    @property
-    def keys_path(self):
-        return os.path.join(self.path, ".keys")
 
     @property
     def credentials(self):

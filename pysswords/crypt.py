@@ -1,4 +1,3 @@
-import os
 import gnupg
 
 
@@ -12,13 +11,16 @@ def generate_key_input(path, passphrase):
         passphrase=passphrase)
 
 
+def getgpg(path):
+    return gnupg.GPG(homedir=path)
+
+
 def generate_keys(path, key_input):
     key = gnupg.GPG(homedir=path).gen_key(key_input)
     return key
 
 
 def create_keyring(path, passphrase):
-    keyring_path = os.path.join(path, ".keys")
-    key_input = generate_key_input(keyring_path, passphrase)
-    generate_keys(keyring_path, key_input)
-    return keyring_path
+    key_input = generate_key_input(path, passphrase)
+    generate_keys(path, key_input)
+    return path
