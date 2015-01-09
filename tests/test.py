@@ -7,13 +7,15 @@ import unittest
 import yaml
 import time
 from functools import wraps
+
 try:
     from unittest.mock import patch, Mock
+    from io import StringIO
 except ImportError:
-    try:
-        from mock import patch, Mock
-    except ImportError:
-        exit("mock not found. Run: `pip install mock`")
+    # backwards compatbility with Python2
+    from mock import patch, Mock
+    from StringIO import StringIO
+
 if sys.version_info >= (3,):
     BUILTINS_NAME = "builtins"
 else:
@@ -33,6 +35,7 @@ from pysswords import __main__
 from pysswords.db import Database, Credential
 
 PROFILE = False
+
 
 def timethis(func):
     ''' Decorator that reports the execution time.
@@ -639,6 +642,41 @@ class ConsoleInterfaceTests(unittest.TestCase):
         name, login = pysswords.__main__.split_name(cred_name)
         self.assertEqual(cred_name.strip("@"), name)
         self.assertEqual(None, login)
+
+    @timethis
+    def test_print_credentials(self):
+        credentials = [
+            some_credential()
+        ]
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            pysswords.__main__.print_credentials(credentials)
+            output = mock_stdout.getvalue()
+        for credential in credentials:
+            self.assertIn(credential.name, output)
+            self.assertIn(credential.login, output)
+            self.assertIn("***", output)
+            self.assertIn(credential.comment, output)
+
+    @timethis
+    def test_print_plaintext_prints_passwords_plaintext(self):
+        credentials = [
+            some_credential()
+        ]
+        plaintext = "plaintext"
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            with patch('pysswords.__main__.Database') as mocked:
+                mocked.decrypt.return_value = plaintext
+                pysswords.__main__.print_plaintext(
+                    credentials=credentials,
+                    database=mocked,
+                    passphrase=Mock()
+                )
+            output = mock_stdout.getvalue()
+        for credential in credentials:
+            self.assertIn(credential.name, output)
+            self.assertIn(credential.login, output)
+            self.assertIn(plaintext, output)
+            self.assertIn(credential.comment, output)
 
 
 if __name__ == "pysswords.__main__":

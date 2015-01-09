@@ -71,6 +71,30 @@ def split_name(fullname):
         raise ValueError("Not a valid name")
 
 
+def print_credentials(credentials, show_password=False):
+    for credential in credentials:
+        credential_str = "{}, {}, {}, {}".format(
+            credential.name,
+            credential.login,
+            credential.password if show_password else "***",
+            credential.comment
+        )
+        print(credential_str)
+
+
+def print_plaintext(credentials, database, passphrase):
+    plaintext_credentials = []
+    for c in credentials:
+        new_credential = Credential(
+            c.name,
+            c.login,
+            database.decrypt(c.password, passphrase),
+            c.comment
+        )
+        plaintext_credentials.append(new_credential)
+    return print_credentials(plaintext_credentials, True)
+
+
 def main(cli_args):
     args = parse_args(cli_args)
     if args.init:
