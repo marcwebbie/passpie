@@ -2,6 +2,13 @@ from errno import EEXIST
 import os
 import sys
 from functools import partial
+try:
+    from unittest.mock import patch, Mock
+    from io import StringIO
+except ImportError:
+    # backwards compatbility with Python2
+    from mock import patch, Mock
+    from StringIO import StringIO
 
 
 if sys.version_info < (3,):
@@ -13,3 +20,8 @@ if sys.version_info < (3,):
                 raise
 else:
     makedirs = partial(os.makedirs)
+
+if sys.version_info >= (3,):
+    BUILTINS_NAME = "builtins"
+else:
+    BUILTINS_NAME = "__builtin__"
