@@ -334,13 +334,6 @@ class DatabaseTests(unittest.TestCase):
         found = self.database.credential(name=values["name"])[0]
         self.assertEqual(found._asdict(), new_values)
 
-    @timethis
-    @unittest.skip
-    def test_check_returns_false_when_bad_passphrase(self):
-        database = Database.create(self.path, self.passphrase)
-        self.assertTrue(database.check(self.passphrase))
-        self.assertFalse(database.check("bad_passphrase"))
-
 
 class CredentialTests(unittest.TestCase):
 
@@ -661,12 +654,12 @@ class ConsoleInterfaceTests(unittest.TestCase):
             self.assertIn(credential.comment, output)
 
     @timethis
-    @patch("pysswords.__main__.Database")
-    def test_with_arg_show_password_asks_for_passphrase(self, _):
+    def test_with_arg_show_password_asks_for_passphrase(self):
         args = ["-D", "/tmp/pysswords", "--show-password"]
         with patch("pysswords.__main__.getpass") as mocked_getpass:
-            pysswords.__main__.main(args)
-            self.assertTrue(mocked_getpass.called)
+            with patch("pysswords.__main__.Database"):
+                pysswords.__main__.main(args)
+                self.assertTrue(mocked_getpass.called)
 
     @timethis
     def test_with_arg_show_password_checks_for_passphrase(self):
