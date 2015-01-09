@@ -87,3 +87,11 @@ class Database(object):
     def decrypt(self, text, passphrase):
         decrypted = str(self.gpg.decrypt(text, passphrase=passphrase))
         return decrypted
+
+    def check(self, passphrase):
+        sign = self.gpg.sign(
+            "testing",
+            default_key=self.key(True),
+            passphrase=passphrase
+        )
+        return True if sign else False
