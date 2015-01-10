@@ -1006,6 +1006,17 @@ class CLITests(unittest.TestCase):
         with patch("pysswords.cli.getpass", return_value=passphrase):
             self.assertEqual(interface.get_passphrase(), passphrase)
 
+    @timethis
+    def test_copy_to_clipboard_writes_error_when_bad_passphrase(self, _):
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        interface.database.get.return_value = [some_credential()]
+        interface.get_passphrase = Mock(return_value=None)
+        interface.write = Mock()
+        interface.copy_to_clipboard("fullname")
+        interface.write.assert_called_once_with(
+            "Wrong passphrase",
+            error=True
+        )
 
 if __name__ == "__main__":
     if sys.version_info >= (3,):

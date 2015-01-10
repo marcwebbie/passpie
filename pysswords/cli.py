@@ -165,7 +165,11 @@ class CLI(object):
             )
         elif len(self.display) == 1:
             credential = self.display[0]
+            self.display = []
             passphrase = self.get_passphrase()
+            if passphrase is None:
+                return self.write("Wrong passphrase", error=True)
+
             password = self.database.gpg.decrypt(
                 credential.password,
                 passphrase=passphrase
@@ -175,7 +179,6 @@ class CLI(object):
                 asfullname(credential.name, credential.login)
             )
             self.write(cred_string)
-            self.display = []
         elif len(self.display) > 1:
             print("-- Multiple credentials were found: try fullname syntax"
                   "\nfor example: login@name")
