@@ -68,7 +68,6 @@ class CLI(object):
         if self.database.check(passphrase):
             return passphrase
 
-
     def decrypt_credentials(self, credentials, passphrase):
         plaintext_credentials = []
         for c in credentials:
