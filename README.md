@@ -147,10 +147,13 @@ pysswords -g doe@example.com
 
 ###### Output
 
+```
 
 | Name        | Login   | Password   | Comment   |
 |-------------+---------+------------+-----------|
 | example.com | doe     | ***        |           |
+
+```
 
 
 Under The Hood
