@@ -21,13 +21,14 @@ Main Features
 + `☑` Manage multiple databases
 + `☑` Add, edit, remove credentials
 + `☑` Copy passwords to clipboard
-+ `☑` Search credentials by name, login or comments
 + `☑` List credentials as a table
 + `☑` Colored output
-+ `☐` Search with regular expression
++ `☑` Search credentials by name, login or comments
++ `☑` Search with regular expression
++ `☑` Select by fullname syntax
++ `☐` Exporting database
 + `☐` Importing credentials from other applications
 + `☐` Undo/Redo modifications to the database
-+ `☐` Pysswords emacs mode
 
 > `☑` implemented feature, `☐` not implemented feature.
 
@@ -48,6 +49,12 @@ pip install pysswords
 Mac/linux | Windows
 ----------|---------
 [![Build](https://travis-ci.org/marcwebbie/pysswords.svg)](https://travis-ci.org/marcwebbie/pysswords) | [![Build on windows](https://ci.appveyor.com/api/projects/status/5b7p1vo3y9x3y35t?svg=true)](https://ci.appveyor.com/project/marcwebbie/pysswords)
+
+to install development version:
+
+``` bash
+pip install https://github.com/marcwebbie/pysswords/zipball/master
+```
 
 The **latest development version** can be installed directly from GitHub:
 
@@ -71,13 +78,16 @@ pysswords -a
 pysswords -g github
 
 # remove credential "github". Option: `-r` or `--remove`
-pysswords -d github
+pysswords -r github
 
-# edit credential "github". Option: `-e` or `--edit`
-pysswords -e github
+# edit credential "github". Option: `-u` or `--update`
+pysswords -u github
 
 # search credentials with query "octocat". Option: `-s` or `--search`
 pysswords -s octocat
+
+# search credentials with regular expression "example\.com|org". Option: `-s` or `--search`
+pysswords -s example\.com|org
 
 # copy password from credential "github" into clipboard. Option: `-c` or `--clipboard`
 # this option have to be used with --get|-g option
@@ -91,7 +101,56 @@ pysswords --show-password
 
 # shows help. Option `-h` or `--help`
 pysswords --help
+
+# specify other passwords. Option `-D` or `--database`
+pysswords -D /path/to/other/database
 ```
+
+### Grouping
+
+Pysswords credentials can have multiple names which groups them for the same name:
+
+```
+pysswords -a
+Name: example.com
+Login: john
+Password: **********
+Comment: first account
+```
+
+```
+pysswords -a
+Name: example.com
+Login: doe
+Password: **********
+Comment: first account
+```
+
+###### Output
+
+```
+
+| Name        | Login   | Password   | Comment    |
+|-------------+---------+------------+------------|
+| example.com | doe     | ***        |            |
+| example.com | john    | ***        | No comment |
+
+```
+
+### Fullname syntax
+
+You can select grouped credentials by using fullname syntax `login@name`:
+
+```
+pysswords -g doe@example.com
+```
+
+###### Output
+
+
+| Name        | Login   | Password   | Comment   |
+|-------------+---------+------------+-----------|
+| example.com | doe     | ***        |           |
 
 
 Under The Hood
@@ -122,7 +181,7 @@ pysswords --database /tmp/pysswords --init
 
 tree /tmp/pysswords -la
 # /tmp/pysswords
-# └── .gnupg
+# └── .keys
 #     ├── pubring.gpg
 #     ├── random_seed
 #     ├── secring.gpg
@@ -136,11 +195,11 @@ pysswords --database /tmp/pysswords -a
 # Name: github
 # Login: octocat
 # Password: **********
-# Comments [optional]:
+# Comments:
 
 tree /tmp/pysswords -la
 # /tmp/pysswords
-# ├── .gnupg
+# ├── .keys
 # │   ├── pubring.gpg
 # │   ├── random_seed
 # │   ├── secring.gpg
