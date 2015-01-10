@@ -1,14 +1,18 @@
 import fnmatch
 import os
-import shutil
+import re
 import yaml
 
-from pysswords.crypt import create_keyring, getgpg
+from pysswords.crypt import create_keyring, getgpg, is_encrypted
 from .credential import (
     Credential,
+    CredentialNotFoundError,
     CredentialExistsError,
     content,
-    expandpath
+    expandpath,
+    exists,
+    clean,
+    asstring
 )
 
 from pysswords.python_two import makedirs
@@ -40,33 +44,60 @@ class Database(object):
         key = next(k for k in self.gpg.list_keys(secret=private))
         return key.get("fingerprint")
 
-    def remove(self, credential):
-        credential_path = expandpath(self.path, credential)
-        credential_dir = os.path.dirname(credential_path)
-        os.remove(credential_path)
-        if not os.listdir(credential_dir):
-            shutil.rmtree(credential_dir)
+    def build_credential(self, name, login, password, comment, encrypt=True):
+        if encrypt and not is_encrypted(password):
+            password = self.encrypt(password)
+        return Credential(
+            name=name,
+            login=login,
+            password=password,
+            comment=comment
+        )
 
-    def add(self, credential):
-        cred_path = expandpath(self.path, credential)
-        if os.path.isfile(cred_path):
+    def write_credential(self, credential):
+        if exists(self.path, credential.name, credential.login):
             raise CredentialExistsError()
+        cred_path = expandpath(self.path, credential.name, credential.login)
         makedirs(os.path.dirname(cred_path), exist_ok=True)
         with open(cred_path, "w") as f:
             f.write(content(credential))
         return cred_path
 
-    def update(self, credential, **values):
-        name = values.get("name", credential.name)
-        login = values.get("login", credential.login)
-        password = values.get("password", credential.password)
-        comment = values.get("comment", credential.comment)
-        self.remove(credential)
-        new_credential = Credential(name, login, password, comment)
-        self.add(new_credential)
-        return new_credential
+    def add(self, name, login, password, comment):
+        credential = self.build_credential(name, login, password, comment)
+        self.write_credential(credential)
+        return credential
 
-    def credential(self, name, login=None):
+    def update(self, name, login, to_update):
+        found = self.get(name, login)
+        updated = []
+        for credential in found:
+            new_credential = self.build_credential(
+                name=to_update.get("name", credential.name),
+                login=to_update.get("login", credential.login),
+                password=to_update.get("password", credential.password),
+                comment=to_update.get("comment", credential.comment),
+                encrypt=True if to_update.get("password") else False
+            )
+            self.remove(credential.name, credential.login)
+            self.add(
+                name=new_credential.name,
+                login=new_credential.login,
+                password=new_credential.password,
+                comment=new_credential.comment,
+            )
+            updated.append(new_credential)
+        return updated
+
+    def remove(self, name, login):
+        found = self.get(name, login)
+        if not found:
+            raise CredentialNotFoundError()
+        else:
+            for credential in found:
+                clean(self.path, credential.name, credential.login)
+
+    def get(self, name, login=None):
         if login:
             return [c for c in self.credentials
                     if c.name == name and c.login == login]
@@ -74,8 +105,8 @@ class Database(object):
             return [c for c in self.credentials if c.name == name]
 
     def search(self, query):
-        return [cred for cred in self.credentials
-                if query in " ".join([v for v in cred])]
+        rgx = re.compile(query)
+        return [c for c in self.credentials if rgx.search(asstring(c))]
 
     def encrypt(self, text):
         encrypted = self.gpg.encrypt(
