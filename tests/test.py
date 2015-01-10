@@ -403,7 +403,7 @@ class UtilsTests(unittest.TestCase):
             mocked_join.assert_any_call("/", "python.exe")
 
 
-class ConsoleInterfaceTests(unittest.TestCase):
+class MainTests(unittest.TestCase):
 
     def setUp(self):
         self.tempdb_path = os.path.join(TEST_DATA_DIR, "tmp")
@@ -423,48 +423,48 @@ class ConsoleInterfaceTests(unittest.TestCase):
             return Database.create(self.tempdb_path, self.passphrase)
 
     @timethis
-    def test_cli_parse_args_returns_argparse_namespace(self):
+    def test_main_parse_args_returns_argparse_namespace(self):
         args = pysswords.__main__.parse_args(["--init"])
         self.assertIsInstance(args, argparse.Namespace)
 
     @timethis
-    def test_cli_default_pyssword_dir(self):
+    def test_main_default_pyssword_dir(self):
         pysswords_dir = os.path.join(os.path.expanduser("~"), ".pysswords")
         self.assertEqual(pysswords_dir, pysswords.__main__.default_db())
 
     @timethis
-    def test_cli_parse_args_has_init_arg(self):
+    def test_main_parse_args_has_init_arg(self):
         args = pysswords.__main__.parse_args(["--init"])
         self.assertIn("init", args.__dict__)
         args_short = pysswords.__main__.parse_args(["-I"])
         self.assertIn("init", args_short.__dict__)
 
     @timethis
-    def test_cli_parse_args_has_database_arg(self):
+    def test_main_parse_args_has_database_arg(self):
         args = pysswords.__main__.parse_args(["--database", "/tmp/pysswords"])
         self.assertIn("database", args.__dict__)
         args_short = pysswords.__main__.parse_args(["-D", "/tmp/pysswords"])
         self.assertIn("database", args_short.__dict__)
 
     @timethis
-    def test_cli_parse_args_has_database_default_value(self):
+    def test_main_parse_args_has_database_default_value(self):
         args = pysswords.__main__.parse_args([])
         self.assertEqual(args.database, pysswords.__main__.default_db())
 
     @timethis
-    def test_cli_parse_args_has_add_arg(self):
+    def test_main_parse_args_has_add_arg(self):
         args = pysswords.__main__.parse_args(["--add"])
         self.assertIn("add", args.__dict__)
         args_short = pysswords.__main__.parse_args(["-a"])
         self.assertIn("add", args_short.__dict__)
 
     @timethis
-    def test_cli_parse_args_add_arg_is_true_when_passed(self):
+    def test_main_parse_args_add_arg_is_true_when_passed(self):
         args = pysswords.__main__.parse_args(["--add"])
         self.assertTrue(args.add)
 
     @timethis
-    def test_cli_parse_args_has_remove_arg(self):
+    def test_main_parse_args_has_remove_arg(self):
         credential_name = "example.com"
         args = pysswords.__main__.parse_args(["--remove", credential_name])
         args_short = pysswords.__main__.parse_args(["-r", credential_name])
@@ -472,13 +472,13 @@ class ConsoleInterfaceTests(unittest.TestCase):
         self.assertIn("remove", args_short.__dict__)
 
     @timethis
-    def test_cli_parse_args_remove_arg_has_credential_name_passed(self):
+    def test_main_parse_args_remove_arg_has_credential_name_passed(self):
         credential_name = "example.com"
         args = pysswords.__main__.parse_args(["--remove", credential_name])
         self.assertTrue(args.remove, credential_name)
 
     @timethis
-    def test_cli_parse_args_has_update_arg(self):
+    def test_main_parse_args_has_update_arg(self):
         credential_name = "example.com"
         args = pysswords.__main__.parse_args(["--update", credential_name])
         args_short = pysswords.__main__.parse_args(["-u", credential_name])
@@ -486,13 +486,13 @@ class ConsoleInterfaceTests(unittest.TestCase):
         self.assertIn("update", args_short.__dict__)
 
     @timethis
-    def test_cli_parse_args_update_arg_has_credential_name_passed(self):
+    def test_main_parse_args_update_arg_has_credential_name_passed(self):
         credential_name = "example.com"
         args = pysswords.__main__.parse_args(["--update", credential_name])
         self.assertEqual(args.update, credential_name)
 
     @timethis
-    def test_cli_parse_args_has_get_arg(self):
+    def test_main_parse_args_has_get_arg(self):
         credential_name = "example.com"
         args = pysswords.__main__.parse_args(["--get", credential_name])
         args_short = pysswords.__main__.parse_args(["-g", credential_name])
@@ -500,20 +500,20 @@ class ConsoleInterfaceTests(unittest.TestCase):
         self.assertIn("get", args_short.__dict__)
 
     @timethis
-    def test_cli_parse_args_has_show_password_arg(self):
+    def test_main_parse_args_has_show_password_arg(self):
         args = pysswords.__main__.parse_args(["--show-password"])
         args_short = pysswords.__main__.parse_args(["-P"])
         self.assertIn("show_password", args.__dict__)
         self.assertIn("show_password", args_short.__dict__)
 
     @timethis
-    def test_cli_parse_args_get_arg_has_credential_name_passed(self):
+    def test_main_parse_args_get_arg_has_credential_name_passed(self):
         credential_name = "example.com"
         args = pysswords.__main__.parse_args(["--get", credential_name])
         self.assertEqual(args.get, credential_name)
 
     @timethis
-    def test_cli_parse_args_has_search_arg(self):
+    def test_main_parse_args_has_search_arg(self):
         credential_name = "example.com"
         args = pysswords.__main__.parse_args(["--search", credential_name])
         args_short = pysswords.__main__.parse_args(["-s", credential_name])
@@ -521,13 +521,13 @@ class ConsoleInterfaceTests(unittest.TestCase):
         self.assertIn("search", args_short.__dict__)
 
     @timethis
-    def test_cli_parse_args_search_arg_has_credential_name_passed(self):
+    def test_main_parse_args_search_arg_has_credential_name_passed(self):
         credential_name = "example.com"
         args = pysswords.__main__.parse_args(["--search", credential_name])
         self.assertEqual(args.search, credential_name)
 
     @timethis
-    def test_cli_raises_error_when_clipboard_passed_without_get_args(self):
+    def test_main_raises_error_when_clipboard_passed_without_get_args(self):
         with open(os.devnull, 'w') as devnull:
             with patch("sys.stderr", devnull):
                 with self.assertRaises(SystemExit):
@@ -537,176 +537,244 @@ class ConsoleInterfaceTests(unittest.TestCase):
                     pysswords.__main__.parse_args(["-c"])
 
     @timethis
-    def test_cli_main_handles_with_init_arg_create_database(self):
-        tempdb_path = os.path.join(self.tempdb_path, "temp")
-        with patch("pysswords.__main__.Database") as mocked:
-            with patch("pysswords.__main__.prompt"):
-                pysswords.__main__.main(["-I", "-D", tempdb_path])
-                self.assertTrue(mocked.create.called)
-
-    @timethis
-    def test_cli_main_add_credential_when_passed_add_arg(self):
-        args = ["-D", "/tmp/pysswords", "-a"]
-        with patch("pysswords.__main__.Database") as mocked:
-            with patch("pysswords.__main__.prompt") as mocked_prompt:
-                mocked_prompt.side_effect = [
-                    "example.com",
-                    "doe",
-                    "pass",
-                    "No Comment"
-                ]
-                pysswords.__main__.main(args)
-                self.assertIsInstance(
-                    mocked().add.call_args[0][0],
-                    Credential
-                )
-
-    @timethis
-    def test_prompt_input_uses_default_arg(self):
-        default = "123123123"
-        with patch(BUILTINS_NAME + ".input") as mocked:
-            __main__.prompt("Name", default)
-            call_args, _ = mocked.call_args
-            self.assertIn(default, call_args[0])
-
-    @timethis
-    def test_prompt_with_password_calls_prompt_password(self):
-        with patch("pysswords.__main__.prompt_password") as mocked:
-            pysswords.__main__.prompt("Pass:", password=True)
-            self.assertTrue(mocked.called)
-
-    @timethis
-    def test_promt_password_returns_entered_password(self):
-        with patch(BUILTINS_NAME + ".print"):
-            with patch("pysswords.__main__.getpass") as mocked:
-                entry = "entry"
-                mocked.return_value = entry
-                ret = pysswords.__main__.prompt_password("Pass:")
-                self.assertEqual(entry, ret)
-
-    @timethis
-    def test_getpassphrase_raises_value_error_when_passwords_didnt_match(self):
-        with patch(BUILTINS_NAME + ".print"):
-            with patch("pysswords.__main__.getpass") as mocked:
-                mocked.side_effect = ["pass", "wrong"] * 3
-                with self.assertRaises(ValueError):
-                    __main__.prompt_password("Password:")
-
-    @timethis
-    def test_get_credential_when_get_arg_passed(self):
-        credential_name = "example.com"
-        args = ["-D", "/tmp/pysswords", "--get", credential_name]
-        with patch("pysswords.__main__.Database") as mocked:
+    def test_main_calls_cli_constructor_with_init_when_init_passed(self):
+        tmp_path = "/tmp/.pysswords"
+        args = ["-D", tmp_path, "--init"]
+        with patch("pysswords.__main__.CLI") as mocked:
             pysswords.__main__.main(args)
-            self.assertTrue(mocked().credential.called)
-            mocked().credential.assert_called_once_with(
-                name=credential_name,
-                login=None
+            mocked.assert_called_once_with(
+                database_path=tmp_path,
+                show_password=False,
+                init=True
             )
 
     @timethis
-    def test_get_credential_when_get_arg_passed_with_login(self):
-        credential = Credential("example.com", "doe", "_", "_")
-        fullname = "{}@{}".format(credential.login, credential.name)
+    def test_main_calls_cli_add_credential_when_add_passed(self):
+        args = ["-D", "/tmp/pysswords", "--add"]
+        with patch("pysswords.__main__.CLI") as mocked:
+            pysswords.__main__.main(args)
+            mocked().add_credential.assert_called_once_with()
+
+    @timethis
+    def test_main_calls_cli_get_credentials_when_get_passed(self):
+        fullname = "john.doe@example.com"
         args = ["-D", "/tmp/pysswords", "--get", fullname]
-        with patch("pysswords.__main__.Database") as mocked:
+        with patch("pysswords.__main__.CLI") as mocked:
             pysswords.__main__.main(args)
-            self.assertTrue(mocked().credential.called)
-            mocked().credential.assert_called_once_with(
-                name=credential.name,
-                login=credential.login
+            mocked().get_credentials.assert_called_once_with(
+                fullname=fullname
             )
 
     @timethis
-    def test_split_name_returns_name_login_from_name(self):
-        cred_name = "example.org"
-        cred_login = "john.doe"
-        credential_full_name = "{}@{}".format(cred_login, cred_name)
-        name, login = pysswords.__main__.split_name(credential_full_name)
-        self.assertEqual(cred_name, name)
-        self.assertEqual(cred_login, login)
-
-    @timethis
-    def test_split_name_raises_value_error_when_not_valid_name_given(self):
-        invalid_name = ""
-        with self.assertRaises(ValueError):
-            pysswords.__main__.split_name(invalid_name)
-
-    @timethis
-    def test_split_name_returns_login_none_when_not_loginname_passed(self):
-        cred_name = "@example.org"
-        name, login = pysswords.__main__.split_name(cred_name)
-        self.assertEqual(cred_name.strip("@"), name)
-        self.assertEqual(None, login)
-
-    @timethis
-    def test_print_credentials(self):
-        credentials = [
-            some_credential()
-        ]
-        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
-            pysswords.__main__.print_credentials(credentials)
-            output = mock_stdout.getvalue()
-        for credential in credentials:
-            self.assertIn(credential.name, output)
-            self.assertIn(credential.login, output)
-            self.assertIn("***", output)
-            self.assertIn(credential.comment, output)
-
-    @timethis
-    def test_decrypt_credentials_is_called_for_every_credential(self):
-        credentials = [
-            some_credential(),
-            some_credential(name="something"),
-        ]
-        with patch('pysswords.__main__.Database') as mocked:
-            pysswords.__main__.decrypt_credentials(
-                mocked,
-                credentials=credentials,
-                passphrase=Mock()
+    def test_main_calls_cli_search_credentials_when_search_passed(self):
+        query = "example.com|org|net"
+        args = ["-D", "/tmp/pysswords", "--search", query]
+        with patch("pysswords.__main__.CLI") as mocked:
+            pysswords.__main__.main(args)
+            mocked().search_credentials.assert_called_once_with(
+                query=query
             )
-            self.assertEqual(2, mocked.decrypt.call_count)
 
     @timethis
-    def test_with_arg_show_password_asks_for_passphrase(self):
-        args = ["-D", "/tmp/pysswords", "--show-password"]
-        with patch("pysswords.__main__.getpass") as mocked_getpass:
-            with patch("pysswords.__main__.Database"):
-                pysswords.__main__.main(args)
-                self.assertTrue(mocked_getpass.called)
+    def test_main_calls_cli_update_credentials_when_update_passed(self):
+        fullname = "john.doe@example.com"
+        args = ["-D", "/tmp/pysswords", "--update", fullname]
+        with patch("pysswords.__main__.CLI") as mocked:
+            pysswords.__main__.main(args)
+            mocked().update_credentials.assert_called_once_with(
+                fullname=fullname
+            )
 
     @timethis
-    def test_with_arg_show_password_checks_for_passphrase(self):
-        args = ["-D", "/tmp/pysswords", "--show-password"]
-        passphrase = "dummy"
-        with patch("pysswords.__main__.getpass") as mocked_getpass:
-            mocked_getpass.return_value = passphrase
-            with patch("pysswords.__main__.Database") as mocked_db:
-                pysswords.__main__.main(args)
-                mocked_db().check.assert_called_once_with(
-                    passphrase
-                )
+    def test_main_calls_cli_remove_credentials_when_remove_passed(self):
+        fullname = "john.doe@example.com"
+        args = ["-D", "/tmp/pysswords", "--remove", fullname]
+        with patch("pysswords.__main__.CLI") as mocked:
+            pysswords.__main__.main(args)
+            mocked().remove_credentials.assert_called_once_with(
+                fullname=fullname
+            )
 
     @timethis
-    def test_print_credentials_when_no_arg_is_passed(self):
+    def test_main_calls_cli_show_display_when_nothing_passed(self):
         args = []
-        with patch("pysswords.__main__.print_credentials") as mocked:
-            with patch("pysswords.__main__.Database") as mocked_db:
-                pysswords.__main__.main(args)
-                mocked.assert_called_once_with(mocked_db().credentials)
+        with patch("pysswords.__main__.CLI") as mocked:
+            pysswords.__main__.main(args)
+            mocked().show_display.assert_called_once_with()
 
     @timethis
-    def test_update_credential_when_update_arg_passed(self):
-        credential_name = "example.com"
-        args = ["-D", "/tmp/pysswords", "--update", credential_name]
-        with patch("pysswords.__main__.Database") as mocked:
-            with patch("pysswords.__main__.prompt_credential"):
-                mocked().credential.return_value = [some_credential()]
-                pysswords.__main__.main(args)
-                self.assertTrue(mocked().update.called)
+    def test_main_calls_copy_to_clipboard_when_clipboard_passed(self):
+        fullname = "john.doe@example.com"
+        args = ["-D", "/tmp/pysswords", "--clipboard", "--get", fullname]
+        with patch("pysswords.__main__.CLI") as mocked:
+            pysswords.__main__.main(args)
+            mocked().copy_to_clipboard.assert_called_once_with(
+                fullname=fullname
+            )
 
 
-if __name__ == "pysswords.__main__":
+    # @timethis
+    # def test_main__handles_with_init_arg_create_database(self):
+    #     tempdb_path = os.path.join(self.tempdb_path, "temp")
+    #     with patch("pysswords.__main__.Database") as mocked:
+    #         with patch("pysswords.__main__.prompt"):
+    #             pysswords.__main__.main(["-I", "-D", tempdb_path])
+    #             self.assertTrue(mocked.create.called)
+
+    # @timethis
+    # def test_cli_main_add_credential_when_passed_add_arg(self):
+    #     args = ["-D", "/tmp/pysswords", "-a"]
+    #     with patch("pysswords.__main__.Database") as mocked:
+    #         with patch("pysswords.__main__.prompt") as mocked_prompt:
+    #             mocked_prompt.side_effect = [
+    #                 "example.com",
+    #                 "doe",
+    #                 "pass",
+    #                 "No Comment"
+    #             ]
+    #             pysswords.__main__.main(args)
+    #             self.assertIsInstance(
+    #                 mocked().add.call_args[0][0],
+    #                 Credential
+    #             )
+
+    # @timethis
+    # def test_prompt_input_uses_default_arg(self):
+    #     default = "123123123"
+    #     with patch(BUILTINS_NAME + ".input") as mocked:
+    #         __main__.prompt("Name", default)
+    #         call_args, _ = mocked.call_args
+    #         self.assertIn(default, call_args[0])
+
+    # @timethis
+    # def test_prompt_with_password_calls_prompt_password(self):
+    #     with patch("pysswords.__main__.prompt_password") as mocked:
+    #         pysswords.__main__.prompt("Pass:", password=True)
+    #         self.assertTrue(mocked.called)
+
+    # @timethis
+    # def test_promt_password_returns_entered_password(self):
+    #     with patch(BUILTINS_NAME + ".print"):
+    #         with patch("pysswords.__main__.getpass") as mocked:
+    #             entry = "entry"
+    #             mocked.return_value = entry
+    #             ret = pysswords.__main__.prompt_password("Pass:")
+    #             self.assertEqual(entry, ret)
+
+    # @timethis
+    # def test_getpassphrase_raises_value_error_when_passwords_didnt_match(self):
+    #     with patch(BUILTINS_NAME + ".print"):
+    #         with patch("pysswords.__main__.getpass") as mocked:
+    #             mocked.side_effect = ["pass", "wrong"] * 3
+    #             with self.assertRaises(ValueError):
+    #                 __main__.prompt_password("Password:")
+
+    # @timethis
+    # def test_calls_cli_get_credential_when_get_arg_passed(self):
+    #     credential = Credential("example.com", "doe", "_", "_")
+    #     fullname = pysswords.db.credential.asfullname(
+    #         credential.login,
+    #         credential.name
+    #     )
+    #     args = ["-D", "/tmp/pysswords", "--get", fullname]
+    #     with patch("pysswords.__main__.Interface") as mocked:
+    #         pysswords.__main__.main(args)
+    #         self.assertTrue(mocked().get_credential.called)
+    #         mocked().get_credential.assert_called_once_with(
+    #             name=credential.name,
+    #             login=credential.login
+    #         )
+
+    # @timethis
+    # def test_split_name_returns_name_login_from_name(self):
+    #     cred_name = "example.org"
+    #     cred_login = "john.doe"
+    #     credential_full_name = "{}@{}".format(cred_login, cred_name)
+    #     name, login = pysswords.__main__.split_name(credential_full_name)
+    #     self.assertEqual(cred_name, name)
+    #     self.assertEqual(cred_login, login)
+
+    # @timethis
+    # def test_split_name_raises_value_error_when_not_valid_name_given(self):
+    #     invalid_name = ""
+    #     with self.assertRaises(ValueError):
+    #         pysswords.__main__.split_name(invalid_name)
+
+    # @timethis
+    # def test_split_name_returns_login_none_when_not_loginname_passed(self):
+    #     cred_name = "@example.org"
+    #     name, login = pysswords.__main__.split_name(cred_name)
+    #     self.assertEqual(cred_name.strip("@"), name)
+    #     self.assertEqual(None, login)
+
+    # @timethis
+    # def test_print_credentials(self):
+    #     credentials = [
+    #         some_credential()
+    #     ]
+    #     with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+    #         pysswords.__main__.print_credentials(credentials)
+    #         output = mock_stdout.getvalue()
+    #     for credential in credentials:
+    #         self.assertIn(credential.name, output)
+    #         self.assertIn(credential.login, output)
+    #         self.assertIn("***", output)
+    #         self.assertIn(credential.comment, output)
+
+    # @timethis
+    # def test_decrypt_credentials_is_called_for_every_credential(self):
+    #     credentials = [
+    #         some_credential(),
+    #         some_credential(name="something"),
+    #     ]
+    #     with patch('pysswords.__main__.Database') as mocked:
+    #         pysswords.__main__.decrypt_credentials(
+    #             mocked,
+    #             credentials=credentials,
+    #             passphrase=Mock()
+    #         )
+    #         self.assertEqual(2, mocked.decrypt.call_count)
+
+    # @timethis
+    # def test_with_arg_show_password_asks_for_passphrase(self):
+    #     args = ["-D", "/tmp/pysswords", "--show-password"]
+    #     with patch("pysswords.__main__.getpass") as mocked_getpass:
+    #         with patch("pysswords.__main__.Database"):
+    #             pysswords.__main__.main(args)
+    #             self.assertTrue(mocked_getpass.called)
+
+    # @timethis
+    # def test_with_arg_show_password_checks_for_passphrase(self):
+    #     args = ["-D", "/tmp/pysswords", "--show-password"]
+    #     passphrase = "dummy"
+    #     with patch("pysswords.__main__.getpass") as mocked_getpass:
+    #         mocked_getpass.return_value = passphrase
+    #         with patch("pysswords.__main__.Database") as mocked_db:
+    #             pysswords.__main__.main(args)
+    #             mocked_db().check.assert_called_once_with(
+    #                 passphrase
+    #             )
+
+    # @timethis
+    # def test_print_credentials_when_no_arg_is_passed(self):
+    #     args = []
+    #     with patch("pysswords.__main__.print_credentials") as mocked:
+    #         with patch("pysswords.__main__.Database") as mocked_db:
+    #             pysswords.__main__.main(args)
+    #             mocked.assert_called_once_with(mocked_db().credentials)
+
+    # @timethis
+    # def test_update_credential_when_update_arg_passed(self):
+    #     credential_name = "example.com"
+    #     args = ["-D", "/tmp/pysswords", "--update", credential_name]
+    #     with patch("pysswords.__main__.Database") as mocked:
+    #         with patch("pysswords.__main__.Interface") as mocked_interface:
+    #             mocked().credential.return_value = [some_credential()]
+    #             pysswords.__main__.main(args)
+    #             self.assertTrue(mocked().update.called)
+
+
+if __name__ == "__main__":
     if sys.version_info >= (3,):
         unittest.main(warnings=False)
     else:
