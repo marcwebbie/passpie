@@ -23,12 +23,14 @@ class CLI(object):
         colorama_color = getattr(colorama.Fore, color.upper())
         return colorama_color + text + colorama.Fore.RESET
 
-    def create_database(self, path):
-        passphrase = CLI.prompt("Passhprase for database", password=True)
+    @classmethod
+    def create_database(cls, path):
+        passphrase = CLI.prompt("Passphrase for database", password=True)
         database = Database.create(path, passphrase)
         return database
 
-    def prompt_password(self, text):
+    @classmethod
+    def prompt_password(cls, text):
         for _ in range(3):
             password = getpass(text)
             repeat_password = getpass("Type again: ")
@@ -39,22 +41,17 @@ class CLI(object):
         else:
             raise ValueError("Entries didn't match")
 
-    def prompt(self, text, default=None, password=False):
-        if password:
-            self.prompt_password(text)
-        else:
-            entry = input("{}{}: ".format(
-                text,
-                "[{}]".format(default) if default else "")
-            )
-            return entry
+    @classmethod
+    def prompt(cls, text, password=False):
+        return cls.prompt_password(text) if password else input(text)
 
-    def prompt_credential(self, **defaults):
+    @classmethod
+    def prompt_credential(cls, **defaults):
         credential_dict = {
-            "name": self.prompt("Name", defaults.get("name")),
-            "login": self.prompt("Login", defaults.get("login")),
-            "password": self.prompt("Password", defaults.get("password")),
-            "comment": self.prompt("Comment", defaults.get("comment"))
+            "name": cls.prompt("Name: "),
+            "login": cls.prompt("Login: "),
+            "password": cls.prompt("Password: ", password=True),
+            "comment": cls.prompt("Comment: ")
         }
         return credential_dict
 
@@ -120,12 +117,13 @@ class CLI(object):
         name, login = splitname(fullname)
         self.display = self.database.get(name=name, login=login)
         if not self.display:
+            print("-- No credentials found for `{}`".format(fullname))
             return
 
         self.show_display()
         confirmed = self.prompt_confirmation("Remove these credentials?")
         if confirmed:
-            self.database.remove(name, login)
+            self.database.remove(name=name, login=login)
             self.display = self.database.credentials
 
     def update_credentials(self, fullname):
