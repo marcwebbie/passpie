@@ -10,12 +10,22 @@ from functools import wraps
 
 import gnupg
 
+try:
+    from unittest.mock import patch, Mock
+    from io import StringIO
+except ImportError:
+    # backwards compatbility with Python2
+    from mock import patch, Mock
+    from StringIO import StringIO
+
 __file__ = os.path.relpath(inspect.getsourcefile(lambda _: None))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.relpath(__file__))))
 import pysswords
 from pysswords.db import Database, Credential
 from pysswords.db.credential import CredentialNotFoundError
 from pysswords.python_two import *
+
+
 
 
 TEST_DIR = os.path.join(os.path.dirname(os.path.relpath(__file__)))
