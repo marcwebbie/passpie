@@ -50,11 +50,6 @@ Mac/linux | Windows
 ----------|---------
 [![Build](https://travis-ci.org/marcwebbie/pysswords.svg)](https://travis-ci.org/marcwebbie/pysswords) | [![Build on windows](https://ci.appveyor.com/api/projects/status/5b7p1vo3y9x3y35t?svg=true)](https://ci.appveyor.com/project/marcwebbie/pysswords)
 
-to install development version:
-
-``` bash
-pip install https://github.com/marcwebbie/pysswords/zipball/master
-```
 
 The **latest development version** can be installed directly from GitHub:
 
