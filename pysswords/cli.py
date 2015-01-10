@@ -25,7 +25,7 @@ class CLI(object):
 
     @classmethod
     def create_database(cls, path):
-        passphrase = CLI.prompt("Passphrase for database", password=True)
+        passphrase = CLI.prompt("Passphrase for database: ", password=True)
         database = Database.create(path, passphrase)
         return database
 
