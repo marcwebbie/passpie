@@ -360,6 +360,18 @@ class DatabaseTests(unittest.TestCase):
             self.database.remove(name="none", login="none")
 
 
+    @timethis
+    def test_check_uses_gpg_sign_as_passphrase_checker(self):
+        self.database.gpg.sign = Mock()
+        self.database.check(self.passphrase)
+        self.assertTrue(self.database.gpg.sign.called)
+        self.database.gpg.sign.assert_called_once_with(
+            "testing",
+            default_key=self.database.key(True),
+            passphrase=self.passphrase
+        )
+
+
 class CredentialTests(unittest.TestCase):
 
     def setUp(self):
