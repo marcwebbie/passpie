@@ -13,8 +13,8 @@ import gnupg
 __file__ = os.path.relpath(inspect.getsourcefile(lambda _: None))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.relpath(__file__))))
 import pysswords
-from pysswords import __main__
 from pysswords.db import Database, Credential
+from pysswords.db.credential import CredentialNotFoundError
 from pysswords.python_two import *
 
 
@@ -353,6 +353,11 @@ class DatabaseTests(unittest.TestCase):
         )
 
         self.assertEqual(found[0].login, new_values["login"])
+
+    @timethis
+    def test_remove_raises_credentialnotfounderror(self):
+        with self.assertRaises(CredentialNotFoundError):
+            self.database.remove(name="none", login="none")
 
 
 class CredentialTests(unittest.TestCase):
