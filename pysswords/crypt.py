@@ -24,3 +24,10 @@ def create_keyring(path, passphrase):
     key_input = generate_key_input(path, passphrase)
     generate_keys(path, key_input)
     return path
+
+
+def is_encrypted(data):
+    if data.startswith("-----BEGIN PGP MESSAGE-----"):
+        return True
+    else:
+        return False
