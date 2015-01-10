@@ -79,6 +79,12 @@ def some_credential(**kwargs):
     )
 
 
+def some_credential_dict(**kwargs):
+    return pysswords.db.credential.asdict(
+        some_credential(**kwargs)
+    )
+
+
 def clean(path):
     if os.path.exists(path):
         shutil.rmtree(path)
@@ -165,41 +171,35 @@ class DatabaseTests(unittest.TestCase):
 
     @timethis
     def test_add_credential_make_dir_in_dbpath_with_credential_name(self):
-        self.database.add(some_credential())
-        credential_dir = os.path.join(self.path, some_credential().name)
+        credential = some_credential()
+        self.database.add(**credential._asdict())
+        credential_dir = os.path.join(self.path, credential.name)
         self.assertTrue(os.path.exists(credential_dir))
         self.assertTrue(os.path.isdir(credential_dir))
 
     @timethis
     def test_add_credential_createas_pyssword_file_named_after_login(self):
         credential = some_credential()
-        self.database.add(credential)
+        self.database.add(**credential._asdict())
         credential_dir = os.path.join(self.path, credential.name)
         credential_filename = "{}.pyssword".format(credential.login)
         credential_file = os.path.join(credential_dir, credential_filename)
         self.assertTrue(os.path.isfile(credential_file))
-        with open(credential_file) as f:
-            self.assertEqual(yaml.load(f.read()), credential)
 
     @timethis
     def test_add_credential_creates_dir_when_credential_name_is_a_dir(self):
         credential = some_credential(name="emails/misc/example.com")
         emails_dir = os.path.join(self.path, "emails")
         misc_dir = os.path.join(emails_dir, "misc")
-        self.database.add(credential)
+        self.database.add(**credential._asdict())
         self.assertTrue(os.path.isdir(emails_dir))
         self.assertTrue(os.path.isdir(misc_dir))
 
     @timethis
-    def test_add_credential_returns_credential_path(self):
-        credential = some_credential()
-        credential_path = self.database.add(credential)
-        expected_path = os.path.join(
-            self.path,
-            os.path.basename(credential.name),
-            "{}.pyssword".format(credential.login)
-        )
-        self.assertEqual(credential_path, expected_path)
+    def test_add_credential_returns_credential(self):
+        credential = some_credential_dict()
+        returned = self.database.add(**credential)
+        self.assertIsInstance(returned, Credential)
 
     @timethis
     def test_gpg_returns_valid_gnupg_gpg_object(self):
@@ -208,8 +208,8 @@ class DatabaseTests(unittest.TestCase):
 
     @timethis
     def test_credentials_returns_a_list_of_all_added_credentials(self):
-        self.database.add(some_credential(name="example.com"))
-        self.database.add(some_credential(name="archive.org"))
+        self.database.add(**some_credential(name="example.com")._asdict())
+        self.database.add(**some_credential(name="archive.org")._asdict())
         credentials = self.database.credentials
         self.assertIsInstance(credentials, list)
         self.assertEqual(2, len(credentials))
@@ -218,70 +218,85 @@ class DatabaseTests(unittest.TestCase):
 
     @timethis
     def test_add_repeated_credential_without_overwrite_on_raises_error(self):
-        credential = some_credential()
-        self.database.add(credential)
+        credential = some_credential_dict()
+        self.database.add(**credential)
         with self.assertRaises(pysswords.db.CredentialExistsError):
-            self.database.add(credential)
+            self.database.add(**credential)
 
     @timethis
     def test_remove_deletes_pysswords_file(self):
-        credential = some_credential()
+        credential = some_credential_dict()
         credential_path = pysswords.db.credential.expandpath(
             self.path,
-            credential)
-        self.database.add(credential)
+            credential["name"],
+            credential["login"]
+        )
+        self.database.add(**credential)
         self.assertTrue(os.path.isfile(credential_path))
-        self.database.remove(credential)
+        self.database.remove(credential["name"], credential["login"])
         self.assertFalse(os.path.isfile(credential_path))
 
     @timethis
     def test_remove_deletes_pyssword_dir_if_empty_after_deletion(self):
-        credential = some_credential()
+        credential = some_credential_dict()
         credential_path = pysswords.db.credential.expandpath(
             self.path,
-            credential
+            credential["name"],
+            credential["login"]
         )
-        self.database.add(credential)
+        self.database.add(**credential)
         self.assertTrue(os.path.exists(os.path.dirname(credential_path)))
-        self.database.remove(credential)
+        self.database.remove(credential["name"], credential["login"])
         self.assertFalse(os.path.exists(os.path.dirname(credential_path)))
 
     @timethis
     def test_get_credential_by_name_returns_expected_credential(self):
         credential = some_credential(name="example.com")
-        self.database.add(credential)
-        found = self.database.credential(name=credential.name)
+        self.database.add(**credential._asdict())
+        found = self.database.get(name=credential.name)
 
         self.assertIsInstance(found, list)
         self.assertTrue(all(True for c in found
                             if isinstance(c, pysswords.db.Credential)))
-        self.assertTrue(any(True for c in found
-                            if c == credential))
+        self.assertTrue(found[0].name, credential.name)
 
     @timethis
     def test_get_returns_unique_credential_when_login_is_passed(self):
-        credential = some_credential(name="example.com")
-        credential2 = some_credential(name="example.com", login="jonny.doe")
-        self.database.add(credential)
-        self.database.add(credential2)
-        found = self.database.credential(
+        pwd = "dummy"
+        credential = some_credential(
+            name="example.com",
+            password=pwd
+        )
+        credential2 = some_credential(
+            name="example.com",
+            login="jonny.doe"
+        )
+        with patch("pysswords.db.Database.encrypt", return_value=pwd):
+            self.database.add(**credential._asdict())
+            self.database.add(**credential2._asdict())
+        found = self.database.get(
             name=credential.name,
             login=credential.login
         )
-        self.assertEqual(found, [credential])
+
+        self.assertEqual(found[0], credential)
 
     @timethis
     def test_get_returns_no_element_when_name_not_found(self):
         credential = some_credential(name="example.com")
-        self.database.add(credential)
-        found = self.database.credential(name="not added")
+        self.database.add(**credential._asdict())
+        found = self.database.get(name="not added name")
+
         self.assertListEqual(found, [])
 
     @timethis
     def test_search_database_returns_list_with_matched_credentials(self):
-        self.database.add(some_credential(name="example.com"))
-        self.database.add(some_credential(name="github.com"))
-        self.database.add(some_credential(name="twitter.com"))
+        credential1 = some_credential_dict(name="example.com")
+        credential2 = some_credential_dict(name="github.com")
+        credential3 = some_credential_dict(name="twitter.com")
+        self.database.add(**credential1)
+        self.database.add(**credential2)
+        self.database.add(**credential3)
 
         self.assertEqual(len(self.database.search("it")), 2)
         self.assertEqual(len(self.database.search("github")), 1)
@@ -320,19 +335,24 @@ class DatabaseTests(unittest.TestCase):
 
     @timethis
     def test_update_credential_updates_credential_values(self):
-        values = {
-            "name": "example.com",
-            "login": "jonh.doe",
-            "password": "dummy",
-            "comment": "No Comments"
-        }
-        credential = some_credential(**values)
-        self.database.add(credential)
+        values = some_credential_dict()
+        self.database.add(
+            name=values["name"],
+            login=values["login"],
+            password=values["password"],
+            comment=values["comment"]
+        )
+        name = values["name"]
+        login = values["login"]
         new_values = values
         new_values["login"] = "doe.john"
-        self.database.update(credential, **new_values)
-        found = self.database.credential(name=values["name"])[0]
-        self.assertEqual(found._asdict(), new_values)
+        self.database.update(name, login, to_update=new_values)
+        found = self.database.get(
+            name=new_values["name"],
+            login=new_values["login"]
+        )
+
+        self.assertEqual(found[0].login, new_values["login"])
 
 
 class CredentialTests(unittest.TestCase):
@@ -353,7 +373,8 @@ class CredentialTests(unittest.TestCase):
         credential = some_credential()
         credential_path = pysswords.db.credential.expandpath(
             self.path,
-            credential
+            name=credential.name,
+            login=credential.login
         )
         expected_path = os.path.join(
             self.path,
@@ -633,25 +654,18 @@ class ConsoleInterfaceTests(unittest.TestCase):
             self.assertIn(credential.comment, output)
 
     @timethis
-    def test_print_plaintext_prints_passwords_plaintext(self):
+    def test_decrypt_credentials_is_called_for_every_credential(self):
         credentials = [
-            some_credential()
+            some_credential(),
+            some_credential(name="something"),
         ]
-        plaintext = "plaintext"
-        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
-            with patch('pysswords.__main__.Database') as mocked:
-                mocked.decrypt.return_value = plaintext
-                pysswords.__main__.print_plaintext(
-                    credentials=credentials,
-                    database=mocked,
-                    passphrase=Mock()
-                )
-            output = mock_stdout.getvalue()
-        for credential in credentials:
-            self.assertIn(credential.name, output)
-            self.assertIn(credential.login, output)
-            self.assertIn(plaintext, output)
-            self.assertIn(credential.comment, output)
+        with patch('pysswords.__main__.Database') as mocked:
+            pysswords.__main__.decrypt_credentials(
+                mocked,
+                credentials=credentials,
+                passphrase=Mock()
+            )
+            self.assertEqual(2, mocked.decrypt.call_count)
 
     @timethis
     def test_with_arg_show_password_asks_for_passphrase(self):
@@ -680,6 +694,16 @@ class ConsoleInterfaceTests(unittest.TestCase):
             with patch("pysswords.__main__.Database") as mocked_db:
                 pysswords.__main__.main(args)
                 mocked.assert_called_once_with(mocked_db().credentials)
+
+    @timethis
+    def test_update_credential_when_update_arg_passed(self):
+        credential_name = "example.com"
+        args = ["-D", "/tmp/pysswords", "--update", credential_name]
+        with patch("pysswords.__main__.Database") as mocked:
+            with patch("pysswords.__main__.prompt_credential"):
+                mocked().credential.return_value = [some_credential()]
+                pysswords.__main__.main(args)
+                self.assertTrue(mocked().update.called)
 
 
 if __name__ == "pysswords.__main__":
