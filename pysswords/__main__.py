@@ -1,5 +1,4 @@
 import argparse
-import logging
 import os
 
 from .cli import CLI
@@ -7,6 +6,12 @@ from .cli import CLI
 
 def default_db():
     return os.path.join(os.path.expanduser("~"), ".pysswords")
+
+
+def get_version():
+    version_file = os.path.join(os.path.dirname(__file__), "__version__")
+    version = open(version_file).read().strip()
+    return "Pysswords {}".format(version)
 
 
 def parse_args(cli_args=None):
@@ -17,6 +22,7 @@ def parse_args(cli_args=None):
                           help="create a new Pysswords database")
     group_db.add_argument("-D", "--database", default=default_db(),
                           help="specify path to database")
+
     group_cred = parser.add_argument_group("Credential options")
     group_cred.add_argument("-a", "--add", action="store_true",
                             help="add new credential")
@@ -32,6 +38,10 @@ def parse_args(cli_args=None):
                             help="copy credential password to clipboard")
     group_cred.add_argument("-P", "--show-password", action="store_true",
                             help="show credentials passwords as plain text")
+
+    group_runtime = parser.add_argument_group("Runtime options")
+    group_runtime.add_argument("--version", action="version",
+                               version=get_version(), help="Print version")
 
     args = parser.parse_args(cli_args)
     if args.clipboard and not args.get:

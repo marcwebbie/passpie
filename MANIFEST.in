@@ -1,1 +1,1 @@
-include requirements.txt README.md
+include requirements.txt README.md pysswords/__version__

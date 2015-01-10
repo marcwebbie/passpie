@@ -1,18 +1,18 @@
 #!/usr/bin/env python
-
+import os
 from setuptools import setup, find_packages
 
-
-__version__ = "0.0.7"
-
-requirements = [pkg.strip() for pkg in open('requirements.txt').readlines()]
+requirements_file = "requirements.txt"
+version_file = os.path.join('pysswords', '__version__')
+requirements = [pkg.strip() for pkg in open(requirements_file).readlines()]
+version = open(version_file).read().strip()
 
 with open("README.md") as f:
     long_description = f.read() + '\n'
 
 setup(
     name='pysswords',
-    version=__version__,
+    version=version,
     license='License :: OSI Approved :: MIT License',
     description="Manage your login credentials from the terminal painlessly.",
     long_description=long_description,
