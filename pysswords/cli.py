@@ -46,7 +46,7 @@ class CLI(object):
         return cls.prompt_password(text) if password else input(text)
 
     @classmethod
-    def prompt_credential(cls, **defaults):
+    def prompt_credential(cls):
         credential_dict = {
             "name": cls.prompt("Name: "),
             "login": cls.prompt("Login: "),
@@ -55,12 +55,18 @@ class CLI(object):
         }
         return credential_dict
 
-    def prompt_confirmation(self, text):
+    @classmethod
+    def prompt_confirmation(cls, text):
         entry = input("{} (y|n): ".format(text))
         if entry and entry.lower().startswith("y"):
             return True
         else:
             return False
+
+    def get_passphrase(self):
+        passphrase = getpass("Passphrase: ")
+        if not self.database.check(passphrase):
+            return None
 
     def decrypt_credentials(self, credentials, passphrase):
         plaintext_credentials = []
@@ -76,15 +82,14 @@ class CLI(object):
 
     def show_display(self):
         if self.show_password:
-            passphrase = getpass("Passphrase: ")
-            if self.database.check(passphrase):
+            passphrase = self.get_passphrase()
+            if passphrase is not None:
                 credentials = self.decrypt_credentials(
                     self.display,
                     passphrase
                 )
             else:
-                print("-- Wrong passphrase")
-                return
+                return self.write("Wrong passphrase", error=True)
         else:
             credentials = self.display
 
@@ -111,14 +116,16 @@ class CLI(object):
         self.display = self.database.get(name=name, login=login)
 
     def search_credentials(self, query):
-        self.display = self.database.search(query)
+        self.display = self.database.search(query=query)
 
     def remove_credentials(self, fullname):
         name, login = splitname(fullname)
         self.display = self.database.get(name=name, login=login)
         if not self.display:
-            print("-- No credentials found for `{}`".format(fullname))
-            return
+            return self.write(
+                "No credentials found for `{}`".format(fullname),
+                error=True
+            )
 
         self.show_display()
         confirmed = self.prompt_confirmation("Remove these credentials?")
@@ -130,7 +137,10 @@ class CLI(object):
         name, login = splitname(fullname)
         self.display = self.database.get(name=name, login=login)
         if not self.display:
-            return
+            return self.write(
+                "No credentials found for `{}`".format(fullname),
+                error=True
+            )
 
         self.show_display()
         confirmed = self.prompt_confirmation("Edit these credentials?")
@@ -148,9 +158,14 @@ class CLI(object):
     def copy_to_clipboard(self, fullname):
         name, login = splitname(fullname)
         self.display = self.database.get(name=name, login=login)
-        if len(self.display) == 1:
+        if not self.display:
+            return self.write(
+                "No credentials found for `{}`".format(fullname),
+                True
+            )
+        elif len(self.display) == 1:
             credential = self.display[0]
-            passphrase = getpass("Passphrase: ")
+            passphrase = self.get_passphrase()
             password = self.database.gpg.decrypt(
                 credential.password,
                 passphrase=passphrase
@@ -159,10 +174,11 @@ class CLI(object):
             cred_string = "Password for '{}' copied to clipboard".format(
                 asfullname(credential.name, credential.login)
             )
-            print(cred_string)
+            self.write(cred_string)
             self.display = []
         elif len(self.display) > 1:
-            print("--Multiple credentials where found: try fullname syntax"
+            print("-- Multiple credentials were found: try fullname syntax"
                   "\nfor example: login@name")
-        else:
-            self.display = []
+
+    def write(self, text, error=False):
+        print("{}{}".format("-- " if error else "", text))

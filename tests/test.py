@@ -777,7 +777,7 @@ class CLITests(unittest.TestCase):
         ]
         interface = pysswords.cli.CLI("some path", show_password=False)
         interface.display = credentials
-        with patch(BUILTINS_NAME + ".print"):
+        with patch("sys.stdout"):
             with patch("pysswords.cli.CLI.prompt_confirmation") as mocked:
                 mocked.return_value = True
                 interface.remove_credentials(fullname)
@@ -832,6 +832,172 @@ class CLITests(unittest.TestCase):
             mockdb().check.assert_called_once_with(
                 passphrase
             )
+
+    @timethis
+    def test_prompt_credential_returns_credential_dict(self, _):
+        name, login, password, comment = "exmp.le", "_", 123, "Sans"
+        with patch("pysswords.cli.CLI.prompt"):
+            interface = pysswords.cli.CLI("some path", show_password=True)
+            interface.prompt.side_effect = [
+                name,
+                login,
+                password,
+                comment
+            ]
+            credential_dict = interface.prompt_credential()
+            self.assertIsInstance(credential_dict, dict)
+            self.assertEqual(credential_dict["name"], name)
+            self.assertEqual(credential_dict["login"], login)
+            self.assertEqual(credential_dict["password"], password)
+            self.assertEqual(credential_dict["comment"], comment)
+
+    @timethis
+    def test_prompt_credentials_returns_expected_boolean_for_reply(self, _):
+        with patch(BUILTINS_NAME + ".input") as mockinput:
+            mockinput.return_value = "y"
+            confirmed = pysswords.cli.CLI.prompt_confirmation("")
+            mockinput.return_value = "n"
+            not_confirmed = pysswords.cli.CLI.prompt_confirmation("")
+            call_args, _ = mockinput.call_args
+
+            self.assertIn("y|n", call_args[0])
+            self.assertTrue(confirmed)
+            self.assertFalse(not_confirmed)
+
+    @timethis
+    def test_decrypt_credentials_is_called_for_every_credential(self, mockdb):
+        credentials = [
+            some_credential(),
+            some_credential(name="something"),
+        ]
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        interface.decrypt_credentials(
+            credentials=credentials,
+            passphrase=Mock()
+        )
+        for credential in credentials:
+            mockdb.decrypt.assert_any_call_with(credential.password)
+
+    @timethis
+    def test_show_display_prints_wrong_passphrase_bad_passphrase(self, mockdb):
+        interface = pysswords.cli.CLI("some path", show_password=True)
+        interface.display = []
+        interface.get_passphrase = Mock(return_value=None)
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            interface.show_display()
+            output = mock_stdout.getvalue()
+        self.assertIn("Wrong passphrase", output)
+
+    @timethis
+    def test_show_display_calls_decrypt_credentials(self, mockdb):
+        interface = pysswords.cli.CLI("some path", show_password=True)
+        interface.display = []
+        interface.get_passphrase = Mock()
+        interface.decrypt_credentials = Mock(return_value=[])
+        with patch("sys.stdout"):
+            interface.show_display()
+        self.assertTrue(interface.decrypt_credentials.called)
+
+    @timethis
+    def test_add_credential_calls_db_add_with_credential_dict(self, mockdb):
+        credential_dict = some_credential_dict()
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        with patch("pysswords.cli.CLI.prompt_credential") as mockprompt:
+            mockprompt.return_value = credential_dict
+            interface.add_credential()
+        mockdb().add.assert_called_once_with(**credential_dict)
+
+    @timethis
+    def test_search_credentials_calls_db_search_with_query(self, mockdb):
+        query = "some query"
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        interface.search_credentials(query)
+        mockdb().search.assert_called_once_with(
+            query=query
+        )
+
+    @timethis
+    def test_uptade_credentials_print_no_credentials_found(self, mockdb):
+        fullname = "doe@example.com"
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        mockdb().get.return_value = []
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            interface.update_credentials(fullname)
+            output = mock_stdout.getvalue()
+
+        self.assertIn("No credentials found for", output)
+
+    @timethis
+    def test_uptade_credentials_calls_prompt_confirmation(self, mockdb):
+        fullname = "doe@example.com"
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        interface.show_display = Mock()
+        mockdb().get.return_value = [some_credential()]
+        with patch("pysswords.cli.CLI.prompt_confirmation") as mockprompt:
+            mockprompt.return_value = False
+            interface.update_credentials(fullname)
+            mockprompt.assert_called_once_with(
+                "Edit these credentials?"
+            )
+
+    @timethis
+    def test_uptade_credentials_calls_db_update_with_entries(self, mockdb):
+        to_update = {"name": "example.com"}
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        interface.show_display = Mock()
+        interface.prompt_credential = Mock()
+        interface.prompt_confirmation = Mock()
+        interface.prompt_confirmation.return_value = True
+        interface.prompt_credential.return_value = to_update
+        mockdb().get.return_value = [some_credential()]
+
+        interface.update_credentials("anything")
+        _, call_args = mockdb().update.call_args
+        self.assertEqual(call_args["to_update"], to_update)
+
+    @timethis
+    def test_copy_to_clipboard_print_multiple_credentials_found(self, mockdb):
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        mockdb().get.return_value = [1, 2, 3]
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            with patch("pysswords.cli.getpass"):
+                interface.copy_to_clipboard("fullname")
+            output = mock_stdout.getvalue()
+
+        self.assertIn("Multiple credentials were found", output)
+
+    @timethis
+    def test_copy_to_clipboard_print_no_credentials_found(self, mockdb):
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        mockdb().get.return_value = []
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            with patch("pysswords.cli.getpass"):
+                interface.copy_to_clipboard("fullname")
+            output = mock_stdout.getvalue()
+
+        self.assertIn("No credentials found", output)
+
+    @timethis
+    def test_copy_to_clipboard_calls_pyperclip_copy_with_pwd(self, mockdb):
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        password = "password"
+        mockdb().get.return_value = [some_credential()]
+        mockdb().gpg.decrypt.return_value = password
+        interface.write = Mock()
+        interface.get_passphrase = Mock()
+        with patch("pysswords.cli.pyperclip") as mockpyperclip:
+            interface.copy_to_clipboard("fullname")
+            mockpyperclip.copy.assert_called_once_with(password)
+
+    @timethis
+    def test_get_passphrase_returns_none_when_bad_passphrase(self, _):
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        interface.database.check = Mock(return_value=False)
+        interface.show_display = Mock()
+        with patch("pysswords.cli.getpass"):
+            self.assertIsNone(interface.get_passphrase())
+
+
 
     # @timethis
     # def test_main__handles_with_init_arg_create_database(self):
