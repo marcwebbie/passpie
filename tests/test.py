@@ -722,7 +722,7 @@ class CLITests(unittest.TestCase):
         with patch("pysswords.cli.CLI.prompt") as mocked_prompt:
             pysswords.cli.CLI.create_database("some path")
             mocked_prompt.assert_called_once_with(
-                "Passphrase for database",
+                "Passphrase for database: ",
                 password=True
             )
 
