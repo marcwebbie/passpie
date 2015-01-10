@@ -405,6 +405,27 @@ class CredentialTests(unittest.TestCase):
         content = pysswords.db.credential.content(some_credential())
         self.assertEqual(yaml.load(content), some_credential())
 
+    @timethis
+    def test_credential_asfullname_returns_expected_string(self):
+        name = "example.com"
+        login = "doe"
+        fullname = pysswords.db.credential.asfullname(name, login)
+        self.assertEqual(fullname, "{}@{}".format(login, name))
+
+    @timethis
+    def test_credential_splitname_returns_expected_name_login_tuple(self):
+        name = "example.com"
+        login = "doe"
+        fullname = "{}@{}".format(login, name)
+        name_login_tuple = pysswords.db.credential.splitname(fullname)
+        self.assertEqual((name, login), name_login_tuple)
+
+    @timethis
+    def test_credential_splitname_raises_valueerror_when_invalid_name(self):
+        invalid = ""
+        with self.assertRaises(ValueError):
+            pysswords.db.credential.splitname(invalid)
+
 
 class UtilsTests(unittest.TestCase):
 
