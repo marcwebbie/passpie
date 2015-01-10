@@ -1,5 +1,0 @@
-#!/usr/bin/env python
-import runpy
-
-
-runpy.run_module("pysswords", run_name="__main__")
