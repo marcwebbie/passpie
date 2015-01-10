@@ -12,7 +12,7 @@ def default_db():
 def parse_args(cli_args=None):
     parser = argparse.ArgumentParser(prog="Pysswords")
 
-    group_db = parser.add_argument_group("Databse options")
+    group_db = parser.add_argument_group("Database options")
     group_db.add_argument("-I", "--init", action="store_true",
                           help="create a new Pysswords database")
     group_db.add_argument("-D", "--database", default=default_db(),
