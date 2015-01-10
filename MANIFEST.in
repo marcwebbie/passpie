@@ -1,1 +1,3 @@
-include requirements.txt README.md pysswords/__version__
+include LICENSE
+include requirements.txt
+recursive-include pysswords *__version__
