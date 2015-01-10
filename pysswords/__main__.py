@@ -1,9 +1,13 @@
 import argparse
 from getpass import getpass
 import os
-import re
+
+import colorama
+import pyperclip
+from tabulate import tabulate
 
 from .db import Database, Credential
+from .db.credential import splitname, asdict, asfullname
 
 
 def default_db():
@@ -33,101 +37,197 @@ def parse_args(cli_args=None):
     return args
 
 
-def prompt_password(text):
-    for _ in range(3):
-        password = getpass(text)
-        repeat_password = getpass("Type again: ")
-        if password == repeat_password:
-            return password
+class CLI(object):
+
+    def __init__(self, database, show_password):
+        self.database = database
+        self.headers = ["Name", "Login", "Password", "Comment"]
+        self.tablefmt = "orgtbl"
+        self.display = self.database.credentials
+        self.show_password = show_password
+
+    @staticmethod
+    def colored(text, color):
+        colorama_color = getattr(colorama.Fore, color.upper())
+        return colorama_color + text + colorama.Fore.RESET
+
+    def prompt_password(self, text):
+        for _ in range(3):
+            password = getpass(text)
+            repeat_password = getpass("Type again: ")
+            if password == repeat_password:
+                return password
+            else:
+                print("Entries don't match!")
         else:
-            print("Entries don't match!")
-    else:
-        raise ValueError("Entries didn't match")
+            raise ValueError("Entries didn't match")
 
+    def prompt(self, text, default=None, password=False):
+        if password:
+            self.prompt_password(text)
+        else:
+            entry = input("{}{}: ".format(
+                text,
+                "[{}]".format(default) if default else "")
+            )
+            return entry
 
-def prompt(text, default=None, password=False):
-    if password:
-        prompt_password(text)
-    else:
-        entry = input("{}{} ".format(
-            text,
-            "[{}]".format(default) if default else "")
-        )
-        return entry
+    def prompt_credential(self, **defaults):
+        credential_dict = {
+            "name": self.prompt("Name", defaults.get("name")),
+            "login": self.prompt("Login", defaults.get("login")),
+            "password": self.prompt("Password", defaults.get("password")),
+            "comment": self.prompt("Comment", defaults.get("comment"))
+        }
+        return credential_dict
 
+    def prompt_confirmation(self, text):
+        entry = input("{} (y|n): ".format(text))
+        if entry and entry.lower().startswith("y"):
+            return True
+        else:
+            return False
 
-def prompt_credential(database, **defaults):
-    name = prompt("Name: ", defaults.get("name"))
-    login = prompt("Login: ", defaults.get("login"))
-    password = prompt("Password: ")
-    comment = prompt("Comment: ", defaults.get("comment"))
-    return Credential(name, login, database.encrypt(password), comment)
+    def decrypt_credentials(self, credentials, passphrase):
+        plaintext_credentials = []
+        for c in credentials:
+            new_credential = Credential(
+                c.name,
+                c.login,
+                self.database.decrypt(c.password, passphrase),
+                c.comment
+            )
+            plaintext_credentials.append(new_credential)
+        return plaintext_credentials
 
+    def show_display(self):
+        if self.show_password:
+            passphrase = getpass("Passphrase: ")
+            if self.database.check(passphrase):
+                credentials = self.decrypt_credentials(
+                    self.display,
+                    passphrase
+                )
+            else:
+                print("-- Wrong passphrase")
+                return
+        else:
+            credentials = self.display
 
-def split_name(fullname):
-    rgx = re.compile(r"(?:(?P<login>.+)?@)?(?P<name>[\w\s\._-]+)")
-    if rgx.match(fullname):
-        name = rgx.match(fullname).group("name")
-        login = rgx.match(fullname).group("login")
-        return name, login
-    else:
-        raise ValueError("Not a valid name")
+        table = []
+        for credential in credentials:
+            row = [
+                CLI.colored(credential.name, "yellow"),
+                credential.login,
+                credential.password if self.show_password else "***",
+                credential.comment
+            ]
+            table.append(row)
+        print("")
+        print(tabulate(table, self.headers, tablefmt=self.tablefmt))
+        print("")
 
+    def add_credential(self):
+        credential = self.prompt_credential()
+        self.database.add(**credential)
+        self.display = self.database.credentials
 
-def print_credentials(credentials, show_password=False):
-    for credential in credentials:
-        credential_str = "{}, {}, {}, {}".format(
-            credential.name,
-            credential.login,
-            credential.password if show_password else "***",
-            credential.comment
-        )
-        print(credential_str)
+    def get_credentials(self, fullname):
+        name, login = splitname(fullname)
+        self.display = self.database.get(name=name, login=login)
 
+    def search_credentials(self, query):
+        self.display = self.database.search(query)
 
-def print_plaintext(credentials, database, passphrase):
-    plaintext_credentials = []
-    for c in credentials:
-        new_credential = Credential(
-            c.name,
-            c.login,
-            database.decrypt(c.password, passphrase),
-            c.comment
-        )
-        plaintext_credentials.append(new_credential)
-    return print_credentials(plaintext_credentials, True)
+    def remove_credentials(self, fullname):
+        name, login = splitname(fullname)
+        self.display = self.database.get(name=name, login=login)
+        if not self.display:
+            return
+
+        self.show_display()
+        confirmed = self.prompt_confirmation("Remove these credentials?")
+        if confirmed:
+            self.database.remove(name, login)
+            self.display = self.database.credentials
+
+    def update_credentials(self, fullname):
+        name, login = splitname(fullname)
+        self.display = self.database.get(name=name, login=login)
+        if not self.display:
+            return
+
+        self.show_display()
+        confirmed = self.prompt_confirmation("Edit these credentials?")
+        if confirmed:
+            values = self.prompt_credential()
+            clean_values = {k: v for k, v in values.items() if v}
+            self.display = self.database.update(
+                name=name,
+                login=login,
+                to_update=clean_values
+            )
+        else:
+            self.display = []
+
+    def copy_to_clipboard(self, fullname):
+        name, login = splitname(fullname)
+        self.display = self.database.get(name=name, login=login)
+        if len(self.display) == 1:
+            credential = self.display[0]
+            passphrase = getpass("Passphrase: ")
+            password = self.database.gpg.decrypt(
+                credential.password,
+                passphrase=passphrase
+            )
+            pyperclip.copy(password)
+            cred_string = "Password for '{}' copied to clipboard".format(
+                asfullname(credential.name, credential.login)
+            )
+            print(cred_string)
+            self.display = []
+        elif len(self.display) > 1:
+            print("--Multiple credentials where found: try fullname syntax"
+                  "\nfor example: login@name")
+        else:
+            self.display = []
 
 
 def main(cli_args=None):
     args = parse_args(cli_args)
 
-    # get database
+    # database
     if args.init:
-        passphrase = prompt("Passhprase for database", password=True)
+        passphrase = CLI.prompt("Passhprase for database", password=True)
         database = Database.create(args.database, passphrase)
     else:
         database = Database(path=args.database)
 
-    # updating database
+    interface = CLI(database, args.show_password)
+
+    # credentials
     if args.add:
-        credential = prompt_credential(database)
-        database.add(credential)
+        interface.add_credential()
 
-    # selecting
     if args.get:
-        name, login = split_name(args.get)
-        credentials = database.credential(name=name, login=login)
-    else:
-        credentials = database.credentials
+        if args.clipboard:
+            interface.copy_to_clipboard(args.get)
+        else:
+            interface.get_credentials(args.get)
+    elif args.search:
+        interface.search_credentials(query=args.search)
+    elif args.update:
+        interface.update_credentials(args.update)
+    elif args.remove:
+        interface.remove_credentials(args.remove)
 
-    # printing
-    if args.show_password:
-        passphrase = getpass("Passphrase: ")
-        if database.check(passphrase):
-            print_plaintext(credentials, database, passphrase)
-    else:
-        print_credentials(credentials)
+
+    if interface.display:
+        interface.show_display()
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("")
