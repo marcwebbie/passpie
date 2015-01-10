@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 
 from .cli import CLI
@@ -42,9 +43,12 @@ def main(cli_args=None):
 
     # credentials
     if args.add:
-        interface.add_credential()
-
-    if args.get:
+        try:
+            interface.add_credential()
+        except ValueError as e:
+            # return logging.error(str(e))
+            return
+    elif args.get:
         if args.clipboard:
             interface.copy_to_clipboard(fullname=args.get)
         else:
