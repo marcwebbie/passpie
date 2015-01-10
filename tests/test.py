@@ -997,6 +997,15 @@ class CLITests(unittest.TestCase):
         with patch("pysswords.cli.getpass"):
             self.assertIsNone(interface.get_passphrase())
 
+    @timethis
+    def test_get_passphrase_returns_good_passphrase(self, _):
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        interface.database.check = Mock(return_value=True)
+        interface.show_display = Mock()
+        passphrase = "passphrase"
+        with patch("pysswords.cli.getpass", return_value=passphrase):
+            self.assertEqual(interface.get_passphrase(), passphrase)
+
 
 
     # @timethis
