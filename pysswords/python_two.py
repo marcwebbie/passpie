@@ -17,3 +17,5 @@ if sys.version_info >= (3,):
     BUILTINS_NAME = "builtins"
 else:
     BUILTINS_NAME = "__builtin__"
+
+input = raw_input if sys.version_info < (3,) else input
