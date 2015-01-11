@@ -5,14 +5,16 @@ from setuptools import setup, find_packages
 requirements_file = "requirements.txt"
 version_file = os.path.join('pysswords', '__version__.py')
 requirements = [pkg.strip() for pkg in open(requirements_file).readlines()]
-version = open(version_file).read().strip()
 
 with open("README.md") as f:
     long_description = f.read() + '\n'
 
+VERSION = None
+exec(open(os.path.join("pysswords", "__version__.py")).read().strip())
+
 setup(
     name='pysswords',
-    version=version,
+    version=VERSION,
     license='License :: OSI Approved :: MIT License',
     description="Manage your login credentials from the terminal painlessly.",
     long_description=long_description,

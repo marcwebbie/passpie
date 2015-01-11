@@ -2,16 +2,11 @@ import argparse
 import os
 
 from .cli import CLI
+from .__version__ import VERSION
 
 
 def default_db():
     return os.path.join(os.path.expanduser("~"), ".pysswords")
-
-
-def get_version():
-    version_file = os.path.join(os.path.dirname(__file__), "__version__.py")
-    version = open(version_file).read().strip()
-    return "Pysswords {}".format(version)
 
 
 def parse_args(cli_args=None):
@@ -41,7 +36,7 @@ def parse_args(cli_args=None):
 
     group_runtime = parser.add_argument_group("Runtime options")
     group_runtime.add_argument("--version", action="version",
-                               version=get_version(), help="Print version")
+                               version=VERSION, help="Print version")
 
     args = parser.parse_args(cli_args)
     if args.clipboard and not args.get:
