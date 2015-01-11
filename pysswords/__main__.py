@@ -79,11 +79,17 @@ def main(cli_args=None):
     if interface.display:
         interface.show_display()
 
+from .db import CredentialExistsError, CredentialNotFoundError
+
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
         print("")
-    except Exception as e:
+    except CredentialExistsError as e:
+        logging.error(str(e))
+    except CredentialNotFoundError as e:
+        logging.error(str(e))
+    except ValueError as e:
         logging.error(str(e))

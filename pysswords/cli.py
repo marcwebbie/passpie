@@ -123,7 +123,13 @@ class CLI(object):
 
     def add_credential(self):
         credential = self.prompt_credential()
-        self.database.add(**credential)
+        try:
+            self.database.add(**credential)
+        except CredentialExistsError:
+            fullname = asfullname(credential["name"], credential["login"])
+            raise CredentialExistsError(
+                "Credential `{}` already exists".format(fullname))
+
         self.display = self.database.credentials
 
     def get_credentials(self, fullname):
