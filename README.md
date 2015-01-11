@@ -25,7 +25,9 @@ Main Features
 + `☑` Colored output
 + `☑` Search credentials by name, login or comments
 + `☑` Search with regular expression
-+ `☑` Select by fullname syntax
++ `☑` Bulk update/remove credentials
++ `☑` Select credentials by fullname syntax
++ `☑` Grouping credentials
 + `☐` Exporting database
 + `☐` Importing credentials from other applications
 + `☐` Undo/Redo modifications to the database
@@ -78,10 +80,10 @@ pysswords -r github
 # edit credential "github". Option: `-u` or `--update`
 pysswords -u github
 
-# search credentials with query "octocat". Option: `-s` or `--search`
+# search credentials with the query "octocat". Option: `-s` or `--search`
 pysswords -s octocat
 
-# search credentials with regular expression "example\.com|org". Option: `-s` or `--search`
+# search credentials with the regular expression "example\.com|org".
 pysswords -s example\.com|org
 
 # copy password from credential "github" into clipboard. Option: `-c` or `--clipboard`
@@ -92,18 +94,22 @@ pysswords -c -g github
 pysswords
 
 # print all credentials and show passwords in plain text. Option: `-P` or `--show-password`
-pysswords --show-password
+pysswords -P
 
 # specify other pysswords database. Option `-D` or `--database`
 pysswords -D /path/to/other/database -g
 
 # shows help. Option `-h` or `--help`
 pysswords --help
+
+# shows version. Option `--version`
+pysswords --version
 ```
+
 
 ### Grouping
 
-Pysswords credentials can have multiple names which groups them for the same name:
+Pysswords credentials can have multiple names which groups credentials with the same name together:
 
 ```
 pysswords -a
