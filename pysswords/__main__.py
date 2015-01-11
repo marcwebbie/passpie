@@ -9,7 +9,7 @@ def default_db():
 
 
 def get_version():
-    version_file = os.path.join(os.path.dirname(__file__), "__version__")
+    version_file = os.path.join(os.path.dirname(__file__), "__version__.py")
     version = open(version_file).read().strip()
     return "Pysswords {}".format(version)
 

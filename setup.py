@@ -3,7 +3,7 @@ import os
 from setuptools import setup, find_packages
 
 requirements_file = "requirements.txt"
-version_file = os.path.join('pysswords', '__version__')
+version_file = os.path.join('pysswords', '__version__.py')
 requirements = [pkg.strip() for pkg in open(requirements_file).readlines()]
 version = open(version_file).read().strip()
 
