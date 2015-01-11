@@ -53,7 +53,7 @@ class CLI(object):
             elif n == 3:
                 raise ValueError("Passwords didn't match.")
             else:
-                cls.write("Entries don't match!", error=True)
+                cls.write("Entries don't match, try again.")
 
     @classmethod
     def prompt(cls, text, password=False):
