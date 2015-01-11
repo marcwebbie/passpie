@@ -91,14 +91,14 @@ pysswords -c -g github
 # print all credentials as a table with hidden passwords
 pysswords
 
-# print all credentials and show passwords in plain text. Option: `--show-password`
+# print all credentials and show passwords in plain text. Option: `-P` or `--show-password`
 pysswords --show-password
+
+# specify other pysswords database. Option `-D` or `--database`
+pysswords -D /path/to/other/database -g
 
 # shows help. Option `-h` or `--help`
 pysswords --help
-
-# specify other passwords. Option `-D` or `--database`
-pysswords -D /path/to/other/database
 ```
 
 ### Grouping
@@ -110,7 +110,7 @@ pysswords -a
 Name: example.com
 Login: john
 Password: **********
-Comment: first account
+Comment: No comment
 ```
 
 ```
@@ -118,7 +118,7 @@ pysswords -a
 Name: example.com
 Login: doe
 Password: **********
-Comment: first account
+Comment:
 ```
 
 ###### Output
@@ -169,8 +169,7 @@ pysswords --init --database "/path/to/database/"
 ### Database structure
 
 Pysswords database is structured in a directory hierachy. Every
-credential is a directory named with credential name inside the database
-path.
+credential is a `.pyssword` file inside a directory named after a credential group.
 
 An empty database would look like this:
 
@@ -190,7 +189,7 @@ After adding a new credential the database would look like this:
 
 ```bash
 pysswords --database /tmp/pysswords -a
-# Name: github
+# Name: github.com
 # Login: octocat
 # Password: **********
 # Comments:
@@ -202,19 +201,39 @@ tree /tmp/pysswords -la
 # │   ├── random_seed
 # │   ├── secring.gpg
 # │   └── trustdb.gpg
+# └── github.com
+#     └── octocat.pyssword
+```
+
+If we add more credentials to group github.com. Directory structure would be:
+
+```bash
+pysswords --database /tmp/pysswords -a
+# Name: github.com
+# Login: octocat2
+# Password: **********
+# Comments:
+
+tree /tmp/pysswords -la
+# /tmp/pysswords
+# ├── .keys
+# │   ├── pubring.gpg
+# │   ├── random_seed
+# │   ├── secring.gpg
+# │   └── trustdb.gpg
 # └── github
-#     ├── comments
-#     ├── login
-#     └── password
+#     └── octocat.pyssword
+#     └── example.pyssword
 ```
 
 
 Contributing
 ------------
 
--   Fork the repository [https://github.com/marcwebbie/pysswords/fork](https://github.com/marcwebbie/pysswords/fork)
--   Write your tests on `tests/test.py`
--   If everything is OK. push your changes and make a pull request. ;)
+- Fork the repository [https://github.com/marcwebbie/pysswords/fork](https://github.com/marcwebbie/pysswords/fork)
+- Read the [Makefile](https://github.com/marcwebbie/pysswords/blob/master/Makefile)
+- Write your tests on `tests/test.py`
+- If everything is OK. push your changes and make a pull request. ;)
 
 
 License ([MIT License](http://choosealicense.com/licenses/mit/))
