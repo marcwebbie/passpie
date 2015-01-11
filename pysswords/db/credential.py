@@ -8,11 +8,11 @@ import yaml
 Credential = namedtuple("Credential", "name login password comment")
 
 
-class CredentialExistsError(ValueError):
+class CredentialExistsError(Exception):
     pass
 
 
-class CredentialNotFoundError(ValueError):
+class CredentialNotFoundError(Exception):
     pass
 
 
