@@ -1,8 +1,10 @@
 import argparse
+import logging
 import os
 
 from .cli import CLI
-from .__version__ import VERSION
+
+__version__ = "0.0.8"
 
 
 def default_db():
@@ -34,9 +36,10 @@ def parse_args(cli_args=None):
     group_cred.add_argument("-P", "--show-password", action="store_true",
                             help="show credentials passwords as plain text")
 
-    group_runtime = parser.add_argument_group("Runtime options")
+    group_runtime = parser.add_argument_group("Default options")
     group_runtime.add_argument("--version", action="version",
-                               version=VERSION, help="Print version")
+                               version="Pysswords {}".format(__version__),
+                               help="Print version")
 
     args = parser.parse_args(cli_args)
     if args.clipboard and not args.get:
@@ -58,7 +61,8 @@ def main(cli_args=None):
     if args.add:
         try:
             interface.add_credential()
-        except ValueError:
+        except ValueError as e:
+            logging.error(str(e))
             return
     elif args.get:
         if args.clipboard:
@@ -81,3 +85,5 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         print("")
+    except Exception as e:
+        logging.error(str(e))

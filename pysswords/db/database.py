@@ -70,6 +70,9 @@ class Database(object):
 
     def update(self, name, login, to_update):
         found = self.get(name, login)
+        if not found:
+            raise CredentialNotFoundError()
+
         updated = []
         for credential in found:
             new_credential = self.build_credential(
@@ -93,16 +96,17 @@ class Database(object):
         found = self.get(name, login)
         if not found:
             raise CredentialNotFoundError()
-        else:
-            for credential in found:
-                clean(self.path, credential.name, credential.login)
+
+        for credential in found:
+            clean(self.path, credential.name, credential.login)
 
     def get(self, name, login=None):
-        if login:
-            return [c for c in self.credentials
-                    if c.name == name and c.login == login]
+        found = [c for c in self.credentials
+                 if c.name == name and ((login is None) or c.login == login)]
+        if not found:
+            raise CredentialNotFoundError()
         else:
-            return [c for c in self.credentials if c.name == name]
+            return found
 
     def search(self, query):
         rgx = re.compile(query)

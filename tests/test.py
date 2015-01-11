@@ -862,8 +862,10 @@ class CLITests(unittest.TestCase):
             self.assertEqual(credential_dict["comment"], comment)
 
     @timethis
-    def test_prompt_credentials_returns_expected_boolean_for_reply(self, _):
-        with patch(BUILTINS_NAME + ".input") as mockinput:
+    def test_prompt_confirmation_returns_expected_boolean_for_reply(self, _):
+        py3 = sys.version_info >= (3,)
+        to_patch = "builtins.input" if py3 else "pysswords.cli.input"
+        with patch(to_patch) as mockinput:
             mockinput.return_value = "y"
             confirmed = pysswords.cli.CLI.prompt_confirmation("")
             mockinput.return_value = "n"

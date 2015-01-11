@@ -3,11 +3,20 @@ import colorama
 import pyperclip
 from tabulate import tabulate
 
-from .db import Database, Credential
+from .python_two import input
 from .db.credential import splitname, asfullname
+from .db import(
+    Database,
+    Credential,
+    CredentialExistsError,
+    CredentialNotFoundError
+)
 
 
 class CLI(object):
+
+    class WrongPassphraseError(Exception):
+        pass
 
     def __init__(self, database_path, show_password, init=False):
         if init:
@@ -27,19 +36,24 @@ class CLI(object):
     def create_database(cls, path):
         passphrase = CLI.prompt("Passphrase for database: ", password=True)
         database = Database.create(path, passphrase)
+        cls.write("Database created at `{}`".format(path))
         return database
 
     @classmethod
+    def write(cls, text, error=False):
+        print("{}{}".format("-- " if error else "", text))
+
+    @classmethod
     def prompt_password(cls, text):
-        for _ in range(3):
+        for n in [1, 2, 3]:
             password = getpass(text)
             repeat_password = getpass("Type again: ")
             if password == repeat_password:
                 return password
+            elif n == 3:
+                raise ValueError("Passwords didn't match.")
             else:
-                print("Entries don't match!")
-        else:
-            raise ValueError("Entries didn't match")
+                cls.write("Entries don't match!", error=True)
 
     @classmethod
     def prompt(cls, text, password=False):
@@ -67,6 +81,8 @@ class CLI(object):
         passphrase = getpass("Passphrase: ")
         if self.database.check(passphrase):
             return passphrase
+        else:
+            raise self.WrongPassphraseError("Wrong passphrase")
 
     def decrypt_credentials(self, credentials, passphrase):
         plaintext_credentials = []
@@ -83,18 +99,16 @@ class CLI(object):
     def show_display(self):
         if self.show_password:
             passphrase = self.get_passphrase()
-            if passphrase is not None:
-                credentials = self.decrypt_credentials(
+            if passphrase is None:
+                raise ValueError("Wrong passphrase.")
+            else:
+                self.display = self.decrypt_credentials(
                     self.display,
                     passphrase
                 )
-            else:
-                return self.write("Wrong passphrase", error=True)
-        else:
-            credentials = self.display
 
         table = []
-        for credential in credentials:
+        for credential in self.display:
             row = [
                 CLI.colored(credential.name, "yellow"),
                 credential.login,
@@ -102,6 +116,7 @@ class CLI(object):
                 credential.comment
             ]
             table.append(row)
+
         print("")
         print(tabulate(table, self.headers, tablefmt=self.tablefmt))
         print("")
@@ -122,10 +137,8 @@ class CLI(object):
         name, login = splitname(fullname)
         self.display = self.database.get(name=name, login=login)
         if not self.display:
-            return self.write(
-                "No credentials found for `{}`".format(fullname),
-                error=True
-            )
+            raise CredentialNotFoundError(
+                "No credentials found for `{}`".format(fullname))
 
         self.show_display()
         confirmed = self.prompt_confirmation("Remove these credentials?")
@@ -135,12 +148,11 @@ class CLI(object):
 
     def update_credentials(self, fullname):
         name, login = splitname(fullname)
-        self.display = self.database.get(name=name, login=login)
-        if not self.display:
-            return self.write(
-                "No credentials found for `{}`".format(fullname),
-                error=True
-            )
+        try:
+            self.display = self.database.get(name=name, login=login)
+        except CredentialNotFoundError:
+            raise CredentialNotFoundError(
+                "No credentials found for `{}`".format(fullname))
 
         self.show_display()
         confirmed = self.prompt_confirmation("Edit these credentials?")
@@ -157,31 +169,23 @@ class CLI(object):
 
     def copy_to_clipboard(self, fullname):
         name, login = splitname(fullname)
-        self.display = self.database.get(name=name, login=login)
-        if not self.display:
-            return self.write(
-                "No credentials found for `{}`".format(fullname),
-                True
-            )
-        elif len(self.display) == 1:
-            credential = self.display[0]
-            self.display = []
-            passphrase = self.get_passphrase()
-            if passphrase is None:
-                return self.write("Wrong passphrase", error=True)
+        self.display = []
+        try:
+            found_credentials = self.database.get(name=name, login=login)
+        except CredentialNotFoundError:
+            raise CredentialNotFoundError(
+                "No credentials found for `{}`".format(fullname))
 
+        if len(found_credentials) > 1:
+            raise ValueError("Multiple credentials were found "
+                             "try fullname syntax, Example:\n"
+                             "  pysswords -c -g login@name")
+        else:
+            credential = found_credentials[0]
+            passphrase = self.get_passphrase()
             password = self.database.gpg.decrypt(
                 credential.password,
-                passphrase=passphrase
-            )
+                passphrase=passphrase)
             pyperclip.copy(password)
-            cred_string = "Password for '{}' copied to clipboard".format(
-                asfullname(credential.name, credential.login)
-            )
-            self.write(cred_string)
-        elif len(self.display) > 1:
-            print("-- Multiple credentials were found: try fullname syntax"
-                  "\nfor example: login@name")
-
-    def write(self, text, error=False):
-        print("{}{}".format("-- " if error else "", text))
+            self.write("Password for `{}` copied to clipboard".format(
+                asfullname(credential.name, credential.login)))
