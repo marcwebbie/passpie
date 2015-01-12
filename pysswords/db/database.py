@@ -70,9 +70,6 @@ class Database(object):
 
     def update(self, name, login, to_update):
         found = self.get(name, login)
-        if not found:
-            raise CredentialNotFoundError()
-
         updated = []
         for credential in found:
             new_credential = self.build_credential(
@@ -94,9 +91,6 @@ class Database(object):
 
     def remove(self, name, login):
         found = self.get(name, login)
-        if not found:
-            raise CredentialNotFoundError()
-
         for credential in found:
             clean(self.path, credential.name, credential.login)
 
