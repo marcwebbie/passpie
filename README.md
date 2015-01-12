@@ -9,7 +9,7 @@ pyssword database you can decrypt password files. If you want to know
 more about how pysswords works internally, check the Under the Hood\_
 section.
 
-![Pysswords console interface](https://github.com/marcwebbie/pysswords/raw/master/images/pysswords.png)
+![Pysswords console interface](https://github.com/marcwebbie/pysswords/raw/master/images/pysswords2.png)
 
 ------------------------------------------------------------------------
 
