@@ -59,11 +59,7 @@ def main(cli_args=None):
 
     # credentials
     if args.add:
-        try:
-            interface.add_credential()
-        except ValueError as e:
-            logging.error(str(e))
-            return
+        interface.add_credential()
     elif args.get:
         if args.clipboard:
             interface.copy_to_clipboard(fullname=args.get)
@@ -84,12 +80,13 @@ from .db import CredentialExistsError, CredentialNotFoundError
 
 if __name__ == "__main__":
     try:
-        main()
+        try:
+            main()
+        except CredentialExistsError as e:
+            logging.error(str(e))
+        except CredentialNotFoundError as e:
+            logging.error(str(e))
+        except ValueError as e:
+            logging.error(str(e))
     except KeyboardInterrupt:
         print("")
-    except CredentialExistsError as e:
-        logging.error(str(e))
-    except CredentialNotFoundError as e:
-        logging.error(str(e))
-    except ValueError as e:
-        logging.error(str(e))

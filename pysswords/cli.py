@@ -15,9 +15,6 @@ from .db import(
 
 class CLI(object):
 
-    class WrongPassphraseError(Exception):
-        pass
-
     def __init__(self, database_path, show_password, init=False):
         if init:
             self.create_database(path=database_path)
@@ -71,7 +68,7 @@ class CLI(object):
 
     @classmethod
     def prompt_confirmation(cls, text):
-        entry = input("{} (y|n): ".format(text))
+        entry = cls.prompt("{} (y|n): ".format(text))
         if entry and entry.lower().startswith("y"):
             return True
         else:
@@ -82,7 +79,7 @@ class CLI(object):
         if self.database.check(passphrase):
             return passphrase
         else:
-            raise self.WrongPassphraseError("Wrong passphrase")
+            raise ValueError("Wrong passphrase")
 
     def decrypt_credentials(self, credentials, passphrase):
         plaintext_credentials = []
@@ -99,13 +96,10 @@ class CLI(object):
     def show_display(self):
         if self.show_password:
             passphrase = self.get_passphrase()
-            if passphrase is None:
-                raise ValueError("Wrong passphrase.")
-            else:
-                self.display = self.decrypt_credentials(
-                    self.display,
-                    passphrase
-                )
+            self.display = self.decrypt_credentials(
+                self.display,
+                passphrase
+            )
 
         table = []
         for credential in self.display:
@@ -117,9 +111,8 @@ class CLI(object):
             ]
             table.append(row)
 
-        print("")
-        print(tabulate(table, self.headers, tablefmt=self.tablefmt))
-        print("")
+        print("\n{}\n".format(
+            tabulate(table, self.headers, tablefmt=self.tablefmt)))
 
     def add_credential(self):
         credential = self.prompt_credential()
@@ -141,10 +134,11 @@ class CLI(object):
 
     def remove_credentials(self, fullname):
         name, login = splitname(fullname)
-        self.display = self.database.get(name=name, login=login)
-        if not self.display:
+        try:
+            self.display = self.database.get(name=name, login=login)
+        except CredentialNotFoundError:
             raise CredentialNotFoundError(
-                "No credentials found for `{}`".format(fullname))
+                "Credential `{}` not found".format(fullname))
 
         self.show_display()
         confirmed = self.prompt_confirmation("Remove these credentials?")
@@ -158,7 +152,7 @@ class CLI(object):
             self.display = self.database.get(name=name, login=login)
         except CredentialNotFoundError:
             raise CredentialNotFoundError(
-                "No credentials found for `{}`".format(fullname))
+                "Credential `{}` not found".format(fullname))
 
         self.show_display()
         confirmed = self.prompt_confirmation("Edit these credentials?")
