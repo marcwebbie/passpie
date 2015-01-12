@@ -97,7 +97,7 @@ pysswords
 pysswords -P
 
 # specify other pysswords database. Option `-D` or `--database`
-pysswords -D /path/to/other/database -g
+pysswords -D /path/to/other/database
 
 # shows help. Option `-h` or `--help`
 pysswords --help
