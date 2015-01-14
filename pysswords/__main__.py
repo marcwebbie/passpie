@@ -4,7 +4,7 @@ import os
 
 from .cli import CLI
 
-__version__ = "0.0.8"
+__version__ = "0.0.8.1"
 
 
 def default_db():
