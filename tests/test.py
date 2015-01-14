@@ -457,7 +457,9 @@ class UtilsTests(unittest.TestCase):
             mocker.pathsep = ":"
             mocked_join = Mock()
             mocker.path.join = mocked_join
-            pysswords.utils.which("python")
+            with patch("pysswords.utils.shutil") as mockshutil:
+                mockshutil.which = Mock(side_effect=AttributeError)
+                pysswords.utils.which("python")
             mocked_join.assert_any_call("/", "python.exe")
 
 
