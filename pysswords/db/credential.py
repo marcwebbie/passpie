@@ -59,4 +59,4 @@ def splitname(fullname):
 
 
 def asfullname(name, login):
-    return "{}@{}".format(login, name)
+    return "{}@{}".format(login if login else "", name)
