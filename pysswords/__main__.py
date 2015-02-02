@@ -83,10 +83,12 @@ if __name__ == "__main__":
         try:
             main()
         except CredentialExistsError as e:
-            logging.error(str(e))
+            logging.error("Credential '{}' exists".format(e))
         except CredentialNotFoundError as e:
-            logging.error(str(e))
-        except ValueError as e:
-            logging.error(str(e))
+            logging.error("Credential '{}' not found".format(e))
+        except OSError as e:
+            logging.error("Database exists")
+        # except ValueError as e:
+        #     logging.error(str(e))
     except KeyboardInterrupt:
         print("")
