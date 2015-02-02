@@ -727,7 +727,6 @@ class CLITests(unittest.TestCase):
     @timethis
     def test_cli_instances_calls_create_database_if_init_true(self, _):
         database_path = "/tmp/pysswords"
-        # self.assertTrue(interface.create_database.called)
         with patch("pysswords.cli.CLI.create_database") as mocked:
             pysswords.cli.CLI(
                 database_path=database_path,
