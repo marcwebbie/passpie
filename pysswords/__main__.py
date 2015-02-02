@@ -87,7 +87,7 @@ if __name__ == "__main__":
             logging.error("Credential '{}' not found".format(e))
         except OSError as e:
             logging.error("Database exists")
-        # except ValueError as e:
-        #     logging.error(str(e))
+        except ValueError as e:
+            logging.error(str(e))
     except KeyboardInterrupt:
         print("")
