@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.0.8.3
+
++ **√** Bug fixes for cli
+
 ### 0.0.8.2
 
 + **√** Fix error messages
