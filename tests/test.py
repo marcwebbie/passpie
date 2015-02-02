@@ -598,6 +598,20 @@ class MainTests(unittest.TestCase):
         self.assertIn("search", args_short.__dict__)
 
     @timethis
+    def test_main_parse_args_has_verbose_arg(self):
+        args = pysswords.__main__.parse_args(["--verbose"])
+        args_short = pysswords.__main__.parse_args(["-v"])
+        self.assertIn("verbose", args.__dict__)
+        self.assertIn("verbose", args_short.__dict__)
+
+    @timethis
+    def test_main_handles_verbose_option_setting_logger_level_to_info(self):
+        with patch("pysswords.__main__.logging") as mock_logging:
+            logger = mock_logging.getLogger()
+            pysswords.__main__.main(["--verbose"])
+            logger.setLevel.assert_called_once_with(mock_logging.INFO)
+
+    @timethis
     def test_main_parse_args_search_arg_has_credential_name_passed(self):
         credential_name = "example.com"
         args = pysswords.__main__.parse_args(["--search", credential_name])
