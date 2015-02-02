@@ -338,6 +338,12 @@ class DatabaseTests(unittest.TestCase):
         self.database.gpg.list_keys.assert_any_call_with(secret=True)
 
     @timethis
+    def test_key_raises_valueerror_when_key_not_found(self):
+        with patch.object(self.database.gpg, "list_keys", return_value=[]):
+            with self.assertRaises(ValueError):
+                self.database.key()
+
+    @timethis
     def test_decrypt_returns_plain_text_data(self):
         text = "secret"
         encrypted = self.database.encrypt(text)
