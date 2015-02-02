@@ -1,4 +1,5 @@
 from getpass import getpass
+import logging
 import colorama
 import pyperclip
 from tabulate import tabulate
@@ -31,7 +32,7 @@ class CLI(object):
     def create_database(cls, path):
         passphrase = CLI.prompt("Passphrase for database: ", password=True)
         database = Database.create(path, passphrase)
-        cls.write("Database created at `{}`".format(path))
+        cls.write("Database initialized in '{}'".format(path))
         return database
 
     @classmethod
