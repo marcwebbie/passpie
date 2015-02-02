@@ -1085,7 +1085,7 @@ class CLITests(unittest.TestCase):
         interface = pysswords.cli.CLI("some path", show_password=False)
         password = "password"
         mockdb().get.return_value = [some_credential()]
-        mockdb().gpg.decrypt.return_value = password
+        mockdb().decrypt.return_value = password
         interface.write = Mock()
         interface.get_passphrase = Mock()
         with patch("pysswords.cli.pyperclip") as mockpyperclip:
