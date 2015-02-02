@@ -54,8 +54,8 @@ run:
 	zsh -c "pyenv activate /tmp/my-virtual-env-2.7.9"
 	pyenv deactivate
 
-wheel:
-	python setup.py bdist_wheel
+deploy:
+	python setup.py sdist bdist_wheel upload -r pypi
 
 tox: set-python
 	tox
