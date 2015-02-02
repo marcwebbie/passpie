@@ -25,9 +25,7 @@ from pysswords.db import (
     Database,
     Credential,
     CredentialNotFoundError,
-    CredentialExistsError
 )
-from pysswords.db.credential import asfullname
 from pysswords.python_two import *
 
 
@@ -402,7 +400,6 @@ class DatabaseTests(unittest.TestCase):
         with self.assertRaises(CredentialNotFoundError):
             self.database.remove(name="none", login="none")
 
-
     @timethis
     def test_check_uses_gpg_sign_as_passphrase_checker(self):
         self.database.gpg.sign = Mock()
@@ -725,7 +722,6 @@ class CLITests(unittest.TestCase):
         self.assertIn("database", dir(interface))
         self.assertIn("headers", dir(interface))
         self.assertIn("tablefmt", dir(interface))
-        self.assertIn("display", dir(interface))
         self.assertIn("show_password", dir(interface))
 
     @timethis
@@ -798,7 +794,7 @@ class CLITests(unittest.TestCase):
                     pysswords.cli.CLI.prompt_password("Password:")
 
     @timethis
-    def test_cli_show_prints_credentials_on_display(self, _):
+    def test_cli_show_prints_credentials(self, _):
         credentials = [
             some_credential(),
             some_credential(login="mylogin")
@@ -828,12 +824,7 @@ class CLITests(unittest.TestCase):
     def test_remove_credentials_calls_db_get(self, mockdb):
         interface = pysswords.cli.CLI("some path", show_password=False)
         fullname = "doe@example.com"
-        credentials = [
-            some_credential(),
-            some_credential(login="mylogin")
-        ]
         interface = pysswords.cli.CLI("some path", show_password=False)
-        interface.display = credentials
         with patch("sys.stdout"):
             with patch("pysswords.cli.CLI.prompt_confirmation") as mocked:
                 mocked.return_value = True
@@ -849,12 +840,7 @@ class CLITests(unittest.TestCase):
     def test_remove_credentials_not_calls_db_remove_no_confirm(self, mockdb):
         interface = pysswords.cli.CLI("some path", show_password=False)
         fullname = "doe@example.com"
-        credentials = [
-            some_credential(),
-            some_credential(login="mylogin")
-        ]
         interface = pysswords.cli.CLI("some path", show_password=False)
-        interface.display = credentials
         with patch(BUILTINS_NAME + ".print"):
             with patch("pysswords.cli.CLI.prompt_confirmation") as mocked:
                 mocked.return_value = False
@@ -928,7 +914,6 @@ class CLITests(unittest.TestCase):
     @timethis
     def test_show_prints_wrong_passphrase_bad_passphrase(self, _):
         interface = pysswords.cli.CLI("some path", show_password=True)
-        interface.display = []
         interface.database.check = Mock(return_value=False)
         interface.database.credentials = [some_credential(),
                                           some_credential(name="none")]
@@ -1028,7 +1013,6 @@ class CLITests(unittest.TestCase):
     def test_get_passphrase_returns_none_when_bad_passphrase(self, _):
         interface = pysswords.cli.CLI("some path", show_password=False)
         interface.database.check = Mock(return_value=False)
-        interface.show_display = Mock()
         with patch("pysswords.cli.getpass"):
             with self.assertRaises(ValueError) as raised:
                 interface.get_passphrase()
@@ -1038,7 +1022,7 @@ class CLITests(unittest.TestCase):
     def test_get_passphrase_returns_good_passphrase(self, _):
         interface = pysswords.cli.CLI("some path", show_password=False)
         interface.database.check = Mock(return_value=True)
-        interface.show_display = Mock()
+        interface.show = Mock()
         passphrase = "passphrase"
         with patch("pysswords.cli.getpass", return_value=passphrase):
             self.assertEqual(interface.get_passphrase(), passphrase)
