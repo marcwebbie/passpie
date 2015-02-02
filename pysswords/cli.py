@@ -35,8 +35,8 @@ class CLI(object):
         return database
 
     @classmethod
-    def write(cls, text, error=False):
-        print("{}{}".format("-- " if error else "", text))
+    def write(cls, text):
+        print(text)
 
     @classmethod
     def prompt_password(cls, text):
@@ -115,7 +115,7 @@ class CLI(object):
                     credentials,
                     passphrase=self.get_passphrase())
             table = self.build_table(credentials, color)
-            print("\n{}\n".format(table))
+            self.write("\n{}\n".format(table))
 
     def add_credential(self):
         credential = self.prompt_credential()

@@ -949,6 +949,16 @@ class CLITests(unittest.TestCase):
             query=query
         )
 
+
+    @timethis
+    def test_write_prints_text_to_stdout(self, _):
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        text = "some text"
+        with patch("sys.stdout", new_callable=StringIO) as mock_stdout:
+            interface.write(text)
+            self.assertIn(text, mock_stdout.getvalue())
+
+
     @timethis
     def test_uptade_credentials_raises_credential_not_found(self, mockdb):
         fullname = "doe@example.com"
