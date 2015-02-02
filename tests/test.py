@@ -31,8 +31,6 @@ from pysswords.db.credential import asfullname
 from pysswords.python_two import *
 
 
-
-
 TEST_DIR = os.path.join(os.path.dirname(os.path.relpath(__file__)))
 TEST_DATA_DIR = os.path.join(TEST_DIR, "data")
 BENCHMARK = os.environ.get("BENCHMARK")
