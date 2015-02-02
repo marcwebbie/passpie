@@ -806,19 +806,6 @@ class CLITests(unittest.TestCase):
         )
 
     @timethis
-    def test_add_credential_raises_credential_exist_error(self, _):
-        credential_dict = some_credential_dict()
-        interface = pysswords.cli.CLI("some path", show_password=False)
-        interface.database.add = Mock(side_effect=CredentialExistsError)
-        interface.prompt_credential = Mock(return_value=credential_dict)
-        fullname = asfullname(
-            credential_dict["name"], credential_dict["login"])
-        with self.assertRaises(CredentialExistsError) as raised:
-            interface.add_credential()
-        expected = "Credential `{}` already exists".format(fullname)
-        self.assertEqual(str(raised.exception), expected)
-
-    @timethis
     def test_remove_credentials_not_calls_db_remove_no_confirm(self, mockdb):
         interface = pysswords.cli.CLI("some path", show_password=False)
         fullname = "doe@example.com"
