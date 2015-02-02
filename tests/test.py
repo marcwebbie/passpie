@@ -614,7 +614,8 @@ class MainTests(unittest.TestCase):
     def test_main_handles_verbose_option_setting_logger_level_to_info(self):
         with patch("pysswords.__main__.logging") as mock_logging:
             logger = mock_logging.getLogger()
-            pysswords.__main__.main(["--verbose"])
+            with patch("sys.stdout"):
+                pysswords.__main__.main(["--verbose"])
             logger.setLevel.assert_called_once_with(mock_logging.INFO)
 
     @timethis
