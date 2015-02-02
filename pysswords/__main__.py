@@ -3,6 +3,7 @@ import logging
 import os
 
 from .cli import CLI
+from .db import CredentialExistsError, CredentialNotFoundError
 
 __version__ = "0.0.8.1"
 
@@ -57,44 +58,38 @@ def main(cli_args=None):
         logger = logging.getLogger()
         logger.setLevel(logging.INFO)
 
-    interface = CLI(
-        database_path=args.database,
-        show_password=args.show_password,
-        init=args.init
-    )
+    try:
+        interface = CLI(
+            database_path=args.database,
+            show_password=args.show_password,
+            init=args.init
+        )
 
-    # credentials
-    if args.add:
-        interface.add_credential()
-    elif args.get:
-        if args.clipboard:
-            interface.copy_to_clipboard(fullname=args.get)
+        if args.add:
+            interface.add_credential()
+        elif args.get:
+            if args.clipboard:
+                interface.copy_to_clipboard(fullname=args.get)
+            else:
+                interface.get_credentials(fullname=args.get)
+        elif args.search:
+            interface.search_credentials(query=args.search)
+        elif args.update:
+            interface.update_credentials(fullname=args.update)
+        elif args.remove:
+            interface.remove_credentials(fullname=args.remove)
         else:
-            interface.get_credentials(fullname=args.get)
-    elif args.search:
-        interface.search_credentials(query=args.search)
-    elif args.update:
-        interface.update_credentials(fullname=args.update)
-    elif args.remove:
-        interface.remove_credentials(fullname=args.remove)
-    else:
-        interface.show()
-
-from .db import CredentialExistsError, CredentialNotFoundError
-
+            interface.show()
+    except CredentialExistsError as e:
+        logging.error("Credential '{}' exists".format(e))
+    except CredentialNotFoundError as e:
+        logging.error("Credential '{}' not found".format(e))
+    except OSError as e:
+        logging.error("Database exists")
+    except ValueError as e:
+        logging.error(str(e))
+    except KeyboardInterrupt:
+        logging.info("Keyboard interrupt")
 
 if __name__ == "__main__":
-    try:
-        try:
-
-            main()
-        except CredentialExistsError as e:
-            logging.error("Credential '{}' exists".format(e))
-        except CredentialNotFoundError as e:
-            logging.error("Credential '{}' not found".format(e))
-        except OSError as e:
-            logging.error("Database exists")
-        except ValueError as e:
-            logging.error(str(e))
-    except KeyboardInterrupt:
-        print("")
+    main()

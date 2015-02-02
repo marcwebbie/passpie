@@ -25,6 +25,7 @@ from pysswords.db import (
     Database,
     Credential,
     CredentialNotFoundError,
+    CredentialExistsError
 )
 from pysswords.python_two import *
 
@@ -706,6 +707,53 @@ class MainTests(unittest.TestCase):
             mocked().copy_to_clipboard.assert_called_once_with(
                 fullname=fullname
             )
+
+    @timethis
+    def test_main_handles_credential_not_found_error(self):
+        fullname = "john@example.com"
+        exception = CredentialNotFoundError(fullname)
+        with patch("pysswords.__main__.CLI.get_credentials", side_effect=exception):
+            with patch("pysswords.__main__.logging") as mock_logging:
+                pysswords.__main__.main(["-g", fullname])
+                mock_logging.error.assert_called_once_with(
+                    "Credential '{}' not found".format(fullname))
+
+    @timethis
+    def test_main_handles_credential_exists_error(self):
+        fullname = "john@example.com"
+        exception = CredentialExistsError(fullname)
+        with patch("pysswords.__main__.CLI.add_credential", side_effect=exception):
+            with patch("pysswords.__main__.logging") as mock_logging:
+                pysswords.__main__.main(["-a"])
+                mock_logging.error.assert_called_once_with(
+                    "Credential '{}' exists".format(fullname))
+
+    @timethis
+    def test_main_handles_credential_oserror(self):
+        fullname = "john@example.com"
+        with patch("pysswords.__main__.CLI.__init__", side_effect=OSError):
+            with patch("pysswords.__main__.logging") as mock_logging:
+                pysswords.__main__.main(["--init"])
+                mock_logging.error.assert_called_once_with(
+                    "Database exists".format(fullname))
+
+    @timethis
+    def test_main_handles_credential_valueerror(self):
+        fullname = "john@example.com"
+        exception = ValueError("Database key not found or corrupted")
+        with patch("pysswords.__main__.CLI.get_credentials", side_effect=exception):
+            with patch("pysswords.__main__.logging") as mock_logging:
+                pysswords.__main__.main(["--get", fullname])
+                mock_logging.error.assert_called_once_with(
+                    "Database key not found or corrupted")
+
+    @timethis
+    def test_main_handles_credential_keyboardinterrupt(self):
+        exception = KeyboardInterrupt()
+        with patch("pysswords.__main__.CLI.add_credential", side_effect=exception):
+            with patch("pysswords.__main__.logging") as mock_logging:
+                pysswords.__main__.main(["--add"])
+                mock_logging.info.assert_called_once_with("Keyboard interrupt")
 
 
 @patch("pysswords.cli.Database")
