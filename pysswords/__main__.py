@@ -40,6 +40,8 @@ def parse_args(cli_args=None):
     group_runtime.add_argument("--version", action="version",
                                version="Pysswords {}".format(__version__),
                                help="Print version")
+    group_runtime.add_argument("--verbose", "-v", action="store_true",
+                               help="Print verbose output")
 
     args = parser.parse_args(cli_args)
     if args.clipboard and not args.get:
@@ -50,6 +52,10 @@ def parse_args(cli_args=None):
 
 def main(cli_args=None):
     args = parse_args(cli_args)
+
+    if args.verbose:
+        logger = logging.getLogger()
+        logger.setLevel(logging.INFO)
 
     interface = CLI(
         database_path=args.database,
@@ -80,6 +86,7 @@ from .db import CredentialExistsError, CredentialNotFoundError
 if __name__ == "__main__":
     try:
         try:
+
             main()
         except CredentialExistsError as e:
             logging.error("Credential '{}' exists".format(e))
