@@ -75,7 +75,7 @@ def build_keys():
 def mock_create_keyring(path, *args, **kwargs):
     """Import key.asc instead of generating new key
     passphrase used to create the key was 'dummy_database'"""
-    gpg = gnupg.GPG(homedir=path)
+    gpg = gnupg.GPG(binary=pysswords.utils.which("gpg"), homedir=path)
     with open(os.path.join(TEST_DATA_DIR, "key.asc")) as keyfile:
         gpg.import_keys(keyfile.read())
     return gpg.list_keys()[0]
