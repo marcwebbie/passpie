@@ -976,21 +976,15 @@ class CLITests(unittest.TestCase):
         self.assertEqual(call_args["to_update"], to_update)
 
     @timethis
-    def test_copy_to_clipboard_print_multiple_credentials_found(self, _):
+    def test_copy_to_clipboard_logs_multiple_credentials_found(self, _):
         interface = pysswords.cli.CLI("some path", show_password=False)
-        interface.database.get.return_value = [1, 2, 3]
-        with self.assertRaises(ValueError) as raised:
+        interface.database.get.return_value = [
+            some_credential(),
+            some_credential(name="something_else")]
+        with patch("pysswords.cli.logging.warning") as logger:
             with patch("pysswords.cli.getpass"):
                 interface.copy_to_clipboard("fullname")
-            self.assertIn("Multiple credentials were found", raised)
-
-    @timethis
-    def test_copy_to_clipboard_print_no_credentials_found(self, _):
-        interface = pysswords.cli.CLI("some path", show_password=False)
-        interface.database.get = Mock(side_effect=CredentialNotFoundError)
-        with self.assertRaises(CredentialNotFoundError) as raised:
-            interface.copy_to_clipboard("fullname")
-        self.assertIn("No credentials found", str(raised.exception))
+            self.assertTrue(logger.called)
 
     @timethis
     def test_copy_to_clipboard_calls_pyperclip_copy_with_pwd(self, mockdb):
