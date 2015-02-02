@@ -367,6 +367,25 @@ class DatabaseTests(unittest.TestCase):
         self.assertEqual(found[0].login, new_values["login"])
 
     @timethis
+    def test_update_credential_empty_passwords_keeps_default_password(self):
+        values = some_credential_dict()
+        self.database.add(
+            name=values["name"],
+            login=values["login"],
+            password=values["password"],
+            comment=values["comment"]
+        )
+        new_name = "NewService"
+        new_values = {"name": new_name}
+        name, login = values["name"], values["login"]
+        self.database.update(name, login, to_update=new_values)
+        found = self.database.get(
+            name=new_values["name"],
+            login=values["login"]
+        )
+        self.assertEqual(found[0].name, new_name)
+
+    @timethis
     def test_update_raises_credential_not_found_error(self):
         self.database.get = Mock(side_effect=CredentialNotFoundError)
         with self.assertRaises(CredentialNotFoundError):
