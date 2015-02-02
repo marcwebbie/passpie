@@ -167,6 +167,6 @@ class CLI(object):
         credential = credentials[0]
         passphrase = self.get_passphrase()
         pyperclip.copy(
-            self.database.gpg.decrypt(credential.password, passphrase))
+            self.database.decrypt(credential.password, passphrase))
         logging.info("Password for `{}` copied to clipboard".format(
             asfullname(credential.name, credential.login)))
