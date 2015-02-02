@@ -8,8 +8,6 @@ from .db.credential import splitname, asfullname
 from .db import(
     Database,
     Credential,
-    CredentialExistsError,
-    CredentialNotFoundError
 )
 
 
