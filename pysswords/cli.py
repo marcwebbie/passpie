@@ -20,7 +20,6 @@ class CLI(object):
         self.database = Database(database_path)
         self.headers = ["Name", "Login", "Password", "Comment"]
         self.tablefmt = "orgtbl"
-        self.display = self.database.credentials
         self.show_password = show_password
 
     @classmethod
