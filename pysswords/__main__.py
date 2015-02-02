@@ -1,11 +1,13 @@
 import argparse
 import logging
 import os
+from pkg_resources import get_distribution
 
 from .cli import CLI
 from .db import CredentialExistsError, CredentialNotFoundError
 
-__version__ = "0.0.8.1"
+__project__ = 'pysswords'
+__version__ = get_distribution('pysswords').version
 
 
 def default_db():
