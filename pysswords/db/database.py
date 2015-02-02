@@ -12,7 +12,8 @@ from .credential import (
     expandpath,
     exists,
     clean,
-    asstring
+    asstring,
+    asfullname
 )
 
 from pysswords.python_two import makedirs
