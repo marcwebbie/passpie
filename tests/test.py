@@ -869,6 +869,21 @@ class CLITests(unittest.TestCase):
             self.assertEqual(2, mock_logging.info.call_count)
 
     @timethis
+    def test_update_credentials_logs_updated_credentials_to_info(self, _):
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        credentials = [some_credential(name="example", login="jonh"),
+                       some_credential(name="example", login="jonh2")]
+        interface.database.get = Mock(return_value=credentials)
+        interface.write = Mock()
+        interface.prompt_confirmation = Mock(return_value=True)
+        interface.prompt_credential = Mock(return_value={"comment": "dummy"})
+        interface.database.update = Mock(return_value=credentials)
+        with patch("pysswords.cli.logging") as mock_logging:
+            fullname = "example"
+            interface.update_credentials(fullname)
+            self.assertEqual(2, mock_logging.info.call_count)
+
+    @timethis
     def test_show_ask_passphrase_when_show_password_true(self, mockdb):
         interface = pysswords.cli.CLI("some path", show_password=True)
         interface.database.credentials = [some_credential(),
