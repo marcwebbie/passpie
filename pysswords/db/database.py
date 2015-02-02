@@ -41,7 +41,10 @@ class Database(object):
         return creds
 
     def key(self, private=False):
-        key = next(k for k in self.gpg.list_keys(secret=private))
+        try:
+            key = next(k for k in self.gpg.list_keys(secret=private))
+        except StopIteration:
+            raise ValueError("Database key not found or corrupted")
         return key.get("fingerprint")
 
     def build_credential(self, name, login, password, comment, encrypt=True):
@@ -56,7 +59,8 @@ class Database(object):
 
     def write_credential(self, credential):
         if exists(self.path, credential.name, credential.login):
-            raise CredentialExistsError()
+            raise CredentialExistsError(
+                asfullname(credential.name, credential.login))
         cred_path = expandpath(self.path, credential.name, credential.login)
         makedirs(os.path.dirname(cred_path), exist_ok=True)
         with open(cred_path, "w") as f:
@@ -98,7 +102,7 @@ class Database(object):
         found = [c for c in self.credentials
                  if c.name == name and ((login is None) or c.login == login)]
         if not found:
-            raise CredentialNotFoundError()
+            raise CredentialNotFoundError(asfullname(name, login))
         else:
             return found
 
