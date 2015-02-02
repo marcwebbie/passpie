@@ -88,71 +88,62 @@ class CLI(object):
                 self.database.decrypt(c.password, passphrase),
                 c.comment
             )
+
             plaintext_credentials.append(new_credential)
         return plaintext_credentials
 
-    def show_display(self):
-        if self.show_password:
-            passphrase = self.get_passphrase()
-            self.display = self.decrypt_credentials(
-                self.display,
-                passphrase
-            )
-
+    def build_table(self, credentials, color):
         table = []
-        for credential in self.display:
+        for credential in credentials:
             row = [
-                CLI.colored(credential.name, "yellow"),
+                CLI.colored(credential.name, color),
                 credential.login,
                 credential.password if self.show_password else "***",
                 credential.comment
             ]
             table.append(row)
 
-        print("\n{}\n".format(
-            tabulate(table, self.headers, tablefmt=self.tablefmt)))
+        return tabulate(table, self.headers, tablefmt=self.tablefmt)
+
+    def show(self, credentials=None, color="yellow"):
+        if not credentials:
+            credentials = self.database.credentials
+
+        if len(credentials) > 0:
+            if self.show_password:
+                credentials = self.decrypt_credentials(
+                    credentials,
+                    passphrase=self.get_passphrase())
+            table = self.build_table(credentials, color)
+            print("\n{}\n".format(table))
 
     def add_credential(self):
         credential = self.prompt_credential()
-        try:
-            self.database.add(**credential)
-        except CredentialExistsError:
-            fullname = asfullname(credential["name"], credential["login"])
-            raise CredentialExistsError(
-                "Credential `{}` already exists".format(fullname))
-
-        self.display = self.database.credentials
+        fullname = asfullname(credential["name"], credential["login"])
+        self.database.add(**credential)
+        logging.info("Added credential '{}'".format(fullname))
 
     def get_credentials(self, fullname):
         name, login = splitname(fullname)
-        self.display = self.database.get(name=name, login=login)
+        self.show(self.database.get(name=name, login=login))
 
     def search_credentials(self, query):
-        self.display = self.database.search(query=query)
+        self.show(self.database.search(query=query))
 
     def remove_credentials(self, fullname):
         name, login = splitname(fullname)
-        try:
-            self.display = self.database.get(name=name, login=login)
-        except CredentialNotFoundError:
-            raise CredentialNotFoundError(
-                "Credential `{}` not found".format(fullname))
-
-        self.show_display()
+        credentials = self.database.get(name=name, login=login)
+        self.show(credentials, color="Red")
         confirmed = self.prompt_confirmation("Remove these credentials?")
         if confirmed:
             self.database.remove(name=name, login=login)
-            self.display = self.database.credentials
+            for cred in credentials:
+                fullname = asfullname(cred.name, cred.login)
+                logging.info("Removed {}".format(cred))
 
     def update_credentials(self, fullname):
         name, login = splitname(fullname)
-        try:
-            self.display = self.database.get(name=name, login=login)
-        except CredentialNotFoundError:
-            raise CredentialNotFoundError(
-                "Credential `{}` not found".format(fullname))
-
-        self.show_display()
+        self.show(self.database.get(name=name, login=login), color="Red")
         confirmed = self.prompt_confirmation("Edit these credentials?")
         if confirmed:
             values = self.prompt_credential()
@@ -160,30 +151,19 @@ class CLI(object):
             self.display = self.database.update(
                 name=name,
                 login=login,
-                to_update=clean_values
-            )
-        else:
-            self.display = []
+                to_update=clean_values)
 
     def copy_to_clipboard(self, fullname):
         name, login = splitname(fullname)
-        self.display = []
-        try:
-            found_credentials = self.database.get(name=name, login=login)
-        except CredentialNotFoundError:
-            raise CredentialNotFoundError(
-                "No credentials found for `{}`".format(fullname))
+        credentials = self.database.get(name=name, login=login)
 
-        if len(found_credentials) > 1:
-            raise ValueError("Multiple credentials were found "
-                             "try fullname syntax, Example:\n"
-                             "  pysswords -c -g login@name")
-        else:
-            credential = found_credentials[0]
-            passphrase = self.get_passphrase()
-            password = self.database.gpg.decrypt(
-                credential.password,
-                passphrase=passphrase)
-            pyperclip.copy(password)
-            self.write("Password for `{}` copied to clipboard".format(
-                asfullname(credential.name, credential.login)))
+        if len(credentials) > 1:
+            logging.warning("Multiple credentials were found."
+                            "Copying first credential password to clipboard")
+
+        credential = credentials[0]
+        passphrase = self.get_passphrase()
+        pyperclip.copy(
+            self.database.gpg.decrypt(credential.password, passphrase))
+        logging.info("Password for `{}` copied to clipboard".format(
+            asfullname(credential.name, credential.login)))

@@ -71,9 +71,8 @@ def main(cli_args=None):
         interface.update_credentials(fullname=args.update)
     elif args.remove:
         interface.remove_credentials(fullname=args.remove)
-
-    if interface.display:
-        interface.show_display()
+    else:
+        interface.show()
 
 from .db import CredentialExistsError, CredentialNotFoundError
 
