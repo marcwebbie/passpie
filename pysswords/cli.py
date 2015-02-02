@@ -138,8 +138,8 @@ class CLI(object):
         if confirmed:
             self.database.remove(name=name, login=login)
             for cred in credentials:
-                fullname = asfullname(cred.name, cred.login)
-                logging.info("Removed {}".format(cred))
+                logging.info("Removed {}".format(
+                    asfullname(cred.name, cred.login)))
 
     def update_credentials(self, fullname):
         name, login = splitname(fullname)
@@ -152,8 +152,9 @@ class CLI(object):
                 name=name,
                 login=login,
                 to_update=clean_values)
-            for credential in updated_credentials:
-                logging.info("Updated credential: {}".format(credential))
+            for cred in updated_credentials:
+                logging.info("Updated credential: {}".format(
+                    asfullname(cred.name, cred.login)))
 
     def copy_to_clipboard(self, fullname):
         name, login = splitname(fullname)

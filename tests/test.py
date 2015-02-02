@@ -848,12 +848,25 @@ class CLITests(unittest.TestCase):
         self.assertFalse(mockdb().remove.called)
 
     @timethis
-    def test_remove_credentials_raises_credential_not_found(self, mockdb):
+    def test_remove_credentials_raises_credential_not_found(self, _):
         interface = pysswords.cli.CLI("some path", show_password=False)
         fullname = "doe@example.com"
         interface.database.get.side_effect = CredentialNotFoundError
         with self.assertRaises(CredentialNotFoundError):
             interface.remove_credentials(fullname)
+
+    @timethis
+    def test_remove_credentials_logs_removed_credentials_to_info(self, _):
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        credentials = [some_credential(name="example", login="jonh"),
+                       some_credential(name="example", login="jonh2")]
+        interface.database.get = Mock(return_value=credentials)
+        interface.write = Mock()
+        interface.prompt_confirmation = Mock(return_value=True)
+        with patch("pysswords.cli.logging") as mock_logging:
+            fullname = "example"
+            interface.remove_credentials(fullname)
+            self.assertEqual(2, mock_logging.info.call_count)
 
     @timethis
     def test_show_ask_passphrase_when_show_password_true(self, mockdb):
@@ -949,7 +962,6 @@ class CLITests(unittest.TestCase):
             query=query
         )
 
-
     @timethis
     def test_write_prints_text_to_stdout(self, _):
         interface = pysswords.cli.CLI("some path", show_password=False)
@@ -957,7 +969,6 @@ class CLITests(unittest.TestCase):
         with patch("sys.stdout", new_callable=StringIO) as mock_stdout:
             interface.write(text)
             self.assertIn(text, mock_stdout.getvalue())
-
 
     @timethis
     def test_uptade_credentials_raises_credential_not_found(self, mockdb):
