@@ -49,7 +49,7 @@ def clean(path, name, login):
 
 
 def splitname(fullname):
-    rgx = re.compile(r"(?:(?P<login>.+)?@)?(?P<name>.+)")
+    rgx = re.compile(r"(?:(?P<login>.+?@?.+)?@)?(?P<name>.+)")
     if rgx.match(fullname):
         name = rgx.match(fullname).group("name")
         login = rgx.match(fullname).group("login")
