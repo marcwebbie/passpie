@@ -913,7 +913,6 @@ class CLITests(unittest.TestCase):
                                           some_credential(name="none")]
         with patch("pysswords.cli.getpass"):
             with self.assertRaises(ValueError):
-                import pdb; pdb.set_trace()
                 interface.show()
 
     @timethis
