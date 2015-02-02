@@ -149,10 +149,12 @@ class CLI(object):
         if confirmed:
             values = self.prompt_credential()
             clean_values = {k: v for k, v in values.items() if v}
-            self.display = self.database.update(
+            updated_credentials = self.database.update(
                 name=name,
                 login=login,
                 to_update=clean_values)
+            for credential in updated_credentials:
+                logging.info("Updated credential: {}".format(credential))
 
     def copy_to_clipboard(self, fullname):
         name, login = splitname(fullname)
