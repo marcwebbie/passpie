@@ -504,6 +504,15 @@ class MainTests(unittest.TestCase):
             return Database.create(self.tempdb_path, self.passphrase)
 
     @timethis
+    def test_logs_error_and_exit_application_when_gpg_is_not_installed(self):
+        with patch("pysswords.__main__.which", return_value=None):
+            with patch("pysswords.__main__.logging") as mock_logging:
+                with self.assertRaises(SystemExit):
+                    args = pysswords.__main__.main(["--init"])
+                mock_logging.error.assert_called_once_with(
+                    "GPG not installed: https://gnupg.org/download")
+
+    @timethis
     def test_main_parse_args_returns_argparse_namespace(self):
         args = pysswords.__main__.parse_args(["--init"])
         self.assertIsInstance(args, argparse.Namespace)

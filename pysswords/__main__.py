@@ -5,6 +5,8 @@ from pkg_resources import get_distribution
 
 from .cli import CLI
 from .db import CredentialExistsError, CredentialNotFoundError
+from .utils import which
+
 
 __project__ = 'pysswords'
 __version__ = get_distribution('pysswords').version
@@ -54,6 +56,11 @@ def parse_args(cli_args=None):
 
 
 def main(cli_args=None):
+
+    if not which("gpg"):
+        logging.error("GPG not installed: https://gnupg.org/download")
+        exit(1)
+
     args = parse_args(cli_args)
 
     if args.verbose:
