@@ -508,7 +508,7 @@ class MainTests(unittest.TestCase):
         with patch("pysswords.__main__.which", return_value=None):
             with patch("pysswords.__main__.logging") as mock_logging:
                 with self.assertRaises(SystemExit):
-                    args = pysswords.__main__.main(["--init"])
+                    pysswords.__main__.main(["--init"])
                 mock_logging.error.assert_called_once_with(
                     "GPG not installed: https://gnupg.org/download")
 
@@ -721,7 +721,8 @@ class MainTests(unittest.TestCase):
     def test_main_handles_credential_not_found_error(self):
         fullname = "john@example.com"
         exception = CredentialNotFoundError(fullname)
-        with patch("pysswords.__main__.CLI.get_credentials", side_effect=exception):
+        with patch("pysswords.__main__.CLI.get_credentials",
+                   side_effect=exception):
             with patch("pysswords.__main__.logging") as mock_logging:
                 pysswords.__main__.main(["-g", fullname])
                 mock_logging.error.assert_called_once_with(
@@ -731,7 +732,8 @@ class MainTests(unittest.TestCase):
     def test_main_handles_credential_exists_error(self):
         fullname = "john@example.com"
         exception = CredentialExistsError(fullname)
-        with patch("pysswords.__main__.CLI.add_credential", side_effect=exception):
+        with patch("pysswords.__main__.CLI.add_credential",
+                   side_effect=exception):
             with patch("pysswords.__main__.logging") as mock_logging:
                 pysswords.__main__.main(["-a"])
                 mock_logging.error.assert_called_once_with(
@@ -750,7 +752,8 @@ class MainTests(unittest.TestCase):
     def test_main_handles_credential_valueerror(self):
         fullname = "john@example.com"
         exception = ValueError("Database key not found or corrupted")
-        with patch("pysswords.__main__.CLI.get_credentials", side_effect=exception):
+        with patch("pysswords.__main__.CLI.get_credentials",
+                   side_effect=exception):
             with patch("pysswords.__main__.logging") as mock_logging:
                 pysswords.__main__.main(["--get", fullname])
                 mock_logging.error.assert_called_once_with(
@@ -759,7 +762,8 @@ class MainTests(unittest.TestCase):
     @timethis
     def test_main_handles_credential_keyboardinterrupt(self):
         exception = KeyboardInterrupt()
-        with patch("pysswords.__main__.CLI.add_credential", side_effect=exception):
+        with patch("pysswords.__main__.CLI.add_credential",
+                   side_effect=exception):
             with patch("pysswords.__main__.logging") as mock_logging:
                 pysswords.__main__.main(["--add"])
                 mock_logging.info.assert_called_once_with("Keyboard interrupt")
