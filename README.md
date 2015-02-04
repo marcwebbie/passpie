@@ -28,9 +28,10 @@ Main Features
 + `☑` Bulk update/remove credentials
 + `☑` Select credentials by fullname syntax
 + `☑` Grouping credentials
-+ `☐` Exporting database
-+ `☐` Importing credentials from other applications
++ `☑` Exporting Pysswords database
++ `☑` Importing Pysswords database
 + `☐` Undo/Redo modifications to the database
++ `☐` Importing credentials from other applications
 
 > `☑` implemented feature, `☐` not implemented feature.
 
@@ -71,14 +72,14 @@ pysswords --init
 # add new credentials. Option: `-a` or `--add`
 pysswords -a
 
-# get credential "github". Option: `-g` or `--get`
-pysswords -g github
+# get credential "example". Option: `-g` or `--get`
+pysswords -g example
 
-# remove credential "github". Option: `-r` or `--remove`
-pysswords -r github
+# remove credential "example". Option: `-r` or `--remove`
+pysswords -r example
 
-# edit credential "github". Option: `-u` or `--update`
-pysswords -u github
+# edit credential "example". Option: `-u` or `--update`
+pysswords -u example
 
 # search credentials with the query "octocat". Option: `-s` or `--search`
 pysswords -s octocat
@@ -86,15 +87,24 @@ pysswords -s octocat
 # search credentials with the regular expression "example\.com|org".
 pysswords -s example\.com|org
 
-# copy password from credential "github" into clipboard. Option: `-c` or `--clipboard`
+# copy password from credential "example" into clipboard. Option: `-c` or `--clipboard`
 # this option have to be used with --get|-g option
-pysswords -c -g github
+pysswords -c -g example
 
 # print all credentials as a table with hidden passwords
 pysswords
 
 # print all credentials and show passwords in plain text. Option: `-P` or `--show-password`
 pysswords -P
+
+# delete database and remove all credentials
+pysswords --clean
+
+# export database to a pysswords database file called pysswords.db
+pysswords --export pysswords.db
+
+# import database from pysswords database file called pysswords.db
+pysswords --import pysswords.db
 
 # specify other pysswords database. Option `-D` or `--database`
 pysswords -D /path/to/other/database
