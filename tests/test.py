@@ -656,6 +656,11 @@ class MainTests(unittest.TestCase):
         self.assertIn("verbose", args_short.__dict__)
 
     @timethis
+    def test_main_parse_args_has_clean_arg(self):
+        args = pysswords.__main__.parse_args(["--clean"])
+        self.assertIn("clean", args.__dict__)
+
+    @timethis
     def test_main_handles_verbose_option_setting_logger_level_to_info(self):
         with patch("pysswords.__main__.logging") as mock_logging:
             logger = mock_logging.getLogger()
@@ -766,6 +771,13 @@ class MainTests(unittest.TestCase):
         with patch("pysswords.__main__.CLI") as mocked:
             pysswords.__main__.main(args)
             mocked().show.assert_called_once_with()
+
+    @timethis
+    def test_main_calls_cli_clean_database_when_clean_arg_passed(self):
+        args = ["--clean"]
+        with patch("pysswords.__main__.CLI") as mocked:
+            pysswords.__main__.main(args)
+            mocked().clean_database.assert_called_once_with()
 
     @timethis
     def test_main_calls_copy_to_clipboard_when_clipboard_passed(self):
@@ -940,6 +952,35 @@ class CLITests(unittest.TestCase):
             name=name,
             login=login
         )
+
+    @timethis
+    def test_cli_clean_removes_database_path_with_prompt_confirmation(self, _):
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        with patch("pysswords.cli.CLI.prompt_confirmation") as mock_prompt:
+            mock_prompt.return_value = True
+            with patch("pysswords.cli.shutil.rmtree") as mock_rmtree:
+                interface.clean_database()
+                dbpath = interface.database.path
+                mock_prompt.assert_called_once_with(
+                    "Delete database at '{}'? ".format(dbpath))
+                mock_rmtree.assert_called_once_with(dbpath)
+
+            mock_prompt.return_value = False
+            with patch("pysswords.cli.shutil.rmtree") as mock_rmtree:
+                interface.clean_database()
+                self.assertFalse(mock_rmtree.called)
+
+    @timethis
+    def test_cli_clean_logs_database_deleted_to_info(self, _):
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        with patch("pysswords.cli.CLI.prompt_confirmation") as mock_prompt:
+            mock_prompt.return_value = True
+            with patch("pysswords.cli.shutil.rmtree") as mock_rmtree:
+                with patch("pysswords.cli.logging") as mock_logging:
+                    interface.clean_database()
+                    dbpath = interface.database.path
+                    mock_logging.info.assert_called_once_with(
+                        "Database '{}' deleted.".format(dbpath))
 
     @timethis
     def test_remove_credentials_calls_db_get(self, mockdb):

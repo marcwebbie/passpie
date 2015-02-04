@@ -32,6 +32,8 @@ def parse_args(cli_args=None):
                           help="export encrypted Pysswords database")
     group_db.add_argument("-i", "--importdb",
                           help="import encrypted Pysswords database")
+    group_db.add_argument("--clean", action="store_true",
+                          help="delete database, cleaning all files")
 
     group_cred = parser.add_argument_group("Credential options")
     group_cred.add_argument("-a", "--add", action="store_true",
@@ -86,6 +88,8 @@ def main(cli_args=None):
             interface.exportdb(args.exportdb)
         elif args.importdb:
             interface.importdb(args.importdb)
+        elif args.clean:
+            interface.clean_database()
         elif args.add:
             interface.add_credential()
         elif args.get:

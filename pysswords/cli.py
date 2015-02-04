@@ -1,4 +1,5 @@
 from getpass import getpass
+import shutil
 import logging
 import colorama
 import pyperclip
@@ -176,3 +177,10 @@ class CLI(object):
 
     def importdb(self, dbfile):
         self.database.importdb(dbfile)
+
+    def clean_database(self):
+        confirmed = self.prompt_confirmation(
+            "Delete database at '{}'? ".format(self.database.path))
+        if confirmed:
+            shutil.rmtree(self.database.path)
+            logging.info("Database '{}' deleted.".format(self.database.path))
