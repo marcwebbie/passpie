@@ -24,6 +24,10 @@ def parse_args(cli_args=None):
                           help="create a new Pysswords database")
     group_db.add_argument("-D", "--database", default=default_db(),
                           help="specify path to database")
+    group_db.add_argument("-e", "--exportdb",
+                          help="export encrypted Pysswords database")
+    # group_db.add_argument("-i", "--importdb",
+    #                       help="import encrypted Pysswords database")
 
     group_cred = parser.add_argument_group("Credential options")
     group_cred.add_argument("-a", "--add", action="store_true",
@@ -74,7 +78,11 @@ def main(cli_args=None):
             init=args.init
         )
 
-        if args.add:
+        if args.exportdb:
+            interface.exportdb(args.exportdb)
+        # elif args.importdb:
+        #     importdb(args.importdb, args.database)
+        elif args.add:
             interface.add_credential()
         elif args.get:
             if args.clipboard:

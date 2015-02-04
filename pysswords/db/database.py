@@ -1,6 +1,7 @@
 import fnmatch
 import os
 import re
+import shutil
 import yaml
 
 from pysswords.crypt import create_keyring, getgpg, is_encrypted
@@ -129,3 +130,6 @@ class Database(object):
             passphrase=passphrase
         )
         return True if sign else False
+
+    def exportdb(self, dbfile):
+        os.rename(shutil.make_archive(dbfile, "tar", self.path), dbfile)

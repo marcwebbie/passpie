@@ -412,6 +412,17 @@ class DatabaseTests(unittest.TestCase):
             passphrase=self.passphrase
         )
 
+    @timethis
+    def test_exportdb_creates_tar_with_database_at_given_dbfile_path(self):
+        dbfile = "pysswords.db"
+        with patch("pysswords.db.database.os"):
+            with patch("pysswords.db.database.shutil") as mock_shutil:
+                self.database.exportdb(dbfile=dbfile)
+                mock_shutil.make_archive.assert_called_once_with(
+                    dbfile,
+                    "tar",
+                    self.path)
+
 
 class CredentialTests(unittest.TestCase):
 
@@ -482,6 +493,8 @@ class UtilsTests(unittest.TestCase):
                 mockshutil.which = Mock(side_effect=AttributeError)
                 pysswords.utils.which("python")
             mocked_join.assert_any_call("/", "python.exe")
+
+
 
 
 class MainTests(unittest.TestCase):
@@ -597,6 +610,13 @@ class MainTests(unittest.TestCase):
         self.assertIn("show_password", args_short.__dict__)
 
     @timethis
+    def test_main_parse_args_has_exportdb_arg(self):
+        args = pysswords.__main__.parse_args(["--exportdb", "pysswords.db"])
+        args_short = pysswords.__main__.parse_args(["-e", "pysswords.db"])
+        self.assertIn("exportdb", args.__dict__)
+        self.assertIn("exportdb", args_short.__dict__)
+
+    @timethis
     def test_main_parse_args_get_arg_has_credential_name_passed(self):
         credential_name = "example.com"
         args = pysswords.__main__.parse_args(["--get", credential_name])
@@ -659,6 +679,18 @@ class MainTests(unittest.TestCase):
         with patch("pysswords.__main__.CLI") as mocked:
             pysswords.__main__.main(args)
             mocked().add_credential.assert_called_once_with()
+
+    @timethis
+    def test_main_calls_interface_exportdb_when_exportdb_arg_passed(self):
+        dbfile = "pysswords.db"
+        database = "/path/to/.pysswords"
+        args = ["-e", dbfile, "-D", database]
+        with patch("pysswords.__main__.CLI"):
+            with patch("pysswords.__main__.CLI") as mocked_cli:
+                pysswords.__main__.main(args)
+                mocked_cli().exportdb.assert_called_once_with(
+                    dbfile
+                )
 
     @timethis
     def test_main_calls_cli_get_credentials_when_get_passed(self):
@@ -1132,6 +1164,15 @@ class CLITests(unittest.TestCase):
             with self.assertRaises(ValueError) as raised:
                 interface.copy_to_clipboard("fullname")
             self.assertEqual(str(raised.exception), "Wrong passphrase")
+
+    @timethis
+    def test_cli_calls_database_exportdb_when_exportdb_called(self, _):
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        dbfile = "pysswords.db"
+        interface.exportdb(dbfile)
+        interface.database.exportdb.assert_called_once_with(
+            dbfile)
+
 
 if __name__ == "__main__":
     if sys.version_info >= (3,):

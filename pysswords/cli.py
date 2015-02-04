@@ -170,3 +170,6 @@ class CLI(object):
             self.database.decrypt(credential.password, passphrase))
         logging.info("Password for `{}` copied to clipboard".format(
             asfullname(credential.name, credential.login)))
+
+    def exportdb(self, dbfile):
+        self.database.exportdb(dbfile)
