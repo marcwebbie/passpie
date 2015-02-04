@@ -622,17 +622,13 @@ class MainTests(unittest.TestCase):
 
     @timethis
     def test_main_parse_args_has_exportdb_arg(self):
-        args = pysswords.__main__.parse_args(["--exportdb", "pysswords.db"])
-        args_short = pysswords.__main__.parse_args(["-e", "pysswords.db"])
+        args = pysswords.__main__.parse_args(["--export", "pysswords.db"])
         self.assertIn("exportdb", args.__dict__)
-        self.assertIn("exportdb", args_short.__dict__)
 
     @timethis
     def test_main_parse_args_has_importdb_arg(self):
-        args = pysswords.__main__.parse_args(["--importdb", "pysswords.db"])
-        args_short = pysswords.__main__.parse_args(["-i", "pysswords.db"])
+        args = pysswords.__main__.parse_args(["--import", "pysswords.db"])
         self.assertIn("importdb", args.__dict__)
-        self.assertIn("importdb", args_short.__dict__)
 
     @timethis
     def test_main_parse_args_get_arg_has_credential_name_passed(self):
@@ -704,10 +700,10 @@ class MainTests(unittest.TestCase):
             mocked().add_credential.assert_called_once_with()
 
     @timethis
-    def test_main_calls_interface_exportdb_when_exportdb_arg_passed(self):
+    def test_main_calls_interface_exportdb_when_export_arg_passed(self):
         dbfile = "pysswords.db"
         database = "/path/to/.pysswords"
-        args = ["-e", dbfile, "-D", database]
+        args = ["--export", dbfile, "-D", database]
         with patch("pysswords.__main__.CLI"):
             with patch("pysswords.__main__.CLI") as mocked_cli:
                 pysswords.__main__.main(args)
@@ -719,7 +715,7 @@ class MainTests(unittest.TestCase):
     def test_main_calls_interface_importdb_when_importb_arg_passed(self):
         dbfile = "pysswords.db"
         database = "/path/to/.pysswords"
-        args = ["-i", dbfile, "-D", database]
+        args = ["--import", dbfile, "-D", database]
         with patch("pysswords.__main__.CLI"):
             with patch("pysswords.__main__.CLI") as mocked_cli:
                 pysswords.__main__.main(args)
@@ -1236,7 +1232,7 @@ class CLITests(unittest.TestCase):
             self.assertEqual(str(raised.exception), "Wrong passphrase")
 
     @timethis
-    def test_cli_calls_database_exportdb_when_exportdb_called(self, _):
+    def test_cli_calls_database_exportdb_when_export_called(self, _):
         interface = pysswords.cli.CLI("some path", show_password=False)
         dbfile = "pysswords.db"
         interface.exportdb(dbfile)

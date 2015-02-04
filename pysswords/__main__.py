@@ -28,9 +28,9 @@ def parse_args(cli_args=None):
                           help="create a new Pysswords database")
     group_db.add_argument("-D", "--database", default=default_db(),
                           help="specify path to database")
-    group_db.add_argument("-e", "--exportdb",
+    group_db.add_argument("--export", dest="exportdb",
                           help="export encrypted Pysswords database")
-    group_db.add_argument("-i", "--importdb",
+    group_db.add_argument("--import", dest="importdb",
                           help="import encrypted Pysswords database")
     group_db.add_argument("--clean", action="store_true",
                           help="delete database, cleaning all files")
