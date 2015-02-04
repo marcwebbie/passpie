@@ -21,6 +21,10 @@ from .credential import (
 from pysswords.python_two import makedirs
 
 
+class DatabaseExistsError(Exception):
+    pass
+
+
 class Database(object):
 
     def __init__(self, path):
@@ -30,7 +34,10 @@ class Database(object):
 
     @classmethod
     def create(cls, path, passphrase):
-        os.makedirs(path)
+        try:
+            os.makedirs(path)
+        except OSError:
+            raise DatabaseExistsError("Database exists")
         create_keyring(os.path.join(path, ".keys"), passphrase)
         return Database(path)
 

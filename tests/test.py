@@ -25,7 +25,8 @@ from pysswords.db import (
     Database,
     Credential,
     CredentialNotFoundError,
-    CredentialExistsError
+    CredentialExistsError,
+    DatabaseExistsError
 )
 from pysswords.python_two import *
 
@@ -799,13 +800,14 @@ class MainTests(unittest.TestCase):
                     "Credential '{}' exists".format(fullname))
 
     @timethis
-    def test_main_handles_credential_oserror(self):
+    def test_main_handles_database_exists_error(self):
         fullname = "john@example.com"
-        with patch("pysswords.__main__.CLI.__init__", side_effect=OSError):
-            with patch("pysswords.__main__.logging") as mock_logging:
-                pysswords.__main__.main(["--init"])
-                mock_logging.error.assert_called_once_with(
-                    "Database exists".format(fullname))
+        with patch("pysswords.db.database.os.makedirs", side_effect=OSError):
+            with patch("pysswords.cli.CLI.prompt"):
+                with patch("pysswords.__main__.logging") as mock_logging:
+                    pysswords.__main__.main(["--init"])
+                    mock_logging.error.assert_called_once_with(
+                        "Database exists".format(fullname))
 
     @timethis
     def test_main_handles_credential_valueerror(self):

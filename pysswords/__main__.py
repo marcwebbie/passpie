@@ -4,7 +4,11 @@ import os
 from pkg_resources import get_distribution
 
 from .cli import CLI
-from .db import CredentialExistsError, CredentialNotFoundError
+from .db import (
+    CredentialExistsError,
+    CredentialNotFoundError,
+    DatabaseExistsError
+)
 from .utils import which
 
 
@@ -101,8 +105,8 @@ def main(cli_args=None):
         logging.error("Credential '{}' exists".format(e))
     except CredentialNotFoundError as e:
         logging.error("Credential '{}' not found".format(e))
-    except OSError as e:
-        logging.error("Database exists")
+    except DatabaseExistsError as e:
+        logging.error(str(e))
     except ValueError as e:
         logging.error(str(e))
     except KeyboardInterrupt:
