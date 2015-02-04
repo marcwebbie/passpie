@@ -173,3 +173,6 @@ class CLI(object):
 
     def exportdb(self, dbfile):
         self.database.exportdb(dbfile)
+
+    def importdb(self, dbfile):
+        self.database.importdb(dbfile)

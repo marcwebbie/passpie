@@ -423,6 +423,16 @@ class DatabaseTests(unittest.TestCase):
                     "tar",
                     self.path)
 
+    @timethis
+    def test_importdb_unpacks_dbfile_tar_at_database_path(self):
+        dbfile = "pysswords.db"
+        with patch("pysswords.db.database.tarfile") as mocked:
+            mocked_tar = Mock()
+            mocked.open.return_value.__enter__.return_value = mocked_tar
+            self.database.importdb(dbfile=dbfile)
+            mocked.open.assert_called_once_with(dbfile)
+            mocked_tar.extractall.assert_called_once_with(self.path)
+
 
 class CredentialTests(unittest.TestCase):
 
@@ -617,6 +627,13 @@ class MainTests(unittest.TestCase):
         self.assertIn("exportdb", args_short.__dict__)
 
     @timethis
+    def test_main_parse_args_has_importdb_arg(self):
+        args = pysswords.__main__.parse_args(["--importdb", "pysswords.db"])
+        args_short = pysswords.__main__.parse_args(["-i", "pysswords.db"])
+        self.assertIn("importdb", args.__dict__)
+        self.assertIn("importdb", args_short.__dict__)
+
+    @timethis
     def test_main_parse_args_get_arg_has_credential_name_passed(self):
         credential_name = "example.com"
         args = pysswords.__main__.parse_args(["--get", credential_name])
@@ -691,6 +708,16 @@ class MainTests(unittest.TestCase):
                 mocked_cli().exportdb.assert_called_once_with(
                     dbfile
                 )
+
+    @timethis
+    def test_main_calls_interface_importdb_when_importb_arg_passed(self):
+        dbfile = "pysswords.db"
+        database = "/path/to/.pysswords"
+        args = ["-i", dbfile, "-D", database]
+        with patch("pysswords.__main__.CLI"):
+            with patch("pysswords.__main__.CLI") as mocked_cli:
+                pysswords.__main__.main(args)
+                mocked_cli().importdb.assert_called_once_with(dbfile)
 
     @timethis
     def test_main_calls_cli_get_credentials_when_get_passed(self):
@@ -1171,6 +1198,14 @@ class CLITests(unittest.TestCase):
         dbfile = "pysswords.db"
         interface.exportdb(dbfile)
         interface.database.exportdb.assert_called_once_with(
+            dbfile)
+
+    @timethis
+    def test_cli_calls_database_importdb_when_importdb_called(self, _):
+        interface = pysswords.cli.CLI("some path", show_password=False)
+        dbfile = "pysswords.db"
+        interface.importdb(dbfile)
+        interface.database.importdb.assert_called_once_with(
             dbfile)
 
 

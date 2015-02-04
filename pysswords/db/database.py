@@ -2,6 +2,7 @@ import fnmatch
 import os
 import re
 import shutil
+import tarfile
 import yaml
 
 from pysswords.crypt import create_keyring, getgpg, is_encrypted
@@ -133,3 +134,7 @@ class Database(object):
 
     def exportdb(self, dbfile):
         os.rename(shutil.make_archive(dbfile, "tar", self.path), dbfile)
+
+    def importdb(self, dbfile):
+        with tarfile.open(dbfile) as tar:
+            tar.extractall(self.path)
