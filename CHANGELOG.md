@@ -3,7 +3,7 @@
 ### 0.0.9
 
 + **√** Add export/import database
-+ **√** Add clean database to remove all database
++ **√** Add clean database
 
 ### 0.0.8.3
 
