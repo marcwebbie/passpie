@@ -113,9 +113,7 @@ pysswords --version
 Tutorials
 ---------
 
-Quick tutorials on ways to use Pysswords
-
-### Syncing your database
+### 1) Syncing your database
 
 #### Dropbox
 
@@ -141,7 +139,7 @@ mv ~/.pysswords ~/GoogleDrive/.pysswords
 ln -s ~/GoogleDrive/.pysswords ~/.pysswords
 ```
 
-### Exporting/Importing Pyssword databases
+### 2) Exporting/Importing Pyssword databases
 
 ```bash
 # export database to a pysswords database file called pysswords.db
@@ -154,7 +152,7 @@ pysswords --import pysswords.db
 
 ```
 
-### Grouping credentials by name
+### 3) Grouping credentials by name
 
 Pysswords credentials handles multiple logins for each name which groups credentials by name:
 
@@ -182,7 +180,7 @@ pysswords
 | example.com | john    | ***        | No comment |
 ```
 
-### Selecting credentials by fullname syntax
+### 4) Selecting credentials by fullname syntax
 
 You can select grouped credentials by using fullname syntax `login@name`:
 
@@ -194,7 +192,7 @@ pysswords -g doe@example.com
 | example.com | doe     | ***        |           |
 ```
 
-### Using multiple databases
+### 5) Using multiple databases
 
 Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using `-D` Pysswords option.
 
