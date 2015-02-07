@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import argparse
 import inspect
 import os
@@ -5,7 +7,6 @@ import shutil
 import sys
 import unittest
 import yaml
-import time
 from functools import wraps
 
 import gnupg
