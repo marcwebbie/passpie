@@ -88,14 +88,14 @@ pysswords -s example\.com|org
 # Option: `-c` or `--clipboard`
 pysswords -c -g example
 
-# print all credentials and show passwords in plain text.
-# Option: `-P` or `--show-password`
-pysswords -P
-
 # print all credentials as a table with hidden passwords
 pysswords
 
-# specify other pysswords database. Option `-D` or `--database`
+# print all credentials as a table with passwords in plain text.
+# Option: `-P` or `--show-password`
+pysswords -P
+
+# specify other Pysswords database. Option `-D` or `--database`
 pysswords -D /path/to/other/database
 
 # delete database and remove all credentials
@@ -109,14 +109,15 @@ pysswords --help
 pysswords --version
 ```
 
-------------------------------------------------------------------------
 
 Tutorials
 ---------
 
-#### Syncing your database
+Quick tutorials on ways to use Pysswords
 
-##### Dropbox
+### Syncing your database
+
+#### Dropbox
 
 With Pysswords database on default path `~/.pysswords` and with a Dropbox shared directory on path `~/Dropbox`
 
@@ -128,7 +129,7 @@ mv ~/.pysswords ~/Dropbox/.pysswords
 ln -s ~/Dropbox/.pysswords ~/.pysswords
 ```
 
-##### Google Drive
+#### Google Drive
 
 With Pysswords database on default path `~/.pysswords` and with a GoogleDrive shared directory on path `~/GoogleDrive`
 
@@ -140,7 +141,7 @@ mv ~/.pysswords ~/GoogleDrive/.pysswords
 ln -s ~/GoogleDrive/.pysswords ~/.pysswords
 ```
 
-#### Exporting/Importing Pyssword databases
+### Exporting/Importing Pyssword databases
 
 ```bash
 # export database to a pysswords database file called pysswords.db
@@ -153,7 +154,7 @@ pysswords --import pysswords.db
 
 ```
 
-#### Grouping credentials by name
+### Grouping credentials by name
 
 Pysswords credentials handles multiple logins for each name which groups credentials by name:
 
@@ -181,7 +182,7 @@ pysswords
 | example.com | john    | ***        | No comment |
 ```
 
-#### Selecting credentials by fullname syntax
+### Selecting credentials by fullname syntax
 
 You can select grouped credentials by using fullname syntax `login@name`:
 
@@ -193,12 +194,12 @@ pysswords -g doe@example.com
 | example.com | doe     | ***        |           |
 ```
 
-#### Using multiple databases
+### Using multiple databases
 
 Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using `-D` Pysswords option.
 
 
-###### Creating databases on a given directory (ex: `~/databases`)
+##### Creating databases on a given directory (ex: `~/databases`)
 
 ```bash
 # create personal Pysswords database
@@ -211,7 +212,7 @@ pysswords --init -D ~/databases/work_passwords
 pysswords --init -D ~/databases/junk_passwords
 ```
 
-###### Adding passwords to specific database
+##### Adding passwords to specific database
 
 ```bash
 # add password to personal Pysswords database
@@ -228,6 +229,7 @@ pysswords -D ~/databases/junk_passwords -a
 pysswords -D ~/databases/junk_passwords
 ```
 
+------------------------------------------------------------------------
 
 Under The Hood
 --------------
