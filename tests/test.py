@@ -5,6 +5,7 @@ import inspect
 import os
 import shutil
 import sys
+import time
 import unittest
 import yaml
 from functools import wraps
@@ -26,10 +27,9 @@ from pysswords.db import (
     Database,
     Credential,
     CredentialNotFoundError,
-    CredentialExistsError,
-    DatabaseExistsError
+    CredentialExistsError
 )
-from pysswords.python_two import *
+from pysswords.python_two import BUILTINS_NAME
 
 
 TEST_DIR = os.path.join(os.path.dirname(os.path.relpath(__file__)))
