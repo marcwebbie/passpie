@@ -36,6 +36,7 @@ clean:
 	rm -rf dist
 
 coverage:
+	pip install coverage
 	coverage run --source=$(PACKAGE) --omit=$(PACKAGE)/python_two.py setup.py test
 	coverage report -m
 
