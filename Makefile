@@ -63,6 +63,11 @@ tox: set-python
 test:
 	python -W ignore setup.py -q test
 
+test-py3:
+	pyenv local $(PY34)
+	pyenv rehash
+	python -W ignore setup.py -q test
+
 test-benchmark:
 	BENCHMARK=True python -W ignore setup.py -q test
 
