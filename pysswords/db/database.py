@@ -35,7 +35,7 @@ class Database(object):
     @classmethod
     def create(cls, path, passphrase):
         try:
-            os.makedirs(path)
+            makedirs(path, exist_ok=False)
         except OSError:
             raise DatabaseExistsError("Database exists")
         create_keyring(os.path.join(path, ".keys"), passphrase)
