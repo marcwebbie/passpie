@@ -113,6 +113,7 @@ pysswords --help
 pysswords --version
 ```
 
+----
 
 ### Tutorials
 
@@ -122,7 +123,7 @@ pysswords --version
 
 With Pysswords database on default path `~/.pysswords` and with a Dropbox shared directory on path `~/Dropbox`
 
-```
+```bash
 # move your Pysswords database inside your Dropbox directory
 mv ~/.pysswords ~/Dropbox/.pysswords
 
@@ -134,7 +135,7 @@ ln -s ~/Dropbox/.pysswords ~/.pysswords
 
 With Pysswords database on default path `~/.pysswords` and with a GoogleDrive shared directory on path `~/GoogleDrive`
 
-```
+```bash
 # move your Pysswords database inside your Dropbox directory
 mv ~/.pysswords ~/GoogleDrive/.pysswords
 
@@ -144,7 +145,7 @@ ln -s ~/GoogleDrive/.pysswords ~/.pysswords
 
 #### Exporting/Importing Pyssword databases
 
-```
+```bash
 # export database to a pysswords database file called pysswords.db
 # Option: `--export`
 pysswords --export pysswords.db
@@ -159,7 +160,7 @@ pysswords --import pysswords.db
 
 Pysswords credentials handles multiple logins for each name which groups credentials by name:
 
-```
+```bash
 # create john credential
 pysswords -a
 Name: example.com
@@ -187,7 +188,7 @@ pysswords
 
 You can select grouped credentials by using fullname syntax `login@name`:
 
-```
+```bash
 pysswords -g doe@example.com
 
 | Name        | Login   | Password   | Comment   |
@@ -202,7 +203,7 @@ Sometimes it is useful to have multiple databases with different passphrases for
 
 ###### Creating databases on a given directory (ex: `~/databases`)
 
-```
+```bash
 # create personal Pysswords database
 pysswords --init -D ~/databases/personal_passwords
 
@@ -215,7 +216,7 @@ pysswords --init -D ~/databases/junk_passwords
 
 ###### Adding passwords to specific database
 
-```
+```bash
 # add password to personal Pysswords database
 pysswords -D ~/databases/personal_passwords -a
 
@@ -225,7 +226,7 @@ pysswords -D ~/databases/junk_passwords -a
 
 ###### Adding passwords to specific database
 
-```
+```bash
 # listing specific databases
 pysswords -D ~/databases/junk_passwords
 ```
@@ -321,7 +322,7 @@ License ([MIT License](http://choosealicense.com/licenses/mit/))
 
 The MIT License (MIT)
 
-Copyright (c) 2014 Marc Webbie, <http://github.com/marcwebbie>
+Copyright (c) 2014-2015 Marc Webbie, <http://github.com/marcwebbie>
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
