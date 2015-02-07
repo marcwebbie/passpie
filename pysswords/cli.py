@@ -5,11 +5,11 @@ import colorama
 import pyperclip
 from tabulate import tabulate
 
-from .python_two import input
+from .python_two import is_python2, input
 from .db.credential import splitname, asfullname
 from .db import(
     Database,
-    Credential,
+    Credential
 )
 
 
@@ -103,7 +103,6 @@ class CLI(object):
                 credential.comment
             ]
             table.append(row)
-
         return tabulate(table, self.headers, tablefmt=self.tablefmt)
 
     def show(self, credentials=None, color="yellow"):
