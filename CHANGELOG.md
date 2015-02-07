@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.0.9.1
+
++ **√** Fixes python2 unicode input
+
 ### 0.0.9
 
 + **√** Add export/import database

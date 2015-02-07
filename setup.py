@@ -7,7 +7,7 @@ requirements = [pkg.strip() for pkg in open(requirements_file).readlines()]
 with open("README.md") as f:
     long_description = f.read() + '\n'
 
-__version__ = "0.0.9"
+__version__ = "0.0.9.1"
 
 setup(
     name='pysswords',
