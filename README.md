@@ -75,39 +75,36 @@ pysswords -a
 # get credential "example". Option: `-g` or `--get`
 pysswords -g example
 
-# remove credential "example". Option: `-r` or `--remove`
-pysswords -r example
-
 # edit credential "example". Option: `-u` or `--update`
 pysswords -u example
 
-# search credentials with the query "octocat". Option: `-s` or `--search`
-pysswords -s octocat
+# remove credential "example". Option: `-r` or `--remove`
+pysswords -r example
 
-# search credentials with the regular expression "example\.com|org".
+# search credentials by "exam". Option: `-s` or `--search`
+pysswords -s exam
+
+# search credentials using regular expressions Option: `-s` or `--search`.
 pysswords -s example\.com|org
 
-# copy password from credential "example" into clipboard. Option: `-c` or `--clipboard`
+# copy password from credential "example" into system clipboard.
 # this option have to be used with --get|-g option
+# Option: `-c` or `--clipboard`
 pysswords -c -g example
+
+# print all credentials and show passwords in plain text.
+# Option: `-P` or `--show-password`
+pysswords -P
 
 # print all credentials as a table with hidden passwords
 pysswords
 
-# print all credentials and show passwords in plain text. Option: `-P` or `--show-password`
-pysswords -P
-
-# delete database and remove all credentials
-pysswords --clean
-
-# export database to a pysswords database file called pysswords.db
-pysswords --export pysswords.db
-
-# import database from pysswords database file called pysswords.db
-pysswords --import pysswords.db
-
 # specify other pysswords database. Option `-D` or `--database`
 pysswords -D /path/to/other/database
+
+# delete database and remove all credentials
+# Option: `--clean`
+pysswords --clean
 
 # shows help. Option `-h` or `--help`
 pysswords --help
@@ -117,53 +114,120 @@ pysswords --version
 ```
 
 
-### Grouping
+### Tutorials
 
-Pysswords credentials can have multiple names which groups credentials with the same name together:
+#### Syncing your database
+
+##### Dropbox
+
+With Pysswords database on default path `~/.pysswords` and with a Dropbox shared directory on path `~/Dropbox`
 
 ```
+# move your Pysswords database inside your Dropbox directory
+mv ~/.pysswords ~/Dropbox/.pysswords
+
+# create a symbolic link to your shared .pysswords directory on the default path.
+ln -s ~/Dropbox/.pysswords ~/.pysswords
+```
+
+##### Google Drive
+
+With Pysswords database on default path `~/.pysswords` and with a GoogleDrive shared directory on path `~/GoogleDrive`
+
+```
+# move your Pysswords database inside your Dropbox directory
+mv ~/.pysswords ~/GoogleDrive/.pysswords
+
+# create a symbolic link to your shared .pysswords directory on the default path.
+ln -s ~/GoogleDrive/.pysswords ~/.pysswords
+```
+
+#### Exporting/Importing Pyssword databases
+
+```
+# export database to a pysswords database file called pysswords.db
+# Option: `--export`
+pysswords --export pysswords.db
+
+# import database from pysswords database file called pysswords.db
+# Option: `--import`
+pysswords --import pysswords.db
+
+```
+
+#### Grouping credentials by name
+
+Pysswords credentials handles multiple logins for each name which groups credentials by name:
+
+```
+# create john credential
 pysswords -a
 Name: example.com
 Login: john
 Password: **********
 Comment: No comment
-```
 
-```
+# create doe credential
 pysswords -a
 Name: example.com
 Login: doe
 Password: **********
 Comment:
-```
 
-###### Output
-
-```
+# listing credentials
+pysswords
 
 | Name        | Login   | Password   | Comment    |
 |-------------+---------+------------+------------|
 | example.com | doe     | ***        |            |
 | example.com | john    | ***        | No comment |
-
 ```
 
-### Fullname syntax
+#### Selecting credentials by fullname syntax
 
 You can select grouped credentials by using fullname syntax `login@name`:
 
 ```
 pysswords -g doe@example.com
-```
-
-###### Output
-
-```
 
 | Name        | Login   | Password   | Comment   |
 |-------------+---------+------------+-----------|
 | example.com | doe     | ***        |           |
+```
 
+#### Using multiple databases
+
+Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using `-D` Pysswords option.
+
+
+###### Creating databases on a given directory (ex: `~/databases`)
+
+```
+# create personal Pysswords database
+pysswords --init -D ~/databases/personal_passwords
+
+# create work Pysswords database
+pysswords --init -D ~/databases/work_passwords
+
+# create junk Pysswords database
+pysswords --init -D ~/databases/junk_passwords
+```
+
+###### Adding passwords to specific database
+
+```
+# add password to personal Pysswords database
+pysswords -D ~/databases/personal_passwords -a
+
+# add password to junk Pysswords database
+pysswords -D ~/databases/junk_passwords -a
+```
+
+###### Adding passwords to specific database
+
+```
+# listing specific databases
+pysswords -D ~/databases/junk_passwords
 ```
 
 
@@ -172,15 +236,15 @@ Under The Hood
 
 ### Encryption
 
-Encryption is done with **GnuGPG** using [AES256](http://en.wikipedia.org/wiki/Advanced_Encryption_Standard). Take a look at [pysswords.crypt](https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py) module to know more.
-
 ### Database Path
 
 The default database path is at `~/.pysswords`. If you want to change the database path, add `--database` option to pysswords together with `--init`.
 
 ```bash
-pysswords --init --database "/path/to/database/"
+pysswords --init --database "/path/to/another/database/"
 ```
+
+Encryption is done with **GnuGPG** using [AES256](http://en.wikipedia.org/wiki/Advanced_Encryption_Standard). Take a look at [pysswords.crypt](https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py) module to know more.
 
 ### Database structure
 
@@ -239,7 +303,7 @@ tree /tmp/pysswords -la
 # │   └── trustdb.gpg
 # └── github
 #     └── octocat.pyssword
-#     └── example.pyssword
+#     └── octocat2.pyssword
 ```
 
 
