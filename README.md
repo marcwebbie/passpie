@@ -13,7 +13,6 @@ section.
 
 ------------------------------------------------------------------------
 
-
 Main Features
 -------------
 
@@ -35,7 +34,6 @@ Main Features
 
 > `☑` implemented feature, `☐` not implemented feature.
 
-
 Installation
 ------------
 
@@ -53,14 +51,12 @@ Mac/linux | Windows
 ----------|---------
 [![Build](https://travis-ci.org/marcwebbie/pysswords.svg)](https://travis-ci.org/marcwebbie/pysswords) | [![Build on windows](https://ci.appveyor.com/api/projects/status/5b7p1vo3y9x3y35t?svg=true)](https://ci.appveyor.com/project/marcwebbie/pysswords)
 
-
 The **latest development version** can be installed directly from GitHub:
 
 ```bash
 # Universal
 $ pip install --upgrade https://github.com/marcwebbie/pysswords/tarball/master
 ```
-
 
 Quickstart
 ----------
@@ -113,9 +109,10 @@ pysswords --help
 pysswords --version
 ```
 
-----
+------------------------------------------------------------------------
 
-### Tutorials
+Tutorials
+---------
 
 #### Syncing your database
 
