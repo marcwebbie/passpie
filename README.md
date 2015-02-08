@@ -221,8 +221,6 @@ pysswords -D ~/databases/junk_passwords -a
 pysswords -D ~/databases/junk_passwords
 ```
 
-------------------------------------------------------------------------
-
 ## Under The Hood
 
 ### Encryption
