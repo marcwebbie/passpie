@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.0.9.2
+
++ **√** Bug fixes on python2
+
 ### 0.0.9.1
 
 + **√** Fixes python2 unicode input

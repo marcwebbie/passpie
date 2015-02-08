@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from getpass import getpass
 import shutil
 import logging
