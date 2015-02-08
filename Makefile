@@ -4,13 +4,11 @@
 # install pyenv (UBUNTU): `sudo apt-get install pyenv`
 
 PACKAGE=pysswords
-
 PY27 = 2.7.9
 PY32 = 3.2.6
 PY33 = 3.3.6
 PY34 = 3.4.2
 PYPY = pypy-2.4.0
-
 
 set-python:
 	pyenv local $(PY27) $(PY32) $(PY33) $(PY34) $(PYPY)
@@ -50,14 +48,6 @@ dist:
 	@echo "--------------------------"
 	@ls -l ./dist/
 
-run:
-	$(eval $(pyenv virtualenv-init -))
-	zsh -c "pyenv activate /tmp/my-virtual-env-2.7.9"
-	pyenv deactivate
-
-deploy:
-	python setup.py sdist bdist_wheel upload -r pypi
-
 tox: set-python
 	tox
 
@@ -76,4 +66,11 @@ test-all: tox
 
 all: set-python test-all
 
-.PHONY: clean coverage setup test wheel dist run install-python all
+# Pypi targets
+deploy:
+	python setup.py sdist bdist_wheel upload -r pypi
+
+register:
+	python setup.py register
+
+.PHONY: clean coverage setup test wheel dist run install-python all deploy register
