@@ -29,6 +29,7 @@ from pysswords.db import (
     CredentialNotFoundError,
     CredentialExistsError
 )
+from pysswords.db import parsers
 from pysswords.python_two import BUILTINS_NAME
 
 
@@ -434,6 +435,29 @@ class DatabaseTests(unittest.TestCase):
             self.database.importdb(dbfile=dbfile)
             mocked.open.assert_called_once_with(dbfile)
             mocked_tar.extractall.assert_called_once_with(self.path)
+
+    @timethis
+    def test_importdb_calls_import1password_if_1pif_file(self):
+        dbfile = "passwords.1pif"
+        self.database.import1password = Mock()
+        self.database.importdb(dbfile=dbfile)
+        self.database.import1password.assert_called_once_with(dbfile)
+
+    @timethis
+    def test_import1password_adds_credentials_to_database(self):
+        dbfile = os.path.join(TEST_DATA_DIR, "passwords.1pif")
+        self.database.import1password(dbfile)
+        self.assertIn("Github", [c.name for c in self.database.credentials])
+        self.assertIn("Bank", [c.name for c in self.database.credentials])
+
+class ParsersTests(unittest.TestCase):
+
+    @timethis
+    def test_import1password_parses_file_correctly(self):
+        dbfile = os.path.join(TEST_DATA_DIR, "passwords.1pif")
+        credentials = parsers.onepassword(dbfile)
+        self.assertEqual(len(credentials), 2)
+        self.assertTrue(all(True for c in credentials if type(c) == type({})))
 
 
 class CredentialTests(unittest.TestCase):

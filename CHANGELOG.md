@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.0.11
+
++ **√** import credentials from export 1password 1pif file
+
 ### 0.0.10
 
 + **√** Remove dependency on --get for --clipboard option.

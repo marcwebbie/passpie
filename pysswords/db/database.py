@@ -17,7 +17,7 @@ from .credential import (
     asstring,
     asfullname
 )
-
+from . import parsers
 from pysswords.python_two import makedirs
 
 
@@ -143,5 +143,14 @@ class Database(object):
         os.rename(shutil.make_archive(dbfile, "tar", self.path), dbfile)
 
     def importdb(self, dbfile):
-        with tarfile.open(dbfile) as tar:
-            tar.extractall(self.path)
+        _, ext = os.path.splitext(dbfile)
+        if ext == ".1pif":
+            self.import1password(dbfile)
+        else:
+            with tarfile.open(dbfile) as tar:
+                tar.extractall(self.path)
+
+    def import1password(self, dbfile):
+        creds = parsers.onepassword(dbfile)
+        for credential in creds:
+            self.add(**credential)

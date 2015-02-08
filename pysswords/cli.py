@@ -6,7 +6,7 @@ import colorama
 import pyperclip
 from tabulate import tabulate
 
-from .python_two import is_python2, input
+from .python_two import input
 from .db.credential import splitname, asfullname
 from .db import(
     Database,

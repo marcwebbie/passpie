@@ -142,6 +142,8 @@ pysswords --export pysswords.db
 # Option: `--import`
 pysswords --import pysswords.db
 
+# import 1password 1pif exported file
+pysswords --import passwords.1pif/data1.1pif
 ```
 
 ### 3) Grouping credentials by name
