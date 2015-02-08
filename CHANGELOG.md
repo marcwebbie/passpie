@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.0.10
+
++ **√** Remove dependency on --get for --clipboard option.
+
 ### 0.0.9.2
 
 + **√** Bug fixes on python2

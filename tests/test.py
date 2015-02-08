@@ -672,16 +672,6 @@ class MainTests(unittest.TestCase):
         self.assertEqual(args.search, credential_name)
 
     @timethis
-    def test_main_raises_error_when_clipboard_passed_without_get_args(self):
-        with open(os.devnull, 'w') as devnull:
-            with patch("sys.stderr", devnull):
-                with self.assertRaises(SystemExit):
-                    pysswords.__main__.parse_args(["--clipboard"])
-            with patch("sys.stderr", devnull):
-                with self.assertRaises(SystemExit):
-                    pysswords.__main__.parse_args(["-c"])
-
-    @timethis
     def test_main_calls_cli_constructor_with_init_when_init_passed(self):
         tmp_path = "/tmp/.pysswords"
         args = ["-D", tmp_path, "--init"]
@@ -779,12 +769,11 @@ class MainTests(unittest.TestCase):
     @timethis
     def test_main_calls_copy_to_clipboard_when_clipboard_passed(self):
         fullname = "john.doe@example.com"
-        args = ["-D", "/tmp/pysswords", "--clipboard", "--get", fullname]
+        args = ["-D", "/tmp/pysswords", "--clipboard", fullname]
         with patch("pysswords.__main__.CLI") as mocked:
             pysswords.__main__.main(args)
             mocked().copy_to_clipboard.assert_called_once_with(
-                fullname=fullname
-            )
+                fullname=fullname)
 
     @timethis
     def test_main_handles_credential_not_found_error(self):

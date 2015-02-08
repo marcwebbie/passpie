@@ -29,9 +29,9 @@ def parse_args(cli_args=None):
                           help="create a new Pysswords database")
     group_db.add_argument("-D", "--database", default=default_db(),
                           help="specify path to database")
-    group_db.add_argument("--export", dest="exportdb",
+    group_db.add_argument("--export", dest="exportdb", metavar="DATABASE_FILE",
                           help="export encrypted Pysswords database")
-    group_db.add_argument("--import", dest="importdb",
+    group_db.add_argument("--import", dest="importdb", metavar="DATABASE_FILE",
                           help="import encrypted Pysswords database")
     group_db.add_argument("--clean", action="store_true",
                           help="delete database, cleaning all files")
@@ -39,16 +39,16 @@ def parse_args(cli_args=None):
     group_cred = parser.add_argument_group("Credential options")
     group_cred.add_argument("-a", "--add", action="store_true",
                             help="add new credential")
-    group_cred.add_argument("-g", "--get",
+    group_cred.add_argument("-g", "--get", metavar="FULLNAME",
                             help="get credentials by name")
-    group_cred.add_argument("-u", "--update",
+    group_cred.add_argument("-u", "--update", metavar="FULLNAME",
                             help="update credentials")
-    group_cred.add_argument("-r", "--remove",
+    group_cred.add_argument("-r", "--remove", metavar="FULLNAME",
                             help="remove credentials")
+    group_cred.add_argument("-c", "--clipboard", metavar="FULLNAME",
+                            help="copy credential password to clipboard")
     group_cred.add_argument("-s", "--search",
                             help="search credentials. [regex supported]")
-    group_cred.add_argument("-c", "--clipboard", action="store_true",
-                            help="copy credential password to clipboard")
     group_cred.add_argument("-P", "--show-password", action="store_true",
                             help="show credentials passwords as plain text")
 
@@ -60,9 +60,6 @@ def parse_args(cli_args=None):
                                help="Print verbose output")
 
     args = parser.parse_args(cli_args)
-    if args.clipboard and not args.get:
-        parser.error('-g argument is required in when using -c')
-
     return args
 
 
@@ -93,11 +90,10 @@ def main(cli_args=None):
             interface.clean_database()
         elif args.add:
             interface.add_credential()
+        elif args.clipboard:
+            interface.copy_to_clipboard(fullname=args.clipboard)
         elif args.get:
-            if args.clipboard:
-                interface.copy_to_clipboard(fullname=args.get)
-            else:
-                interface.get_credentials(fullname=args.get)
+            interface.get_credentials(fullname=args.get)
         elif args.search:
             interface.search_credentials(query=args.search)
         elif args.update:

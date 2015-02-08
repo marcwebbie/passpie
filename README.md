@@ -79,9 +79,8 @@ pysswords -s exam
 pysswords -s example\.com|org
 
 # copy password from credential "example" into system clipboard.
-# this option have to be used with --get|-g option
 # Option: `-c` or `--clipboard`
-pysswords -c -g example
+pysswords -c example
 
 # print all credentials as a table with hidden passwords
 pysswords
