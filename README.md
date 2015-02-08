@@ -1,5 +1,4 @@
-Pysswords: Manage your passwords from the terminal
-==================================================
+# Pysswords: Manage your passwords from the terminal
 
 [Pysswords](https://marcwebbie.github.io/pysswords) lets you manage
 your login credentials from the terminal. Password files are saved into
@@ -13,8 +12,7 @@ section.
 
 ------------------------------------------------------------------------
 
-Main Features
--------------
+## Main Features
 
 + `☑` Console interface
 + `☑` Manage multiple databases
@@ -34,8 +32,7 @@ Main Features
 
 > `☑` implemented feature, `☐` not implemented feature.
 
-Installation
-------------
+## Installation
 
 ### Stable version ![pypi version](https://img.shields.io/pypi/v/pysswords.svg)
 
@@ -58,8 +55,7 @@ The **latest development version** can be installed directly from GitHub:
 $ pip install --upgrade https://github.com/marcwebbie/pysswords/tarball/master
 ```
 
-Quickstart
-----------
+## Quickstart
 
 ```bash
 # create a new credentials database. Option: `-I` or `--init`
@@ -109,9 +105,7 @@ pysswords --help
 pysswords --version
 ```
 
-
-Tutorials
----------
+## Tutorials
 
 ### 1) Syncing your database
 
@@ -197,7 +191,7 @@ pysswords -g doe@example.com
 Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using `-D` Pysswords option.
 
 
-##### Creating databases on a given directory (ex: `~/databases`)
+#### Creating databases on a given directory (ex: `~/databases`)
 
 ```bash
 # create personal Pysswords database
@@ -210,7 +204,7 @@ pysswords --init -D ~/databases/work_passwords
 pysswords --init -D ~/databases/junk_passwords
 ```
 
-##### Adding passwords to specific database
+#### Adding passwords to specific database
 
 ```bash
 # add password to personal Pysswords database
@@ -220,7 +214,7 @@ pysswords -D ~/databases/personal_passwords -a
 pysswords -D ~/databases/junk_passwords -a
 ```
 
-###### Adding passwords to specific database
+##### Adding passwords to specific database
 
 ```bash
 # listing specific databases
@@ -229,10 +223,11 @@ pysswords -D ~/databases/junk_passwords
 
 ------------------------------------------------------------------------
 
-Under The Hood
---------------
+## Under The Hood
 
 ### Encryption
+
+Encryption is done with **GnuGPG** using [AES256](http://en.wikipedia.org/wiki/Advanced_Encryption_Standard). Take a look at [pysswords.crypt](https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py) module to know more.
 
 ### Database Path
 
@@ -241,8 +236,6 @@ The default database path is at `~/.pysswords`. If you want to change the databa
 ```bash
 pysswords --init --database "/path/to/another/database/"
 ```
-
-Encryption is done with **GnuGPG** using [AES256](http://en.wikipedia.org/wiki/Advanced_Encryption_Standard). Take a look at [pysswords.crypt](https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py) module to know more.
 
 ### Database structure
 
@@ -304,18 +297,14 @@ tree /tmp/pysswords -la
 #     └── octocat2.pyssword
 ```
 
-
-Contributing
-------------
+## Contributing
 
 - Fork the repository [https://github.com/marcwebbie/pysswords/fork](https://github.com/marcwebbie/pysswords/fork)
 - Read the [Makefile](https://github.com/marcwebbie/pysswords/blob/master/Makefile)
 - Write your tests on `tests/test.py`
 - If everything is OK. push your changes and make a pull request. ;)
 
-
-License ([MIT License](http://choosealicense.com/licenses/mit/))
-----------------------------------------------------------------
+## License ([MIT License](http://choosealicense.com/licenses/mit/))
 
 The MIT License (MIT)
 
