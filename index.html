@@ -74,9 +74,10 @@ section.</p>
 <li>
 <code>☑</code> Importing Pysswords database</li>
 <li>
-<code>☐</code> Undo/Redo modifications to the database</li>
+<code>☑</code> Importing credentials from <a href="https://agilebits.com/onepassword">1password</a>
+</li>
 <li>
-<code>☐</code> Importing credentials from other applications</li>
+<code>☐</code> Undo/Redo updates to the database</li>
 </ul>
 
 <blockquote>
@@ -142,9 +143,8 @@ pysswords -s exam
 pysswords -s example<span class="pl-cce">\.</span>com<span class="pl-k">|</span>org
 
 <span class="pl-c"># copy password from credential "example" into system clipboard.</span>
-<span class="pl-c"># this option have to be used with --get|-g option</span>
 <span class="pl-c"># Option: `-c` or `--clipboard`</span>
-pysswords -c -g example
+pysswords -c example
 
 <span class="pl-c"># print all credentials as a table with hidden passwords</span>
 pysswords
@@ -204,7 +204,9 @@ pysswords --export pysswords.db
 <span class="pl-c"># import database from pysswords database file called pysswords.db</span>
 <span class="pl-c"># Option: `--import`</span>
 pysswords --import pysswords.db
-</pre></div>
+
+<span class="pl-c"># import 1password 1pif exported file</span>
+pysswords --import passwords.1pif/data1.1pif</pre></div>
 
 <h3>
 <a id="3-grouping-credentials-by-name" class="anchor" href="#3-grouping-credentials-by-name" aria-hidden="true"><span class="octicon octicon-link"></span></a>3) Grouping credentials by name</h3>
