@@ -70,11 +70,13 @@ section.</p>
 <li>
 <code>☑</code> Grouping credentials</li>
 <li>
-<code>☐</code> Exporting database</li>
+<code>☑</code> Exporting Pysswords database</li>
 <li>
-<code>☐</code> Importing credentials from other applications</li>
+<code>☑</code> Importing Pysswords database</li>
 <li>
 <code>☐</code> Undo/Redo modifications to the database</li>
+<li>
+<code>☐</code> Importing credentials from other applications</li>
 </ul>
 
 <blockquote>
@@ -124,33 +126,39 @@ pysswords --init
 <span class="pl-c"># add new credentials. Option: `-a` or `--add`</span>
 pysswords -a
 
-<span class="pl-c"># get credential "github". Option: `-g` or `--get`</span>
-pysswords -g github
+<span class="pl-c"># get credential "example". Option: `-g` or `--get`</span>
+pysswords -g example
 
-<span class="pl-c"># remove credential "github". Option: `-r` or `--remove`</span>
-pysswords -r github
+<span class="pl-c"># edit credential "example". Option: `-u` or `--update`</span>
+pysswords -u example
 
-<span class="pl-c"># edit credential "github". Option: `-u` or `--update`</span>
-pysswords -u github
+<span class="pl-c"># remove credential "example". Option: `-r` or `--remove`</span>
+pysswords -r example
 
-<span class="pl-c"># search credentials with the query "octocat". Option: `-s` or `--search`</span>
-pysswords -s octocat
+<span class="pl-c"># search credentials by "exam". Option: `-s` or `--search`</span>
+pysswords -s exam
 
-<span class="pl-c"># search credentials with the regular expression "example\.com|org".</span>
+<span class="pl-c"># search credentials using regular expressions Option: `-s` or `--search`.</span>
 pysswords -s example<span class="pl-cce">\.</span>com<span class="pl-k">|</span>org
 
-<span class="pl-c"># copy password from credential "github" into clipboard. Option: `-c` or `--clipboard`</span>
+<span class="pl-c"># copy password from credential "example" into system clipboard.</span>
 <span class="pl-c"># this option have to be used with --get|-g option</span>
-pysswords -c -g github
+<span class="pl-c"># Option: `-c` or `--clipboard`</span>
+pysswords -c -g example
 
 <span class="pl-c"># print all credentials as a table with hidden passwords</span>
 pysswords
 
-<span class="pl-c"># print all credentials and show passwords in plain text. Option: `-P` or `--show-password`</span>
+<span class="pl-c"># print all credentials as a table with passwords in plain text.</span>
+<span class="pl-c"># Option: `-P` or `--show-password`</span>
 pysswords -P
 
-<span class="pl-c"># specify other pysswords database. Option `-D` or `--database`</span>
-pysswords -D /path/to/other/database -g
+<span class="pl-c"># specify other Pysswords database. Option `-D` or `--database`</span>
+pysswords -D /path/to/other/database
+
+<span class="pl-c"># delete database and remove all credentials</span>
+<span class="pl-c"># Option: `--clean`</span>
+pysswords --clean
 
 <span class="pl-c"># shows help. Option `-h` or `--help`</span>
 pysswords --help
@@ -158,53 +166,115 @@ pysswords --help
 <span class="pl-c"># shows version. Option `--version`</span>
 pysswords --version</pre></div>
 
+<h2>
+<a id="tutorials" class="anchor" href="#tutorials" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tutorials</h2>
+
 <h3>
-<a id="grouping" class="anchor" href="#grouping" aria-hidden="true"><span class="octicon octicon-link"></span></a>Grouping</h3>
+<a id="1-syncing-your-database" class="anchor" href="#1-syncing-your-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>1) Syncing your database</h3>
 
-<p>Pysswords credentials can have multiple names which groups credentials with the same name together:</p>
+<h4>
+<a id="dropbox" class="anchor" href="#dropbox" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dropbox</h4>
 
-<pre><code>pysswords -a
+<p>With Pysswords database on default path <code>~/.pysswords</code> and with a Dropbox shared directory on path <code>~/Dropbox</code></p>
+
+<div class="highlight highlight-bash"><pre><span class="pl-c"># move your Pysswords database inside your Dropbox directory</span>
+mv <span class="pl-k">~</span>/.pysswords <span class="pl-k">~</span>/Dropbox/.pysswords
+
+<span class="pl-c"># create a symbolic link to your shared .pysswords directory on the default path.</span>
+ln -s <span class="pl-k">~</span>/Dropbox/.pysswords <span class="pl-k">~</span>/.pysswords</pre></div>
+
+<h4>
+<a id="google-drive" class="anchor" href="#google-drive" aria-hidden="true"><span class="octicon octicon-link"></span></a>Google Drive</h4>
+
+<p>With Pysswords database on default path <code>~/.pysswords</code> and with a GoogleDrive shared directory on path <code>~/GoogleDrive</code></p>
+
+<div class="highlight highlight-bash"><pre><span class="pl-c"># move your Pysswords database inside your Dropbox directory</span>
+mv <span class="pl-k">~</span>/.pysswords <span class="pl-k">~</span>/GoogleDrive/.pysswords
+
+<span class="pl-c"># create a symbolic link to your shared .pysswords directory on the default path.</span>
+ln -s <span class="pl-k">~</span>/GoogleDrive/.pysswords <span class="pl-k">~</span>/.pysswords</pre></div>
+
+<h3>
+<a id="2-exportingimporting-pyssword-databases" class="anchor" href="#2-exportingimporting-pyssword-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>2) Exporting/Importing Pyssword databases</h3>
+
+<div class="highlight highlight-bash"><pre><span class="pl-c"># export database to a pysswords database file called pysswords.db</span>
+<span class="pl-c"># Option: `--export`</span>
+pysswords --export pysswords.db
+
+<span class="pl-c"># import database from pysswords database file called pysswords.db</span>
+<span class="pl-c"># Option: `--import`</span>
+pysswords --import pysswords.db
+</pre></div>
+
+<h3>
+<a id="3-grouping-credentials-by-name" class="anchor" href="#3-grouping-credentials-by-name" aria-hidden="true"><span class="octicon octicon-link"></span></a>3) Grouping credentials by name</h3>
+
+<p>Pysswords credentials handles multiple logins for each name which groups credentials by name:</p>
+
+<div class="highlight highlight-bash"><pre><span class="pl-c"># create john credential</span>
+pysswords -a
 Name: example.com
 Login: john
-Password: **********
+Password: <span class="pl-k">**********</span>
 Comment: No comment
-</code></pre>
 
-<pre><code>pysswords -a
+<span class="pl-c"># create doe credential</span>
+pysswords -a
 Name: example.com
 Login: doe
-Password: **********
+Password: <span class="pl-k">**********</span>
 Comment:
-</code></pre>
 
-<h6>
-<a id="output" class="anchor" href="#output" aria-hidden="true"><span class="octicon octicon-link"></span></a>Output</h6>
+<span class="pl-c"># listing credentials</span>
+pysswords
 
-<pre><code>
-| Name        | Login   | Password   | Comment    |
-|-------------+---------+------------+------------|
-| example.com | doe     | ***        |            |
-| example.com | john    | ***        | No comment |
-
-</code></pre>
+<span class="pl-k">|</span> Name        <span class="pl-k">|</span> Login   <span class="pl-k">|</span> Password   <span class="pl-k">|</span> Comment    <span class="pl-k">|</span>
+<span class="pl-k">|</span>-------------+---------+------------+------------<span class="pl-k">|</span>
+<span class="pl-k">|</span> example.com <span class="pl-k">|</span> doe     <span class="pl-k">|</span> <span class="pl-k">***</span>        <span class="pl-k">|</span>            <span class="pl-k">|</span>
+<span class="pl-k">|</span> example.com <span class="pl-k">|</span> john    <span class="pl-k">|</span> <span class="pl-k">***</span>        <span class="pl-k">|</span> No comment <span class="pl-k">|</span></pre></div>
 
 <h3>
-<a id="fullname-syntax" class="anchor" href="#fullname-syntax" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fullname syntax</h3>
+<a id="4-selecting-credentials-by-fullname-syntax" class="anchor" href="#4-selecting-credentials-by-fullname-syntax" aria-hidden="true"><span class="octicon octicon-link"></span></a>4) Selecting credentials by fullname syntax</h3>
 
 <p>You can select grouped credentials by using fullname syntax <code>login@name</code>:</p>
 
-<pre><code>pysswords -g doe@example.com
-</code></pre>
+<div class="highlight highlight-bash"><pre>pysswords -g doe@example.com
 
-<h6>
-<a id="output-1" class="anchor" href="#output-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Output</h6>
+<span class="pl-k">|</span> Name        <span class="pl-k">|</span> Login   <span class="pl-k">|</span> Password   <span class="pl-k">|</span> Comment   <span class="pl-k">|</span>
+<span class="pl-k">|</span>-------------+---------+------------+-----------<span class="pl-k">|</span>
+<span class="pl-k">|</span> example.com <span class="pl-k">|</span> doe     <span class="pl-k">|</span> <span class="pl-k">***</span>        <span class="pl-k">|</span>           <span class="pl-k">|</span></pre></div>
 
-<pre><code>
-| Name        | Login   | Password   | Comment   |
-|-------------+---------+------------+-----------|
-| example.com | doe     | ***        |           |
+<h3>
+<a id="5-using-multiple-databases" class="anchor" href="#5-using-multiple-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>5) Using multiple databases</h3>
 
-</code></pre>
+<p>Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using <code>-D</code> Pysswords option.</p>
+
+<h4>
+<a id="creating-databases-on-a-given-directory-ex-databases" class="anchor" href="#creating-databases-on-a-given-directory-ex-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating databases on a given directory (ex: <code>~/databases</code>)</h4>
+
+<div class="highlight highlight-bash"><pre><span class="pl-c"># create personal Pysswords database</span>
+pysswords --init -D <span class="pl-k">~</span>/databases/personal_passwords
+
+<span class="pl-c"># create work Pysswords database</span>
+pysswords --init -D <span class="pl-k">~</span>/databases/work_passwords
+
+<span class="pl-c"># create junk Pysswords database</span>
+pysswords --init -D <span class="pl-k">~</span>/databases/junk_passwords</pre></div>
+
+<h4>
+<a id="adding-passwords-to-specific-database" class="anchor" href="#adding-passwords-to-specific-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding passwords to specific database</h4>
+
+<div class="highlight highlight-bash"><pre><span class="pl-c"># add password to personal Pysswords database</span>
+pysswords -D <span class="pl-k">~</span>/databases/personal_passwords -a
+
+<span class="pl-c"># add password to junk Pysswords database</span>
+pysswords -D <span class="pl-k">~</span>/databases/junk_passwords -a</pre></div>
+
+<h5>
+<a id="adding-passwords-to-specific-database-1" class="anchor" href="#adding-passwords-to-specific-database-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding passwords to specific database</h5>
+
+<div class="highlight highlight-bash"><pre><span class="pl-c"># listing specific databases</span>
+pysswords -D <span class="pl-k">~</span>/databases/junk_passwords</pre></div>
 
 <h2>
 <a id="under-the-hood" class="anchor" href="#under-the-hood" aria-hidden="true"><span class="octicon octicon-link"></span></a>Under The Hood</h2>
@@ -219,12 +289,13 @@ Comment:
 
 <p>The default database path is at <code>~/.pysswords</code>. If you want to change the database path, add <code>--database</code> option to pysswords together with <code>--init</code>.</p>
 
-<div class="highlight highlight-bash"><pre>pysswords --init --database <span class="pl-s1"><span class="pl-pds">"</span>/path/to/database/<span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-bash"><pre>pysswords --init --database <span class="pl-s1"><span class="pl-pds">"</span>/path/to/another/database/<span class="pl-pds">"</span></span></pre></div>
 
 <h3>
 <a id="database-structure" class="anchor" href="#database-structure" aria-hidden="true"><span class="octicon octicon-link"></span></a>Database structure</h3>
 
-<p>Pysswords database is structured in a directory hierachy. Every credential is a <code>.pyssword</code> file inside a directory named after a credential group.</p>
+<p>Pysswords database is structured in a directory hierachy. Every
+credential is a <code>.pyssword</code> file inside a directory named after a credential group.</p>
 
 <p>An empty database would look like this:</p>
 
@@ -273,7 +344,7 @@ tree /tmp/pysswords -la
 <span class="pl-c"># │   └── trustdb.gpg</span>
 <span class="pl-c"># └── github</span>
 <span class="pl-c">#     └── octocat.pyssword</span>
-<span class="pl-c">#     └── example.pyssword</span></pre></div>
+<span class="pl-c">#     └── octocat2.pyssword</span></pre></div>
 
 <h2>
 <a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
@@ -293,7 +364,7 @@ tree /tmp/pysswords -la
 
 <p>The MIT License (MIT)</p>
 
-<p>Copyright (c) 2014 Marc Webbie, <a href="http://github.com/marcwebbie">http://github.com/marcwebbie</a></p>
+<p>Copyright (c) 2014-2015 Marc Webbie, <a href="http://github.com/marcwebbie">http://github.com/marcwebbie</a></p>
 
 <p>Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
