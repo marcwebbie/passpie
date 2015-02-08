@@ -36,22 +36,21 @@ section.
 
 ### Stable version ![pypi version](https://img.shields.io/pypi/v/pysswords.svg)
 
-Make sure you have [GPG](https://www.gnupg.org/) and [pip](http://pip.readthedocs.org/en/latest/installing.html) installed.
+Make sure you have [GPG](https://www.gnupg.org/) and [pip](http://pip.readthedocs.org/en/latest/installing.html) installed:
 
 ```bash
 pip install pysswords
 ```
 
-### Development version [![Test Coverage](https://img.shields.io/coveralls/marcwebbie/pysswords.svg)](https://coveralls.io/r/marcwebbie/pysswords) [![Code Health](https://landscape.io/github/marcwebbie/pysswords/master/landscape.svg)](https://landscape.io/github/marcwebbie/pysswords/master).
+### Development version [![Test Coverage](https://img.shields.io/coveralls/marcwebbie/pysswords.svg)](https://coveralls.io/r/marcwebbie/pysswords) [![Code Health](https://landscape.io/github/marcwebbie/pysswords/master/landscape.svg)](https://landscape.io/github/marcwebbie/pysswords/master)
 
-Mac/linux | Windows
+Linux/OSX | Windows
 ----------|---------
 [![Build](https://travis-ci.org/marcwebbie/pysswords.svg)](https://travis-ci.org/marcwebbie/pysswords) | [![Build on windows](https://ci.appveyor.com/api/projects/status/5b7p1vo3y9x3y35t?svg=true)](https://ci.appveyor.com/project/marcwebbie/pysswords)
 
 The **latest development version** can be installed directly from GitHub:
 
 ```bash
-# Universal
 $ pip install --upgrade https://github.com/marcwebbie/pysswords/tarball/master
 ```
 
