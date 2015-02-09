@@ -59,7 +59,7 @@ test-py3:
 	pyenv rehash
 	python -W ignore setup.py -q test
 
-test-benchmark:
+benchmark:
 	BENCHMARK=True python -W ignore setup.py -q test
 
 test-all: tox
@@ -73,4 +73,4 @@ deploy:
 register:
 	python setup.py register
 
-.PHONY: clean coverage setup test wheel dist run install-python all deploy register
+.PHONY: clean coverage setup test wheel dist run install-python all deploy register benchmark
