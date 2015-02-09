@@ -12,17 +12,19 @@ from .db import(
     Database,
     Credential
 )
+from .utils import genpass
 
 
 class CLI(object):
 
-    def __init__(self, database_path, show_password, init=False):
+    def __init__(self, database_path, show_password, init=False, randompass=False):
         if init:
             self.create_database(path=database_path)
         self.database = Database(database_path)
         self.headers = ["Name", "Login", "Password", "Comment"]
         self.tablefmt = "orgtbl"
         self.show_password = show_password
+        self.randompass = randompass
 
     @classmethod
     def colored(cls, text, color):
@@ -57,14 +59,17 @@ class CLI(object):
         return cls.prompt_password(text) if password else input(text)
 
     @classmethod
-    def prompt_credential(cls):
-        credential_dict = {
-            "name": cls.prompt("Name: "),
-            "login": cls.prompt("Login: "),
-            "password": cls.prompt("Password: ", password=True),
-            "comment": cls.prompt("Comment: ")
-        }
-        return credential_dict
+    def prompt_credential(cls, random_password=False):
+        cred_dict = {}
+        cred_dict["name"] = cls.prompt("Name: ")
+        cred_dict["login"] = cls.prompt("Login: ")
+        if random_password:
+            cred_dict["password"] = genpass()
+            logging.info("Random password generated")
+        else:
+            cred_dict["password"] = cls.prompt("Password: ", password=True)
+        cred_dict["comment"] = cls.prompt("Comment: ")
+        return cred_dict
 
     @classmethod
     def prompt_confirmation(cls, text):
@@ -119,7 +124,7 @@ class CLI(object):
             self.write("\n{}\n".format(table))
 
     def add_credential(self):
-        credential = self.prompt_credential()
+        credential = self.prompt_credential(random_password=self.randompass)
         fullname = asfullname(credential["name"], credential["login"])
         self.database.add(**credential)
         logging.info("Added credential '{}'".format(fullname))
@@ -147,7 +152,7 @@ class CLI(object):
         self.show(self.database.get(name=name, login=login), color="Red")
         confirmed = self.prompt_confirmation("Edit these credentials?")
         if confirmed:
-            values = self.prompt_credential()
+            values = self.prompt_credential(random_password=self.randompass)
             clean_values = {k: v for k, v in values.items() if v}
             updated_credentials = self.database.update(
                 name=name,

@@ -51,6 +51,8 @@ def parse_args(cli_args=None):
                             help="search credentials. [regex supported]")
     group_cred.add_argument("-P", "--show-password", action="store_true",
                             help="show credentials passwords as plain text")
+    group_cred.add_argument("-R", "--random", action="store_true",
+                            help="randomly generate a password for credential")
 
     group_runtime = parser.add_argument_group("Default options")
     group_runtime.add_argument("--version", action="version",
@@ -79,7 +81,8 @@ def main(cli_args=None):
         interface = CLI(
             database_path=args.database,
             show_password=args.show_password,
-            init=args.init
+            init=args.init,
+            randompass=args.random
         )
 
         if args.exportdb:

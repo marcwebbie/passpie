@@ -28,6 +28,7 @@ section.
 + `☑` Exporting Pysswords database
 + `☑` Importing Pysswords database
 + `☑` Importing credentials from [1password](https://agilebits.com/onepassword)
++ `☑` Randomly generated credential passwords
 + `☐` Undo/Redo updates to the database
 
 > `☑` implemented feature, `☐` not implemented feature.

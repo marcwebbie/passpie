@@ -13,11 +13,11 @@ from functools import wraps
 import gnupg
 
 try:
-    from unittest.mock import patch, Mock
+    from unittest.mock import patch, Mock, DEFAULT
     from io import StringIO
 except ImportError:
     # backwards compatbility with Python2
-    from mock import patch, Mock
+    from mock import patch, Mock, DEFAULT
     from StringIO import StringIO
 
 __file__ = os.path.relpath(inspect.getsourcefile(lambda _: None))
@@ -530,7 +530,10 @@ class UtilsTests(unittest.TestCase):
                 pysswords.utils.which("python")
             mocked_join.assert_any_call("/", "python.exe")
 
-
+    @timethis
+    def test_genpass_generates_a_password_with_length_32(self):
+        password = pysswords.utils.genpass()
+        self.assertEqual(len(password), 32)
 
 
 class MainTests(unittest.TestCase):
@@ -656,6 +659,11 @@ class MainTests(unittest.TestCase):
         self.assertIn("importdb", args.__dict__)
 
     @timethis
+    def test_main_parse_args_has_random_arg(self):
+        args = pysswords.__main__.parse_args(["--random"])
+        self.assertIn("random", args.__dict__)
+
+    @timethis
     def test_main_parse_args_get_arg_has_credential_name_passed(self):
         credential_name = "example.com"
         args = pysswords.__main__.parse_args(["--get", credential_name])
@@ -704,7 +712,8 @@ class MainTests(unittest.TestCase):
             mocked.assert_called_once_with(
                 database_path=tmp_path,
                 show_password=False,
-                init=True
+                init=True,
+                randompass=False
             )
 
     @timethis
@@ -851,6 +860,14 @@ class MainTests(unittest.TestCase):
                 pysswords.__main__.main(["--add"])
                 mock_logging.info.assert_called_once_with("Keyboard interrupt")
 
+    @timethis
+    def test_main_creates_interface_with_random_pass_true(self):
+        dbpath = "/tmp/pysswords"
+        args = ["-a", "--random", "-D", dbpath]
+        with patch("pysswords.__main__.CLI") as mocked:
+            pysswords.__main__.main(args)
+            self.assertIsNotNone(mocked.call_args[-1].get("randompass"))
+            self.assertTrue(mocked.call_args[-1]["randompass"])
 
 @patch("pysswords.cli.Database")
 class CLITests(unittest.TestCase):
@@ -1260,6 +1277,46 @@ class CLITests(unittest.TestCase):
         interface.importdb(dbfile)
         interface.database.importdb.assert_called_once_with(
             dbfile)
+
+    @timethis
+    def test_cli_prompt_credential_calls_utils_genpass(self, _):
+        interface = pysswords.cli.CLI("some path",
+                                      show_password=False,
+                                      randompass=True)
+        with patch("pysswords.cli.CLI.prompt"):
+            with patch("pysswords.cli.logging") as mocked_logger:
+                msg = "Random password generated"
+                with patch("pysswords.cli.genpass") as mocked:
+                    interface.prompt_credential(random_password=True)
+                    mocked.assert_called_once_with()
+                    mocked_logger.info.assert_called_once_with(msg)
+
+    @timethis
+    def test_cli_add_calls_prompt_credential_with_random_password_true(self, _):
+        interface = pysswords.cli.CLI("some path",
+                                      show_password=False,
+                                      randompass=True)
+        with patch("pysswords.cli.CLI.prompt_credential") as mocked:
+            with patch("pysswords.cli.CLI.prompt"):
+                with patch("pysswords.cli.genpass"):
+                    interface.add_credential()
+                    self.assertTrue(
+                        mocked.call_args[-1].get("random_password"))
+
+    @timethis
+    def test_cli_update_calls_prompt_credential_with_random_password_true(self, _):
+        interface = pysswords.cli.CLI("some path",
+                                      show_password=False,
+                                      randompass=True)
+        with patch.multiple("pysswords.cli.CLI",
+                            prompt=DEFAULT,
+                            prompt_confirmation=DEFAULT,
+                            show=DEFAULT):
+            with patch("pysswords.cli.CLI.prompt_credential") as mocked:
+                with patch("pysswords.cli.genpass"):
+                    interface.update_credentials("fullname")
+                    self.assertTrue(
+                        mocked.call_args[-1].get("random_password"))
 
 
 if __name__ == "__main__":

@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.0.12
+
++ **√** generate random credential passwords for Add/Update
+
 ### 0.0.11
 
 + **√** import credentials from export 1password 1pif file
