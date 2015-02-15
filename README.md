@@ -14,24 +14,22 @@ section.
 
 ## Main Features
 
-+ `☑` Console interface
-+ `☑` Manage multiple databases
-+ `☑` Add, edit, remove credentials
-+ `☑` Copy passwords to clipboard
-+ `☑` List credentials as a table
-+ `☑` Colored output
-+ `☑` Search credentials by name, login or comments
-+ `☑` Search with regular expression
-+ `☑` Bulk update/remove credentials
-+ `☑` Select credentials by fullname syntax
-+ `☑` Grouping credentials
-+ `☑` Exporting Pysswords database
-+ `☑` Importing Pysswords database
-+ `☑` Importing credentials from [1password](https://agilebits.com/onepassword)
-+ `☑` Randomly generated credential passwords
-+ `☐` Undo/Redo updates to the database
-
-> `☑` implemented feature, `☐` not implemented feature.
++ [x] Console interface
++ [x] Manage multiple databases
++ [x] Add, edit, remove credentials
++ [x] Copy passwords to clipboard
++ [x] List credentials as a table
++ [x] Colored output
++ [x] Search credentials by name, login or comments
++ [x] Search with regular expression
++ [x] Bulk update/remove credentials
++ [x] Select credentials by fullname syntax
++ [x] Grouping credentials
++ [x] Exporting Pysswords database
++ [x] Importing Pysswords database
++ [x] Importing credentials from [1Password](https://agilebits.com/onepassword)
++ [x] Randomly generated credential passwords
++ [ ] Undo/Redo updates to the database
 
 ## Installation
 
