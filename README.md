@@ -1,6 +1,6 @@
 # Pysswords: Manage your passwords from the terminal
 
-[Pysswords](https://marcwebbie.github.io/pysswords) lets you manage
+[Pysswords](https://marcwebbie.github.io/pysswords) (pronounced Py-Swords) lets you manage
 your login credentials from the terminal. Password files are saved into
 [GnuPG](http://en.wikipedia.org/wiki/GNU_Privacy_Guard) encrypted files
 into the Database Path\_. Only with the passphrase used to create the
@@ -300,6 +300,7 @@ tree /tmp/pysswords -la
 - Read the [Makefile](https://github.com/marcwebbie/pysswords/blob/master/Makefile)
 - Write your tests on `tests/test.py`
 - If everything is OK. push your changes and make a pull request. ;)
+
 
 ## License ([MIT License](http://choosealicense.com/licenses/mit/))
 
