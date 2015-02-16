@@ -2,7 +2,7 @@
 
 [Pysswords](https://marcwebbie.github.io/pysswords) lets you manage
 your login credentials from the terminal. Password files are saved into
-[GnuGPG](http://en.wikipedia.org/wiki/GNU_Privacy_Guard) encrypted files
+[GnuPG](http://en.wikipedia.org/wiki/GNU_Privacy_Guard) encrypted files
 into the Database Path\_. Only with the passphrase used to create the
 pyssword database you can decrypt password files. If you want to know
 more about how pysswords works internally, check the Under the Hood\_
