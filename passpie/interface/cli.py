@@ -54,8 +54,8 @@ def init(passphrase, force):
 @cli.command()
 @click.argument("fullname")
 @click.password_option(help="credential password")
-@click.option('--random', 'password', flag_value=genpass())
-@click.option('--comment', default="", help="credential comment")
+@click.option('-R', '--random', 'password', flag_value=genpass())
+@click.option('-C', '--comment', default="", help="credential comment")
 def add(fullname, password, comment):
     db = Database(config.path)
     login, name = split_fullname(fullname)
