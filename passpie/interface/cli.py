@@ -20,7 +20,7 @@ __version__ = "0.1.rc1"
 config = Namespace(
     path=os.path.expanduser("~/.passpie"),
     show_password=False,
-    headers=("name", "login", "password", "comment"),
+    headers=("name", "login", "password", "comment", "modified"),
     hidden=("password",),
     colors={"name": "yellow", "login": "green"},
     tablefmt="rst",
@@ -46,14 +46,14 @@ def cli(ctx, database, verbose):
         table = OrderedDict()
 
         for header in config.headers:
-            table[header] = [c[header] for c in credentials]
             if header in config.hidden:
                 table[header] = [None for c in credentials]
             elif header in config.colors:
-                table[header] = [click.style(c[header], config.colors[header])
+                color = config.colors[header]
+                table[header] = [click.style(c.get(header, ""), color)
                                  for c in credentials]
             else:
-                table[header] = [c[header] for c in credentials]
+                table[header] = [c.get(header, "") for c in credentials]
 
         click.echo(tabulate(table))
 
