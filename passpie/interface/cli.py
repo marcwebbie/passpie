@@ -1,10 +1,13 @@
 from argparse import Namespace
+from collections import OrderedDict
 from datetime import datetime
+from functools import partial
 import os
 import shutil
 
 import click
 from tinydb.queries import where
+from tabulate import tabulate
 
 from passpie.crypt import Cryptor
 from passpie.credential import split_fullname
@@ -17,20 +20,42 @@ __version__ = "0.1.rc1"
 config = Namespace(
     path=os.path.expanduser("~/.passpie"),
     show_password=False,
+    headers=("name", "login", "password", "comment"),
+    hidden=("password",),
+    colors={"name": "yellow", "login": "green"},
+    tablefmt="rst",
+    missingval="*****"
 )
+
+tabulate = partial(tabulate,
+                   headers="keys",
+                   tablefmt=config.tablefmt,
+                   numalign='left',
+                   missingval=config.missingval)
 
 
 @click.group(invoke_without_command=True)
 @click.option('-D', '--database', metavar="PATH", help="alternative database")
-@click.option('-P', '--show-password', is_flag=True, help="show passwords")
 @click.option('-v', '--verbose', is_flag=True, help="verbose debug output")
 @click.version_option(version=__version__)
 @click.pass_context
-def cli(ctx, database, show_password, verbose):
+def cli(ctx, database, verbose):
     if ctx.invoked_subcommand is None:
         db = Database(config.path)
-        for cred in sorted(db.all(), key=lambda x: x["login"]+x["name"]):
-            click.echo("%(login)s@%(name)s" % cred)
+        credentials = sorted(db.all(), key=lambda x: x["login"]+x["name"])
+        table = OrderedDict()
+
+        for header in config.headers:
+            table[header] = [c[header] for c in credentials]
+            if header in config.hidden:
+                table[header] = [None for c in credentials]
+            elif header in config.colors:
+                table[header] = [click.style(c[header], config.colors[header])
+                                 for c in credentials]
+            else:
+                table[header] = [c[header] for c in credentials]
+
+        click.echo(tabulate(table))
 
 
 @cli.command()

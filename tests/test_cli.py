@@ -7,8 +7,11 @@ from passpie._compat import FileExistsError
 
 
 class CLIDefaultTests(MockerTestCase):
+
     def setUp(self):
         self.MockDB = self.patch("passpie.interface.cli.Database")
+        self.mock_config = self.patch("passpie.interface.cli.config")
+        self.mock_config.headers = ["name", "login"]
 
     def test_default_command_prints_all_credentials(self):
         db = self.MockDB()
@@ -18,12 +21,31 @@ class CLIDefaultTests(MockerTestCase):
             {"name": "example", "login": "spam"},
         ]
         db.all.return_value = credentials
+
         runner = CliRunner()
         result = runner.invoke(cli.cli)
 
         for cred in credentials:
             self.assertIn(cred["name"], result.output)
             self.assertIn(cred["login"], result.output)
+
+    def test_default_command_hides_config_hidden_columns(self):
+        self.mock_config.hidden = ["login"]
+
+        db = self.MockDB()
+        credentials = [
+            {"name": "example", "login": "foo"},
+            {"name": "example", "login": "bar"},
+            {"name": "example", "login": "spam"},
+        ]
+        db.all.return_value = credentials
+
+        runner = CliRunner()
+        result = runner.invoke(cli.cli)
+
+        for cred in credentials:
+            self.assertIn(cred["name"], result.output)
+            self.assertNotIn(cred["login"], result.output)
 
 
 class CliInitTests(MockerTestCase):
