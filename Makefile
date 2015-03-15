@@ -52,7 +52,7 @@ clean:
 	rm -rf __pycache__ || true
 
 coverage:
-	pip install coverage
+	pip install coverage --ignore-installed
 	coverage run --source=$(PACKAGE) --omit=$(PACKAGE)/_compat.py setup.py test
 	coverage report -m --fail-under=100
 
@@ -70,9 +70,11 @@ register:
 	python setup.py register
 
 check:
+	pip install flake8 --ignore-installed
 	flake8 $(PACKAGE) $(PACKAGE_TESTS)
 
 tox: set-python
+	pip install flake8 --ignore-installed
 	tox
 
 test-py2:
