@@ -8,13 +8,8 @@ import string
 def genpass(length=32, special="_-#|+="):
     """generates a password with random chararcters
     """
-    chars = "{}{}{}{}{}".format(
-        special,
-        string.ascii_uppercase,
-        string.digits,
-        string.ascii_lowercase,
-        string.whitespace)
-    return "".join(random.SystemRandom().choice(chars) for _ in range(length))
+    chars = special + string.ascii_letters + string.digits + " "
+    return "".join(random.choice(chars) for _ in range(length))
 
 
 @contextmanager

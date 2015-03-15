@@ -129,9 +129,18 @@ class CLIAddTests(MockerTestCase):
         db.get.return_value = {"name", name, "login", login}
 
         runner = CliRunner()
-        result = runner.invoke(
-            cli.add, [fullname, "--password", "pwd", "--comment", "comment"])
+        result = runner.invoke(cli.add, [fullname, "--password", "pwd"])
 
         message_exists = "Credential {} already exists.\n".format(fullname)
         message_abort = "Aborted!\n"
         self.assertEqual(result.output, message_exists + message_abort)
+
+    def test_add_credential_with_random_password(self):
+        fullname = "foo@example"
+        login, name = split_fullname(fullname)
+        db = self.MockDB()
+        db.get.return_value = {}
+
+        runner = CliRunner()
+        result = runner.invoke(cli.add, [fullname, "--random"])
+        self.assertEqual(result.exit_code, 0)

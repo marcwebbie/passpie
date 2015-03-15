@@ -9,6 +9,7 @@ from tinydb.queries import where
 from passpie.crypt import Cryptor
 from passpie.credential import split_fullname
 from passpie.database import Database
+from passpie.utils import genpass
 from passpie._compat import FileExistsError
 
 __version__ = "0.1.rc1"
@@ -52,8 +53,8 @@ def init(passphrase, force):
 
 @cli.command()
 @click.argument("fullname")
-@click.option('--password', help="credential password",
-              prompt=True, hide_input=True, confirmation_prompt=True)
+@click.password_option(help="credential password")
+@click.option('--random', 'password', flag_value=genpass())
 @click.option('--comment', default="", help="credential comment")
 def add(fullname, password, comment):
     db = Database(config.path)
