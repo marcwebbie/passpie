@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 
-__version__ = "0.0.12"
+
+__version__ = "0.13rc1"
 
 requirements_file = "requirements.txt"
 requirements = [pkg.strip() for pkg in open(requirements_file).readlines()]
+requirements_tests = ["mock", "factory_boy", "flake8"]
 
 try:
     import pypandoc
@@ -13,24 +15,23 @@ except(IOError, ImportError):
     long_description = open('README.md').read() + "\n"
 
 setup(
-    name='pysswords',
+    name='passpie',
     version=__version__,
     license='License :: OSI Approved :: MIT License',
     description="Manage your login credentials from the terminal painlessly.",
     long_description=long_description,
     author='Marcwebbie',
     author_email='marcwebbie@gmail.com',
-    url='https://github.com/marcwebbie/pysswords',
-    download_url='https://pypi.python.org/pypi/pysswords',
+    url='https://github.com/marcwebbie/passpie',
+    download_url='https://pypi.python.org/pypi/passpie',
     packages=find_packages(),
-    entry_points={
-        'console_scripts': [
-            'pysswords = pysswords.__main__:main',
-        ]
-    },
+    entry_points="""
+        [console_scripts]
+        passpie=passpie.interface.cli:cli
+    """,
     install_requires=requirements,
-    tests_require=['mock'],
-    test_suite='tests.test',
+    tests_require=requirements_tests,
+    test_suite='tests',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Environment :: Console',
