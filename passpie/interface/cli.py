@@ -6,8 +6,8 @@ import os
 import shutil
 
 import click
-from tinydb.queries import where
 from tabulate import tabulate
+from tinydb.queries import where
 
 from passpie.crypt import Cryptor
 from passpie.credential import split_fullname

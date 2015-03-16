@@ -47,6 +47,23 @@ class CLIDefaultTests(MockerTestCase):
             self.assertIn(cred["name"], result.output)
             self.assertNotIn(cred["login"], result.output)
 
+    def test_default_colorize_columns_from_config_colors(self):
+        self.mock_config.colors = {"login": "red"}
+        self.mock_click = self.patch("passpie.interface.cli.click")
+
+        db = self.MockDB()
+        credentials = [
+            {"name": "example", "login": "foo"},
+            {"name": "example", "login": "bar"},
+            {"name": "example", "login": "spam"},
+        ]
+        db.all.return_value = credentials
+
+        CliRunner().invoke(cli.cli)
+
+        for cred in credentials:
+            self.mock_click.style.assert_any_call(cred["login"], "red")
+
 
 class CliInitTests(MockerTestCase):
 
