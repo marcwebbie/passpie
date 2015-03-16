@@ -6,7 +6,7 @@ __version__ = "0.13rc1"
 
 requirements_file = "requirements.txt"
 requirements = [pkg.strip() for pkg in open(requirements_file).readlines()]
-requirements_tests = ["mock", "factory_boy", "flake8"]
+requirements_tests = ["mock", "flake8", "coverage"]
 
 try:
     import pypandoc
