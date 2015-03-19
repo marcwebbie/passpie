@@ -183,3 +183,26 @@ class CLIAddTests(MockerTestCase):
         runner = CliRunner()
         result = runner.invoke(cli.add, [fullname, "--random"])
         self.assertEqual(result.exit_code, 0)
+
+
+class DatabaseCopyToClipboardTests(MockerTestCase):
+
+    def setUp(self):
+        self.mock_cryptor = self.MagicMock()
+        mock_cryptor_context = self.patch("passpie.interface.cli.Cryptor")
+        mock_cryptor_context().__enter__.return_value = self.mock_cryptor
+        self.MockDB = self.patch("passpie.interface.cli.Database")
+        self.pyperclip = self.patch("passpie.interface.cli.pyperclip")
+
+    def test_copy_to_clipboard_decrypts_password_to_pass_to_pyperclip(self):
+        fullname = "foo@bar"
+        passphrase = "passphrase"
+        runner = CliRunner()
+        result = runner.invoke(
+            cli.copy, [fullname, "--passphrase", passphrase])
+
+        mock_password = self.mock_cryptor.decrypt()
+        self.pyperclip.copy.assert_called_once_with(mock_password)
+        self.assertEqual(
+            result.output,
+            "Password for '{}' copied to clipboard\n".format(fullname))

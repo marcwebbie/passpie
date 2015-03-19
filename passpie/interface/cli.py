@@ -6,6 +6,7 @@ import os
 import shutil
 
 import click
+import pyperclip
 from tabulate import tabulate
 from tinydb.queries import where
 
@@ -89,6 +90,7 @@ def add(fullname, password, comment):
     if not found:
         with Cryptor(config.path) as cryptor:
             password = cryptor.encrypt(password)
+
         cred = dict(name=name,
                     login=login,
                     password=password,
@@ -100,111 +102,15 @@ def add(fullname, password, comment):
         raise click.Abort
 
 
-# @cli.command()
-# @click.argument("fullname")
-# @click.option("-R", "--random", help="generate random password",
-#               flag_value=utils.genpass(__config__["random_length"]))
-# @click.option('--password', metavar="PASSWORD", help="password")
-# @click.option("--comment", default="", help="credential comment")
-# def add(fullname, random, password, comment):
-#     backend = Backend(__config__["database_path"], doctype=Credential)
-#     if random:
-#         password = random
-#     elif not password:
-#         password = click.prompt("Password", hide_input=True,
-#                                 confirmation_prompt=True)
-#     login, name = split_fullname(fullname)
-#     values = {"name": name,
-#               "login": login,
-#               "password": crypt.encrypt(backend.path, password),
-#               "comment": comment}
-#     credential = Credential(values)
-#     backend.insert(credential)
-
-
-# @cli.command("print")
-# def printdb():
-#     database = Backend(__config__["database_path"], doctype=Credential)
-#     headers = ["name", "login", "password", "comment"]
-#     table = []
-#     for credential in database.read():
-#         row = [
-#             click.style(credential.name, fg="yellow"),
-#             credential.login,
-#             "***",
-#             credential.comment
-#         ]
-#         table.append(row)
-#     click.echo(tabulate(table, headers))
-
-
-# @cli.command()
-# @click.argument("fullname")
-# @click.option("-y", "--yes", is_flag=True, help="skip confimation prompts")
-# def remove(fullname, yes):
-#     database = Backend(__config__["database_path"], doctype=Credential)
-#     matcher = Matcher(fullname=fullname)
-#     matched_credentials = database.read(matcher)
-#     if matched_credentials:
-#         for c in matched_credentials:
-#             click.echo(c)
-#         if not yes:
-#             yes = click.confirm(click.style("Remove", fg="red"))
-#         if yes:
-#             database.delete(matcher)
-
-
-# @cli.command()
-# @click.argument("fullname")
-# @click.option("-s", "--search", is_flag=True,
-# help="search by regex matching")
-# @click.option("-y", "--yes", is_flag=True,
-# help="skip confirmation prompt")
-# @click.option("-R", "--random", is_flag=True,
-# help="generate random password")
-# def update(fullname, search, yes, random):
-#     database = Backend(__config__["database_path"], doctype=Credential)
-#     matcher = Matcher(fullname=fullname)
-#     matched_credentials = database.read(matcher)
-#     if matched_credentials:
-#         for c in matched_credentials:
-#             click.echo(c)
-
-#         if not yes:
-#             yes = click.confirm(click.style("Update", fg="red"))
-#         if yes:
-#             if random:
-#                 password_default = utils.genpass(__config__.random_length)
-#             else:
-#                 password_default = "*****"
-
-#             cred = matched_credentials[0]
-#             name = click.prompt("Name", default=cred.name)
-#             login = click.prompt("Login", default=cred.login)
-#             password = click.prompt("Password", default=password_default,
-#                                     confirmation_prompt=True,
-# hide_input=True)
-#             comment = click.prompt("Comment", default=cred.comment)
-
-#             values = {"name": name, "login": login,
-#                       "password": password, "comment": comment}
-#             clean_values = {k: v for k, v in values.items()
-#                             if values[k] != v or v != "*****"}
-
-#             database.update(matcher, clean_values)
-
-
-# @cli.command()
-# @click.argument("fullname")
-# @click.option("-s", "--search", is_flag=True,
-# help="search by regex matching")
-# @click.option('--passphrase', prompt=True, hide_input=True)
-# def clipboard(fullname, search, passphrase):
-#     database = Backend(__config__["database_path"], doctype=Credential)
-#     matcher = Matcher(fullname=fullname)
-#     matched_credentials = database.read(matcher)
-#     if matched_credentials:
-#         credential = matched_credentials[0]
-#         pyperclip.copy(
-#             crypt.decrypt(database.path, credential.password, passphrase))
-#         click.echo("Copied '{}' password to clipboard".format(fullname))
+@cli.command()
+@click.argument("fullname")
+@click.option('--passphrase', prompt=True, hide_input=True,
+              confirmation_prompt=True)
+def copy(fullname, passphrase):
+    db = Database(config.path)
+    login, name = split_fullname(fullname)
+    found = db.get((where("login") == login) & (where("name") == name))
+    if found:
+        with Cryptor(config.path) as cryptor:
+            pyperclip.copy(cryptor.decrypt(found["password"], passphrase))
+        click.echo("Password for '{}' copied to clipboard".format(fullname))
