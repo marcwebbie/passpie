@@ -12,10 +12,13 @@ PY34 = 3.4.2
 PYPY = pypy-2.4.0
 
 
+.PHONY: set-python setup-dev test test-py2 test-pypy wheel dist run install-python deploy register check simulate coverage clean
+
+
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  set-python	=> to set pyenv shell shell version"
-	@echo "  setup		=> to install all needed versions of pyenv"
+	@echo "  setup-dev	=> to install all needed versions of pyenv"
 	@echo "  clean		=> to clean clean all automatically generated files"
 	@echo "  coverage	=> to run coverage"
 	@echo "  dist		=> to build $(PACKAGE)"
@@ -32,12 +35,15 @@ set-python:
 	pyenv local $(PY27) $(PY32) $(PY33) $(PY34) $(PYPY)
 	pyenv rehash
 
-setup:
-	- pyenv install $(PY27) --skip-existing --verbose
-	- pyenv install $(PY32) --skip-existing --verbose
-	- pyenv install $(PY33) --skip-existing --verbose
-	- pyenv install $(PY34) --skip-existing --verbose
-	- pyenv install $(PYPY) --skip-existing --verbose
+scripts:
+	pyenv install --editable .
+
+setup-dev:
+	pyenv install $(PY27) --skip-existing --verbose
+	pyenv install $(PY32) --skip-existing --verbose
+	pyenv install $(PY33) --skip-existing --verbose
+	pyenv install $(PY34) --skip-existing --verbose
+	pyenv install $(PYPY) --skip-existing --verbose
 
 clean:
 	find $(PACKAGE) -name \*.pyc -delete
@@ -95,5 +101,3 @@ simulate: check test test-py2 coverage
 
 deploy: simulate
 	python setup.py sdist bdist_wheel upload -r pypi
-
-.PHONY: clean coverage setup test wheel dist run install-python all deploy register benchmark check-quality
