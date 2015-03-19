@@ -220,6 +220,22 @@ class DatabaseCopyToClipboardTests(MockerTestCase):
             result.output,
             "Credential '{}' not found\nAborted!\n".format(fullname))
 
+    def test_abort_with_wrong_passphrase_message_when_bad_passphrase(self):
+        fullname = "foo@bar"
+        cred = dict(
+            fullname=fullname,
+            name="bar",
+            login="foo",
+            password="encrypted",
+            comment="",
+        )
+        self.MockDB().get.return_value = cred
+
+        runner = CliRunner()
+        result = runner.invoke(cli.copy, [fullname, "--passphrase", "pwd"])
+
+        self.assertEqual(result.output, "Wrong passphrase\nAborted!\n")
+
 
 class UpdateTests(MockerTestCase):
 
@@ -228,6 +244,7 @@ class UpdateTests(MockerTestCase):
         mock_cryptor_context = self.patch("passpie.interface.cli.Cryptor")
         mock_cryptor_context().__enter__.return_value = self.mock_cryptor
         self.MockDB = self.patch("passpie.interface.cli.Database")
+        self.mock_datetime = self.patch("passpie.interface.cli.datetime")
 
     def test_abort_with_not_found_message_when_credential_not_found(self):
         self.MockDB().get.return_value = None
@@ -240,14 +257,72 @@ class UpdateTests(MockerTestCase):
             result.output,
             "Credential '{}' not found\nAborted!\n".format(fullname))
 
+    def test_has_no_confirmation_prompt_when_yes_is_passed(self):
+        fullname = "foo@bar"
+        cred = dict(
+            fullname=fullname,
+            name="bar",
+            login="foo",
+            password="encrypted",
+            comment="",
+            modified=self.mock_datetime.now()
+        )
+        self.MockDB().get.return_value = cred
+        self.mock_click_confirm = self.patch(
+            "passpie.interface.cli.click.confirm")
 
-    # def test_has_no_confirmation_prompt_when_yes_is_passed(self):
-    #     self.MockDB().get.return_value = None
-    #     fullname = "foo@bar"
+        runner = CliRunner()
+        runner.invoke(cli.update, [fullname, "--random"])
 
-    #     runner = CliRunner()
-    #     result = runner.invoke(cli.update, [fullname, "--random"])
+        self.mock_click_confirm.assert_called_once_with(
+            "Update credential '{}'".format(fullname), abort=True)
 
-    #     self.assertEqual(
-    #         result.output,
-    #         "Credential '{}' not found\nAborted!\n".format(fullname))
+    def test_set_values_to_update_if_any(self):
+        self.mock_where = self.patch("passpie.interface.cli.where")
+        fullname = "foo@bar"
+        cred = dict(
+            fullname=fullname,
+            name="bar",
+            login="foo",
+            password="encrypted",
+            comment="",
+            modified=self.mock_datetime.now()
+        )
+        values = cred.copy()
+        new_login = "foozy"
+        new_fullname = "{}@{}".format(new_login, values["name"])
+        values["fullname"] = new_fullname
+        values["login"] = new_login
+
+        self.MockDB().get.return_value = cred
+
+        runner = CliRunner()
+        runner.invoke(cli.update, [fullname, "--login", new_login, "--yes"])
+
+        self.MockDB().update.assert_called_once_with(
+            values, self.mock_where("fullname") == fullname)
+
+    def test_prompt_user_for_each_credential_attribute_if_none_passed(self):
+        mock_click_prompt = self.patch("passpie.interface.cli.click.prompt")
+        fullname = "foo@bar"
+        cred = dict(
+            fullname=fullname,
+            name="bar",
+            login="foo",
+            password="encrypted",
+            comment="",
+        )
+        self.MockDB().get.return_value = cred
+
+        runner = CliRunner()
+        runner.invoke(cli.update, [fullname, "--yes"])
+
+        self.assertEqual(mock_click_prompt.call_count, 4)
+        mock_click_prompt.assert_any_call("Name", default=cred["name"])
+        mock_click_prompt.assert_any_call("Login", default=cred["login"])
+        mock_click_prompt.assert_any_call("Comment", default=cred["comment"])
+        mock_click_prompt.assert_any_call("Password", hide_input=True,
+                                          default=cred["password"],
+                                          confirmation_prompt=True,
+                                          show_default=False,
+                                          prompt_suffix=" [*****]: ")
