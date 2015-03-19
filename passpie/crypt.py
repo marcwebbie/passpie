@@ -5,6 +5,7 @@ import tempfile
 import gnupg
 
 from ._compat import which, FileNotFoundError, FileExistsError
+from .utils import mkdir_open
 
 
 KEY_INPUT = """Key-Type: RSA
@@ -56,7 +57,7 @@ class Cryptor(object):
         keys = self._gpg.gen_key(KEY_INPUT.format(passphrase))
         pubkey = self._gpg.export_keys(keys.fingerprint)
         seckey = self._gpg.export_keys(keys.fingerprint, secret=True)
-        with open(self.keys_path, "w") as keyfile:
+        with mkdir_open(self.keys_path, "w") as keyfile:
             keyfile.write(pubkey + seckey)
 
     def encrypt(self, data):
