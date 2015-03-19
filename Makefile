@@ -12,8 +12,9 @@ PY34 = 3.4.2
 PYPY = pypy-2.4.0
 
 
-.PHONY: set-python setup-dev test test-py2 test-pypy wheel dist run install-python deploy register check simulate coverage clean
+.PHONY: configure set-python setup-dev test test-py2 test-pypy wheel dist run install-python deploy register check simulate coverage clean test-tools
 
+configure: scripts test-tools
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -36,7 +37,10 @@ set-python:
 	pyenv rehash
 
 scripts:
-	pyenv install --editable .
+	pip install --editable .
+
+test-tools:
+	pip install coverage ipython pudb flake8
 
 setup-dev:
 	pyenv install $(PY27) --skip-existing --verbose
@@ -58,7 +62,6 @@ clean:
 	rm -rf __pycache__ || true
 
 coverage:
-	pip install coverage --ignore-installed
 	coverage run --source=$(PACKAGE) --omit=$(PACKAGE)/_compat.py setup.py test
 	coverage report -m --fail-under=100
 
@@ -76,11 +79,9 @@ register:
 	python setup.py register
 
 check:
-	pip install flake8 --ignore-installed
 	flake8 $(PACKAGE) $(PACKAGE_TESTS)
 
 tox: set-python
-	pip install flake8 --ignore-installed
 	tox
 
 test-py2:
