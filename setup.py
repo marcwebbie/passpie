@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 
-__version__ = "0.13rc1"
+__version__ = "0.1beta1"
 
 requirements_file = "requirements.txt"
 requirements = [pkg.strip() for pkg in open(requirements_file).readlines()]
@@ -33,7 +33,7 @@ setup(
     tests_require=requirements_tests,
     test_suite='tests',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 2 - Beta',
         'Environment :: Console',
         'Intended Audience :: End Users/Desktop',
         'Natural Language :: English',
