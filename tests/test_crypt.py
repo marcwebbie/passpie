@@ -77,7 +77,7 @@ class CryptTests(MockerTestCase):
                    self.Mock(return_value=False))
         keys = self.Mock(fingerprint="HEX")
         cryptor._gpg.gen_key.return_value = keys
-        mock_open = self.patch("passpie.crypt.open",
+        mock_open = self.patch("passpie.crypt.mkdir_open",
                                self.mock_open(), create=True)
         mock_keyfile = self.Mock()
         mock_open().__enter__.return_value = mock_keyfile
