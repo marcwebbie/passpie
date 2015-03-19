@@ -113,4 +113,4 @@ def copy(fullname, passphrase):
     if found:
         with Cryptor(config.path) as cryptor:
             pyperclip.copy(cryptor.decrypt(found["password"], passphrase))
-        click.echo("Password for '{}' copied to clipboard".format(fullname))
+        click.echo("Password copied to clipboard".format(fullname))

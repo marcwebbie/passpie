@@ -205,4 +205,4 @@ class DatabaseCopyToClipboardTests(MockerTestCase):
         self.pyperclip.copy.assert_called_once_with(mock_password)
         self.assertEqual(
             result.output,
-            "Password for '{}' copied to clipboard\n".format(fullname))
+            "Password copied to clipboard\n".format(fullname))
