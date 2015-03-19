@@ -44,19 +44,21 @@ def cli(ctx, database, verbose):
     if ctx.invoked_subcommand is None:
         db = Database(config.path)
         credentials = sorted(db.all(), key=lambda x: x["login"]+x["name"])
-        table = OrderedDict()
 
-        for header in config.headers:
-            if header in config.hidden:
-                table[header] = [None for c in credentials]
-            elif header in config.colors:
-                color = config.colors[header]
-                table[header] = [click.style(c.get(header, ""), color)
-                                 for c in credentials]
-            else:
-                table[header] = [c.get(header, "") for c in credentials]
+        if credentials:
+            table = OrderedDict()
 
-        click.echo(tabulate(table))
+            for header in config.headers:
+                if header in config.hidden:
+                    table[header] = [None for c in credentials]
+                elif header in config.colors:
+                    color = config.colors[header]
+                    table[header] = [click.style(c.get(header, ""), color)
+                                     for c in credentials]
+                else:
+                    table[header] = [c.get(header, "") for c in credentials]
+
+            click.echo(tabulate(table))
 
 
 @cli.command()
