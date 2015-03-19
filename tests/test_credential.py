@@ -1,5 +1,5 @@
 from .helpers import MockerTestCase
-from passpie.credential import split_fullname
+from passpie.credential import split_fullname, make_fullname
 
 
 class CredentialTests(MockerTestCase):
@@ -15,3 +15,8 @@ class CredentialTests(MockerTestCase):
         self.assertEqual(split_fullname("@bar"), ("_", "bar"))
         self.assertEqual(
             split_fullname("foo@example.com@bar"), ("foo@example.com", "bar"))
+
+    def test_make_fullname_returns_expected_fullname(self):
+        self.assertEqual(make_fullname("foo", "bar"), "foo@bar")
+        self.assertEqual(make_fullname("_", "bar"), "_@bar")
+        self.assertEqual(make_fullname(None, "bar"), "_@bar")

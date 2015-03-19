@@ -127,6 +127,7 @@ class CLIAddTests(MockerTestCase):
         db = self.MockDB()
         db.get.return_value = None
         cred = dict(
+            fullname=fullname,
             name=name,
             login=login,
             password=encrypted_password,
@@ -148,6 +149,7 @@ class CLIAddTests(MockerTestCase):
         db = self.MockDB()
         db.get.return_value = None
         cred = dict(
+            fullname=fullname,
             name=name,
             login=login,
             password=encrypted_password,
@@ -206,3 +208,46 @@ class DatabaseCopyToClipboardTests(MockerTestCase):
         self.assertEqual(
             result.output,
             "Password copied to clipboard\n".format(fullname))
+
+    def test_abort_with_not_found_message_when_credential_not_found(self):
+        self.MockDB().get.return_value = None
+        fullname = "foo@bar"
+
+        runner = CliRunner()
+        result = runner.invoke(cli.copy, [fullname, "--passphrase", "pwd"])
+
+        self.assertEqual(
+            result.output,
+            "Credential '{}' not found\nAborted!\n".format(fullname))
+
+
+class UpdateTests(MockerTestCase):
+
+    def setUp(self):
+        self.mock_cryptor = self.MagicMock()
+        mock_cryptor_context = self.patch("passpie.interface.cli.Cryptor")
+        mock_cryptor_context().__enter__.return_value = self.mock_cryptor
+        self.MockDB = self.patch("passpie.interface.cli.Database")
+
+    def test_abort_with_not_found_message_when_credential_not_found(self):
+        self.MockDB().get.return_value = None
+        fullname = "foo@bar"
+
+        runner = CliRunner()
+        result = runner.invoke(cli.update, [fullname, "--random"])
+
+        self.assertEqual(
+            result.output,
+            "Credential '{}' not found\nAborted!\n".format(fullname))
+
+
+    # def test_has_no_confirmation_prompt_when_yes_is_passed(self):
+    #     self.MockDB().get.return_value = None
+    #     fullname = "foo@bar"
+
+    #     runner = CliRunner()
+    #     result = runner.invoke(cli.update, [fullname, "--random"])
+
+    #     self.assertEqual(
+    #         result.output,
+    #         "Credential '{}' not found\nAborted!\n".format(fullname))

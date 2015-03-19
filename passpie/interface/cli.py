@@ -11,7 +11,7 @@ from tabulate import tabulate
 from tinydb.queries import where
 
 from passpie.crypt import Cryptor
-from passpie.credential import split_fullname
+from passpie.credential import split_fullname, make_fullname
 from passpie.database import Database
 from passpie.utils import genpass
 from passpie._compat import FileExistsError
@@ -61,7 +61,7 @@ def cli(ctx, database, verbose):
             click.echo(tabulate(table))
 
 
-@cli.command()
+@cli.command(help="Initialize new passpie database")
 @click.option('--passphrase', prompt=True, hide_input=True,
               confirmation_prompt=True)
 @click.option('--force', is_flag=True, help="force overwrite database")
@@ -79,11 +79,11 @@ def init(passphrase, force):
     click.echo("Initialized database in {}".format(config.path))
 
 
-@cli.command()
+@cli.command(help="Add new credential")
 @click.argument("fullname")
-@click.password_option(help="credential password")
+@click.password_option(help="Credential password")
 @click.option('-R', '--random', 'password', flag_value=genpass())
-@click.option('-C', '--comment', default="", help="credential comment")
+@click.option('-C', '--comment', default="", help="Credential comment")
 def add(fullname, password, comment):
     db = Database(config.path)
     login, name = split_fullname(fullname)
@@ -93,7 +93,8 @@ def add(fullname, password, comment):
         with Cryptor(config.path) as cryptor:
             password = cryptor.encrypt(password)
 
-        cred = dict(name=name,
+        cred = dict(fullname=fullname,
+                    name=name,
                     login=login,
                     password=password,
                     comment=comment,
@@ -104,7 +105,7 @@ def add(fullname, password, comment):
         raise click.Abort
 
 
-@cli.command()
+@cli.command(help="Copy credential password to clipboard")
 @click.argument("fullname")
 @click.option('--passphrase', prompt=True, hide_input=True,
               confirmation_prompt=True)
@@ -112,7 +113,61 @@ def copy(fullname, passphrase):
     db = Database(config.path)
     login, name = split_fullname(fullname)
     found = db.get((where("login") == login) & (where("name") == name))
-    if found:
+
+    if not found:
+        click.secho("Credential '{}' not found".format(fullname), fg="red")
+        raise click.Abort
+    else:
         with Cryptor(config.path) as cryptor:
             pyperclip.copy(cryptor.decrypt(found["password"], passphrase))
         click.echo("Password copied to clipboard".format(fullname))
+
+
+@cli.command(help="Update matched credentials")
+@click.argument("fullname")
+@click.option("--name", help="Credential new name")
+@click.option("--login", help="Credential new login")
+@click.password_option(help="Credential new password")
+@click.option('--random', 'password', flag_value=genpass(),
+              help="Credential new randomly generated password")
+@click.option("--comment", help="Credential new comment")
+@click.option("-y", "--yes", is_flag=True, help="Skip confirmation prompt")
+def update(fullname, name, login, password, comment, yes):
+    db = Database(config.path)
+    found = db.get(where("fullname") == fullname)
+
+    if not found:
+        click.echo("Credential '{}' not found".format(fullname))
+        raise click.Abort
+    else:
+        if not yes:
+            click.confirm("Update credential '{}'".format(fullname),
+                          abort=True)
+
+        values = {}
+        if any([name, login, password, comment]):
+            values["name"] = name if name else found["name"]
+            values["login"] = login if login else found["login"]
+            values["password"] = password if password else found["password"]
+            values["comment"] = comment if comment else found["comment"]
+            if password:
+                with Cryptor(config.path) as cryptor:
+                    values["password"] = cryptor.encrypt(password)
+        else:
+            values["name"] = click.prompt("Name", default=found["name"])
+            values["login"] = click.prompt("Login", default=found["login"])
+            values["password"] = click.prompt("Password", default="*****",
+                                              confirmation_prompt=True,
+                                              hide_input=True)
+            values["comment"] = click.prompt("Comment",
+                                             default=found["comment"])
+            if values["password"] == "*****":
+                values["password"] = found["password"]
+            else:
+                with Cryptor(config.path) as cryptor:
+                    values["password"] = cryptor.encrypt(password)
+
+        values["fullname"] = make_fullname(values["login"], values["name"])
+        values["modified"] = datetime.now()
+
+        db.update(values, (where("fullname") == fullname))

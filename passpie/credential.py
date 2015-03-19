@@ -9,3 +9,7 @@ def split_fullname(fullname):
     except AttributeError:
         raise ValueError("Not a valid name")
     return login if login else "_", name
+
+
+def make_fullname(login, name):
+    return "{}@{}".format("_" if login is None else login, name)
