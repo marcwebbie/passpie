@@ -58,6 +58,7 @@ clean:
 	rm -rf __pycache__ || true
 
 coverage:
+	pip install coverage --ignore-installed
 	coverage run --source=$(PACKAGE) --omit=$(PACKAGE)/_compat.py setup.py test
 	coverage report -m --fail-under=100
 
