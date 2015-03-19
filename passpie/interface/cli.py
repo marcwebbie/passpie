@@ -43,7 +43,7 @@ tabulate = partial(tabulate,
 def cli(ctx, database, verbose):
     if ctx.invoked_subcommand is None:
         db = Database(config.path)
-        credentials = sorted(db.all(), key=lambda x: x["login"]+x["name"])
+        credentials = sorted(db.all(), key=lambda x: x["name"]+x["login"])
 
         if credentials:
             table = OrderedDict()
