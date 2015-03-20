@@ -67,5 +67,19 @@ class Cryptor(object):
 
     def decrypt(self, data, passphrase):
         self._import_keys()
+        self.check(passphrase, ensure=True)
         decrypted = self._gpg.decrypt(data, passphrase=passphrase)
         return str(decrypted)
+
+    def check(self, passphrase, ensure=False):
+        self._import_keys()
+        sign = self._gpg.sign(
+            "testing",
+            default_key=self.current_key,
+            passphrase=passphrase
+        )
+        if sign:
+            return True
+        else:
+            if ensure:
+                raise ValueError("Wrong passphrase")

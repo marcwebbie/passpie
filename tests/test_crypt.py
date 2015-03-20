@@ -108,3 +108,26 @@ class CryptTests(MockerTestCase):
         cryptor._gpg.decrypt.return_value = decrypted
 
         self.assertEqual(cryptor.decrypt("data", "passphrase"), str(decrypted))
+
+    def test_passphrase_check_raises_value_error_when_bad_passphrase(self):
+        cryptor = Cryptor("path/to/database")
+        cryptor._import_keys = self.Mock()
+        passphrase = "passphrase"
+        result = cryptor.check(passphrase)
+
+        self.assertTrue(result)
+        self.assertTrue(cryptor._gpg.sign.called)
+        cryptor._gpg.sign.assert_called_once_with(
+            "testing",
+            default_key=cryptor.current_key,
+            passphrase=passphrase
+        )
+
+    def test_passprase_check_with_ensure_raises_value_error_with_ensure(self):
+        cryptor = Cryptor("path/to/database")
+        cryptor._import_keys = self.Mock()
+        cryptor._gpg.sign.return_value = None
+        passphrase = "passphrase"
+
+        with self.assertRaises(ValueError):
+            cryptor.check(passphrase, ensure=True)

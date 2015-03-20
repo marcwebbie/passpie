@@ -230,6 +230,7 @@ class DatabaseCopyToClipboardTests(MockerTestCase):
             comment="",
         )
         self.MockDB().get.return_value = cred
+        self.mock_cryptor.decrypt.side_effect = ValueError
 
         runner = CliRunner()
         result = runner.invoke(cli.copy, [fullname, "--passphrase", "pwd"])
