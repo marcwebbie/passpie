@@ -35,6 +35,63 @@ tabulate = partial(tabulate,
                    missingval=config.missingval)
 
 
+def credential_confirmation_option(*param_decls, **attrs):
+    def decorator(f):
+        prompt = attrs.pop("prompt")
+
+        def callback(ctx, param, value):
+            if not value:
+                prompt_text = "{} '{}'".format(
+                    prompt, ctx.params["credential"]["fullname"])
+                click.confirm(prompt_text, abort=True)
+
+        attrs.setdefault('is_flag', True)
+        attrs.setdefault('callback', callback)
+        attrs.setdefault('expose_value', False)
+        attrs.setdefault('help', 'Confirm the action without prompting.')
+        return click.option(*(param_decls or ('--yes',)), **attrs)(f)
+    return decorator
+
+
+def passphrase_option(*param_decls, **attrs):
+    def decorator(f):
+        def callback(ctx, param, value):
+            passphrase = value
+            try:
+                with Cryptor(config.path) as cryptor:
+                    cryptor.check(passphrase, ensure=True)
+                return passphrase
+            except ValueError:
+                click.secho("Wrong passphrase", fg="red")
+                raise click.Abort
+
+        attrs.setdefault('callback', callback)
+        attrs.setdefault('prompt', True)
+        attrs.setdefault('hide_input', True)
+        return click.option(*(param_decls or ('--passphrase',)), **attrs)(f)
+    return decorator
+
+
+def credential_argument(*param_decls, **attrs):
+    def decorator(f):
+        def callback(ctx, param, value):
+            fullname = value
+            db = Database(config.path)
+            credential = db.get(where("fullname") == fullname)
+            if credential:
+                return credential
+            else:
+                click.secho(
+                    "Credential '{}' not found".format(fullname), fg="red")
+            raise click.Abort
+
+        attrs.setdefault('metavar', 'fullname')
+        attrs.setdefault('callback', callback)
+        attrs.setdefault("is_eager", True)
+        return click.argument("credential", **attrs)(f)
+    return decorator
+
+
 @click.group(invoke_without_command=True)
 @click.option('-D', '--database', metavar="PATH", help="alternative database")
 @click.option('-v', '--verbose', is_flag=True, help="verbose debug output")
@@ -106,70 +163,49 @@ def add(fullname, password, comment):
 
 
 @cli.command(help="Copy credential password to clipboard")
-@click.argument("fullname")
-@click.option('--passphrase', prompt=True, hide_input=True)
-def copy(fullname, passphrase):
-    db = Database(config.path)
-    login, name = split_fullname(fullname)
-    found = db.get((where("login") == login) & (where("name") == name))
-
-    if not found:
-        click.secho("Credential '{}' not found".format(fullname), fg="red")
-        raise click.Abort
-    else:
-        with Cryptor(config.path) as cryptor:
-            try:
-                decrypted = cryptor.decrypt(found["password"], passphrase)
-            except ValueError:
-                click.secho("Wrong passphrase", fg="red")
-                raise click.Abort
-
-            pyperclip.copy(decrypted)
-            click.echo("Password copied to clipboard".format(fullname))
+@credential_argument()
+@passphrase_option()
+def copy(credential, passphrase):
+    with Cryptor(config.path) as cryptor:
+        decrypted = cryptor.decrypt(credential["password"], passphrase)
+        pyperclip.copy(decrypted)
+        click.echo("Password copied to clipboard".format(
+            credential["fullname"]))
 
 
 @cli.command(help="Update matched credentials")
-@click.argument("fullname")
+@credential_argument()
+@credential_confirmation_option(prompt="Update credential")
 @click.option("--name", help="Credential new name")
 @click.option("--login", help="Credential new login")
+@click.option("--comment", help="Credential new comment")
 @click.option("--password", help="Credential new password")
 @click.option('--random', 'password', flag_value=genpass(),
               help="Credential new randomly generated password")
-@click.option("--comment", help="Credential new comment")
-@click.option("-y", "--yes", is_flag=True, help="Skip confirmation prompt")
-def update(fullname, name, login, password, comment, yes):
-    db = Database(config.path)
-    found = db.get(where("fullname") == fullname)
-
-    if not found:
-        click.echo("Credential '{}' not found".format(fullname))
-        raise click.Abort
+def update(credential, name, login, password, comment):
+    values = credential.copy()
+    if any([name, login, password, comment]):
+        values["name"] = name if name else credential["name"]
+        values["login"] = login if login else credential["login"]
+        values["password"] = password if password else credential["password"]
+        values["comment"] = comment if comment else credential["comment"]
     else:
-        if not yes:
-            click.confirm("Update credential '{}'".format(fullname),
-                          abort=True)
+        values["name"] = click.prompt("Name", default=credential["name"])
+        values["login"] = click.prompt("Login", default=credential["login"])
+        values["password"] = click.prompt("Password",
+                                          hide_input=True,
+                                          default=credential["password"],
+                                          confirmation_prompt=True,
+                                          show_default=False,
+                                          prompt_suffix=" [*****]: ")
+        values["comment"] = click.prompt("Comment",
+                                         default=credential["comment"])
 
-        values = found.copy()
-        if any([name, login, password, comment]):
-            values["name"] = name if name else found["name"]
-            values["login"] = login if login else found["login"]
-            values["password"] = password if password else found["password"]
-            values["comment"] = comment if comment else found["comment"]
-        else:
-            values["name"] = click.prompt("Name", default=found["name"])
-            values["login"] = click.prompt("Login", default=found["login"])
-            values["password"] = click.prompt("Password", hide_input=True,
-                                              default=found["password"],
-                                              confirmation_prompt=True,
-                                              show_default=False,
-                                              prompt_suffix=" [*****]: ")
-            values["comment"] = click.prompt("Comment",
-                                             default=found["comment"])
-
-        if values != found:
-            values["fullname"] = make_fullname(values["login"], values["name"])
-            values["modified"] = datetime.now()
-            if values["password"] != found["password"]:
-                with Cryptor(config.path) as cryptor:
-                    values["password"] = cryptor.encrypt(password)
-            db.update(values, (where("fullname") == fullname))
+    if values != credential:
+        values["fullname"] = make_fullname(values["login"], values["name"])
+        values["modified"] = datetime.now()
+        if values["password"] != credential["password"]:
+            with Cryptor(config.path) as cryptor:
+                values["password"] = cryptor.encrypt(password)
+        db = Database(config.path)
+        db.update(values, (where("fullname") == credential["fullname"]))
