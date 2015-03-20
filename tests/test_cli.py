@@ -343,3 +343,35 @@ class RemoveTests(MockerTestCase):
 
         self.MockDB().remove.assert_called_once_with(
             self.mock_where("fullname") == fullname)
+
+
+class SearchTests(MockerTestCase):
+
+    def setUp(self):
+        self.MockDB = self.patch("passpie.interface.cli.Database")
+        self.mock_where = self.patch("passpie.interface.cli.where")
+
+    def test_search_prints_matched_credentials_from_database(self):
+        regex = "f[oa]o"
+        cred = dict(
+            fullname="foo@bar",
+            name="bar",
+            login="foo",
+            comment="",
+        )
+        cred2 = dict(
+            fullname="fao@spam",
+            name="spam",
+            login="fao",
+            comment="",
+        )
+        self.MockDB().search.return_value = [cred, cred2]
+        runner = CliRunner()
+        result = runner.invoke(cli.search, [regex])
+
+        self.assertIn(cred["login"], result.output)
+        self.assertIn(cred2["login"], result.output)
+        self.MockDB().search.assert_called_once_with(
+            self.mock_where("name").matches(regex) |
+            self.mock_where("login").matches(regex) |
+            self.mock_where("comment").matches(regex))

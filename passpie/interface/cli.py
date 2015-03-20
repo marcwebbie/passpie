@@ -91,6 +91,22 @@ def credential_argument(*param_decls, **attrs):
     return decorator
 
 
+def make_table(credentials):
+    table = OrderedDict()
+
+    for header in config.headers:
+        if header in config.hidden:
+            table[header] = [None for c in credentials]
+        elif header in config.colors:
+            color = config.colors[header]
+            table[header] = [click.style(c.get(header, ""), color)
+                             for c in credentials]
+        else:
+            table[header] = [c.get(header, "") for c in credentials]
+
+    return tabulate(table)
+
+
 @click.group(invoke_without_command=True)
 @click.option('-D', '--database', metavar="PATH", help="alternative database")
 @click.option('-v', '--verbose', is_flag=True, help="verbose debug output")
@@ -102,19 +118,7 @@ def cli(ctx, database, verbose):
         credentials = sorted(db.all(), key=lambda x: x["name"]+x["login"])
 
         if credentials:
-            table = OrderedDict()
-
-            for header in config.headers:
-                if header in config.hidden:
-                    table[header] = [None for c in credentials]
-                elif header in config.colors:
-                    color = config.colors[header]
-                    table[header] = [click.style(c.get(header, ""), color)
-                                     for c in credentials]
-                else:
-                    table[header] = [c.get(header, "") for c in credentials]
-
-            click.echo(tabulate(table))
+            click.echo(make_table(credentials))
 
 
 @cli.command(help="Initialize new passpie database")
@@ -216,3 +220,16 @@ def update(credential, name, login, password, comment):
 def remove(credential):
     db = Database(config.path)
     db.remove(where('fullname') == credential["fullname"])
+
+
+@cli.command(help="Search credentials by regular expressions")
+@click.argument("regex")
+def search(regex):
+    db = Database(config.path)
+    credentials = db.search(
+        where("name").matches(regex) |
+        where("login").matches(regex) |
+        where("comment").matches(regex))
+
+    if credentials:
+        click.echo(make_table(credentials))
