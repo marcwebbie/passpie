@@ -327,3 +327,19 @@ class UpdateTests(MockerTestCase):
                                           confirmation_prompt=True,
                                           show_default=False,
                                           prompt_suffix=" [*****]: ")
+
+
+class RemoveTests(MockerTestCase):
+
+    def setUp(self):
+        self.MockDB = self.patch("passpie.interface.cli.Database")
+        self.mock_where = self.patch("passpie.interface.cli.where")
+
+    def test_remove_deletes_credential_from_database(self):
+        fullname = "foo@bar"
+
+        runner = CliRunner()
+        runner.invoke(cli.remove, [fullname, "--yes"])
+
+        self.MockDB().remove.assert_called_once_with(
+            self.mock_where("fullname") == fullname)

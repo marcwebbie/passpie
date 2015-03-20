@@ -87,7 +87,6 @@ def credential_argument(*param_decls, **attrs):
 
         attrs.setdefault('metavar', 'fullname')
         attrs.setdefault('callback', callback)
-        attrs.setdefault("is_eager", True)
         return click.argument("credential", **attrs)(f)
     return decorator
 
@@ -209,3 +208,11 @@ def update(credential, name, login, password, comment):
                 values["password"] = cryptor.encrypt(password)
         db = Database(config.path)
         db.update(values, (where("fullname") == credential["fullname"]))
+
+
+@cli.command(help="Remove credential")
+@credential_argument()
+@credential_confirmation_option(prompt="Remove credential")
+def remove(credential):
+    db = Database(config.path)
+    db.remove(where('fullname') == credential["fullname"])
