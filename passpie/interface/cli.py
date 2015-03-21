@@ -247,27 +247,28 @@ def status(full, days, passphrase):
         for cred in credentials:
             cred["password"] = cryptor.decrypt(cred["password"], passphrase)
 
-    def find_repeated(cred, credentials):
+    def check_password(cred, credentials):
         repeated = [c["fullname"] for c in credentials
                     if c is not cred and c["password"] == cred["password"]]
-        return repeated if repeated else None
+        return "same as %s" % repeated if repeated else None
 
     def check_mtime(cred, delta):
         mtime_delta = (datetime.now() - cred["modified"])
         return "%s days" % mtime_delta.days if mtime_delta > delta else None
 
+    def style(elems, fg, key=lambda x: True):
+        return [click.style(e, fg) if key(e) else e for e in elems]
+
     if credentials:
         table = OrderedDict()
         table["Name"] = [c["name"] for c in credentials]
         table["Login"] = [c["login"] for c in credentials]
-        table["Password"] = [find_repeated(c, credentials) for c in credentials]
+        table["Password"] = [check_password(c, credentials) for c in credentials]
         table["Modified"] = [check_mtime(c, timedelta(days)) for c in credentials]
 
         # styling
-        table["Password"] = [click.style(str(k), "red") if k else k for k
-                             in table["Password"]]
-        table["Modified"] = [click.style(str(k), "red") if k else k for k
-                             in table["Modified"]]
+        table["Password"] = style(table["Password"], "red", key=bool)
+        table["Modified"] = style(table["Modified"], "red", key=bool)
 
         if not full:
             zipped_table = zip(table["Password"], table["Modified"])
