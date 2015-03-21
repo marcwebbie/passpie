@@ -11,16 +11,16 @@ class CLIDefaultTests(MockerTestCase):
     def setUp(self):
         self.MockDB = self.patch("passpie.interface.cli.Database")
         self.mock_config = self.patch("passpie.interface.cli.config")
-        self.mock_config.headers = ["name", "login"]
+        self.mock_config.table = {}
+        self.mock_config.table["headers"] = ["name", "login"]
 
     def test_default_command_prints_all_credentials(self):
-        db = self.MockDB()
         credentials = [
             {"name": "example", "login": "foo"},
             {"name": "example", "login": "bar"},
             {"name": "example", "login": "spam"},
         ]
-        db.all.return_value = credentials
+        self.MockDB().all.return_value = credentials
 
         runner = CliRunner()
         result = runner.invoke(cli.cli)
@@ -30,7 +30,7 @@ class CLIDefaultTests(MockerTestCase):
             self.assertIn(cred["login"], result.output)
 
     def test_default_command_hides_config_hidden_columns(self):
-        self.mock_config.hidden = ["login"]
+        self.mock_config.table["hidden"] = ["login"]
 
         db = self.MockDB()
         credentials = [
@@ -42,14 +42,15 @@ class CLIDefaultTests(MockerTestCase):
 
         runner = CliRunner()
         result = runner.invoke(cli.cli)
+        # cli.cli()
 
         for cred in credentials:
             self.assertIn(cred["name"], result.output)
             self.assertNotIn(cred["login"], result.output)
 
     def test_default_colorize_columns_from_config_colors(self):
-        self.mock_config.colors = {"login": "red"}
-        self.mock_click = self.patch("passpie.interface.cli.click")
+        self.mock_config.table["colors"] = {"login": "red"}
+        self.mock_click = self.patch("passpie.interface.table.click")
 
         db = self.MockDB()
         credentials = [
@@ -59,7 +60,7 @@ class CLIDefaultTests(MockerTestCase):
         ]
         db.all.return_value = credentials
 
-        CliRunner().invoke(cli.cli)
+        CliRunner().invoke(cli.cli, catch_exceptions=False)
 
         for cred in credentials:
             self.mock_click.style.assert_any_call(cred["login"], "red")
@@ -350,6 +351,13 @@ class SearchTests(MockerTestCase):
     def setUp(self):
         self.MockDB = self.patch("passpie.interface.cli.Database")
         self.mock_where = self.patch("passpie.interface.cli.where")
+        self.mock_config = self.patch("passpie.interface.cli.config")
+        self.mock_config.table = dict(
+            headers=("name", "login", "comment"),
+            hidden=[],
+            colors={},
+            tablefmt="rst",
+        )
 
     def test_search_prints_matched_credentials_from_database(self):
         regex = "f[oa]o"

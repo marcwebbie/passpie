@@ -15,24 +15,22 @@ from passpie.credential import split_fullname, make_fullname
 from passpie.database import Database
 from passpie.utils import genpass
 from passpie._compat import FileExistsError
+from .table import Table
+
 
 __version__ = "0.1.rc1"
 
 config = Namespace(
     path=os.path.expanduser("~/.passpie"),
     show_password=False,
-    headers=("name", "login", "password", "comment"),
-    hidden=("password",),
-    colors={"name": "yellow", "login": "green"},
-    tablefmt="rst",
-    missingval="*****"
+    table=dict(
+        headers=("name", "login", "password", "comment"),
+        hidden=("password",),
+        colors={"name": "yellow", "login": "green", "password": "magenta"},
+        tablefmt="rst",
+        missingval="*****"
+    ),
 )
-
-tabulate = partial(tabulate,
-                   headers="keys",
-                   tablefmt=config.tablefmt,
-                   numalign='left',
-                   missingval=config.missingval)
 
 
 def credential_confirmation_option(*param_decls, **attrs):
@@ -92,32 +90,30 @@ def credential_argument(*param_decls, **attrs):
 
 
 def make_table(credentials):
-    table = OrderedDict()
+    table = Table(credentials, config.table["headers"])
+    colors = config.table.get("colors", None)
+    hidden = config.table.get("hidden", ())
+    fmt = config.table.get("tablefmt", "simple")
+    return table.format(colors, hidden, fmt)
 
-    for header in config.headers:
-        if header in config.hidden:
-            table[header] = [None for c in credentials]
-        elif header in config.colors:
-            color = config.colors[header]
-            table[header] = [click.style(c.get(header, ""), color)
-                             for c in credentials]
-        else:
-            table[header] = [c.get(header, "") for c in credentials]
 
-    return tabulate(table)
+# =================================================
+# Commands
+# =================================================
 
 
 @click.group(invoke_without_command=True)
-@click.option('-D', '--database', metavar="PATH", help="alternative database")
 @click.option('-v', '--verbose', is_flag=True, help="verbose debug output")
 @click.version_option(version=__version__)
 @click.pass_context
-def cli(ctx, database, verbose):
+def cli(ctx, verbose):
     if ctx.invoked_subcommand is None:
         db = Database(config.path)
         credentials = sorted(db.all(), key=lambda x: x["name"]+x["login"])
 
+        click.echo("IF CREDENTIALS")
         if credentials:
+            click.echo("INSIDE CREDENTIALS")
             click.echo(make_table(credentials))
 
 
