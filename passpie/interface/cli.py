@@ -1,6 +1,6 @@
 from argparse import Namespace
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import partial
 import os
 import shutil
@@ -230,6 +230,50 @@ def search(regex):
         where("name").matches(regex) |
         where("login").matches(regex) |
         where("comment").matches(regex))
+    credentials = sorted(credentials, key=lambda x: x["name"]+x["login"])
 
     if credentials:
         click.echo(make_table(credentials))
+
+
+@cli.command(help="Diagnose database for improvements")
+@click.option("--full", is_flag=True, help="Show all entries")
+@click.option("--days", default=90, type=int, help="Elapsed days")
+@passphrase_option()
+def status(full, days, passphrase):
+    db = Database(config.path)
+    credentials = sorted(db.all(), key=lambda x: x["name"]+x["login"])
+    with Cryptor(config.path) as cryptor:
+        for cred in credentials:
+            cred["password"] = cryptor.decrypt(cred["password"], passphrase)
+
+    def find_repeated(cred, credentials):
+        repeated = [c["fullname"] for c in credentials
+                    if c is not cred and c["password"] == cred["password"]]
+        return repeated if repeated else None
+
+    def check_mtime(cred, delta):
+        mtime_delta = (datetime.now() - cred["modified"])
+        return "%s days" % mtime_delta.days if mtime_delta > delta else None
+
+    if credentials:
+        table = OrderedDict()
+        table["Name"] = [c["name"] for c in credentials]
+        table["Login"] = [c["login"] for c in credentials]
+        table["Password"] = [find_repeated(c, credentials) for c in credentials]
+        table["Modified"] = [check_mtime(c, timedelta(days)) for c in credentials]
+
+        # styling
+        table["Password"] = [click.style(str(k), "red") if k else k for k
+                             in table["Password"]]
+        table["Modified"] = [click.style(str(k), "red") if k else k for k
+                             in table["Modified"]]
+
+        if not full:
+            zipped_table = zip(table["Password"], table["Modified"])
+            exclude = [i for i, e in enumerate(zipped_table) if not any(e)]
+            for key in table.keys():
+                table[key] = [
+                    e for i, e in enumerate(table[key]) if i not in exclude]
+
+        click.echo(tabulate(table, missingval=click.style("OK", "green")))
