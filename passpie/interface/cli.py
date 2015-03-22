@@ -1,9 +1,10 @@
 from argparse import Namespace
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from functools import partial
+import json
 import os
 import shutil
+import yaml
 
 import click
 import pyperclip
@@ -274,3 +275,25 @@ def status(full, days, passphrase):
                     e for i, e in enumerate(table[key]) if i not in exclude]
 
         click.echo(tabulate(table, missingval=click.style("OK", "green")))
+
+
+@cli.command(name="export", help="Export credentials in plain text")
+@click.argument("dbfile", type=click.File("w"))
+@click.option("--json", "as_json", is_flag=True, help="Export as JSON")
+@passphrase_option()
+def export_database(dbfile, as_json, passphrase):
+    db = Database(config.path)
+    credentials = sorted(db.all(), key=lambda x: x["name"]+x["login"])
+    with Cryptor(config.path) as cryptor:
+        for cred in credentials:
+            cred["password"] = cryptor.decrypt(cred["password"], passphrase)
+
+    if as_json:
+        for cred in credentials:
+            cred["modified"] = str(cred["modified"])
+        content = json.dumps([dict(x) for x in credentials], indent=2)
+    else:
+        content = yaml.dump([dict(x) for x in credentials],
+                            default_flow_style=False)
+
+    dbfile.write(content)

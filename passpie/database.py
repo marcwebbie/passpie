@@ -43,7 +43,7 @@ class PasspieStorage(Storage):
             dirname, filename = cred["name"], cred["login"] + self.extension
             credpath = os.path.join(self.path, dirname, filename)
             with mkdir_open(credpath, "w") as f:
-                f.write(yaml.dump(cred, default_flow_style=False))
+                f.write(yaml.dump(dict(cred), default_flow_style=False))
 
 
 Database = partial(TinyDB, storage=PasspieStorage)
