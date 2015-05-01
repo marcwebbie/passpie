@@ -124,7 +124,11 @@ def init(passphrase, force):
 @click.option('-c', '--comment', default="", help="Credential comment")
 def add(fullname, password, comment):
     db = Database(config.path)
-    login, name = split_fullname(fullname)
+    try:
+        login, name = split_fullname(fullname)
+    except ValueError:
+        click.secho('invalid fullname syntax', fg='yellow')
+        raise click.Abort
 
     found = db.get((where("login") == login) & (where("name") == name))
     if not found:
