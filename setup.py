@@ -27,7 +27,7 @@ setup(
     packages=find_packages(),
     entry_points="""
         [console_scripts]
-        passpie=passpie.interface.cli:cli
+        passpie=passpie.cli:cli
     """,
     install_requires=requirements,
     tests_require=requirements_tests,
