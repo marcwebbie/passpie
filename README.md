@@ -231,32 +231,32 @@ You can override default passpie configuration if you write a .passpierc file on
 Options:
 
 + colors:
-  1. black
-  2. red
-  3. green
-  4. yellow
-  5. blue
-  6. magenta
-  7. cyan
-  8. white
+  - black
+  - red
+  - green
+  - yellow
+  - blue
+  - magenta
+  - cyan
+  - white
 + headers:
-  1. fullname
-  2. name
-  3. login
-  4. password
-  5. comment
+  - fullname
+  - name
+  - login
+  - password
+  - comment
 + path: Path to database
 + table_format:
-  1. rst
-  2. simple
-  3. orgtbl
-  4. fancy_grid
+  - rst
+  - simple
+  - orgtbl
+  - fancy_grid
 + short_commands: Use short commands aliases as in `passpie a` for `passpie add`
-  1. true
-  2. false
+  - true
+  - false
 + show_password:
-  1. true
-  2. false
+  - true
+  - false
 
 
 ### Example `.passpierc`:
