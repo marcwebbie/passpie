@@ -11,7 +11,8 @@ more about how passpie works internally, check Under the Hood section.
 
 ------------------------------------------------------------------------
 
-## Main Features
+
+## Features
 
 + [x] Console interface
 + [x] Manage multiple databases
@@ -32,6 +33,15 @@ more about how passpie works internally, check Under the Hood section.
 + [ ] Undo/Redo updates to the database
 + [ ] Bulk update/remove credentials
 
+
+-----
+
+![pypi](https://img.shields.io/pypi/v/passpie.svg?style=flat-square&label=latest%20version)
+![unix_build](https://img.shields.io/travis/marcwebbie/passpie/master.svg?style=flat-square&label=unix%20build)
+![windows_build](https://img.shields.io/appveyor/ci/marcwebbie/marcwebbie.svg?style=flat-square&label=windows%20build)
+![coverage](https://img.shields.io/coveralls/marcwebbie/passpie/master.svg?style=flat-square)
+
+-----
 
 ## Installation
 
