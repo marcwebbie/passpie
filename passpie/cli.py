@@ -33,6 +33,7 @@ else:
 
 CONFIG_PATH = os.path.expanduser('~/.passpierc')
 
+config_dict = {}
 if os.path.exists(CONFIG_PATH):
     with open(CONFIG_PATH) as f:
         config_content = f.read()
