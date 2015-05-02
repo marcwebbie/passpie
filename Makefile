@@ -65,6 +65,7 @@ coverage:
 	py.test --cov .
 
 dist:
+	pip install wheel
 	python setup.py -q sdist
 	python setup.py -q bdist_egg
 	python setup.py -q bdist_wheel
@@ -75,6 +76,7 @@ dist:
 	@ls -l ./dist/
 
 register:
+	pip install pypandoc
 	python setup.py register
 
 check:
@@ -98,5 +100,5 @@ test:
 
 simulate: check test test-py2 coverage
 
-deploy: simulate
+deploy:
 	python setup.py sdist bdist_wheel upload -r pypi
