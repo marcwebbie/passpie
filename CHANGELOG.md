@@ -1,5 +1,12 @@
 # Changelog
 
+## Versions
+
+### 0.1rc2
+
++ **√** Add `reset` command. Reset passphrase and re-encrypt all credentials
++ **√** Bug fixes
+
 ### 0.1rc1
 
 + **√** Console interface
