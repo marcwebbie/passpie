@@ -259,6 +259,25 @@ Options:
   2. false
 
 
+### Example `.passpierc`:
+
+```yaml
+path: /Users/jon.doe/.passpie
+short_commands: true
+show_password: false
+table_format: fancy_grid
+colors:
+  login: green
+  name: yellow
+  password: cyan
+headers:
+  - name
+  - login
+  - password
+  - comment
+```
+
+
 ## Under The Hood
 
 ### Encryption
