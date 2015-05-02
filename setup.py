@@ -6,7 +6,7 @@ __version__ = "0.1rc1"
 
 requirements_file = "requirements.txt"
 requirements = [pkg.strip() for pkg in open(requirements_file).readlines()]
-requirements_tests = ["mock", "flake8", "coverage"]
+requirements_tests = ["mock", "coverage"]
 
 try:
     import pypandoc
@@ -33,18 +33,19 @@ setup(
     tests_require=requirements_tests,
     test_suite='tests',
     classifiers=[
-        'Development Status :: 2 - Beta',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: End Users/Desktop',
+        'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Topic :: Security :: Cryptography',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy',
+        'Programming Language :: Python',
+        'Topic :: Security :: Cryptography',
     ],
 )
