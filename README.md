@@ -22,6 +22,7 @@ more about how passpie works internally, check Under the Hood section.
 + [x] Search credentials by name, login or comments
 + [x] Search with regular expression
 + [x] Grouping credentials
++ [x] Configuration by file
 + [x] Exporting Passpie database
 + [x] Importing Passpie database
 + [ ] Importing credentials from [1Password](https://agilebits.com/onepassword)
