@@ -12,10 +12,11 @@ python:
   - pypy
 allow_failures:
   - python: pypy
-install:
+before-install:
   - pip install -r requirements.txt
-  - pip install pytest mock coveralls
+  - pip install pytest pytest-cov
+  - pip install coveralls
 script:
-  coverage run --source=py.test
+  py.test
 after_success:
   coveralls
