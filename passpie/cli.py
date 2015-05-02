@@ -30,13 +30,29 @@ except DistributionNotFound:
 else:
     __version__ = _dist.version
 
-config = Namespace(
-    path=os.path.expanduser("~/.passpie"),
-    show_password=False,
-    headers=("name", "login", "password", "comment"),
-    colors={"name": "yellow", "login": "green", "password": "magenta"},
-    table_format="fancy_grid"
-)
+
+CONFIG_PATH = os.path.expanduser('~/.passpierc')
+
+if os.path.exists(CONFIG_PATH):
+    with open(CONFIG_PATH) as f:
+        config_content = f.read()
+
+    try:
+        config_dict = yaml.load(config_content)
+        for k in ('path', 'show_password', 'headers', 'colors', 'table_format'):
+            assert k in config_dict
+    except (AssertionError, yaml.scanner.ScannerError) as e:
+        click.ClickException('Bad configuration file: {}'.format(e))
+
+    config = Namespace(**config_dict)
+else:
+    config = Namespace(
+        path=os.path.expanduser("~/.passpie"),
+        show_password=False,
+        headers=["name", "login", "password", "comment"],
+        colors={"name": "yellow", "login": "green", "password": "magenta"},
+        table_format="fancy_grid"
+    )
 
 
 class Table(object):
@@ -113,6 +129,11 @@ def cli(ctx, database=config.path):
         db = Database(config.path)
         credentials = sorted(db.all(), key=lambda x: x["name"]+x["login"])
         print_table(credentials)
+
+
+@cli.command(name='config', help='Show configuration')
+def print_config():
+    print(yaml.dump(vars(config), default_flow_style=False))
 
 
 @cli.command(help="Initialize new passpie database")
