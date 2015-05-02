@@ -14,7 +14,7 @@ allow_failures:
   - python: pypy
 before-install:
   - pip install -r requirements.txt
-  - pip install pytest pytest-cov pytest-mocker
+  - pip install pytest pytest-cov pytest-mock
   - pip install coveralls
 script:
   py.test
