@@ -2,12 +2,12 @@
 
 ## Versions
 
-### 0.1rc2
+### v0.1rc2
 
 + **√** Add `reset` command. Reset passphrase and re-encrypt all credentials
 + **√** Bug fixes
 
-### 0.1rc1
+### v0.1rc1
 
 + **√** Console interface
 + **√** Manage multiple databases
