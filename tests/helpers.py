@@ -13,7 +13,7 @@ class MockerTestCase(unittest.TestCase):
         self.Mock = Mock
         self.MagicMock = MagicMock
 
-        super().__init__(*args, **kwargs)
+        super(MockerTestCase, self).__init__(*args, **kwargs)
 
     def patch(self, *args, **kwargs):
         patcher = patch(*args, **kwargs)
