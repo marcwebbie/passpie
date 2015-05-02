@@ -7,7 +7,7 @@ into the Database Path\_. Only with the passphrase used to create the
 pass database you can decrypt password files. If you want to know
 more about how passpie works internally, check Under the Hood section.
 
-![Passpie console interface](https://github.com/marcwebbie/passpie/raw/master/images/passpie2.png)
+![Passpie console interface](https://github.com/marcwebbie/passpie/raw/master/images/passpie.png)
 
 ------------------------------------------------------------------------
 
