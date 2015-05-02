@@ -73,23 +73,24 @@ passpie init
 
 # add new credentials.
 passpie add foo@example.com
+passpie add bar@example.com
 
-# edit credential "example".
-passpie update foo@example
+# edit credential "foo@example.com".
+passpie update foo@example.com
 
-# copy password from credential "foo@example" into system clipboard.
-passpie copy foo@example
+# copy password from credential "foo@example.com" into system clipboard.
+passpie copy foo@example.com
 
-# search credentials by "exam".
+# search credentials by string "exam".
 passpie search exam
 
 # search credentials using regular expressions.
-passpie search 'example\.com|org'
+passpie search 'foo|bar'
 
-# remove credential "foo@example".
-passpie remove foo@example
+# remove credential "foo@example.com".
+passpie remove foo@example.com
 
-# check database credential status
+# check database status
 passpie status
 
 # print all credentials as a table with hidden passwords
@@ -145,7 +146,32 @@ Import credentials
 
 ## Tutorials
 
-### 1) Syncing your database
+### 1. Diving into *fullname* syntax
+
+Passpie fullname syntax handles login and name for credentials in one go for faster adding and querying.
+
+#### Structure of a fullname
+
+`login`@`name`. Login is optional, however no logins  means that you can add credentials without login by passing only names:
+
+```bash
+passpie add @banks/mybank --password 1234
+passpie add @banks/myotherbank --password 5678
+```
+
+Listing the database would show:
+
+```bash
+=================  =======  ==========  =========
+Name               Login    Password    Comment
+=================  =======  ==========  =========
+banks/mybank       _        *****
+banks/myotherbank  _        *****
+=================  =======  ==========  =========
+```
+
+
+### 2. Syncing your database
 
 #### Dropbox
 
@@ -171,22 +197,19 @@ mv ~/.passpie ~/GoogleDrive/.passpie
 ln -s ~/GoogleDrive/.passpie ~/.passpie
 ```
 
-### 2) Exporting/Importing Passpie databases
+### 3. Exporting/Importing Passpie databases
 
 ```bash
 # export database to a passpie database file called passpie.db
-# Option: `--export`
+# Command: `export`
 passpie export passpie.db
 
 # import database from passpie database file called passpie.db
-# Option: `--import`
+# Option: `import`
 passpie import passpie.db
-
-# import 1password 1pif exported file
-passpie import passwords.1pif/data1.1pif
 ```
 
-### 3) Grouping credentials by name
+### 4. Grouping credentials by name
 
 Passpie credentials handles multiple logins for each name which groups credentials by name:
 
@@ -209,7 +232,7 @@ example.com  jonh     *****       Jonh main email
 ===========  =======  ==========  ===============
 ```
 
-### 5) Using multiple databases
+### 5. Using multiple databases
 
 Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using `-D` Passpie option.
 
@@ -236,14 +259,14 @@ passpie -D ~/databases/personal_passwords add my@example
 passpie -D ~/databases/junk_passwords add other@example
 ```
 
-##### Listing passwords from specific database
+#### Listing passwords from specific database
 
 ```bash
 # listing specific databases
 passpie -D ~/databases/junk_passwords
 ```
 
-### Configuring passpie with `.passpierc`
+### 6. Configuring passpie with `.passpierc`
 
 You can override default passpie configuration with a `.passpierc` file on your home directory. Passpie configuration files must be written as a valid [yaml](http://yaml.org/) file.
 
