@@ -13,7 +13,7 @@ import pyperclip
 import yaml
 
 from ._compat import FileExistsError
-from .credential import split_fullname
+from .credential import split_fullname, make_fullname
 from .crypt import Cryptor
 from .database import Database
 from .utils import genpass
@@ -53,6 +53,21 @@ else:
         colors={"name": "yellow", "login": "green", "password": "magenta"},
         table_format="fancy_grid"
     )
+
+
+class AliasedGroup(click.Group):
+
+    def get_command(self, ctx, cmd_name):
+        rv = click.Group.get_command(self, ctx, cmd_name)
+        if rv is not None:
+            return rv
+        matches = [x for x in self.list_commands(ctx)
+                   if x.startswith(cmd_name)]
+        if not matches:
+            return None
+        elif len(matches) == 1:
+            return click.Group.get_command(self, ctx, matches[0])
+        ctx.fail('Too many matches: %s' % ', '.join(sorted(matches)))
 
 
 class Table(object):
@@ -117,7 +132,8 @@ def ensure_database(func):
     return decorator
 
 
-@click.group(invoke_without_command=True)
+@click.group(cls=AliasedGroup if config.short_commands else click.Group,
+             invoke_without_command=True)
 @click.option('-D', '--database', help='Alternative database path',
               type=click.Path(dir_okay=True, writable=True, resolve_path=True))
 @click.version_option(version=__version__)
@@ -165,8 +181,8 @@ def add(fullname, password, comment):
     try:
         login, name = split_fullname(fullname)
     except ValueError:
-        click.secho('invalid fullname syntax', fg='yellow')
-        raise click.Abort
+        message = 'invalid fullname syntax'
+        raise click.ClickException(click.style(message, fg='yellow'))
 
     found = db.get((where("login") == login) & (where("name") == name))
     if not found:
@@ -181,8 +197,49 @@ def add(fullname, password, comment):
                           modified=datetime.now())
         db.insert(credential)
     else:
-        click.echo("Credential {} already exists.".format(fullname))
-        raise click.Abort
+        message = "Credential {} already exists. --force to overwrite".format(
+            fullname)
+        raise click.ClickException(click.style(message, fg='yellow'))
+
+
+@cli.command(help="Update credential")
+@click.argument("fullname")
+@click.option("--name", help="Credential new name")
+@click.option("--login", help="Credential new login")
+@click.option("--comment", help="Credential new comment")
+@click.option("--password", help="Credential new password")
+@click.option('--random', 'password', flag_value=genpass(),
+              help="Credential new randomly generated password")
+def update(fullname, name, login, password, comment):
+    db = Database(config.path)
+    credential = get_credential_or_abort(db, fullname)
+    values = credential.copy()
+
+    if any([name, login, password, comment]):
+        values["name"] = name if name else credential["name"]
+        values["login"] = login if login else credential["login"]
+        values["password"] = password if password else credential["password"]
+        values["comment"] = comment if comment else credential["comment"]
+    else:
+        values["name"] = click.prompt("Name", default=credential["name"])
+        values["login"] = click.prompt("Login", default=credential["login"])
+        values["password"] = click.prompt("Password",
+                                          hide_input=True,
+                                          default=credential["password"],
+                                          confirmation_prompt=True,
+                                          show_default=False,
+                                          prompt_suffix=" [*****]: ")
+        values["comment"] = click.prompt("Comment",
+                                         default=credential["comment"])
+
+    if values != credential:
+        values["fullname"] = make_fullname(values["login"], values["name"])
+        values["modified"] = datetime.now()
+        if values["password"] != credential["password"]:
+            with Cryptor(config.path) as cryptor:
+                values["password"] = cryptor.encrypt(password)
+        db = Database(config.path)
+        db.update(values, (where("fullname") == credential["fullname"]))
 
 
 @cli.command(help="Remove credential")
