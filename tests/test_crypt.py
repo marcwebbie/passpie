@@ -23,7 +23,7 @@ class CryptTests(MockerTestCase):
 
     def test_cryptor__enter__returns_self(self):
         cryptor = Cryptor("path/to/database")
-        self.assertEqual(Cryptor.__enter__(self=cryptor), cryptor)
+        self.assertEqual(Cryptor.__enter__(cryptor), cryptor)
 
     def test_cryptor__exit__removes_homedir_temp_directory(self):
         with Cryptor("path/to/database") as cryptor:
