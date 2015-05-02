@@ -1,170 +1,172 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Pysswords by marcwebbie</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <meta charset="UTF-8">
+    <title>Passpie by marcwebbie</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Pysswords</h1>
-        <p>Pysswords manages login credentials in a local encrypted database</p>
+    <section class="page-header">
+      <h1 class="project-name">Passpie</h1>
+      <h2 class="project-tagline">Passpie: manage login credentials from the terminal</h2>
+      <a href="https://github.com/marcwebbie/passpie" class="btn">View on GitHub</a>
+      <a href="https://github.com/marcwebbie/passpie/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/marcwebbie/passpie/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-        <p class="view"><a href="https://github.com/marcwebbie/pysswords">View the Project on GitHub <small>marcwebbie/pysswords</small></a></p>
+    <section class="main-content">
+      <h1>
+<a id="passpie-manage-your-passwords-from-the-terminal" class="anchor" href="#passpie-manage-your-passwords-from-the-terminal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Passpie: Manage your passwords from the terminal</h1>
 
-
-        <ul>
-          <li><a href="https://github.com/marcwebbie/pysswords/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/marcwebbie/pysswords/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/marcwebbie/pysswords">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h1>
-<a id="pysswords-manage-your-passwords-from-the-terminal" class="anchor" href="#pysswords-manage-your-passwords-from-the-terminal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pysswords: Manage your passwords from the terminal</h1>
-
-<p><a href="https://marcwebbie.github.io/pysswords">Pysswords</a> lets you manage
+<p><a href="https://marcwebbie.github.io/passpie">Passpie</a> lets you manage
 your login credentials from the terminal. Password files are saved into
-<a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard">GnuGPG</a> encrypted files
+<a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard">GnuPG</a> encrypted files
 into the Database Path_. Only with the passphrase used to create the
-pyssword database you can decrypt password files. If you want to know
-more about how pysswords works internally, check the Under the Hood_
-section.</p>
+pass database you can decrypt password files. If you want to know
+more about how passpie works internally, check Under the Hood section.</p>
 
-<p><img src="https://github.com/marcwebbie/pysswords/raw/master/images/pysswords2.png" alt="Pysswords console interface"></p>
+<p><img src="https://github.com/marcwebbie/passpie/raw/master/images/passpie.png" alt="Passpie console interface"></p>
 
 <hr>
 
 <h2>
-<a id="main-features" class="anchor" href="#main-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Main Features</h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
 
 <ul>
-<li>
-<code>☑</code> Console interface</li>
-<li>
-<code>☑</code> Manage multiple databases</li>
-<li>
-<code>☑</code> Add, edit, remove credentials</li>
-<li>
-<code>☑</code> Copy passwords to clipboard</li>
-<li>
-<code>☑</code> List credentials as a table</li>
-<li>
-<code>☑</code> Colored output</li>
-<li>
-<code>☑</code> Search credentials by name, login or comments</li>
-<li>
-<code>☑</code> Search with regular expression</li>
-<li>
-<code>☑</code> Bulk update/remove credentials</li>
-<li>
-<code>☑</code> Select credentials by fullname syntax</li>
-<li>
-<code>☑</code> Grouping credentials</li>
-<li>
-<code>☑</code> Exporting Pysswords database</li>
-<li>
-<code>☑</code> Importing Pysswords database</li>
-<li>
-<code>☑</code> Importing credentials from <a href="https://agilebits.com/onepassword">1password</a>
+<li>[x] Console interface</li>
+<li>[x] Manage multiple databases</li>
+<li>[x] Add, update, remove credentials</li>
+<li>[x] Copy passwords to clipboard</li>
+<li>[x] List credentials as a table</li>
+<li>[x] Colored output</li>
+<li>[x] Search credentials by name, login or comments</li>
+<li>[x] Search with regular expression</li>
+<li>[x] Grouping credentials</li>
+<li>[x] Configuration by file</li>
+<li>[ ] Change passphrase and re-encrypt database</li>
+<li>[x] Exporting Passpie database</li>
+<li>[x] Importing Passpie database</li>
+<li>[ ] Importing credentials from <a href="https://agilebits.com/onepassword">1Password</a>
 </li>
-<li>
-<code>☐</code> Undo/Redo updates to the database</li>
+<li>[x] Randomly generated credential passwords</li>
+<li>[x] Generate database status report</li>
+<li>[ ] Undo/Redo updates to the database</li>
+<li>[ ] Bulk update/remove credentials</li>
 </ul>
 
-<blockquote>
-<p><code>☑</code> implemented feature, <code>☐</code> not implemented feature.</p>
-</blockquote>
+<hr>
+
+<p><a href="https://pypi.python.org/pypi/passpie"><img src="https://img.shields.io/pypi/v/passpie.svg?style=flat-square&amp;label=latest%20version" alt="pypi"></a>
+<a href="https://travis-ci.org/marcwebbie/passpie"><img src="https://img.shields.io/travis/marcwebbie/passpie/master.svg?style=flat-square&amp;label=unix%20build" alt="unix_build"></a>
+<a href="https://ci.appveyor.com/project/marcwebbie/passpie"><img src="https://img.shields.io/appveyor/ci/marcwebbie/marcwebbie.svg?style=flat-square&amp;label=windows%20build" alt="windows_build"></a>
+<a href="https://coveralls.io/r/marcwebbie/passpie"><img src="https://img.shields.io/coveralls/marcwebbie/passpie/master.svg?style=flat-square" alt="coverage"></a></p>
+
+<hr>
 
 <h2>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
 <h3>
-<a id="stable-version-" class="anchor" href="#stable-version-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stable version <img src="https://img.shields.io/pypi/v/pysswords.svg" alt="pypi version">
-</h3>
+<a id="stable-version" class="anchor" href="#stable-version" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stable version</h3>
 
 <p>Make sure you have <a href="https://www.gnupg.org/">GPG</a> and <a href="http://pip.readthedocs.org/en/latest/installing.html">pip</a> installed:</p>
 
-<div class="highlight highlight-bash"><pre>pip install pysswords</pre></div>
+<div class="highlight highlight-bash"><pre>pip install passpie</pre></div>
 
 <h3>
-<a id="development-version--" class="anchor" href="#development-version--" aria-hidden="true"><span class="octicon octicon-link"></span></a>Development version <a href="https://coveralls.io/r/marcwebbie/pysswords"><img src="https://img.shields.io/coveralls/marcwebbie/pysswords.svg" alt="Test Coverage"></a> <a href="https://landscape.io/github/marcwebbie/pysswords/master"><img src="https://landscape.io/github/marcwebbie/pysswords/master/landscape.svg" alt="Code Health"></a>
-</h3>
-
-<table>
-<thead>
-<tr>
-<th>Linux/OSX</th>
-<th>Windows</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://travis-ci.org/marcwebbie/pysswords"><img src="https://travis-ci.org/marcwebbie/pysswords.svg" alt="Build"></a></td>
-<td><a href="https://ci.appveyor.com/project/marcwebbie/pysswords"><img src="https://ci.appveyor.com/api/projects/status/5b7p1vo3y9x3y35t?svg=true" alt="Build on windows"></a></td>
-</tr>
-</tbody>
-</table>
+<a id="development-version" class="anchor" href="#development-version" aria-hidden="true"><span class="octicon octicon-link"></span></a>Development version</h3>
 
 <p>The <strong>latest development version</strong> can be installed directly from GitHub:</p>
 
-<div class="highlight highlight-bash"><pre>$ pip install --upgrade https://github.com/marcwebbie/pysswords/tarball/master</pre></div>
+<div class="highlight highlight-bash"><pre>$ pip install --upgrade https://github.com/marcwebbie/passpie/tarball/master</pre></div>
 
 <h2>
 <a id="quickstart" class="anchor" href="#quickstart" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quickstart</h2>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># create a new credentials database. Option: `-I` or `--init`</span>
-pysswords --init
+<div class="highlight highlight-bash"><pre><span class="pl-c"># create a new credentials database.</span>
+passpie init
 
-<span class="pl-c"># add new credentials. Option: `-a` or `--add`</span>
-pysswords -a
+<span class="pl-c"># add new credentials.</span>
+passpie add foo@example.com
 
-<span class="pl-c"># get credential "example". Option: `-g` or `--get`</span>
-pysswords -g example
+<span class="pl-c"># edit credential "example".</span>
+passpie update foo@example
 
-<span class="pl-c"># edit credential "example". Option: `-u` or `--update`</span>
-pysswords -u example
+<span class="pl-c"># copy password from credential "foo@example" into system clipboard.</span>
+passpie copy foo@example
 
-<span class="pl-c"># remove credential "example". Option: `-r` or `--remove`</span>
-pysswords -r example
+<span class="pl-c"># search credentials by "exam".</span>
+passpie search exam
 
-<span class="pl-c"># search credentials by "exam". Option: `-s` or `--search`</span>
-pysswords -s exam
+<span class="pl-c"># search credentials using regular expressions.</span>
+passpie search <span class="pl-s"><span class="pl-pds">'</span>example\.com|org<span class="pl-pds">'</span></span>
 
-<span class="pl-c"># search credentials using regular expressions Option: `-s` or `--search`.</span>
-pysswords -s example<span class="pl-cce">\.</span>com<span class="pl-k">|</span>org
+<span class="pl-c"># remove credential "foo@example".</span>
+passpie remove foo@example
 
-<span class="pl-c"># copy password from credential "example" into system clipboard.</span>
-<span class="pl-c"># Option: `-c` or `--clipboard`</span>
-pysswords -c example
+<span class="pl-c"># check database credential status</span>
+passpie status
 
 <span class="pl-c"># print all credentials as a table with hidden passwords</span>
-pysswords
+passpie
 
-<span class="pl-c"># print all credentials as a table with passwords in plain text.</span>
-<span class="pl-c"># Option: `-P` or `--show-password`</span>
-pysswords -P
-
-<span class="pl-c"># specify other Pysswords database. Option `-D` or `--database`</span>
-pysswords -D /path/to/other/database
-
-<span class="pl-c"># delete database and remove all credentials</span>
-<span class="pl-c"># Option: `--clean`</span>
-pysswords --clean
+<span class="pl-c"># specify other Passpie database. Option `-D` or `--database`</span>
+passpie -D /path/to/other/database
 
 <span class="pl-c"># shows help. Option `-h` or `--help`</span>
-pysswords --help
+passpie --help
 
 <span class="pl-c"># shows version. Option `--version`</span>
-pysswords --version</pre></div>
+passpie --version</pre></div>
+
+<h2>
+<a id="commands" class="anchor" href="#commands" aria-hidden="true"><span class="octicon octicon-link"></span></a>Commands</h2>
+
+<h3>
+<a id="init" class="anchor" href="#init" aria-hidden="true"><span class="octicon octicon-link"></span></a>
+<code>init</code>:</h3>
+
+<p>Initialize database</p>
+
+<h3>
+<a id="add" class="anchor" href="#add" aria-hidden="true"><span class="octicon octicon-link"></span></a>
+<code>add</code>:</h3>
+
+<p>Insert new credential to database</p>
+
+<h3>
+<a id="update" class="anchor" href="#update" aria-hidden="true"><span class="octicon octicon-link"></span></a>
+<code>update</code>:</h3>
+
+<p>Update credential from database</p>
+
+<h3>
+<a id="remove" class="anchor" href="#remove" aria-hidden="true"><span class="octicon octicon-link"></span></a>
+<code>remove</code>:</h3>
+
+<p>Remove credential from database</p>
+
+<h3>
+<a id="copy" class="anchor" href="#copy" aria-hidden="true"><span class="octicon octicon-link"></span></a>
+<code>copy</code>:</h3>
+
+<p>Copy credential password to clipboard</p>
+
+<h3>
+<a id="search" class="anchor" href="#search" aria-hidden="true"><span class="octicon octicon-link"></span></a>
+<code>search</code>:</h3>
+
+<p>Search credentials using regular expression</p>
+
+<h3>
+<a id="status" class="anchor" href="#status" aria-hidden="true"><span class="octicon octicon-link"></span></a>
+<code>status</code>:</h3>
+
+<p>Query database status for maintenance</p>
 
 <h2>
 <a id="tutorials" class="anchor" href="#tutorials" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tutorials</h2>
@@ -175,108 +177,167 @@ pysswords --version</pre></div>
 <h4>
 <a id="dropbox" class="anchor" href="#dropbox" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dropbox</h4>
 
-<p>With Pysswords database on default path <code>~/.pysswords</code> and with a Dropbox shared directory on path <code>~/Dropbox</code></p>
+<p>With Passpie database on default path <code>~/.passpie</code> and with a Dropbox shared directory on path <code>~/Dropbox</code></p>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># move your Pysswords database inside your Dropbox directory</span>
-mv <span class="pl-k">~</span>/.pysswords <span class="pl-k">~</span>/Dropbox/.pysswords
-
-<span class="pl-c"># create a symbolic link to your shared .pysswords directory on the default path.</span>
-ln -s <span class="pl-k">~</span>/Dropbox/.pysswords <span class="pl-k">~</span>/.pysswords</pre></div>
+<div class="highlight highlight-bash"><pre><span class="pl-c"># move your Passpie database inside your Dropbox directory</span>
+mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/Dropbox/.passpie
+v
+<span class="pl-c"># create a symbolic link to your shared .passpie directory on the default path.</span>
+ln -s <span class="pl-k">~</span>/Dropbox/.passpie <span class="pl-k">~</span>/.passpie</pre></div>
 
 <h4>
 <a id="google-drive" class="anchor" href="#google-drive" aria-hidden="true"><span class="octicon octicon-link"></span></a>Google Drive</h4>
 
-<p>With Pysswords database on default path <code>~/.pysswords</code> and with a GoogleDrive shared directory on path <code>~/GoogleDrive</code></p>
+<p>With Passpie database on default path <code>~/.passpie</code> and with a GoogleDrive shared directory on path <code>~/GoogleDrive</code></p>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># move your Pysswords database inside your Dropbox directory</span>
-mv <span class="pl-k">~</span>/.pysswords <span class="pl-k">~</span>/GoogleDrive/.pysswords
+<div class="highlight highlight-bash"><pre><span class="pl-c"># move your Passpie database inside your Dropbox directory</span>
+mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/GoogleDrive/.passpie
 
-<span class="pl-c"># create a symbolic link to your shared .pysswords directory on the default path.</span>
-ln -s <span class="pl-k">~</span>/GoogleDrive/.pysswords <span class="pl-k">~</span>/.pysswords</pre></div>
+<span class="pl-c"># create a symbolic link to your shared .passpie directory on the default path.</span>
+ln -s <span class="pl-k">~</span>/GoogleDrive/.passpie <span class="pl-k">~</span>/.passpie</pre></div>
 
 <h3>
-<a id="2-exportingimporting-pyssword-databases" class="anchor" href="#2-exportingimporting-pyssword-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>2) Exporting/Importing Pyssword databases</h3>
+<a id="2-exportingimporting-passpie-databases" class="anchor" href="#2-exportingimporting-passpie-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>2) Exporting/Importing Passpie databases</h3>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># export database to a pysswords database file called pysswords.db</span>
+<div class="highlight highlight-bash"><pre><span class="pl-c"># export database to a passpie database file called passpie.db</span>
 <span class="pl-c"># Option: `--export`</span>
-pysswords --export pysswords.db
+passpie <span class="pl-k">export</span> passpie.db
 
-<span class="pl-c"># import database from pysswords database file called pysswords.db</span>
+<span class="pl-c"># import database from passpie database file called passpie.db</span>
 <span class="pl-c"># Option: `--import`</span>
-pysswords --import pysswords.db
+passpie import passpie.db
 
 <span class="pl-c"># import 1password 1pif exported file</span>
-pysswords --import passwords.1pif/data1.1pif</pre></div>
+passpie import passwords.1pif/data1.1pif</pre></div>
 
 <h3>
 <a id="3-grouping-credentials-by-name" class="anchor" href="#3-grouping-credentials-by-name" aria-hidden="true"><span class="octicon octicon-link"></span></a>3) Grouping credentials by name</h3>
 
-<p>Pysswords credentials handles multiple logins for each name which groups credentials by name:</p>
+<p>Passpie credentials handles multiple logins for each name which groups credentials by name:</p>
 
 <div class="highlight highlight-bash"><pre><span class="pl-c"># create john credential</span>
-pysswords -a
-Name: example.com
-Login: john
-Password: <span class="pl-k">**********</span>
-Comment: No comment
+passpie add jonh@example.com --comment <span class="pl-s"><span class="pl-pds">"</span>Jonh main mail<span class="pl-pds">"</span></span>
+<span class="pl-c">#Password: **********</span>
 
 <span class="pl-c"># create doe credential</span>
-pysswords -a
-Name: example.com
-Login: doe
-Password: <span class="pl-k">**********</span>
-Comment:
+passpie add doe@example.com --comment <span class="pl-s"><span class="pl-pds">"</span>No comment<span class="pl-pds">"</span></span>
+<span class="pl-c">#Password: **********</span>
 
 <span class="pl-c"># listing credentials</span>
-pysswords
-
-<span class="pl-k">|</span> Name        <span class="pl-k">|</span> Login   <span class="pl-k">|</span> Password   <span class="pl-k">|</span> Comment    <span class="pl-k">|</span>
-<span class="pl-k">|</span>-------------+---------+------------+------------<span class="pl-k">|</span>
-<span class="pl-k">|</span> example.com <span class="pl-k">|</span> doe     <span class="pl-k">|</span> <span class="pl-k">***</span>        <span class="pl-k">|</span>            <span class="pl-k">|</span>
-<span class="pl-k">|</span> example.com <span class="pl-k">|</span> john    <span class="pl-k">|</span> <span class="pl-k">***</span>        <span class="pl-k">|</span> No comment <span class="pl-k">|</span></pre></div>
-
-<h3>
-<a id="4-selecting-credentials-by-fullname-syntax" class="anchor" href="#4-selecting-credentials-by-fullname-syntax" aria-hidden="true"><span class="octicon octicon-link"></span></a>4) Selecting credentials by fullname syntax</h3>
-
-<p>You can select grouped credentials by using fullname syntax <code>login@name</code>:</p>
-
-<div class="highlight highlight-bash"><pre>pysswords -g doe@example.com
-
-<span class="pl-k">|</span> Name        <span class="pl-k">|</span> Login   <span class="pl-k">|</span> Password   <span class="pl-k">|</span> Comment   <span class="pl-k">|</span>
-<span class="pl-k">|</span>-------------+---------+------------+-----------<span class="pl-k">|</span>
-<span class="pl-k">|</span> example.com <span class="pl-k">|</span> doe     <span class="pl-k">|</span> <span class="pl-k">***</span>        <span class="pl-k">|</span>           <span class="pl-k">|</span></pre></div>
+passpie
+===========  =======  ==========  ===============
+name         login    password    comment
+===========  =======  ==========  ===============
+example.com  doe      <span class="pl-k">*****</span>       No comment
+example.com  jonh     <span class="pl-k">*****</span>       Jonh main email
+===========  =======  ==========  ===============</pre></div>
 
 <h3>
 <a id="5-using-multiple-databases" class="anchor" href="#5-using-multiple-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>5) Using multiple databases</h3>
 
-<p>Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using <code>-D</code> Pysswords option.</p>
+<p>Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using <code>-D</code> Passpie option.</p>
 
 <h4>
 <a id="creating-databases-on-a-given-directory-ex-databases" class="anchor" href="#creating-databases-on-a-given-directory-ex-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating databases on a given directory (ex: <code>~/databases</code>)</h4>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># create personal Pysswords database</span>
-pysswords --init -D <span class="pl-k">~</span>/databases/personal_passwords
+<div class="highlight highlight-bash"><pre><span class="pl-c"># create personal Passpie database</span>
+passpie -D <span class="pl-k">~</span>/databases/personal_passwords init
 
-<span class="pl-c"># create work Pysswords database</span>
-pysswords --init -D <span class="pl-k">~</span>/databases/work_passwords
+<span class="pl-c"># create work Passpie database</span>
+passpie -D <span class="pl-k">~</span>/databases/work_passwords init
 
-<span class="pl-c"># create junk Pysswords database</span>
-pysswords --init -D <span class="pl-k">~</span>/databases/junk_passwords</pre></div>
+<span class="pl-c"># create junk Passpie database</span>
+passpie -D <span class="pl-k">~</span>/databases/junk_passwords init</pre></div>
 
 <h4>
 <a id="adding-passwords-to-specific-database" class="anchor" href="#adding-passwords-to-specific-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding passwords to specific database</h4>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># add password to personal Pysswords database</span>
-pysswords -D <span class="pl-k">~</span>/databases/personal_passwords -a
+<div class="highlight highlight-bash"><pre><span class="pl-c"># add password to personal Passpie database</span>
+passpie -D <span class="pl-k">~</span>/databases/personal_passwords add my@example
 
-<span class="pl-c"># add password to junk Pysswords database</span>
-pysswords -D <span class="pl-k">~</span>/databases/junk_passwords -a</pre></div>
+<span class="pl-c"># add password to junk Passpie database</span>
+passpie -D <span class="pl-k">~</span>/databases/junk_passwords add other@example</pre></div>
 
 <h5>
 <a id="adding-passwords-to-specific-database-1" class="anchor" href="#adding-passwords-to-specific-database-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding passwords to specific database</h5>
 
 <div class="highlight highlight-bash"><pre><span class="pl-c"># listing specific databases</span>
-pysswords -D <span class="pl-k">~</span>/databases/junk_passwords</pre></div>
+passpie -D <span class="pl-k">~</span>/databases/junk_passwords</pre></div>
+
+<h3>
+<a id="configuring-passpie-with-passpierc" class="anchor" href="#configuring-passpie-with-passpierc" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuring passpie with <code>.passpierc</code>
+</h3>
+
+<p>You can override default passpie configuration if you write a .passpierc file on your home directory. Passpie configuration files must be written as a valid <a href="http://yaml.org/">yaml</a> file</p>
+
+<p>Options:</p>
+
+<ul>
+<li>colors:
+
+<ul>
+<li>black</li>
+<li>red</li>
+<li>green</li>
+<li>yellow</li>
+<li>blue</li>
+<li>magenta</li>
+<li>cyan</li>
+<li>white</li>
+</ul>
+</li>
+<li>headers:
+
+<ul>
+<li>fullname</li>
+<li>name</li>
+<li>login</li>
+<li>password</li>
+<li>comment</li>
+</ul>
+</li>
+<li>path: Path to database</li>
+<li>table_format:
+
+<ul>
+<li>rst</li>
+<li>simple</li>
+<li>orgtbl</li>
+<li>fancy_grid</li>
+</ul>
+</li>
+<li>short_commands: Use short commands aliases as in <code>passpie a</code> for <code>passpie add</code>
+
+<ul>
+<li>true</li>
+<li>false</li>
+</ul>
+</li>
+<li>show_password:
+
+<ul>
+<li>true</li>
+<li>false</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="example-passpierc" class="anchor" href="#example-passpierc" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example <code>.passpierc</code>:</h3>
+
+<div class="highlight highlight-yaml"><pre><span class="pl-s"><span class="pl-ent">path:</span> <span class="pl-s">/Users/jon.doe/.passpie</span></span>
+<span class="pl-s"><span class="pl-ent">short_commands:</span> <span class="pl-s">true</span></span>
+<span class="pl-s"><span class="pl-ent">show_password:</span> <span class="pl-s">false</span></span>
+<span class="pl-s"><span class="pl-ent">table_format:</span> <span class="pl-s">fancy_grid</span></span>
+<span class="pl-s"><span class="pl-ent">colors:</span></span>
+  <span class="pl-s"><span class="pl-ent">login:</span> <span class="pl-s">green</span></span>
+  <span class="pl-s"><span class="pl-ent">name:</span> <span class="pl-s">yellow</span></span>
+  <span class="pl-s"><span class="pl-ent">password:</span> <span class="pl-s">cyan</span></span>
+<span class="pl-s"><span class="pl-ent">headers:</span></span>
+  <span class="pl-s">- <span class="pl-s">name</span></span>
+  <span class="pl-s">- <span class="pl-s">login</span></span>
+  <span class="pl-s">- <span class="pl-s">password</span></span>
+  <span class="pl-s">- <span class="pl-s">comment</span></span></pre></div>
 
 <h2>
 <a id="under-the-hood" class="anchor" href="#under-the-hood" aria-hidden="true"><span class="octicon octicon-link"></span></a>Under The Hood</h2>
@@ -284,77 +345,59 @@ pysswords -D <span class="pl-k">~</span>/databases/junk_passwords</pre></div>
 <h3>
 <a id="encryption" class="anchor" href="#encryption" aria-hidden="true"><span class="octicon octicon-link"></span></a>Encryption</h3>
 
-<p>Encryption is done with <strong>GnuGPG</strong> using <a href="http://en.wikipedia.org/wiki/Advanced_Encryption_Standard">AES256</a>. Take a look at <a href="https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py">pysswords.crypt</a> module to know more.</p>
+<p>Encryption is done with <strong>GnuGPG</strong> using <a href="http://en.wikipedia.org/wiki/Advanced_Encryption_Standard">AES256</a>. Take a look at <a href="https://github.com/marcwebbie/passpie/blob/master/passpie/crypt.py">passpie.crypt</a> module to know more.</p>
 
 <h3>
 <a id="database-path" class="anchor" href="#database-path" aria-hidden="true"><span class="octicon octicon-link"></span></a>Database Path</h3>
 
-<p>The default database path is at <code>~/.pysswords</code>. If you want to change the database path, add <code>--database</code> option to pysswords together with <code>--init</code>.</p>
+<p>The default database path is at <code>~/.passpie</code>. If you want to change the database path, add <code>--database</code> option to passpie. Together with <code>--init</code> you can create arbitrary databases.</p>
 
-<div class="highlight highlight-bash"><pre>pysswords --init --database <span class="pl-s1"><span class="pl-pds">"</span>/path/to/another/database/<span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-bash"><pre>passpie --init --database <span class="pl-s"><span class="pl-pds">"</span>/path/to/another/database/<span class="pl-pds">"</span></span></pre></div>
 
 <h3>
 <a id="database-structure" class="anchor" href="#database-structure" aria-hidden="true"><span class="octicon octicon-link"></span></a>Database structure</h3>
 
-<p>Pysswords database is structured in a directory hierachy. Every
-credential is a <code>.pyssword</code> file inside a directory named after a credential group.</p>
+<p>Passpie database is structured in a directory hierachy. Every
+credential is a <code>.pass</code> file inside a directory named after a credential group.</p>
 
 <p>An empty database would look like this:</p>
 
-<div class="highlight highlight-bash"><pre>pysswords --database /tmp/pysswords --init
+<div class="highlight highlight-bash"><pre>passpie --database /tmp/passpie init
 
-tree /tmp/pysswords -la
-<span class="pl-c"># /tmp/pysswords</span>
-<span class="pl-c"># └── .keys</span>
-<span class="pl-c">#     ├── pubring.gpg</span>
-<span class="pl-c">#     ├── random_seed</span>
-<span class="pl-c">#     ├── secring.gpg</span>
-<span class="pl-c">#     └── trustdb.gpg</span></pre></div>
+tree /tmp/passpie -la
+<span class="pl-c"># /tmp/passpie</span>
+<span class="pl-c"># └── .keys</span></pre></div>
 
 <p>After adding a new credential the database would look like this:</p>
 
-<div class="highlight highlight-bash"><pre>pysswords --database /tmp/pysswords -a
-<span class="pl-c"># Name: github.com</span>
-<span class="pl-c"># Login: octocat</span>
+<div class="highlight highlight-bash"><pre>passpie --database /tmp/passpie add octocat@github.com
 <span class="pl-c"># Password: **********</span>
-<span class="pl-c"># Comments:</span>
 
-tree /tmp/pysswords -la
-<span class="pl-c"># /tmp/pysswords</span>
+tree /tmp/passpie -la
+<span class="pl-c"># /tmp/passpie</span>
 <span class="pl-c"># ├── .keys</span>
-<span class="pl-c"># │   ├── pubring.gpg</span>
-<span class="pl-c"># │   ├── random_seed</span>
-<span class="pl-c"># │   ├── secring.gpg</span>
-<span class="pl-c"># │   └── trustdb.gpg</span>
 <span class="pl-c"># └── github.com</span>
-<span class="pl-c">#     └── octocat.pyssword</span></pre></div>
+<span class="pl-c">#     └── octocat.pass</span></pre></div>
 
 <p>If we add more credentials to group github.com. Directory structure would be:</p>
 
-<div class="highlight highlight-bash"><pre>pysswords --database /tmp/pysswords -a
-<span class="pl-c"># Name: github.com</span>
-<span class="pl-c"># Login: octocat2</span>
+<div class="highlight highlight-bash"><pre>passpie --database /tmp/passpie add octocat2@github.com
 <span class="pl-c"># Password: **********</span>
-<span class="pl-c"># Comments:</span>
 
-tree /tmp/pysswords -la
-<span class="pl-c"># /tmp/pysswords</span>
+tree /tmp/passpie -la
+<span class="pl-c"># /tmp/passpie</span>
 <span class="pl-c"># ├── .keys</span>
-<span class="pl-c"># │   ├── pubring.gpg</span>
-<span class="pl-c"># │   ├── random_seed</span>
-<span class="pl-c"># │   ├── secring.gpg</span>
-<span class="pl-c"># │   └── trustdb.gpg</span>
 <span class="pl-c"># └── github</span>
-<span class="pl-c">#     └── octocat.pyssword</span>
-<span class="pl-c">#     └── octocat2.pyssword</span></pre></div>
+<span class="pl-c">#     └── octocat.pass</span>
+<span class="pl-c">#     └── octocat2.pass</span></pre></div>
 
 <h2>
 <a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
 <ul>
-<li>Fork the repository <a href="https://github.com/marcwebbie/pysswords/fork">https://github.com/marcwebbie/pysswords/fork</a>
+<li>Fork the repository <a href="https://github.com/marcwebbie/passpie/fork">https://github.com/marcwebbie/passpie/fork</a>
 </li>
-<li>Read the <a href="https://github.com/marcwebbie/pysswords/blob/master/Makefile">Makefile</a>
+<li>Read the <a href="https://github.com/marcwebbie/passpie/blob/master/Makefile">Makefile</a>
 </li>
 <li>Write your tests on <code>tests/test.py</code>
 </li>
@@ -386,14 +429,16 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/marcwebbie">marcwebbie</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/marcwebbie/passpie">Passpie</a> is maintained by <a href="https://github.com/marcwebbie">marcwebbie</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-              <script type="text/javascript">
+
+    </section>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -406,3 +451,4 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 
   </body>
 </html>
+
