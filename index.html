@@ -70,7 +70,8 @@ more about how passpie works internally, check Under the Hood section.</p>
 <p><a href="https://pypi.python.org/pypi/passpie"><img src="https://img.shields.io/pypi/v/passpie.svg?style=flat-square&amp;label=latest%20version" alt="pypi"></a>
 <a href="https://travis-ci.org/marcwebbie/passpie"><img src="https://img.shields.io/travis/marcwebbie/passpie/master.svg?style=flat-square&amp;label=unix%20build" alt="unix_build"></a>
 <a href="https://ci.appveyor.com/project/marcwebbie/passpie"><img src="https://img.shields.io/appveyor/ci/marcwebbie/marcwebbie.svg?style=flat-square&amp;label=windows%20build" alt="windows_build"></a>
-<a href="https://coveralls.io/r/marcwebbie/passpie"><img src="https://img.shields.io/coveralls/marcwebbie/passpie/master.svg?style=flat-square" alt="coverage"></a></p>
+<a href="https://coveralls.io/r/marcwebbie/passpie"><img src="https://img.shields.io/coveralls/marcwebbie/passpie/master.svg?style=flat-square" alt="coverage"></a>
+<a href="https://bitdeli.com/free" title="Bitdeli Badge"><img src="https://d2weczhvl823v0.cloudfront.net/marcwebbie/passpie/trend.png" alt="Bitdeli Badge"></a></p>
 
 <hr>
 
@@ -99,23 +100,24 @@ passpie init
 
 <span class="pl-c"># add new credentials.</span>
 passpie add foo@example.com
+passpie add bar@example.com
 
-<span class="pl-c"># edit credential "example".</span>
-passpie update foo@example
+<span class="pl-c"># edit credential "foo@example.com".</span>
+passpie update foo@example.com
 
-<span class="pl-c"># copy password from credential "foo@example" into system clipboard.</span>
-passpie copy foo@example
+<span class="pl-c"># copy password from credential "foo@example.com" into system clipboard.</span>
+passpie copy foo@example.com
 
-<span class="pl-c"># search credentials by "exam".</span>
+<span class="pl-c"># search credentials by string "exam".</span>
 passpie search exam
 
 <span class="pl-c"># search credentials using regular expressions.</span>
-passpie search <span class="pl-s"><span class="pl-pds">'</span>example\.com|org<span class="pl-pds">'</span></span>
+passpie search <span class="pl-s"><span class="pl-pds">'</span>foo|bar<span class="pl-pds">'</span></span>
 
-<span class="pl-c"># remove credential "foo@example".</span>
-passpie remove foo@example
+<span class="pl-c"># remove credential "foo@example.com".</span>
+passpie remove foo@example.com
 
-<span class="pl-c"># check database credential status</span>
+<span class="pl-c"># check database status</span>
 passpie status
 
 <span class="pl-c"># print all credentials as a table with hidden passwords</span>
@@ -191,7 +193,29 @@ passpie --version</pre></div>
 <a id="tutorials" class="anchor" href="#tutorials" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tutorials</h2>
 
 <h3>
-<a id="1-syncing-your-database" class="anchor" href="#1-syncing-your-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>1) Syncing your database</h3>
+<a id="1-diving-into-fullname-syntax" class="anchor" href="#1-diving-into-fullname-syntax" aria-hidden="true"><span class="octicon octicon-link"></span></a>1. Diving into <em>fullname</em> syntax</h3>
+
+<p>Passpie fullname syntax handles login and name for credentials in one go for faster adding and querying.</p>
+
+<h4>
+<a id="structure-of-a-fullname" class="anchor" href="#structure-of-a-fullname" aria-hidden="true"><span class="octicon octicon-link"></span></a>Structure of a fullname</h4>
+
+<p><code>login</code>@<code>name</code>. Login is optional, however no logins  means that you can add credentials without login by passing only names:</p>
+
+<div class="highlight highlight-bash"><pre>passpie add @banks/mybank --password 1234
+passpie add @banks/myotherbank --password 5678</pre></div>
+
+<p>Listing the database would show:</p>
+
+<div class="highlight highlight-bash"><pre>=================  =======  ==========  =========
+Name               Login    Password    Comment
+=================  =======  ==========  =========
+banks/mybank       _        <span class="pl-k">*****</span>
+banks/myotherbank  _        <span class="pl-k">*****</span>
+=================  =======  ==========  =========</pre></div>
+
+<h3>
+<a id="2-syncing-your-database" class="anchor" href="#2-syncing-your-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>2. Syncing your database</h3>
 
 <h4>
 <a id="dropbox" class="anchor" href="#dropbox" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dropbox</h4>
@@ -216,21 +240,18 @@ mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/GoogleDrive/
 ln -s <span class="pl-k">~</span>/GoogleDrive/.passpie <span class="pl-k">~</span>/.passpie</pre></div>
 
 <h3>
-<a id="2-exportingimporting-passpie-databases" class="anchor" href="#2-exportingimporting-passpie-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>2) Exporting/Importing Passpie databases</h3>
+<a id="3-exportingimporting-passpie-databases" class="anchor" href="#3-exportingimporting-passpie-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>3. Exporting/Importing Passpie databases</h3>
 
 <div class="highlight highlight-bash"><pre><span class="pl-c"># export database to a passpie database file called passpie.db</span>
-<span class="pl-c"># Option: `--export`</span>
+<span class="pl-c"># Command: `export`</span>
 passpie <span class="pl-k">export</span> passpie.db
 
 <span class="pl-c"># import database from passpie database file called passpie.db</span>
-<span class="pl-c"># Option: `--import`</span>
-passpie import passpie.db
-
-<span class="pl-c"># import 1password 1pif exported file</span>
-passpie import passwords.1pif/data1.1pif</pre></div>
+<span class="pl-c"># Option: `import`</span>
+passpie import passpie.db</pre></div>
 
 <h3>
-<a id="3-grouping-credentials-by-name" class="anchor" href="#3-grouping-credentials-by-name" aria-hidden="true"><span class="octicon octicon-link"></span></a>3) Grouping credentials by name</h3>
+<a id="4-grouping-credentials-by-name" class="anchor" href="#4-grouping-credentials-by-name" aria-hidden="true"><span class="octicon octicon-link"></span></a>4. Grouping credentials by name</h3>
 
 <p>Passpie credentials handles multiple logins for each name which groups credentials by name:</p>
 
@@ -252,7 +273,7 @@ example.com  jonh     <span class="pl-k">*****</span>       Jonh main email
 ===========  =======  ==========  ===============</pre></div>
 
 <h3>
-<a id="5-using-multiple-databases" class="anchor" href="#5-using-multiple-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>5) Using multiple databases</h3>
+<a id="5-using-multiple-databases" class="anchor" href="#5-using-multiple-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>5. Using multiple databases</h3>
 
 <p>Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using <code>-D</code> Passpie option.</p>
 
@@ -277,14 +298,14 @@ passpie -D <span class="pl-k">~</span>/databases/personal_passwords add my@examp
 <span class="pl-c"># add password to junk Passpie database</span>
 passpie -D <span class="pl-k">~</span>/databases/junk_passwords add other@example</pre></div>
 
-<h5>
-<a id="listing-passwords-from-specific-database" class="anchor" href="#listing-passwords-from-specific-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Listing passwords from specific database</h5>
+<h4>
+<a id="listing-passwords-from-specific-database" class="anchor" href="#listing-passwords-from-specific-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Listing passwords from specific database</h4>
 
 <div class="highlight highlight-bash"><pre><span class="pl-c"># listing specific databases</span>
 passpie -D <span class="pl-k">~</span>/databases/junk_passwords</pre></div>
 
 <h3>
-<a id="configuring-passpie-with-passpierc" class="anchor" href="#configuring-passpie-with-passpierc" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuring passpie with <code>.passpierc</code>
+<a id="6-configuring-passpie-with-passpierc" class="anchor" href="#6-configuring-passpie-with-passpierc" aria-hidden="true"><span class="octicon octicon-link"></span></a>6. Configuring passpie with <code>.passpierc</code>
 </h3>
 
 <p>You can override default passpie configuration with a <code>.passpierc</code> file on your home directory. Passpie configuration files must be written as a valid <a href="http://yaml.org/">yaml</a> file.</p>
@@ -398,6 +419,21 @@ tree /tmp/passpie -la
 <li>Read the <a href="https://github.com/marcwebbie/passpie/blob/master/Makefile">Makefile</a>
 </li>
 </ul>
+
+<h2>
+<a id="common-issues" class="anchor" href="#common-issues" aria-hidden="true"><span class="octicon octicon-link"></span></a>Common issues</h2>
+
+<h3>
+<a id="running-passpie-init-raises-typeerror-init-got-an-unexpected-keyword-argument-binary" class="anchor" href="#running-passpie-init-raises-typeerror-init-got-an-unexpected-keyword-argument-binary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running passpie init raises <code>TypeError: init() got an unexpected keyword argument 'binary'</code>
+</h3>
+
+<p>You probably have the unexpected <code>python-gnupg</code> package installed. Passpie depends on <a href="https://github.com/isislovecruft">isislovecruft</a> fork of <a href="https://github.com/isislovecruft/python-gnupg">python-gnupg</a></p>
+
+<p>To fix:</p>
+
+<pre><code>pip uninstall python-gnupg
+pip install -U passpie
+</code></pre>
 
 <h2>
 <a id="license-mit-license" class="anchor" href="#license-mit-license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License (<a href="http://choosealicense.com/licenses/mit/">MIT License</a>)</h2>
