@@ -9,6 +9,8 @@ more about how passpie works internally, check Under the Hood section.
 
 ![Passpie console interface](https://github.com/marcwebbie/passpie/raw/master/images/passpie.png)
 
+> Passpie is built with [Click](http://click.pocoo.org) for its interface, [TinyDB](https://github.com/msiemens/tinydb) for its database and [python-gnupg](https://github.com/isislovecruft/python-gnupg) for its encryption using gpg.
+
 ------------------------------------------------------------------------
 
 
@@ -19,15 +21,16 @@ more about how passpie works internally, check Under the Hood section.
 + [x] Add, update, remove credentials
 + [x] Copy passwords to clipboard
 + [x] List credentials as a table
-+ [x] Colored output
++ [x] List credentials with a colored output
 + [x] Search credentials by name, login or comments
 + [x] Search with regular expression
-+ [x] Grouping credentials
-+ [x] Configuration by file
++ [x] Group credentials by name
++ [x] Configure from configfile. `~/.passpie`
 + [ ] Change passphrase and re-encrypt database
-+ [x] Exporting Passpie database
-+ [x] Importing Passpie database
-+ [ ] Importing credentials from [1Password](https://agilebits.com/onepassword)
++ [x] Export Passpie database to plain text file
++ [x] Import plain text Passpie database
++ [ ] Import credentials from [1Password](https://agilebits.com/onepassword)
++ [ ] Import credentials from [Pysswords](https://github.com/marcwebbie/pysswords)
 + [x] Randomly generated credential passwords
 + [x] Generate database status report
 + [ ] Undo/Redo updates to the database
@@ -130,6 +133,14 @@ Search credentials using regular expression
 ### `status`:
 
 Query database status for maintenance
+
+### `export`:
+
+Export credentials as plain text
+
+### `import`:
+
+Import credentials
 
 ## Tutorials
 
@@ -235,6 +246,24 @@ passpie -D ~/databases/junk_passwords
 
 You can override default passpie configuration if you write a .passpierc file on your home directory. Passpie configuration files must be written as a valid [yaml](http://yaml.org/) file
 
+#### Example `.passpierc`:
+
+```yaml
+path: /Users/jon.doe/.passpie
+short_commands: true
+show_password: false
+table_format: fancy_grid
+colors:
+  login: green
+  name: yellow
+  password: cyan
+headers:
+  - name
+  - login
+  - password
+  - comment
+```
+
 Options:
 
 + colors:
@@ -264,26 +293,6 @@ Options:
 + show_password:
   - true
   - false
-
-
-### Example `.passpierc`:
-
-```yaml
-path: /Users/jon.doe/.passpie
-short_commands: true
-show_password: false
-table_format: fancy_grid
-colors:
-  login: green
-  name: yellow
-  password: cyan
-headers:
-  - name
-  - login
-  - password
-  - comment
-```
-
 
 ## Under The Hood
 
@@ -343,9 +352,12 @@ tree /tmp/passpie -la
 
 ## Contributing
 
+Feel free to comment, open a bug report or ask for new features on Passpie [issues](https://github.com/marcwebbie/passpie/issues) page or over [Twitter](https://twitter.com/marcwebbie).
+
+If you want to contributing with code:
+
 - Fork the repository [https://github.com/marcwebbie/passpie/fork](https://github.com/marcwebbie/passpie/fork)
 - Read the [Makefile](https://github.com/marcwebbie/passpie/blob/master/Makefile)
-- Write your tests on `tests/test.py`
 - If everything is OK. push your changes and make a pull request. ;)
 
 
