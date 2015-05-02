@@ -142,7 +142,7 @@ With Passpie database on default path `~/.passpie` and with a Dropbox shared dir
 ```bash
 # move your Passpie database inside your Dropbox directory
 mv ~/.passpie ~/Dropbox/.passpie
-
+v
 # create a symbolic link to your shared .passpie directory on the default path.
 ln -s ~/Dropbox/.passpie ~/.passpie
 ```
