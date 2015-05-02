@@ -1,10 +1,11 @@
 from argparse import Namespace
 from datetime import datetime, timedelta
-import functools
 from pkg_resources import get_distribution, DistributionNotFound
+import functools
 import json
 import os
 import shutil
+import tempfile
 
 from tabulate import tabulate
 from tinydb.queries import where
@@ -26,7 +27,7 @@ try:
     if not here.startswith(os.path.join(dist_loc, 'passpie')):
         raise DistributionNotFound
 except DistributionNotFound:
-    __version__ = 'Please install this project with setup.py'
+    __version__ = 'Please install this project with setup.py or pip'
 else:
     __version__ = _dist.version
 
@@ -382,3 +383,30 @@ def import_database(path):
             encrypted = cryptor.encrypt(cred['password'])
             cred['password'] = encrypted
         db.insert_multiple(credentials)
+
+
+@cli.command(help='Renew passpie password and re-encrypt credentials')
+@click.option("--passphrase", prompt="Passphrase", hide_input=True)
+def reset(passphrase):
+    db = Database(config.path)
+    ensure_passphrase(db, passphrase)
+    credentials = db.all()
+
+    # decrypt passwords
+    with Cryptor(config.path) as cryptor:
+        for cred in credentials:
+            cred["password"] = cryptor.decrypt(cred["password"], passphrase)
+
+    new_passphrase = click.prompt('New passphrase',
+                                  hide_input=True, confirmation_prompt=True)
+
+    # remove old credentials
+    tempdir = tempfile.mkdtemp()
+    with Cryptor(tempdir) as cryptor:
+        cryptor.create_keys(new_passphrase)
+        for cred in credentials:
+            cred["password"] = cryptor.encrypt(cred["password"])
+
+    # replace old database with tempdir
+    shutil.rmtree(config.path)
+    os.rename(tempdir, config.path)

@@ -26,7 +26,7 @@ more about how passpie works internally, check Under the Hood section.
 + [x] Search with regular expression
 + [x] Group credentials by name
 + [x] Configure from configfile. `~/.passpie`
-+ [ ] Change passphrase and re-encrypt database
++ [x] Change passphrase and re-encrypt database
 + [x] Export Passpie database to plain text file
 + [x] Import plain text Passpie database
 + [ ] Import credentials from [1Password](https://agilebits.com/onepassword)
@@ -143,6 +143,10 @@ Export credentials as plain text
 ### `import`:
 
 Import credentials
+
+### `reset`:
+
+Reset database passphrase and re-encrypt credentials
 
 ## Tutorials
 
