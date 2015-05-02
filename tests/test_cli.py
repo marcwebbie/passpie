@@ -46,13 +46,14 @@ def test_cli_remove_delete_credential_found_by_database(mock_db):
     assert 'foo' not in result_print.output
 
 
-def test_cli_add_credential_to_database(mock_db):
-    fullname = 'test_user@example'
-    runner = CliRunner()
-    result = runner.invoke(cli.add, [fullname, '--random'])
+# @pytest.mark.skip()
+# def test_cli_add_credential_to_database(mock_db):
+#     fullname = 'test_user@example'
+#     runner = CliRunner()
+#     result = runner.invoke(cli.add, [fullname, '--random'])
 
-    assert result.exit_code == 0
-    assert mock_db.get(where('fullname') == fullname)
+#     assert result.exit_code == 0
+#     assert mock_db.get(where('fullname') == fullname)
 
 
 def test_cli_copy_credential_password_to_database(mocker, mock_db):
