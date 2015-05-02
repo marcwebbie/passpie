@@ -3,7 +3,7 @@
 [Passpie](https://marcwebbie.github.io/passpie) lets you manage
 your login credentials from the terminal. Password files are saved into
 [GnuPG](http://en.wikipedia.org/wiki/GNU_Privacy_Guard) encrypted files
-into the Database Path\_. Only with the passphrase used to create the
+into the Database Path. Only with the passphrase used to create the
 pass database you can decrypt password files. If you want to know
 more about how passpie works internally, check Under the Hood section.
 
@@ -153,7 +153,7 @@ With Passpie database on default path `~/.passpie` and with a Dropbox shared dir
 ```bash
 # move your Passpie database inside your Dropbox directory
 mv ~/.passpie ~/Dropbox/.passpie
-v
+
 # create a symbolic link to your shared .passpie directory on the default path.
 ln -s ~/Dropbox/.passpie ~/.passpie
 ```
@@ -235,7 +235,7 @@ passpie -D ~/databases/personal_passwords add my@example
 passpie -D ~/databases/junk_passwords add other@example
 ```
 
-##### Adding passwords to specific database
+##### Listing passwords from specific database
 
 ```bash
 # listing specific databases
@@ -244,7 +244,7 @@ passpie -D ~/databases/junk_passwords
 
 ### Configuring passpie with `.passpierc`
 
-You can override default passpie configuration if you write a .passpierc file on your home directory. Passpie configuration files must be written as a valid [yaml](http://yaml.org/) file
+You can override default passpie configuration with a `.passpierc` file on your home directory. Passpie configuration files must be written as a valid [yaml](http://yaml.org/) file.
 
 #### Example `.passpierc`:
 
@@ -266,27 +266,10 @@ headers:
 
 Options:
 
-+ colors:
-  - black
-  - red
-  - green
-  - yellow
-  - blue
-  - magenta
-  - cyan
-  - white
-+ headers:
-  - fullname
-  - name
-  - login
-  - password
-  - comment
-+ path: Path to database
-+ table_format:
-  - rst
-  - simple
-  - orgtbl
-  - fancy_grid
++ colors: *[black, red, green, yellow, blue, magenta, cyan, white]*
++ headers: *[fullname, name, login, password, comment]*
++ path: path to database. Default: *~/.passpie*
++ table_format: *[rst, simple, orgtbl, fancy_grid]*
 + short_commands: Use short commands aliases as in `passpie a` for `passpie add`
   - true
   - false
@@ -302,10 +285,10 @@ Encryption is done with **GnuGPG** using [AES256](http://en.wikipedia.org/wiki/A
 
 ### Database Path
 
-The default database path is at `~/.passpie`. If you want to change the database path, add `--database` option to passpie. Together with `--init` you can create arbitrary databases.
+The default database path is at `~/.passpie`. If you want to change the database path, add `--database` option to passpie. Together with `init` you can create arbitrary databases.
 
 ```bash
-passpie --init --database "/path/to/another/database/"
+passpie --database "/path/to/another/database/" init
 ```
 
 ### Database structure
@@ -358,7 +341,6 @@ If you want to contributing with code:
 
 - Fork the repository [https://github.com/marcwebbie/passpie/fork](https://github.com/marcwebbie/passpie/fork)
 - Read the [Makefile](https://github.com/marcwebbie/passpie/blob/master/Makefile)
-- If everything is OK. push your changes and make a pull request. ;)
 
 
 ## License ([MIT License](http://choosealicense.com/licenses/mit/))
