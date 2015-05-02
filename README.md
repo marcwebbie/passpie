@@ -24,6 +24,7 @@ more about how passpie works internally, check Under the Hood section.
 + [x] Search with regular expression
 + [x] Grouping credentials
 + [x] Configuration by file
++ [ ] Change passphrase and re-encrypt database
 + [x] Exporting Passpie database
 + [x] Importing Passpie database
 + [ ] Importing credentials from [1Password](https://agilebits.com/onepassword)
@@ -45,7 +46,7 @@ more about how passpie works internally, check Under the Hood section.
 
 ## Installation
 
-### Stable version ![pypi version](https://img.shields.io/pypi/v/passpie.svg)
+### Stable version
 
 Make sure you have [GPG](https://www.gnupg.org/) and [pip](http://pip.readthedocs.org/en/latest/installing.html) installed:
 
@@ -53,11 +54,7 @@ Make sure you have [GPG](https://www.gnupg.org/) and [pip](http://pip.readthedoc
 pip install passpie
 ```
 
-### Development version [![Test Coverage](https://img.shields.io/coveralls/marcwebbie/passpie.svg)](https://coveralls.io/r/marcwebbie/passpie) [![Code Health](https://landscape.io/github/marcwebbie/passpie/master/landscape.svg)](https://landscape.io/github/marcwebbie/passpie/master)
-
-Linux/OSX | Windows
-----------|---------
-[![Build](https://travis-ci.org/marcwebbie/passpie.svg)](https://travis-ci.org/marcwebbie/passpie) | [![Build on windows](https://ci.appveyor.com/api/projects/status/5b7p1vo3y9x3y35t?svg=true)](https://ci.appveyor.com/project/marcwebbie/passpie)
+### Development version
 
 The **latest development version** can be installed directly from GitHub:
 
