@@ -40,7 +40,7 @@ scripts:
 	pip install --editable .
 
 test-tools:
-	pip install coverage ipython pudb flake8
+	pip install ipython pudb flake8 pytest pytest-cov
 
 setup-dev:
 	pyenv install $(PY27) --skip-existing --verbose
@@ -62,8 +62,7 @@ clean:
 	rm -rf __pycache__ || true
 
 coverage:
-	coverage run --source=$(PACKAGE) --omit=$(PACKAGE)/_compat.py setup.py test
-	coverage report -m --fail-under=100
+	py.test --cov .
 
 dist:
 	python setup.py -q sdist
@@ -95,8 +94,6 @@ test-pypy:
 	python -W ignore setup.py -q test
 
 test:
-	pyenv local $(PY34)
-	pyenv rehash
 	python -W ignore setup.py -q test
 
 simulate: check test test-py2 coverage
