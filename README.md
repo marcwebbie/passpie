@@ -1,14 +1,13 @@
-# Pysswords: Manage your passwords from the terminal
+# Passpie: Manage your passwords from the terminal
 
-[Pysswords](https://marcwebbie.github.io/pysswords) (pronounced Py-Swords) lets you manage
+[Passpie](https://marcwebbie.github.io/passpie) lets you manage
 your login credentials from the terminal. Password files are saved into
 [GnuPG](http://en.wikipedia.org/wiki/GNU_Privacy_Guard) encrypted files
 into the Database Path\_. Only with the passphrase used to create the
-pyssword database you can decrypt password files. If you want to know
-more about how pysswords works internally, check the Under the Hood\_
-section.
+pass database you can decrypt password files. If you want to know
+more about how passpie works internally, check Under the Hood section.
 
-![Pysswords console interface](https://github.com/marcwebbie/pysswords/raw/master/images/pysswords2.png)
+![Passpie console interface](https://github.com/marcwebbie/passpie/raw/master/images/passpie2.png)
 
 ------------------------------------------------------------------------
 
@@ -16,91 +15,114 @@ section.
 
 + [x] Console interface
 + [x] Manage multiple databases
-+ [x] Add, edit, remove credentials
++ [x] Add, update, remove credentials
 + [x] Copy passwords to clipboard
 + [x] List credentials as a table
 + [x] Colored output
 + [x] Search credentials by name, login or comments
 + [x] Search with regular expression
-+ [x] Bulk update/remove credentials
-+ [x] Select credentials by fullname syntax
 + [x] Grouping credentials
-+ [x] Exporting Pysswords database
-+ [x] Importing Pysswords database
-+ [x] Importing credentials from [1Password](https://agilebits.com/onepassword)
++ [x] Exporting Passpie database
++ [x] Importing Passpie database
++ [ ] Importing credentials from [1Password](https://agilebits.com/onepassword)
 + [x] Randomly generated credential passwords
++ [x] Generate database status report
++ [x] Generate database status report
 + [ ] Undo/Redo updates to the database
++ [ ] Bulk update/remove credentials
+
 
 ## Installation
 
-### Stable version ![pypi version](https://img.shields.io/pypi/v/pysswords.svg)
+### Stable version ![pypi version](https://img.shields.io/pypi/v/passpie.svg)
 
 Make sure you have [GPG](https://www.gnupg.org/) and [pip](http://pip.readthedocs.org/en/latest/installing.html) installed:
 
 ```bash
-pip install pysswords
+pip install passpie
 ```
 
-### Development version [![Test Coverage](https://img.shields.io/coveralls/marcwebbie/pysswords.svg)](https://coveralls.io/r/marcwebbie/pysswords) [![Code Health](https://landscape.io/github/marcwebbie/pysswords/master/landscape.svg)](https://landscape.io/github/marcwebbie/pysswords/master)
+### Development version [![Test Coverage](https://img.shields.io/coveralls/marcwebbie/passpie.svg)](https://coveralls.io/r/marcwebbie/passpie) [![Code Health](https://landscape.io/github/marcwebbie/passpie/master/landscape.svg)](https://landscape.io/github/marcwebbie/passpie/master)
 
 Linux/OSX | Windows
 ----------|---------
-[![Build](https://travis-ci.org/marcwebbie/pysswords.svg)](https://travis-ci.org/marcwebbie/pysswords) | [![Build on windows](https://ci.appveyor.com/api/projects/status/5b7p1vo3y9x3y35t?svg=true)](https://ci.appveyor.com/project/marcwebbie/pysswords)
+[![Build](https://travis-ci.org/marcwebbie/passpie.svg)](https://travis-ci.org/marcwebbie/passpie) | [![Build on windows](https://ci.appveyor.com/api/projects/status/5b7p1vo3y9x3y35t?svg=true)](https://ci.appveyor.com/project/marcwebbie/passpie)
 
 The **latest development version** can be installed directly from GitHub:
 
 ```bash
-$ pip install --upgrade https://github.com/marcwebbie/pysswords/tarball/master
+$ pip install --upgrade https://github.com/marcwebbie/passpie/tarball/master
 ```
 
 ## Quickstart
 
 ```bash
-# create a new credentials database. Option: `-I` or `--init`
-pysswords --init
+# create a new credentials database.
+passpie init
 
-# add new credentials. Option: `-a` or `--add`
-pysswords -a
+# add new credentials.
+passpie add foo@example.com
 
-# get credential "example". Option: `-g` or `--get`
-pysswords -g example
+# edit credential "example".
+passpie update foo@example
 
-# edit credential "example". Option: `-u` or `--update`
-pysswords -u example
+# copy password from credential "foo@example" into system clipboard.
+passpie copy foo@example
 
-# remove credential "example". Option: `-r` or `--remove`
-pysswords -r example
+# search credentials by "exam".
+passpie search exam
 
-# search credentials by "exam". Option: `-s` or `--search`
-pysswords -s exam
+# search credentials using regular expressions.
+passpie search 'example\.com|org'
 
-# search credentials using regular expressions Option: `-s` or `--search`.
-pysswords -s example\.com|org
+# remove credential "foo@example".
+passpie remove foo@example
 
-# copy password from credential "example" into system clipboard.
-# Option: `-c` or `--clipboard`
-pysswords -c example
+# check database credential status
+passpie status
 
 # print all credentials as a table with hidden passwords
-pysswords
+passpie
 
-# print all credentials as a table with passwords in plain text.
-# Option: `-P` or `--show-password`
-pysswords -P
-
-# specify other Pysswords database. Option `-D` or `--database`
-pysswords -D /path/to/other/database
-
-# delete database and remove all credentials
-# Option: `--clean`
-pysswords --clean
+# specify other Passpie database. Option `-D` or `--database`
+passpie -D /path/to/other/database
 
 # shows help. Option `-h` or `--help`
-pysswords --help
+passpie --help
 
 # shows version. Option `--version`
-pysswords --version
+passpie --version
 ```
+
+## Commands
+
+### `init`:
+
+Initialize database
+
+### `add`:
+
+Insert new credential to database
+
+### `update`:
+
+Update credential from database
+
+### `remove`:
+
+Remove credential from database
+
+### `copy`:
+
+Copy credential password to clipboard
+
+### `search`:
+
+Search credentials using regular expression
+
+### `status`:
+
+Query database status for maintenance
 
 ## Tutorials
 
@@ -108,196 +130,195 @@ pysswords --version
 
 #### Dropbox
 
-With Pysswords database on default path `~/.pysswords` and with a Dropbox shared directory on path `~/Dropbox`
+With Passpie database on default path `~/.passpie` and with a Dropbox shared directory on path `~/Dropbox`
 
 ```bash
-# move your Pysswords database inside your Dropbox directory
-mv ~/.pysswords ~/Dropbox/.pysswords
+# move your Passpie database inside your Dropbox directory
+mv ~/.passpie ~/Dropbox/.passpie
 
-# create a symbolic link to your shared .pysswords directory on the default path.
-ln -s ~/Dropbox/.pysswords ~/.pysswords
+# create a symbolic link to your shared .passpie directory on the default path.
+ln -s ~/Dropbox/.passpie ~/.passpie
 ```
 
 #### Google Drive
 
-With Pysswords database on default path `~/.pysswords` and with a GoogleDrive shared directory on path `~/GoogleDrive`
+With Passpie database on default path `~/.passpie` and with a GoogleDrive shared directory on path `~/GoogleDrive`
 
 ```bash
-# move your Pysswords database inside your Dropbox directory
-mv ~/.pysswords ~/GoogleDrive/.pysswords
+# move your Passpie database inside your Dropbox directory
+mv ~/.passpie ~/GoogleDrive/.passpie
 
-# create a symbolic link to your shared .pysswords directory on the default path.
-ln -s ~/GoogleDrive/.pysswords ~/.pysswords
+# create a symbolic link to your shared .passpie directory on the default path.
+ln -s ~/GoogleDrive/.passpie ~/.passpie
 ```
 
-### 2) Exporting/Importing Pyssword databases
+### 2) Exporting/Importing Passpie databases
 
 ```bash
-# export database to a pysswords database file called pysswords.db
+# export database to a passpie database file called passpie.db
 # Option: `--export`
-pysswords --export pysswords.db
+passpie export passpie.db
 
-# import database from pysswords database file called pysswords.db
+# import database from passpie database file called passpie.db
 # Option: `--import`
-pysswords --import pysswords.db
+passpie import passpie.db
 
 # import 1password 1pif exported file
-pysswords --import passwords.1pif/data1.1pif
+passpie import passwords.1pif/data1.1pif
 ```
 
 ### 3) Grouping credentials by name
 
-Pysswords credentials handles multiple logins for each name which groups credentials by name:
+Passpie credentials handles multiple logins for each name which groups credentials by name:
 
 ```bash
 # create john credential
-pysswords -a
-Name: example.com
-Login: john
-Password: **********
-Comment: No comment
+passpie add jonh@example.com --comment "Jonh main mail"
+#Password: **********
 
 # create doe credential
-pysswords -a
-Name: example.com
-Login: doe
-Password: **********
-Comment:
+passpie add doe@example.com --comment "No comment"
+#Password: **********
 
 # listing credentials
-pysswords
-
-| Name        | Login   | Password   | Comment    |
-|-------------+---------+------------+------------|
-| example.com | doe     | ***        |            |
-| example.com | john    | ***        | No comment |
-```
-
-### 4) Selecting credentials by fullname syntax
-
-You can select grouped credentials by using fullname syntax `login@name`:
-
-```bash
-pysswords -g doe@example.com
-
-| Name        | Login   | Password   | Comment   |
-|-------------+---------+------------+-----------|
-| example.com | doe     | ***        |           |
+passpie
+===========  =======  ==========  ===============
+name         login    password    comment
+===========  =======  ==========  ===============
+example.com  doe      *****       No comment
+example.com  jonh     *****       Jonh main email
+===========  =======  ==========  ===============
 ```
 
 ### 5) Using multiple databases
 
-Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using `-D` Pysswords option.
-
+Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using `-D` Passpie option.
 
 #### Creating databases on a given directory (ex: `~/databases`)
 
 ```bash
-# create personal Pysswords database
-pysswords --init -D ~/databases/personal_passwords
+# create personal Passpie database
+passpie -D ~/databases/personal_passwords init
 
-# create work Pysswords database
-pysswords --init -D ~/databases/work_passwords
+# create work Passpie database
+passpie -D ~/databases/work_passwords init
 
-# create junk Pysswords database
-pysswords --init -D ~/databases/junk_passwords
+# create junk Passpie database
+passpie -D ~/databases/junk_passwords init
 ```
 
 #### Adding passwords to specific database
 
 ```bash
-# add password to personal Pysswords database
-pysswords -D ~/databases/personal_passwords -a
+# add password to personal Passpie database
+passpie -D ~/databases/personal_passwords add my@example
 
-# add password to junk Pysswords database
-pysswords -D ~/databases/junk_passwords -a
+# add password to junk Passpie database
+passpie -D ~/databases/junk_passwords add other@example
 ```
 
 ##### Adding passwords to specific database
 
 ```bash
 # listing specific databases
-pysswords -D ~/databases/junk_passwords
+passpie -D ~/databases/junk_passwords
 ```
+
+### Configuring passpie with `.passpierc`
+
+You can override default passpie configuration if you write a .passpierc file on your home directory. Passpie configuration files must be written as a valid [yaml](http://yaml.org/) file
+
+Options:
+
++ colors:
+  1. black
+  2. red
+  3. green
+  4. yellow
+  5. blue
+  6. magenta
+  7. cyan
+  8. white
++ headers:
+  1. fullname
+  2. name
+  3. login
+  4. password
+  5. comment
++ path: Path to database
++ table_format:
+  1. rst
+  2. simple
+  3. orgtbl
+  4. fancy_grid
++ short_commands: Use short commands aliases as in `passpie a` for `passpie add`
+  1. true
+  2. false
++ show_password:
+  1. true
+  2. false
+
 
 ## Under The Hood
 
 ### Encryption
 
-Encryption is done with **GnuGPG** using [AES256](http://en.wikipedia.org/wiki/Advanced_Encryption_Standard). Take a look at [pysswords.crypt](https://github.com/marcwebbie/pysswords/blob/master/pysswords/crypt.py) module to know more.
+Encryption is done with **GnuGPG** using [AES256](http://en.wikipedia.org/wiki/Advanced_Encryption_Standard). Take a look at [passpie.crypt](https://github.com/marcwebbie/passpie/blob/master/passpie/crypt.py) module to know more.
 
 ### Database Path
 
-The default database path is at `~/.pysswords`. If you want to change the database path, add `--database` option to pysswords together with `--init`.
+The default database path is at `~/.passpie`. If you want to change the database path, add `--database` option to passpie. Together with `--init` you can create arbitrary databases.
 
 ```bash
-pysswords --init --database "/path/to/another/database/"
+passpie --init --database "/path/to/another/database/"
 ```
 
 ### Database structure
 
-Pysswords database is structured in a directory hierachy. Every
-credential is a `.pyssword` file inside a directory named after a credential group.
+Passpie database is structured in a directory hierachy. Every
+credential is a `.pass` file inside a directory named after a credential group.
 
 An empty database would look like this:
 
 ```bash
-pysswords --database /tmp/pysswords --init
+passpie --database /tmp/passpie init
 
-tree /tmp/pysswords -la
-# /tmp/pysswords
+tree /tmp/passpie -la
+# /tmp/passpie
 # └── .keys
-#     ├── pubring.gpg
-#     ├── random_seed
-#     ├── secring.gpg
-#     └── trustdb.gpg
 ```
 
 After adding a new credential the database would look like this:
 
 ```bash
-pysswords --database /tmp/pysswords -a
-# Name: github.com
-# Login: octocat
+passpie --database /tmp/passpie add octocat@github.com
 # Password: **********
-# Comments:
 
-tree /tmp/pysswords -la
-# /tmp/pysswords
+tree /tmp/passpie -la
+# /tmp/passpie
 # ├── .keys
-# │   ├── pubring.gpg
-# │   ├── random_seed
-# │   ├── secring.gpg
-# │   └── trustdb.gpg
 # └── github.com
-#     └── octocat.pyssword
+#     └── octocat.pass
 ```
 
 If we add more credentials to group github.com. Directory structure would be:
 
 ```bash
-pysswords --database /tmp/pysswords -a
-# Name: github.com
-# Login: octocat2
+passpie --database /tmp/passpie add octocat2@github.com
 # Password: **********
-# Comments:
 
-tree /tmp/pysswords -la
-# /tmp/pysswords
+tree /tmp/passpie -la
+# /tmp/passpie
 # ├── .keys
-# │   ├── pubring.gpg
-# │   ├── random_seed
-# │   ├── secring.gpg
-# │   └── trustdb.gpg
 # └── github
-#     └── octocat.pyssword
-#     └── octocat2.pyssword
+#     └── octocat.pass
+#     └── octocat2.pass
 ```
 
 ## Contributing
 
-- Fork the repository [https://github.com/marcwebbie/pysswords/fork](https://github.com/marcwebbie/pysswords/fork)
-- Read the [Makefile](https://github.com/marcwebbie/pysswords/blob/master/Makefile)
+- Fork the repository [https://github.com/marcwebbie/passpie/fork](https://github.com/marcwebbie/passpie/fork)
+- Read the [Makefile](https://github.com/marcwebbie/passpie/blob/master/Makefile)
 - Write your tests on `tests/test.py`
 - If everything is OK. push your changes and make a pull request. ;)
 
