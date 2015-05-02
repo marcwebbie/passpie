@@ -1,8 +1,6 @@
-click==3.3
-colorama==0.3.3
-gnupg==2.0.1
-psutil==2.2.1
+click==4.0
+gnupg==2.0.2
 pyperclip==1.5.9
 PyYAML==3.11
-tabulate==0.7.4
-tinydb==2.2.2
+tabulate==0.7.5
+tinydb==2.3.1
