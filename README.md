@@ -30,7 +30,6 @@ more about how passpie works internally, check Under the Hood section.
 + [ ] Importing credentials from [1Password](https://agilebits.com/onepassword)
 + [x] Randomly generated credential passwords
 + [x] Generate database status report
-+ [x] Generate database status report
 + [ ] Undo/Redo updates to the database
 + [ ] Bulk update/remove credentials
 
