@@ -1,5 +1,6 @@
 from argparse import Namespace
 from datetime import datetime, timedelta
+import functools
 from pkg_resources import get_distribution, DistributionNotFound
 import json
 import os
@@ -60,9 +61,8 @@ class Table(object):
 def get_credential_or_abort(db, fullname):
     credential = db.get(where("fullname") == fullname)
     if not credential:
-        click.secho(
-            "Credential '{}' not found".format(fullname), fg="red")
-        raise click.Abort
+        message = "Credential '{}' not found".format(fullname)
+        raise click.ClickException(click.style(message, fg='red'))
     return credential
 
 
@@ -72,8 +72,8 @@ def ensure_passphrase(db, passphrase):
             cryptor.check(passphrase, ensure=True)
         return passphrase
     except ValueError:
-        click.secho("Wrong passphrase", fg="red")
-        raise click.Abort
+        message = 'Wrong passphrase'
+        raise click.ClickException(click.style(message, fg='red'))
 
 
 def print_table(credentials):
@@ -89,10 +89,26 @@ def print_table(credentials):
         click.echo(Table(credentials).render(headers))
 
 
+def ensure_database(func):
+    @functools.wraps(func)
+    def decorator(*args, **kwargs):
+        keys_path = os.path.join(config.path, '.keys')
+        if os.path.isdir(config.path) and os.path.isfile(keys_path):
+            return func(*args, **kwargs)
+        else:
+            message = 'Not initialized database at {.path}'.format(config)
+            raise click.ClickException(click.style(message, fg='yellow'))
+    return decorator
+
+
 @click.group(invoke_without_command=True)
+@click.option('-D', '--database', help='Alternative database path',
+              type=click.Path(dir_okay=True, writable=True, resolve_path=True))
 @click.version_option(version=__version__)
 @click.pass_context
-def cli(ctx):
+def cli(ctx, database=config.path):
+    if database:
+        config.path = database
     if ctx.invoked_subcommand is None:
         db = Database(config.path)
         credentials = sorted(db.all(), key=lambda x: x["name"]+x["login"])
@@ -111,9 +127,9 @@ def init(passphrase, force):
         with Cryptor(config.path) as cryptor:
             cryptor.create_keys(passphrase)
     except FileExistsError:
-        msg = "Database exists in {}. `--force` to overwrite"
-        click.secho(msg.format(config.path), fg="yellow")
-        raise click.Abort
+        message = "Database exists in {}. `--force` to overwrite".format(
+            config.path)
+        raise click.ClickException(click.style(message, fg='yellow'))
     click.echo("Initialized database in {}".format(config.path))
 
 
@@ -122,6 +138,7 @@ def init(passphrase, force):
 @click.option('-r', '--random', 'password', flag_value=genpass())
 @click.password_option(help="Credential password")
 @click.option('-c', '--comment', default="", help="Credential comment")
+@ensure_database
 def add(fullname, password, comment):
     db = Database(config.path)
     try:
