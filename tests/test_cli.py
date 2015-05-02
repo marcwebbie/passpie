@@ -2,15 +2,15 @@ from click.testing import CliRunner
 
 from .helpers import MockerTestCase
 from passpie.credential import split_fullname
-from passpie.interface import cli
+from passpie import cli
 from passpie._compat import FileExistsError
 
 
 class CLIDefaultTests(MockerTestCase):
 
     def setUp(self):
-        self.MockDB = self.patch("passpie.interface.cli.Database")
-        self.mock_config = self.patch("passpie.interface.cli.config")
+        self.MockDB = self.patch("passpie.cli.Database")
+        self.mock_config = self.patch("passpie.cli.config")
         self.mock_config.table = {}
         self.mock_config.table["headers"] = ["name", "login"]
 
@@ -76,8 +76,8 @@ class CliInitTests(MockerTestCase):
 
     def setUp(self):
         self.mock_cryptor = self.MagicMock()
-        self.mock_shutil = self.patch("passpie.interface.cli.shutil")
-        mock_cryptor_context = self.patch("passpie.interface.cli.Cryptor")
+        self.mock_shutil = self.patch("passpie.cli.shutil")
+        mock_cryptor_context = self.patch("passpie.cli.Cryptor")
         mock_cryptor_context().__enter__.return_value = self.mock_cryptor
 
     def test_database_initialization(self):
@@ -90,7 +90,7 @@ class CliInitTests(MockerTestCase):
         self.mock_cryptor.create_keys.assert_called_once_with(passphrase)
 
     def test_database_initialization_prints_error_when_keys_exist(self):
-        mock_rmtree = self.patch("passpie.interface.cli.shutil.rmtree")
+        mock_rmtree = self.patch("passpie.cli.shutil.rmtree")
         passphrase = "PASS2pie"
 
         runner = CliRunner()
@@ -114,10 +114,10 @@ class CLIAddTests(MockerTestCase):
 
     def setUp(self):
         self.mock_cryptor = self.MagicMock()
-        mock_cryptor_context = self.patch("passpie.interface.cli.Cryptor")
+        mock_cryptor_context = self.patch("passpie.cli.Cryptor")
         mock_cryptor_context().__enter__.return_value = self.mock_cryptor
-        self.MockDB = self.patch("passpie.interface.cli.Database")
-        self.mock_datetime = self.patch("passpie.interface.cli.datetime")
+        self.MockDB = self.patch("passpie.cli.Database")
+        self.mock_datetime = self.patch("passpie.cli.datetime")
         self.patch_object(self.MockDB(), "search", self.Mock(return_value=[]))
 
     def test_add_credential_by_fullname_creates_credential_and_add(self):
@@ -192,10 +192,10 @@ class DatabaseCopyToClipboardTests(MockerTestCase):
 
     def setUp(self):
         self.mock_cryptor = self.MagicMock()
-        mock_cryptor_context = self.patch("passpie.interface.cli.Cryptor")
+        mock_cryptor_context = self.patch("passpie.cli.Cryptor")
         mock_cryptor_context().__enter__.return_value = self.mock_cryptor
-        self.MockDB = self.patch("passpie.interface.cli.Database")
-        self.pyperclip = self.patch("passpie.interface.cli.pyperclip")
+        self.MockDB = self.patch("passpie.cli.Database")
+        self.pyperclip = self.patch("passpie.cli.pyperclip")
 
     def test_copy_to_clipboard_decrypts_password_to_pass_to_pyperclip(self):
         fullname = "foo@bar"
@@ -243,10 +243,10 @@ class UpdateTests(MockerTestCase):
 
     def setUp(self):
         self.mock_cryptor = self.MagicMock()
-        mock_cryptor_context = self.patch("passpie.interface.cli.Cryptor")
+        mock_cryptor_context = self.patch("passpie.cli.Cryptor")
         mock_cryptor_context().__enter__.return_value = self.mock_cryptor
-        self.MockDB = self.patch("passpie.interface.cli.Database")
-        self.mock_datetime = self.patch("passpie.interface.cli.datetime")
+        self.MockDB = self.patch("passpie.cli.Database")
+        self.mock_datetime = self.patch("passpie.cli.datetime")
 
     def test_abort_with_not_found_message_when_credential_not_found(self):
         self.MockDB().get.return_value = None
@@ -271,7 +271,7 @@ class UpdateTests(MockerTestCase):
         )
         self.MockDB().get.return_value = cred
         self.mock_click_confirm = self.patch(
-            "passpie.interface.cli.click.confirm")
+            "passpie.cli.click.confirm")
 
         runner = CliRunner()
         runner.invoke(cli.update, [fullname, "--random"])
@@ -280,7 +280,7 @@ class UpdateTests(MockerTestCase):
             "Update credential '{}'".format(fullname), abort=True)
 
     def test_set_values_to_update_if_any(self):
-        self.mock_where = self.patch("passpie.interface.cli.where")
+        self.mock_where = self.patch("passpie.cli.where")
         fullname = "foo@bar"
         cred = dict(
             fullname=fullname,
@@ -305,7 +305,7 @@ class UpdateTests(MockerTestCase):
             values, self.mock_where("fullname") == fullname)
 
     def test_prompt_user_for_each_credential_attribute_if_none_passed(self):
-        mock_click_prompt = self.patch("passpie.interface.cli.click.prompt")
+        mock_click_prompt = self.patch("passpie.cli.click.prompt")
         fullname = "foo@bar"
         cred = dict(
             fullname=fullname,
@@ -333,8 +333,8 @@ class UpdateTests(MockerTestCase):
 class RemoveTests(MockerTestCase):
 
     def setUp(self):
-        self.MockDB = self.patch("passpie.interface.cli.Database")
-        self.mock_where = self.patch("passpie.interface.cli.where")
+        self.MockDB = self.patch("passpie.cli.Database")
+        self.mock_where = self.patch("passpie.cli.where")
 
     def test_remove_deletes_credential_from_database(self):
         fullname = "foo@bar"
@@ -349,9 +349,9 @@ class RemoveTests(MockerTestCase):
 class SearchTests(MockerTestCase):
 
     def setUp(self):
-        self.MockDB = self.patch("passpie.interface.cli.Database")
-        self.mock_where = self.patch("passpie.interface.cli.where")
-        self.mock_config = self.patch("passpie.interface.cli.config")
+        self.MockDB = self.patch("passpie.cli.Database")
+        self.mock_where = self.patch("passpie.cli.where")
+        self.mock_config = self.patch("passpie.cli.config")
         self.mock_config.table = dict(
             headers=("name", "login", "comment"),
             hidden=[],
