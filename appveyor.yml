@@ -1,10 +1,9 @@
-# https://ci.appveyor.com/api/projects/status/5b7p1vo3y9x3y35t
 build: false
 environment:
   matrix:
     - PYTHON: "C:/Python27"
-    - PYTHON: "C:/Python34"
     - PYTHON: "C:/Python33"
+    - PYTHON: "C:/Python34"
 init:
   - "ECHO %PYTHON%"
   - ps: "ls C:/Python*"
@@ -13,5 +12,6 @@ install:
   - "%PYTHON%/python.exe C:/get-pip.py"
   - "%PYTHON%/Scripts/pip.exe install setuptools"
   - "%PYTHON%/Scripts/pip.exe install -r requirements.txt"
+  - "%PYTHON%/Scripts/pip.exe install -r pytest mock"
 test_script:
-  - "%PYTHON%/python.exe setup.py test"
+  - "%PYTHON%/py.test"
