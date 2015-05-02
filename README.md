@@ -367,6 +367,20 @@ If you want to contributing with code:
 - Read the [Makefile](https://github.com/marcwebbie/passpie/blob/master/Makefile)
 
 
+## Common issues
+
+### Running passpie init raises `TypeError: init() got an unexpected keyword argument 'binary'`
+
+You probably have the unexpected `python-gnupg` package installed. Passpie depends on [isislovecruft](https://github.com/isislovecruft) fork of [python-gnupg](https://github.com/isislovecruft/python-gnupg)
+
+To fix:
+
+```
+pip uninstall python-gnupg
+pip install -U passpie
+```
+
+
 ## License ([MIT License](http://choosealicense.com/licenses/mit/))
 
 The MIT License (MIT)
