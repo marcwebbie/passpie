@@ -44,15 +44,18 @@ if os.path.exists(CONFIG_PATH):
     except (AssertionError, yaml.scanner.ScannerError) as e:
         click.ClickException('Bad configuration file: {}'.format(e))
 
-    config = Namespace(**config_dict)
-else:
-    config = Namespace(
-        path=os.path.expanduser("~/.passpie"),
-        show_password=False,
-        headers=["name", "login", "password", "comment"],
-        colors={"name": "yellow", "login": "green", "password": "magenta"},
-        table_format="fancy_grid"
-    )
+config = Namespace(
+    path=config_dict.get('path', os.path.expanduser("~/.passpie")),
+    show_password=config_dict.get('show_password', False),
+    short_commands=config_dict.get('short_commands', False),
+    table_format=config_dict.get('table_format', "fancy_grid"),
+    headers=config_dict.get(
+        'headers',
+        ["name", "login", "password", "comment"]),
+    colors=config_dict.get(
+        'colors',
+        {"name": "yellow", "login": "green", "password": "magenta"}),
+)
 
 
 class AliasedGroup(click.Group):
@@ -116,6 +119,12 @@ def print_table(credentials):
         for header, color in config.colors.items():
             for credential in credentials:
                 credential[header] = click.style(credential[header], fg=color)
+
+        for credential in [c for c in credentials if 'name' in c.keys()]:
+            credential['name'] = click.style(credential['name'], bold=True)
+
+        for credential in [c for c in credentials if 'login' in c.keys()]:
+            credential['login'] = click.style(credential['login'], bold=True)
 
         click.echo(Table(credentials).render(headers))
 
