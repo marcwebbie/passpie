@@ -105,11 +105,11 @@ def print_table(credentials):
             for credential in credentials:
                 credential[header] = click.style(credential[header], fg=color)
 
-        for credential in [c for c in credentials if 'name' in c.keys()]:
+        for credential in credentials:
             credential['name'] = click.style(credential['name'], bold=True)
-
-        for credential in [c for c in credentials if 'login' in c.keys()]:
             credential['login'] = click.style(credential['login'], bold=True)
+            credential['fullname'] = click.style(
+                credential['fullname'], bold=True)
 
         click.echo(Table(credentials).render(config.headers))
 

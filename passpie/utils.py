@@ -48,11 +48,12 @@ def load_config(default_config, user_config_path):
     if os.path.exists(user_config_path) and os.path.isfile(user_config_path):
         with open(user_config_path) as config_file:
             config_content = config_file.read()
+
         try:
             user_config = yaml.load(config_content)
+            default_config.update(user_config)
         except yaml.scanner.ScannerError as e:
             logging.debug('Malformed user configuration file {}'.format(e))
 
-        default_config.update(user_config)
-        config = Namespace(**default_config)
-        return config
+    config = Namespace(**default_config)
+    return config
