@@ -285,6 +285,7 @@ colors:
   name: yellow
   password: cyan
 headers:
+  - fullname
   - name
   - login
   - password
