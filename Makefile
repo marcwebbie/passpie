@@ -12,13 +12,12 @@ PY34 = 3.4.2
 PYPY = pypy-2.4.0
 
 
-.PHONY: configure set-python setup-dev test test-py2 test-pypy wheel dist run install-python deploy register check simulate cov clean test-tools
+.PHONY: configure setup-dev test test-py2 test-pypy wheel dist run install-python deploy register check simulate cov clean test-tools
 
 configure: scripts test-tools
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
-	@echo "  set-python	=> to set pyenv shell shell version"
 	@echo "  setup-dev	=> to install all needed versions of pyenv"
 	@echo "  clean		=> to clean clean all automatically generated files"
 	@echo "  cov		=> to run coverage"
@@ -32,11 +31,7 @@ help:
 	@echo "  simulate	=> to simulate CI tests tasks"
 	@echo "  deploy		=> to push binary wheels to pypi servers"
 
-set-python:
-	pyenv local $(PY27) $(PY32) $(PY33) $(PY34) $(PYPY)
-	pyenv rehash
-
-scripts:
+install:
 	pip install --editable .
 
 test-tools:
@@ -94,5 +89,5 @@ test:
 
 simulate: check test test-py2 test-pypy
 
-deploy: check test test-py2 test-pypy register
+deploy: simulate register
 	python setup.py sdist bdist_wheel upload -r pypi
