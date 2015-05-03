@@ -377,7 +377,8 @@ def import_database(path):
     from passpie.importers import find_importer
     importer = find_importer(path)
     credentials = importer.handle(path)
-    db = Database(config.path)
+    if credentials:
+        db = Database(config.path)
     with Cryptor(config.path) as cryptor:
         for cred in credentials:
             encrypted = cryptor.encrypt(cred['password'])
@@ -390,23 +391,24 @@ def import_database(path):
 def reset(passphrase):
     db = Database(config.path)
     ensure_passphrase(db, passphrase)
-    credentials = db.all()
-
-    # decrypt passwords
-    with Cryptor(config.path) as cryptor:
-        for cred in credentials:
-            cred["password"] = cryptor.decrypt(cred["password"], passphrase)
-
     new_passphrase = click.prompt('New passphrase',
                                   hide_input=True, confirmation_prompt=True)
 
-    # remove old credentials
-    tempdir = tempfile.mkdtemp()
-    with Cryptor(tempdir) as cryptor:
-        cryptor.create_keys(new_passphrase)
-        for cred in credentials:
-            cred["password"] = cryptor.encrypt(cred["password"])
+    credentials = db.all()
+    if credentials:
+        with Cryptor(config.path) as cryptor:
+            # decrypt passwords
+            for cred in credentials:
+                cred["password"] = cryptor.decrypt(cred["password"],
+                                                   passphrase)
 
-    # replace old database with tempdir
-    shutil.rmtree(config.path)
-    os.rename(tempdir, config.path)
+            # recreate keys
+            cryptor.create_keys(new_passphrase, overwrite=True)
+
+            # encrypt passwords
+            for cred in credentials:
+                cred["password"] = cryptor.encrypt(cred["password"])
+
+        # remove old and insert re-encrypted credentials
+        db.purge()
+        db.insert_multiple(credentials)
