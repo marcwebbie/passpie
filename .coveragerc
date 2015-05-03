@@ -13,5 +13,6 @@ exclude_lines =
     _import_all_importer_files
 
     # Don't complain if tests don't hit defensive assertion code:
+    except ImportError
     raise AssertionError
     raise NotImplementedError
