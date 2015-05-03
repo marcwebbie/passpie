@@ -7,6 +7,7 @@ import yaml
 
 from passpie.importers import find_importer, BaseImporter, get_instances
 from passpie.importers.default_importer import DefaultImporter
+from passpie.importers.pysswords_importer import PysswordsImporter
 
 
 def test_find_importer_returns_first_match_default_importer(mocker):
@@ -119,3 +120,56 @@ def test_get_instances_returns_instances_of_all_found_importers(mocker):
     assert Importer() in importers
     assert Importer2() in importers
     assert Importer3() in importers
+
+
+def test_pysswords_returns_false_with_logging_when_not_installed(mocker):
+    to_patch = 'passpie.importers.pysswords_importer.found_pysswords'
+    mocker.patch(to_patch, return_value=False)
+    importer = PysswordsImporter()
+    importer.log = Mock()
+
+    result = importer.match('filepath')
+    assert result is False
+    assert importer.log.called
+    importer.log.assert_called_once_with('Pysswords is not installed')
+
+
+def test_pysswords_returns_false_with_logging_when_path_not_dir(mocker):
+    to_patch = 'passpie.importers.pysswords_importer.found_pysswords'
+    mocker.patch(to_patch, return_value=True)
+    mock_os = mocker.patch('passpie.importers.pysswords_importer.os')
+    mock_os.path.is_dir.return_value = False
+    importer = PysswordsImporter()
+    importer.log = Mock()
+
+    result = importer.match('filepath')
+    assert result is False
+    assert importer.log.called
+    importer.log.assert_called_once_with('.keys not found in path')
+
+
+def test_pysswords_returns_false_with_logging_when_keys_not_in_path(mocker):
+    to_patch = 'passpie.importers.pysswords_importer.found_pysswords'
+    mocker.patch(to_patch, return_value=True)
+    mock_os = mocker.patch('passpie.importers.pysswords_importer.os')
+    mock_os.path.is_dir.return_value = True
+    mock_os.listdir.return_value = []
+    importer = PysswordsImporter()
+    importer.log = Mock()
+
+    result = importer.match('filepath')
+    assert result is False
+    assert importer.log.called
+    importer.log.assert_called_once_with('.keys not found in path')
+
+
+def test_pysswords_match_returns_true_when_expected_path(mocker):
+    to_patch = 'passpie.importers.pysswords_importer.found_pysswords'
+    mocker.patch(to_patch, return_value=True)
+    mock_os = mocker.patch('passpie.importers.pysswords_importer.os')
+    mock_os.path.is_dir.return_value = True
+    mock_os.listdir.return_value = ['.keys']
+    importer = PysswordsImporter()
+
+    result = importer.match('filepath')
+    assert result is True

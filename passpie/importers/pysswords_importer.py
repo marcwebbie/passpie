@@ -6,14 +6,18 @@ import click
 from passpie.importers import BaseImporter
 from passpie.credential import make_fullname
 
+try:
+    from pysswords.db import Database
+    found_pysswords = lambda: True
+except ImportError:
+    found_pysswords = lambda: False
+
 
 class PysswordsImporter(BaseImporter):
 
     def match(self, filepath):
-        try:
-            from pysswords.db import Database
-        except ImportError:
-            self.log('pysswords is not installed')
+        if not found_pysswords():
+            self.log('Pysswords is not installed')
             return False
 
         try:
@@ -26,8 +30,6 @@ class PysswordsImporter(BaseImporter):
         return True
 
     def handle(self, filepath):
-        from pysswords.db import Database
-
         db = Database(path=filepath)
         passphrase = click.prompt('Pysswords passphrase', hide_input=True)
         if not db.check(passphrase):
