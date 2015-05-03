@@ -8,6 +8,7 @@ except ImportError:
     from unittest import mock
 
 from passpie import cli
+from passpie.crypt import FileExistsError
 
 
 @pytest.fixture
@@ -110,3 +111,38 @@ def test_cli_reset_purges_all_elements(mocker, mock_db, mock_cryptor):
 
     assert result.exit_code is 0
     assert mock_db.purge.called
+
+
+def test_init_success(mock_cryptor):
+    passphrase = "PASS2pie"
+    runner = CliRunner()
+    result = runner.invoke(cli.init, ["--passphrase", passphrase])
+    expected_msg = "Initialized database in {}\n".format(cli.config.path)
+
+    assert result.output == expected_msg
+    mock_cryptor.create_keys.assert_called_once_with(passphrase)
+
+
+def test_init_prints_error_when_keys_exist(mocker, mock_cryptor):
+    mock_cryptor.create_keys.side_effect = FileExistsError
+    passphrase = "PASS2pie"
+    path = cli.config.path
+    message = 'Error: Database exists in %s. `--force` to overwrite\n' % path
+
+    runner = CliRunner()
+    result = runner.invoke(cli.init, ["--passphrase", passphrase])
+
+    assert result.exit_code is not 0
+    assert result.output == message
+
+
+def test_init_has_success_when_keys_exits_and_force_is_passed(mocker, mock_cryptor):
+    mock_shutil = mocker.patch('passpie.cli.shutil')
+    passphrase = "PASS2pie"
+
+    runner = CliRunner()
+    result = runner.invoke(cli.init, ["--passphrase", passphrase, '--force'])
+
+    assert result.exit_code is 0
+    assert mock_shutil.rmtree.called
+    mock_shutil.rmtree.assert_called_once_with(cli.config.path)
