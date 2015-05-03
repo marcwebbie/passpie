@@ -1,14 +1,25 @@
-from click.testing import CliRunner
-from tinydb import TinyDB
-from tinydb.storages import MemoryStorage
-import pytest
+import tempfile
 try:
     import mock
 except ImportError:
     from unittest import mock
 
+from click.testing import CliRunner
+from tinydb import TinyDB
+from tinydb.storages import MemoryStorage
+import pytest
+
 from passpie import cli
 from passpie.crypt import FileExistsError
+
+
+@pytest.fixture
+def mock_cfg(mocker):
+    tmpdir = tempfile.mkdtemp()
+    config = cli.config
+    config.path = tmpdir
+    mocker.patch('passpie.cli.load_config', return_value=config)
+    return config
 
 
 @pytest.fixture
@@ -171,3 +182,18 @@ def test_import_prints_nothing_when_no_importer_is_found(mocker, mock_cryptor):
     result = runner.invoke(cli.import_database, ['~/something'])
 
     assert result.exit_code is 0
+
+
+def test_import_reencrypt_all_credential_passwords(mocker, mock_cryptor):
+    password = 's3cret'
+    credentials = [{'password': password}]
+    mocker.patch('passpie.cli.Database')
+    mock_importer = mocker.patch('passpie.cli.find_importer')()
+    mock_importer.handle.return_value = credentials
+
+    runner = CliRunner()
+    result = runner.invoke(cli.import_database, ['something'])
+
+    assert result.exit_code is 0
+    assert mock_cryptor.encrypt.called is True
+    mock_cryptor.encrypt.assert_called_once_with(password)
