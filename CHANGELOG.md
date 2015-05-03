@@ -2,6 +2,12 @@
 
 ## Versions
 
+### v0.1rc6
+
++ **√** Bug fixes on loading user config
++ **√** Minor bug fixes
++ **√** Disable show_password config
+
 ### v0.1rc5
 
 + **√** Bug fixes on import command
