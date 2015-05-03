@@ -146,3 +146,19 @@ def test_init_has_success_when_keys_exits_and_force_is_passed(mocker, mock_crypt
     assert result.exit_code is 0
     assert mock_shutil.rmtree.called
     mock_shutil.rmtree.assert_called_once_with(cli.config.path)
+
+
+def test_copy_to_clipboard_decrypts_password_to_pass_to_pyperclip(mocker, mock_cryptor):
+    mock_pyperclip = mocker.patch('passpie.cli.pyperclip')
+    mocker.patch('passpie.cli.get_credential_or_abort')
+    mocker.patch('passpie.cli.ensure_passphrase')
+    fullname = "foo@bar"
+    passphrase = "passphrase"
+    mock_password = mock_cryptor.decrypt()
+
+    runner = CliRunner()
+    result = runner.invoke(cli.copy, [fullname, "--passphrase", passphrase])
+
+    assert result.exit_code is 0
+    assert result.output == "Password copied to clipboard\n"
+    mock_pyperclip.copy.assert_called_once_with(mock_password)
