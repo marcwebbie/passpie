@@ -2,6 +2,10 @@
 
 ## Versions
 
+### v0.1rc3
+
++ **√** Bump invalid pypi version
+
 ### v0.1rc2.1
 
 + **√** Fix `reset` command not copying newly re-encrypted credentials
