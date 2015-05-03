@@ -6,7 +6,7 @@ from passpie.importers import BaseImporter
 
 class DefaultImporter(BaseImporter):
 
-    def _read_file(filepath):
+    def _read_file(self, filepath):
         return open(filepath).read()
 
     def match(self, filepath):
