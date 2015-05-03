@@ -33,7 +33,7 @@ class PysswordsImporter(BaseImporter):
         db = Database(path=filepath)
         passphrase = click.prompt('Pysswords passphrase', hide_input=True)
         if not db.check(passphrase):
-            return False
+            return []
 
         credentials = []
         for cred in db.credentials:

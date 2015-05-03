@@ -1,3 +1,4 @@
+from collections import namedtuple
 try:
     from mock import Mock, mock_open
 except ImportError:
@@ -173,3 +174,31 @@ def test_pysswords_match_returns_true_when_expected_path(mocker):
 
     result = importer.match('filepath')
     assert result is True
+
+
+def test_pysswords_handle_returns_empty_when_bad_passphrase(mocker):
+    mocker.patch('passpie.importers.pysswords_importer.click')
+    to_patch = 'passpie.importers.pysswords_importer.Database'
+    mock_pysswords_db = mocker.patch(to_patch, create=True)()
+    mock_pysswords_db.check.return_value = False
+    importer = PysswordsImporter()
+
+    result = importer.handle('path')
+    assert result == []
+
+
+def test_pysswords_handle_returns_pysswords_credentials(mocker):
+    Cred = namedtuple('Credential', 'name login password comment')
+    credentials = [
+        Cred('name', 'login', 'password', 'comment')
+    ]
+    mocker.patch('passpie.importers.pysswords_importer.click')
+    mocker.patch('passpie.importers.pysswords_importer.make_fullname')
+    to_patch = 'passpie.importers.pysswords_importer.Database'
+    mock_pysswords_db = mocker.patch(to_patch, create=True)()
+    mock_pysswords_db.check.return_value = True
+    mock_pysswords_db.credentials = credentials
+    importer = PysswordsImporter()
+
+    result = importer.handle('path')
+    assert credentials[0].name in [c['name'] for c in result]
