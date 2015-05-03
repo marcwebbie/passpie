@@ -1,17 +1,19 @@
-# Passpie: Manage your passwords from the terminal
+# Passpie: Manage passwords from the terminal
 
-[Passpie](https://marcwebbie.github.io/passpie) lets you manage
-your login credentials from the terminal. Password files are saved into
-[GnuPG](http://en.wikipedia.org/wiki/GNU_Privacy_Guard) encrypted files
-into the Database Path. Only with the passphrase used to create the
-pass database you can decrypt password files. If you want to know
-more about how passpie works internally, check Under the Hood section.
+[Passpie](https://marcwebbie.github.io/passpie) lets you manage your login credentials from the terminal with a coloroful/configurable cli interface. Password files are saved into [GnuPG](http://en.wikipedia.org/wiki/GNU_Privacy_Guard) encrypted files into the Database Path. Use your master passphrase to decrypt password files or copy passwords to clipboard.
 
 ![Passpie console interface](https://github.com/marcwebbie/passpie/raw/master/images/passpie.png)
 
-> Passpie is built with [Click](http://click.pocoo.org) for its interface, [TinyDB](https://github.com/msiemens/tinydb) for its database and [python-gnupg](https://github.com/isislovecruft/python-gnupg) for its encryption using gpg.
+> Passpie is built with [Click](http://click.pocoo.org) and [Tabulate](https://pypi.python.org/pypi/tabulate) for its interface, [TinyDB](https://github.com/msiemens/tinydb) for its database and [python-gnupg](https://github.com/isislovecruft/python-gnupg) for its encryption using *gpg*. Passpie is also inspired by great cli applications like [git](https://github.com/git/git) and [httpie](http://httpie.org/)
 
-------------------------------------------------------------------------
+-----
+
+[![pypi](https://img.shields.io/pypi/v/passpie.svg?style=flat-square&label=latest%20version)](https://pypi.python.org/pypi/passpie)
+[![unix_build](https://img.shields.io/travis/marcwebbie/passpie/master.svg?style=flat-square&label=unix%20build)](https://travis-ci.org/marcwebbie/passpie)
+[![windows_build](https://img.shields.io/appveyor/ci/marcwebbie/passpie.svg?style=flat-square&label=windows%20build)](https://ci.appveyor.com/project/marcwebbie/passpie)
+[![coverage](https://img.shields.io/codecov/c/github/marcwebbie/passpie.svg?style=flat-square&label=coverage)](https://codecov.io/github/marcwebbie/passpie)
+
+-----
 
 
 ## Features
@@ -38,15 +40,6 @@ more about how passpie works internally, check Under the Hood section.
 + [ ] Bulk update/remove credentials
 
 
------
-
-[![pypi](https://img.shields.io/pypi/v/passpie.svg?style=flat-square&label=latest%20version)](https://pypi.python.org/pypi/passpie)
-[![unix_build](https://img.shields.io/travis/marcwebbie/passpie/master.svg?style=flat-square&label=unix%20build)](https://travis-ci.org/marcwebbie/passpie)
-[![windows_build](https://img.shields.io/appveyor/ci/marcwebbie/passpie.svg?style=flat-square&label=windows%20build)](https://ci.appveyor.com/project/marcwebbie/passpie)
-[![coverage](https://img.shields.io/codecov/c/github/marcwebbie/passpie.svg?style=flat-square&label=coverage)](https://codecov.io/github/marcwebbie/passpie)
-
------
-
 ## Installation
 
 ### Stable version
@@ -62,7 +55,7 @@ pip install passpie
 The **latest development version** can be installed directly from GitHub:
 
 ```bash
-$ pip install --upgrade https://github.com/marcwebbie/passpie/tarball/master
+pip install --upgrade https://github.com/marcwebbie/passpie/tarball/master
 ```
 
 ## Quickstart
@@ -109,47 +102,28 @@ passpie --help
 passpie --version
 ```
 
-## Commands
+## Usage
 
-### `init`:
+```
+Usage: passpie [OPTIONS] COMMAND [ARGS]...
 
-Initialize database
+Options:
+  -D, --database PATH  Alternative database path
+  --version            Show the version and exit.
+  --help               Show this message and exit.
 
-### `add`:
-
-Insert new credential to database
-
-### `update`:
-
-Update credential from database
-
-### `remove`:
-
-Remove credential from database
-
-### `copy`:
-
-Copy credential password to clipboard
-
-### `search`:
-
-Search credentials using regular expression
-
-### `status`:
-
-Query database status for maintenance
-
-### `export`:
-
-Export credentials as plain text
-
-### `import`:
-
-Import credentials
-
-### `reset`:
-
-Reset database passphrase and re-encrypt credentials
+Commands:
+  add     Add new credential
+  copy    Copy credential password to clipboard
+  export  Export credentials in plain text
+  import  Import credentials from path
+  init    Initialize new passpie database
+  remove  Remove credential
+  reset   Renew passpie database and re-encrypt...
+  search  Search credentials by regular expressions
+  status  Diagnose database for improvements
+  update  Update credential
+```
 
 ## Tutorials
 
@@ -159,7 +133,7 @@ Passpie fullname syntax handles login and name for credentials in one go for fas
 
 #### Structure of a fullname
 
-`login`@`name`. Login is optional, however no logins  means that you can add credentials without login by passing only names:
+`login`@`name`. Login is optional,  when adding new credentials without login, login will be replaced by a `_` character:
 
 ```bash
 passpie add @banks/mybank --password 1234
@@ -169,6 +143,7 @@ passpie add @banks/myotherbank --password 5678
 Listing the database would show:
 
 ```bash
+$ passpie
 =================  =======  ==========  =========
 Name               Login    Password    Comment
 =================  =======  ==========  =========
@@ -177,31 +152,38 @@ banks/myotherbank  _        *****
 =================  =======  ==========  =========
 ```
 
-
 ### 2. Syncing your database
 
 #### Dropbox
 
-With Passpie database on default path `~/.passpie` and with a Dropbox shared directory on path `~/Dropbox`
-v
-```bash
-# move your Passpie database inside your Dropbox directory
-mv ~/.passpie ~/Dropbox/.passpie
+Assuming you have passpie database on the default path `~/.passpie` and a Dropbox shared directory on path `~/Dropbox`
 
-# create a symbolic link to your shared .passpie directory on the default path.
-ln -s ~/Dropbox/.passpie ~/.passpie
+##### 1. Move your Passpie database inside your Dropbox directory:
+
+```bash
+mv ~/.passpie ~/Dropbox/passpie
+```
+
+##### 2. create a symbolic link to your shared `passpie` directory on the default path.
+
+```
+ln -s ~/Dropbox/passpie ~/.passpie
 ```
 
 #### Google Drive
 
-With Passpie database on default path `~/.passpie` and with a GoogleDrive shared directory on path `~/GoogleDrive`
+Assuming you have passpie database on the default path `~/.passpie` and a Google Drive shared directory on path `~/GoogleDrive`
+
+
+##### 1. move your Passpie database inside your Google Drive directory
 
 ```bash
-# move your Passpie database inside your Dropbox directory
-mv ~/.passpie ~/GoogleDrive/.passpie
+mv ~/.passpie ~/GoogleDrive/passpie
+```
+##### 2. create a symbolic link to your shared `passpie` directory on the default path.
 
-# create a symbolic link to your shared .passpie directory on the default path.
-ln -s ~/GoogleDrive/.passpie ~/.passpie
+```bash
+ln -s ~/GoogleDrive/.passpie ~.passpie
 ```
 
 ### 3. Exporting/Importing Passpie databases
@@ -222,12 +204,10 @@ Passpie credentials handles multiple logins for each name which groups credentia
 
 ```bash
 # create john credential
-passpie add jonh@example.com --comment "Jonh main mail"
-#Password: **********
+passpie add jonh@example.com --comment "Jonh main mail" --random
 
 # create doe credential
-passpie add doe@example.com --comment "No comment"
-#Password: **********
+passpie add doe@example.com --comment "No comment" --random
 
 # listing credentials
 passpie
@@ -280,33 +260,46 @@ You can override default passpie configuration with a `.passpierc` file on your 
 #### Example `.passpierc`:
 
 ```yaml
-path: /Users/jon.doe/.passpie
+path: /Users/john.doe/.passpie
 short_commands: true
 table_format: fancy_grid
+headers:
+  - name
+  - login
+  - password
+  - comment
 colors:
   login: green
   name: yellow
   password: cyan
-headers:
+```
+
+Options:
+
++ path: path to database. Default: `~/.passpie`
++ short_commands: Use short commands aliases as in `passpie a` for `passpie add`
+  - true
+  - false
++ headers:
   - fullname
   - name
   - login
   - password
   - comment
-```
-
-Options:
-
-+ colors: *[black, red, green, yellow, blue, magenta, cyan, white]*
-+ headers: *[fullname, name, login, password, comment]*
-+ path: path to database. Default: *~/.passpie*
-+ table_format: *[rst, simple, orgtbl, fancy_grid]*
-+ short_commands: Use short commands aliases as in `passpie a` for `passpie add`
-  - true
-  - false
-+ show_password:
-  - true
-  - false
++ table_format:
+  - rst
+  - simple
+  - orgtbl
+  - fancy_grid
++ colors:
+  - black
+  - red
+  - green
+  - yellow
+  - blue
+  - magenta
+  - cyan
+  - white
 
 ## Under The Hood
 
@@ -378,7 +371,7 @@ If you want to contributing with code:
 
 ### Running passpie init raises `TypeError: init() got an unexpected keyword argument 'binary'`
 
-You probably have the unexpected `python-gnupg` package installed. Passpie depends on [isislovecruft](https://github.com/isislovecruft) fork of [python-gnupg](https://github.com/isislovecruft/python-gnupg)
+You probably have the `python-gnupg` package installed. Passpie depends on [isislovecruft](https://github.com/isislovecruft) fork of [python-gnupg](https://github.com/isislovecruft/python-gnupg)
 
 To fix:
 
