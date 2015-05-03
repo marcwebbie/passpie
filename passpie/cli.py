@@ -352,7 +352,7 @@ def import_database(path):
         db.insert_multiple(credentials)
 
 
-@cli.command(help='Renew passpie password and re-encrypt credentials')
+@cli.command(help='Renew passpie database and re-encrypt credentials')
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
 def reset(passphrase):
     db = Database(config.path)
