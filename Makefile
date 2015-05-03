@@ -76,7 +76,7 @@ register:
 
 check:
 	flake8 $(PACKAGE) --exclude=\*_compat.py || true
-	grep -inrR "i\?pu\?db" --color=auto passpie
+	grep -inr "set_trace()" --color=auto .
 
 test-py2:
 	PYENV_VERSION=$(PY27) python -W ignore setup.py -q test
