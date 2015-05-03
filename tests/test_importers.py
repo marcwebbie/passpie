@@ -1,7 +1,7 @@
 try:
-    from mock import Mock
+    from mock import Mock, mock_open
 except ImportError:
-    from unittest.mock import Mock
+    from unittest.mock import Mock, mock_open
 
 import yaml
 
@@ -15,7 +15,6 @@ def test_find_importer_returns_first_match_default_importer(mocker):
     mock_importer.match.return_value = False
     mock_importer2.match.return_value = True
 
-    mocker.patch('passpie.importers.default_importer.os.path.isfile', return_value=True)
     mocker.patch('passpie.importers.get_instances',
                  return_value=[mock_importer, mock_importer2])
 
@@ -26,8 +25,8 @@ def test_find_importer_returns_first_match_default_importer(mocker):
 
 def test_default_importer_match_passpie_exported_yaml(mocker):
     dict_content = {'handler': 'passpie', 'version': 1.0}
-    mocker.patch('passpie.importers.default_importer.os.path.isfile', return_value=True)
-    mocker.patch('passpie.importers.default_importer.DefaultImporter._read_file')
+    mocker.patch('passpie.importers.default_importer.open',
+                 mock_open(), create=True)
     mocker.patch('passpie.importers.default_importer.yaml.load',
                  return_value=dict_content)
 
@@ -35,10 +34,19 @@ def test_default_importer_match_passpie_exported_yaml(mocker):
     assert result is True
 
 
+def test_default_importer_returns_false_when_bad_file(mocker):
+    mockopen = mocker.patch(
+        'passpie.importers.default_importer.open', mock_open(), create=True)()
+    mockopen.read.side_effect = OSError
+
+    result = DefaultImporter().match('filepath')
+    assert result is False
+
+
 def test_default_importer_returns_false_when_missing_version_key(mocker):
     dict_content = {'handler': 'passpie'}
-    mocker.patch('passpie.importers.default_importer.os.path.isfile', return_value=True)
-    mocker.patch('passpie.importers.default_importer.DefaultImporter._read_file')
+    mocker.patch('passpie.importers.default_importer.open',
+                 mock_open(), create=True)
     mocker.patch('passpie.importers.default_importer.yaml.load',
                  return_value=dict_content)
 
@@ -48,8 +56,8 @@ def test_default_importer_returns_false_when_missing_version_key(mocker):
 
 def test_default_importer_returns_false_when_missing_handler_key(mocker):
     dict_content = {'version': 1.0}
-    mocker.patch('passpie.importers.default_importer.os.path.isfile', return_value=True)
-    mocker.patch('passpie.importers.default_importer.DefaultImporter._read_file')
+    mocker.patch('passpie.importers.default_importer.open',
+                 mock_open(), create=True)
     mocker.patch('passpie.importers.default_importer.yaml.load',
                  return_value=dict_content)
 
@@ -59,8 +67,8 @@ def test_default_importer_returns_false_when_missing_handler_key(mocker):
 
 def test_default_importer_returns_false_when_version_keys_isnt_float(mocker):
     dict_content = {'version': '1.0'}
-    mocker.patch('passpie.importers.default_importer.os.path.isfile', return_value=True)
-    mocker.patch('passpie.importers.default_importer.DefaultImporter._read_file')
+    mocker.patch('passpie.importers.default_importer.open',
+                 mock_open(), create=True)
     mocker.patch('passpie.importers.default_importer.yaml.load',
                  return_value=dict_content)
 
@@ -70,8 +78,8 @@ def test_default_importer_returns_false_when_version_keys_isnt_float(mocker):
 
 def test_default_importer_returns_loaded_credentials_from_yaml_file(mocker):
     dict_content = {'credentials': {'name': 'foo', 'name': 'bar'}}
-    mocker.patch('passpie.importers.default_importer.os.path.isfile', return_value=True)
-    mocker.patch('passpie.importers.default_importer.DefaultImporter._read_file')
+    mocker.patch('passpie.importers.default_importer.open',
+                 mock_open(), create=True)
     mocker.patch('passpie.importers.default_importer.yaml.load',
                  return_value=dict_content)
 
@@ -80,8 +88,8 @@ def test_default_importer_returns_loaded_credentials_from_yaml_file(mocker):
 
 
 def test_default_importer_match_returns_false_when_bad_yaml(mocker):
-    mocker.patch('passpie.importers.default_importer.os.path.isfile', return_value=True)
-    mocker.patch('passpie.importers.default_importer.DefaultImporter._read_file')
+    mocker.patch('passpie.importers.default_importer.open',
+                 mock_open(), create=True)
     mocker.patch('passpie.importers.default_importer.yaml.load',
                  side_effect=[yaml.scanner.ScannerError])
 
@@ -107,7 +115,6 @@ def test_get_instances_returns_instances_of_all_found_importers(mocker):
                  return_value=[Importer, Importer2, Importer3])
 
     importers = list(get_instances())
-
     assert len(importers) == 3
     assert Importer() in importers
     assert Importer2() in importers
