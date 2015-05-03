@@ -1,3 +1,5 @@
+import os
+
 import yaml
 from yaml.scanner import ScannerError
 
@@ -10,6 +12,9 @@ class DefaultImporter(BaseImporter):
         return open(filepath).read()
 
     def match(self, filepath):
+        if not os.path.isfile(filepath):
+            return False
+
         try:
             dict_content = yaml.load(self._read_file(filepath))
         except ScannerError:
