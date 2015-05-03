@@ -5,7 +5,6 @@ import functools
 import json
 import os
 import shutil
-import tempfile
 
 from tabulate import tabulate
 from tinydb.queries import where
@@ -41,7 +40,8 @@ if os.path.exists(CONFIG_PATH):
 
     try:
         config_dict = yaml.load(config_content)
-        for k in ('path', 'show_password', 'headers', 'colors', 'table_format'):
+        keys = ('path', 'show_password', 'headers', 'colors', 'table_format')
+        for k in keys:
             assert k in config_dict
     except (AssertionError, yaml.scanner.ScannerError) as e:
         click.ClickException('Bad configuration file: {}'.format(e))
