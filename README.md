@@ -104,7 +104,7 @@ passpie --version
 
 ## Usage
 
-```
+```bash
 Usage: passpie [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -166,7 +166,7 @@ mv ~/.passpie ~/Dropbox/passpie
 
 ##### 2. create a symbolic link to your shared `passpie` directory on the default path.
 
-```
+```bash
 ln -s ~/Dropbox/passpie ~/.passpie
 ```
 
@@ -183,7 +183,7 @@ mv ~/.passpie ~/GoogleDrive/passpie
 ##### 2. create a symbolic link to your shared `passpie` directory on the default path.
 
 ```bash
-ln -s ~/GoogleDrive/.passpie ~.passpie
+ln -s ~/GoogleDrive/passpie ~.passpie
 ```
 
 ### 3. Exporting/Importing Passpie databases
