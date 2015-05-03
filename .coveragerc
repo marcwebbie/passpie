@@ -3,3 +3,15 @@ omit =
     */tests*.py
     setup.py
     */_compat.py
+
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # importer __init__
+    __all__
+    _import_all_importer_files
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
