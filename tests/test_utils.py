@@ -1,7 +1,7 @@
 try:
-    from mock import mock_open
+    from mock import mock_open, MagicMock
 except:
-    from unittest.mock import mock_open
+    from unittest.mock import mock_open, MagicMock
 
 import yaml
 
@@ -54,10 +54,19 @@ def test_load_config_replaces_sets_user_config_element(mocker):
 
 def test_load_config_logs_debug_message_when_malformed_config(mocker):
     mocker.patch('passpie.utils.open', mock_open(), create=True)
-    mocker.patch('passpie.utils.os.path.exists', return_value=True)
-    mocker.patch('passpie.utils.os.path.isfile', return_value=True)
     mocker.patch('passpie.utils.yaml.load',
                  side_effect=yaml.scanner.ScannerError)
+    mock_logging = mocker.patch('passpie.utils.logging')
+
+    load_config({}, {})
+
+    assert mock_logging.debug.called
+
+
+def test_load_config_logs_not_valid_path(mocker):
+    mocker.patch('passpie.utils.open',
+                 mock_open(MagicMock(side_effect=OSError)),
+                 create=True)
     mock_logging = mocker.patch('passpie.utils.logging')
 
     load_config({}, {})
