@@ -1,4 +1,3 @@
-from argparse import Namespace
 from datetime import datetime, timedelta
 
 import functools
@@ -17,38 +16,20 @@ from .credential import split_fullname, make_fullname
 from .crypt import Cryptor
 from .database import Database
 from .importers import find_importer
-from .utils import genpass, get_version
+from .utils import genpass, get_version, load_config
 
 
 __version__ = get_version()
 
-CONFIG_PATH = os.path.expanduser('~/.passpierc')
-
-config_dict = {}
-if os.path.exists(CONFIG_PATH):
-    with open(CONFIG_PATH) as f:
-        config_content = f.read()
-
-    try:
-        config_dict = yaml.load(config_content)
-        keys = ('path', 'show_password', 'headers', 'colors', 'table_format')
-        for k in keys:
-            assert k in config_dict
-    except (AssertionError, yaml.scanner.ScannerError) as e:
-        click.ClickException('Bad configuration file: {}'.format(e))
-
-config = Namespace(
-    path=config_dict.get('path', os.path.expanduser("~/.passpie")),
-    show_password=config_dict.get('show_password', False),
-    short_commands=config_dict.get('short_commands', False),
-    table_format=config_dict.get('table_format', "fancy_grid"),
-    headers=config_dict.get(
-        'headers',
-        ["name", "login", "password", "comment"]),
-    colors=config_dict.get(
-        'colors',
-        {"name": "yellow", "login": "green", "password": "magenta"}),
-)
+USER_CONFIG_PATH = os.path.expanduser('~/.passpierc')
+DEFAULT_CONFIG = {
+    'path': os.path.expanduser('~/.passpie'),
+    'short_commands': False,
+    'table_format': 'fancy_grid',
+    'headers': ['name', 'login', 'password', 'comment'],
+    'colors': {'name': 'yellow', 'login': 'green'},
+}
+config = load_config(DEFAULT_CONFIG, USER_CONFIG_PATH)
 
 
 class AliasedGroup(click.Group):
@@ -93,6 +74,18 @@ def get_credential_or_abort(db, fullname):
     return credential
 
 
+def ensure_database(func):
+    @functools.wraps(func)
+    def decorator(*args, **kwargs):
+        keys_path = os.path.join(config.path, '.keys')
+        if os.path.isdir(config.path) and os.path.isfile(keys_path):
+            return func(*args, **kwargs)
+        else:
+            message = 'Not initialized database at {.path}'.format(config)
+            raise click.ClickException(click.style(message, fg='yellow'))
+    return decorator
+
+
 def ensure_passphrase(db, passphrase):
     try:
         with Cryptor(db._storage.path) as cryptor:
@@ -107,7 +100,6 @@ def print_table(credentials):
     if credentials:
         for credential in credentials:
             credential['password'] = "*****"
-            headers = config.headers
 
         for header, color in config.colors.items():
             for credential in credentials:
@@ -119,19 +111,7 @@ def print_table(credentials):
         for credential in [c for c in credentials if 'login' in c.keys()]:
             credential['login'] = click.style(credential['login'], bold=True)
 
-        click.echo(Table(credentials).render(headers))
-
-
-def ensure_database(func):
-    @functools.wraps(func)
-    def decorator(*args, **kwargs):
-        keys_path = os.path.join(config.path, '.keys')
-        if os.path.isdir(config.path) and os.path.isfile(keys_path):
-            return func(*args, **kwargs)
-        else:
-            message = 'Not initialized database at {.path}'.format(config)
-            raise click.ClickException(click.style(message, fg='yellow'))
-    return decorator
+        click.echo(Table(credentials).render(config.headers))
 
 
 @click.group(cls=AliasedGroup if config.short_commands else click.Group,
@@ -140,18 +120,14 @@ def ensure_database(func):
               type=click.Path(dir_okay=True, writable=True, resolve_path=True))
 @click.version_option(version=__version__)
 @click.pass_context
-def cli(ctx, database=config.path):
+def cli(ctx, database):
     if database:
         config.path = database
+
     if ctx.invoked_subcommand is None:
         db = Database(config.path)
         credentials = sorted(db.all(), key=lambda x: x["name"]+x["login"])
         print_table(credentials)
-
-
-@cli.command(name='config', help='Show configuration')
-def print_config():
-    print(yaml.dump(vars(config), default_flow_style=False))
 
 
 @cli.command(help="Initialize new passpie database")
