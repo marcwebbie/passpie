@@ -89,5 +89,11 @@ test:
 
 simulate: check test test-py2 test-pypy
 
-deploy: simulate register
+publish:
+	python setup.py publish
+
+tag:
+	python setup.py tag
+
+deploy: simulate register publish tag
 	python setup.py sdist bdist_wheel upload -r pypi
