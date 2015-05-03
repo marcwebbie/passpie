@@ -14,8 +14,8 @@ allow_failures:
   - python: pypy
 install:
   - pip install -r requirements_test.txt
-  - pip install coveralls
 script:
   py.test --cov passpie
 after_success:
-  coveralls
+  pip install codecov
+  codecov
