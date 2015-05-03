@@ -63,16 +63,6 @@ def test_default_importer_returns_false_when_version_keys_isnt_float(mocker):
     assert result is False
 
 
-def test_default_importer_returns_false_when_version_keys_isnt_float(mocker):
-    dict_content = {'version': '1.0'}
-    mocker.patch('passpie.importers.default.DefaultImporter._read_file')
-    mocker.patch('passpie.importers.default.yaml.load',
-                 return_value=dict_content)
-
-    result = DefaultImporter().match('filepath')
-    assert result is False
-
-
 def test_default_importer_returns_loaded_credentials_from_yaml_file(mocker):
     dict_content = {'credentials': {'name': 'foo', 'name': 'bar'}}
     mocker.patch('passpie.importers.default.DefaultImporter._read_file')

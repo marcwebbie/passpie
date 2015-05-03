@@ -1,5 +1,5 @@
 from click.testing import CliRunner
-from tinydb import TinyDB, where
+from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 import pytest
 try:
@@ -44,16 +44,6 @@ def test_cli_remove_delete_credential_found_by_database(mock_db):
 
     assert result.exit_code == 0
     assert 'foo' not in result_print.output
-
-
-# @pytest.mark.skip()
-# def test_cli_add_credential_to_database(mock_db):
-#     fullname = 'test_user@example'
-#     runner = CliRunner()
-#     result = runner.invoke(cli.add, [fullname, '--random'])
-
-#     assert result.exit_code == 0
-#     assert mock_db.get(where('fullname') == fullname)
 
 
 def test_cli_copy_credential_password_to_database(mocker, mock_db):
