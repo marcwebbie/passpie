@@ -96,4 +96,3 @@ tag:
 	python setup.py tag
 
 deploy: simulate register publish tag
-	python setup.py sdist bdist_wheel upload -r pypi
