@@ -75,6 +75,9 @@ passpie init
 passpie add foo@example.com
 passpie add bar@example.com
 
+# add credential with random password
+passpie add spam@egg.local --random
+
 # edit credential "foo@example.com".
 passpie update foo@example.com
 
@@ -99,7 +102,7 @@ passpie
 # specify other Passpie database. Option `-D` or `--database`
 passpie -D /path/to/other/database
 
-# shows help. Option `-h` or `--help`
+# shows help. Option `--help`
 passpie --help
 
 # shows version. Option `--version`
