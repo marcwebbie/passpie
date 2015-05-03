@@ -34,7 +34,8 @@ def get_all():
 
     _import_all_importer_files()
 
-    for module in (value for key, value in globals().items() if key in __all__):
+    for module in (value for key, value in globals().items()
+                   if key in __all__):
         for klass_name, klass in inspect.getmembers(module, inspect.isclass):
             if klass is not BaseImporter and issubclass(klass, BaseImporter):
                 yield klass
