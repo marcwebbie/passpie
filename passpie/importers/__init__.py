@@ -1,10 +1,23 @@
 import inspect
 import os
 import glob
+import logging
 
 
 class BaseImporter(object):
-    pass
+
+    def log(self, message):
+        logging.debug(message)
+
+    def match(self, filepath):
+        """Return True if file for filepath parseable by importer
+        """
+        raise NotImplementedError('Handle should be implemented by base class')
+
+    def handle(self, filepath):
+        """Return all credentials decrypted from filepath
+        """
+        raise NotImplementedError('Handle should be implemented by base class')
 
 
 __all__ = [os.path.basename(f)[:-3]
