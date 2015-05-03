@@ -50,8 +50,8 @@ class Cryptor(object):
         keys = self._gpg.list_keys()
         return keys.curkey["fingerprint"]
 
-    def create_keys(self, passphrase):
-        if os.path.exists(self.keys_path):
+    def create_keys(self, passphrase, overwrite=False):
+        if overwrite is False and os.path.exists(self.keys_path):
             raise FileExistsError("Keys found in path")
 
         keys = self._gpg.gen_key(KEY_INPUT.format(passphrase))
