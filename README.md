@@ -43,7 +43,6 @@ more about how passpie works internally, check Under the Hood section.
 [![unix_build](https://img.shields.io/travis/marcwebbie/passpie/master.svg?style=flat-square&label=unix%20build)](https://travis-ci.org/marcwebbie/passpie)
 [![windows_build](https://img.shields.io/appveyor/ci/marcwebbie/marcwebbie.svg?style=flat-square&label=windows%20build)](https://ci.appveyor.com/project/marcwebbie/passpie)
 [![coverage](https://img.shields.io/coveralls/marcwebbie/passpie/master.svg?style=flat-square)](https://coveralls.io/r/marcwebbie/passpie)
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/marcwebbie/passpie/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 -----
 
