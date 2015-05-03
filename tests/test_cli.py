@@ -27,6 +27,14 @@ def mock_db(mocker):
     return database
 
 
+@pytest.fixture
+def mock_cryptor(mocker):
+    mock_cryptor = mock.MagicMock()
+    mock_cryptor_context = mocker.patch("passpie.cli.Cryptor")
+    mock_cryptor_context().__enter__.return_value = mock_cryptor
+    return mock_cryptor
+
+
 def test_cli_search_find_results_by_login_regex(mock_db):
     runner = CliRunner()
     result = runner.invoke(cli.search, ['fo[oa]'])
@@ -46,13 +54,12 @@ def test_cli_remove_delete_credential_found_by_database(mock_db):
     assert 'foo' not in result_print.output
 
 
-def test_cli_copy_credential_password_to_database(mocker, mock_db):
+def test_cli_copy_credential_password_to_database(mocker, mock_db, mock_cryptor):
     fullname = 'foo@bar'
     password = 's3cr3t'
     mocker.patch('passpie.cli.ensure_passphrase')
     mock_pyperclip = mocker.patch('passpie.cli.pyperclip')
-    mocker.patch('passpie.cli.Cryptor.decrypt',
-                 mock.Mock(return_value=password))
+    mock_cryptor.decrypt.return_value = password
     runner = CliRunner()
     result = runner.invoke(cli.copy, [fullname], input='passphrase')
 
@@ -61,48 +68,41 @@ def test_cli_copy_credential_password_to_database(mocker, mock_db):
     mock_pyperclip.copy.assert_called_once_with(password)
 
 
-def test_cli_reset_database_overwrite_old_keys(mocker, mock_db):
+def test_cli_reset_database_overwrite_old_keys(mocker, mock_db, mock_cryptor):
     mocker.patch('passpie.cli.ensure_passphrase')
-    mock_create_keys = mocker.patch('passpie.cli.Cryptor.create_keys')
-    mock_decrypt = mocker.patch('passpie.cli.Cryptor.decrypt')
-    mock_decrypt.return_value = ''
     new_passphrase = mocker.patch('passpie.cli.click.prompt')()
 
     runner = CliRunner()
     result = runner.invoke(cli.reset, input='passphrase')
 
     assert result.exit_code == 0
-    assert mock_create_keys.called
-    mock_create_keys.assert_called_once_with(new_passphrase, overwrite=True)
+    assert mock_cryptor.create_keys.called
+    mock_cryptor.create_keys.assert_called_once_with(
+        new_passphrase, overwrite=True)
 
 
-def test_cli_reset_database_re_encrypt_all_passwords(mocker, mock_db):
+def test_cli_reset_database_re_encrypt_all_passwords(mocker, mock_db, mock_cryptor):
     password = 's3cr3t'
     mocker.patch('passpie.cli.ensure_passphrase')
     mocker.patch('passpie.cli.Cryptor.create_keys')
     mocker.patch('passpie.cli.click.prompt')
-    mock_encrypt = mocker.patch('passpie.cli.Cryptor.encrypt')
-    mock_decrypt = mocker.patch('passpie.cli.Cryptor.decrypt')
-    mock_decrypt.return_value = password
+    mock_cryptor.decrypt.return_value = password
 
     runner = CliRunner()
     result = runner.invoke(cli.reset, input='passphrase')
 
     assert result.exit_code is 0
-    assert mock_encrypt.call_count is len(mock_db.all())
-    assert mock_decrypt.call_count is len(mock_db.all())
+    assert mock_cryptor.encrypt.call_count is len(mock_db.all())
+    assert mock_cryptor.decrypt.call_count is len(mock_db.all())
     for credential in mock_db.all():
-        mock_decrypt.assert_any_call_with(credential['password'])
+        mock_cryptor.decrypt.assert_any_call_with(credential['password'])
     for credential in mock_db.all():
-        mock_encrypt.assert_any_call_with(password)
+        mock_cryptor.encrypt.assert_any_call_with(password)
 
 
-def test_cli_reset_purges_all_elements(mocker, mock_db):
+def test_cli_reset_purges_all_elements(mocker, mock_db, mock_cryptor):
     mocker.patch('passpie.cli.ensure_passphrase')
-    mocker.patch('passpie.cli.Cryptor.create_keys')
     mocker.patch('passpie.cli.click.prompt')
-    mocker.patch('passpie.cli.Cryptor.encrypt')
-    mocker.patch('passpie.cli.Cryptor.decrypt')
     mocker.patch.object(mock_db, 'purge')
 
     runner = CliRunner()
