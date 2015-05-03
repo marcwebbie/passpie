@@ -16,6 +16,7 @@ from ._compat import FileExistsError
 from .credential import split_fullname, make_fullname
 from .crypt import Cryptor
 from .database import Database
+from .importers import find_importer
 from .utils import genpass, get_version
 
 
@@ -364,15 +365,14 @@ def export_database(dbfile, as_json, passphrase):
 @cli.command(name="import", help="Import credentials from path")
 @click.argument("path", type=click.Path())
 def import_database(path):
-    from passpie.importers import find_importer
     importer = find_importer(path)
-    credentials = importer.handle(path)
-    if credentials:
+    if importer:
+        credentials = importer.handle(path)
         db = Database(config.path)
-    with Cryptor(config.path) as cryptor:
-        for cred in credentials:
-            encrypted = cryptor.encrypt(cred['password'])
-            cred['password'] = encrypted
+        with Cryptor(config.path) as cryptor:
+            for cred in credentials:
+                encrypted = cryptor.encrypt(cred['password'])
+                cred['password'] = encrypted
         db.insert_multiple(credentials)
 
 
