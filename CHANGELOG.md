@@ -2,6 +2,11 @@
 
 ## Versions
 
+### v0.1rc4
+
++ **√** Add Pysswords importer
++ **√** Fix bugs on default importer readfile
+
 ### v0.1rc3
 
 + **√** Bump invalid pypi version

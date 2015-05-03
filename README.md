@@ -30,7 +30,7 @@ more about how passpie works internally, check Under the Hood section.
 + [x] Export Passpie database to plain text file
 + [x] Import plain text Passpie database
 + [ ] Import credentials from [1Password](https://agilebits.com/onepassword)
-+ [ ] Import credentials from [Pysswords](https://github.com/marcwebbie/pysswords)
++ [x] Import credentials from [Pysswords](https://github.com/marcwebbie/pysswords)
 + [x] Randomly generated credential passwords
 + [x] Generate database status report
 + [ ] Undo/Redo updates to the database
@@ -180,7 +180,7 @@ banks/myotherbank  _        *****
 #### Dropbox
 
 With Passpie database on default path `~/.passpie` and with a Dropbox shared directory on path `~/Dropbox`
-
+v
 ```bash
 # move your Passpie database inside your Dropbox directory
 mv ~/.passpie ~/Dropbox/.passpie
