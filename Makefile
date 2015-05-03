@@ -12,7 +12,7 @@ PY34 = 3.4.2
 PYPY = pypy-2.4.0
 
 
-.PHONY: configure set-python setup-dev test test-py2 test-pypy wheel dist run install-python deploy register check simulate coverage clean test-tools
+.PHONY: configure set-python setup-dev test test-py2 test-pypy wheel dist run install-python deploy register check simulate cov clean test-tools
 
 configure: scripts test-tools
 
@@ -21,7 +21,7 @@ help:
 	@echo "  set-python	=> to set pyenv shell shell version"
 	@echo "  setup-dev	=> to install all needed versions of pyenv"
 	@echo "  clean		=> to clean clean all automatically generated files"
-	@echo "  coverage	=> to run coverage"
+	@echo "  cov		=> to run coverage"
 	@echo "  dist		=> to build $(PACKAGE)"
 	@echo "  register	=> to update metadata on pypi servers"
 	@echo "  check		=> to check code for smells"
@@ -61,7 +61,7 @@ clean:
 	rm -rf dist || true
 	rm -rf __pycache__ || true
 
-coverage:
+cov:
 	py.test --cov .
 
 dist:
@@ -82,23 +82,16 @@ register:
 check:
 	flake8 $(PACKAGE) $(PACKAGE_TESTS)
 
-tox: set-python
-	tox
-
 test-py2:
-	pyenv local $(PY27)
-	pyenv rehash
-	python -W ignore setup.py -q test
+	PYENV_VERSION=$(PY27) python -W ignore setup.py -q test
 
 test-pypy:
-	pyenv local $(PYPY)
-	pyenv rehash
-	python -W ignore setup.py -q test
+	PYENV_VERSION=$(PYPY) python -W ignore setup.py -q test
 
 test:
 	python -W ignore setup.py -q test
 
-simulate: check test test-py2 coverage
+simulate: test test-py2 test-pypy
 
 deploy:
 	python setup.py sdist bdist_wheel upload -r pypi
