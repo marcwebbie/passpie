@@ -5,7 +5,7 @@ except ImportError:
 
 import yaml
 
-from passpie.importers import find_importer
+from passpie.importers import find_importer, BaseImporter, get_instances
 from passpie.importers.default_importer import DefaultImporter
 
 
@@ -87,3 +87,28 @@ def test_default_importer_match_returns_false_when_bad_yaml(mocker):
 
     result = DefaultImporter().match('filepath')
     assert result is False
+
+
+def test_base_importer_log_calls_logging_debug_with_message(mocker):
+    mock_logging = mocker.patch('passpie.importers.logging')
+    importer = BaseImporter()
+    message = 'test debugging'
+    importer.log(message)
+
+    assert mock_logging.debug.called is True
+    mock_logging.debug.assert_called_once_with(message)
+
+
+def test_get_instances_returns_instances_of_all_found_importers(mocker):
+    Importer = Mock()
+    Importer2 = Mock()
+    Importer3 = Mock()
+    mocker.patch('passpie.importers.get_all',
+                 return_value=[Importer, Importer2, Importer3])
+
+    importers = list(get_instances())
+
+    assert len(importers) == 3
+    assert Importer() in importers
+    assert Importer2() in importers
+    assert Importer3() in importers
