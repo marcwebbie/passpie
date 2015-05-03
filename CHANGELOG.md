@@ -2,6 +2,10 @@
 
 ## Versions
 
+### v0.1rc5
+
++ **√** Bug fixes on import command
+
 ### v0.1rc4
 
 + **√** Add Pysswords importer
