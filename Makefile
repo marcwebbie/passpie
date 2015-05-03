@@ -81,7 +81,7 @@ register:
 
 check:
 	flake8 $(PACKAGE) --exclude=\*_compat.py || true
-	grep -inrR "i\?pu\?db" --color=auto passpie || true
+	grep -inrR "i\?pu\?db" --color=auto passpie
 
 test-py2:
 	PYENV_VERSION=$(PY27) python -W ignore setup.py -q test
@@ -94,5 +94,5 @@ test:
 
 simulate: check test test-py2 test-pypy
 
-deploy:
+deploy: check test test-py2 test-pypy register
 	python setup.py sdist bdist_wheel upload -r pypi
