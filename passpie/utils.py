@@ -1,9 +1,13 @@
+from argparse import Namespace
 from contextlib import contextmanager
 from pkg_resources import get_distribution, DistributionNotFound
 import errno
+import logging
 import os
 import random
 import string
+
+import yaml
 
 
 def genpass(length=32, special="_-#|+="):
@@ -38,3 +42,17 @@ def get_version():
         return 'Please install this project with setup.py or pip'
     else:
         return _dist.version
+
+
+def load_config(default_config, user_config_path):
+    if os.path.exists(user_config_path) and os.path.isfile(user_config_path):
+        with open(user_config_path) as config_file:
+            config_content = config_file.read()
+        try:
+            user_config = yaml.load(config_content)
+        except yaml.scanner.ScannerError as e:
+            logging.debug('Malformed user configuration file {}'.format(e))
+
+        default_config.update(user_config)
+        config = Namespace(**default_config)
+        return config
