@@ -2,6 +2,10 @@
 
 ## Versions
 
+### v0.1rc2.1
+
++ **√** Fix `reset` command not copying newly re-encrypted credentials
+
 ### v0.1rc2
 
 + **√** Add `reset` command. Reset passphrase and re-encrypt all credentials
