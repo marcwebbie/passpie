@@ -1,8 +1,28 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages
+
+import os
+import sys
+
+try:
+    from setuptools import setup, Command, find_packages
+except ImportError:
+    from distutils.core import setup, Command, find_packages
 
 
 __version__ = "0.1rc5"
+
+
+if sys.argv[-1] == 'publish':
+    os.system('python setup.py sdist upload')
+    os.system('python setup.py bdist_wheel upload')
+    sys.exit()
+
+
+if sys.argv[-1] == 'tag':
+    os.system("git tag -a %s -m 'version %s'" % (__version__, __version__))
+    os.system("git push --tags")
+    sys.exit()
+
 
 requirements_file = "requirements.txt"
 requirements = [pkg.strip() for pkg in open(requirements_file).readlines()]
@@ -14,6 +34,22 @@ try:
     long_description = pypandoc.convert('README.md', 'rst') + "\n"
 except(IOError, ImportError):
     long_description = open('README.md').read() + "\n"
+
+
+class PyTest(Command):
+    user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
+
+    def initialize_options(self):
+        self.pytest_args = []
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        import pytest
+        errno = pytest.main(self.pytest_args)
+        sys.exit(errno)
+
 
 setup(
     name='passpie',
@@ -31,6 +67,7 @@ setup(
         passpie=passpie.cli:cli
     """,
     install_requires=requirements,
+    cmdclass={'test': PyTest},
     tests_require=requirements_tests,
     test_suite='tests',
     classifiers=[
