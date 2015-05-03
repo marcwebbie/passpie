@@ -68,9 +68,10 @@ def test_load_config_logs_debug_message_when_malformed_config(mocker):
 def test_get_version_uses_get_distribution_to_find_version(mocker):
     expected_version = '1.0'
     mock_dist = mocker.patch('passpie.utils.get_distribution')()
-    mock_dist.location = '/Users/foo/applications'
+    mock_dist.location = 'applications'
     mock_dist.version = expected_version
     mocker.patch('passpie.utils.os.path.normcase')
+    mocker.patch('passpie.utils.os.path.join')
 
     version = get_version()
 
