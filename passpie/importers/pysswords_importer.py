@@ -25,7 +25,6 @@ class PysswordsImporter(BaseImporter):
 
         return True
 
-
     def handle(self, filepath):
         from pysswords.db import Database
 
