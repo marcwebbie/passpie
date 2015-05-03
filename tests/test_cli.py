@@ -162,3 +162,12 @@ def test_copy_to_clipboard_decrypts_password_to_pass_to_pyperclip(mocker, mock_c
     assert result.exit_code is 0
     assert result.output == "Password copied to clipboard\n"
     mock_pyperclip.copy.assert_called_once_with(mock_password)
+
+
+def test_import_prints_nothing_when_no_importer_is_found(mocker, mock_cryptor):
+    mocker.patch('passpie.cli.find_importer', return_value=None)
+
+    runner = CliRunner()
+    result = runner.invoke(cli.import_database, ['~/something'])
+
+    assert result.exit_code is 0
