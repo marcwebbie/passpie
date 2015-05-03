@@ -7,22 +7,27 @@ from passpie.importers import BaseImporter
 from passpie.credential import make_fullname
 
 
-class PysswordImporter(BaseImporter):
+class PysswordsImporter(BaseImporter):
 
     def match(self, filepath):
-        if '.keys' not in os.listdir(filepath):
-            return False
-
         try:
             from pysswords.db import Database
         except ImportError:
+            self.log('pysswords is not installed')
+            return False
+
+        try:
+            assert os.path.isdir(filepath)
+            assert '.keys' in os.listdir(filepath)
+        except AssertionError:
+            self.log('.keys not found in path')
             return False
 
         return True
 
+
     def handle(self, filepath):
         from pysswords.db import Database
-        # import pudb; pudb.set_trace()
 
         db = Database(path=filepath)
         passphrase = click.prompt('Pysswords passphrase', hide_input=True)
