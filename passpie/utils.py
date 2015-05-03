@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from pkg_resources import get_distribution, DistributionNotFound
 import errno
 import os
 import random
@@ -24,3 +25,16 @@ def mkdir_open(path, mode="r"):
             raise
     with open(path, mode) as fd:
         yield fd
+
+
+def get_version():
+    try:
+        _dist = get_distribution('passpie')
+        dist_loc = os.path.normcase(_dist.location)
+        here = os.path.normcase(__file__)
+        if not here.startswith(os.path.join(dist_loc, 'passpie')):
+            raise DistributionNotFound
+    except DistributionNotFound:
+        return 'Please install this project with setup.py or pip'
+    else:
+        return _dist.version

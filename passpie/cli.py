@@ -1,6 +1,6 @@
 from argparse import Namespace
 from datetime import datetime, timedelta
-from pkg_resources import get_distribution, DistributionNotFound
+
 import functools
 import json
 import os
@@ -16,20 +16,10 @@ from ._compat import FileExistsError
 from .credential import split_fullname, make_fullname
 from .crypt import Cryptor
 from .database import Database
-from .utils import genpass
+from .utils import genpass, get_version
 
 
-try:
-    _dist = get_distribution('passpie')
-    dist_loc = os.path.normcase(_dist.location)
-    here = os.path.normcase(__file__)
-    if not here.startswith(os.path.join(dist_loc, 'passpie')):
-        raise DistributionNotFound
-except DistributionNotFound:
-    __version__ = 'Please install this project with setup.py or pip'
-else:
-    __version__ = _dist.version
-
+__version__ = get_version()
 
 CONFIG_PATH = os.path.expanduser('~/.passpierc')
 
