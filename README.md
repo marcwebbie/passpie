@@ -25,13 +25,14 @@ more about how passpie works internally, check Under the Hood section.
 + [x] Search credentials by name, login or comments
 + [x] Search with regular expression
 + [x] Group credentials by name
-+ [x] Configure from configfile. `~/.passpie`
++ [x] Configuration from file. `~/.passpie`
 + [x] Change passphrase and re-encrypt database
 + [x] Export Passpie database to plain text file
 + [x] Import plain text Passpie database
 + [ ] Import credentials from [1Password](https://agilebits.com/onepassword)
 + [x] Import credentials from [Pysswords](https://github.com/marcwebbie/pysswords)
 + [x] Randomly generated credential passwords
++ [ ] Configurable random password generation
 + [x] Generate database status report
 + [ ] Undo/Redo updates to the database
 + [ ] Bulk update/remove credentials
@@ -278,7 +279,6 @@ You can override default passpie configuration with a `.passpierc` file on your 
 ```yaml
 path: /Users/jon.doe/.passpie
 short_commands: true
-show_password: false
 table_format: fancy_grid
 colors:
   login: green
