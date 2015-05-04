@@ -65,7 +65,7 @@ def test_load_config_logs_debug_message_when_malformed_config(mocker):
 
 def test_load_config_logs_not_valid_path(mocker):
     mocker.patch('passpie.utils.open',
-                 mock_open(MagicMock(side_effect=OSError)),
+                 mock_open(MagicMock(side_effect=IOError)),
                  create=True)
     mock_logging = mocker.patch('passpie.utils.logging')
 

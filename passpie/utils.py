@@ -48,7 +48,7 @@ def load_config(default_config, user_config_path):
     try:
         with open(user_config_path) as config_file:
             config_content = config_file.read()
-    except OSError as e:
+    except IOError as e:
         logging.debug('Not a valid path for config {}'.format(e))
         return Namespace(**default_config)
 
