@@ -197,3 +197,36 @@ def test_import_reencrypt_all_credential_passwords(mocker, mock_cryptor):
     assert result.exit_code is 0
     assert mock_cryptor.encrypt.called is True
     mock_cryptor.encrypt.assert_called_once_with(password)
+
+
+def test_search_prints_all_matched_search_credentials(mocker, mock_db):
+    mock_db.search = mock.Mock(return_value=mock_db.all())
+    mock_print_table = mocker.patch('passpie.cli.print_table')
+
+    runner = CliRunner()
+    result = runner.invoke(cli.search, ['pattern'])
+
+    assert result.exit_code is 0
+    mock_print_table.assert_called_once_with(mock_db.all())
+
+
+def test_add_results_in_error_when_invalid_fullname(mocker, mock_db):
+    mocker.patch('passpie.cli.split_fullname', side_effect=ValueError)
+
+    runner = CliRunner()
+    result = runner.invoke(cli.add, ['**bad**fullname', '--random'])
+
+    assert result.exit_code is not 0
+    assert result.output == 'Error: invalid fullname syntax\n'
+
+
+def test_add_results_in_error_when_credential_already_exists(mocker, mock_db):
+    message = 'Error: Credential foo@bar already exists. --force to overwrite\n'
+    mocker.patch('passpie.cli.split_fullname', return_value=('foo', 'bar'))
+    mock_db.get = mock.Mock(return_value=['found credential'])
+
+    runner = CliRunner()
+    result = runner.invoke(cli.add, ['foo@bar', '--random'])
+
+    assert result.exit_code is not 0
+    assert result.output == message
