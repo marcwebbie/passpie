@@ -24,8 +24,8 @@ def mock_cfg(mocker):
 
 
 @pytest.fixture
-def mock_db(mocker):
-    mocker.patch('passpie.cli.ensure_database')
+def mock_db(mocker, mock_cfg):
+    mocker.patch('passpie.cli.ensure_is_database')
     credentials = [
         {'login': 'foo', 'name': 'bar', 'fullname': 'foo@bar',
          'password': '', 'comment': ''},
@@ -42,7 +42,7 @@ def mock_db(mocker):
 
 
 @pytest.fixture
-def mock_cryptor(mocker):
+def mock_cryptor(mocker, mock_cfg):
     mock_cryptor = mock.MagicMock()
     mock_cryptor_context = mocker.patch("passpie.cli.Cryptor")
     mock_cryptor_context().__enter__.return_value = mock_cryptor
