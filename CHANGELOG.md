@@ -2,6 +2,13 @@
 
 ## Versions
 
+### v0.1rc7
+
++ **√** Support configurable random password generation
++ **√** Add query credential only by name
++ **√** Fix passpie utils handling bad config filepath
++ **√** Fix pysswords importer reading filepath
+
 ### v0.1rc6
 
 + **√** Bug fixes on loading user config
