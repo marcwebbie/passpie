@@ -1,11 +1,9 @@
 from datetime import datetime, timedelta
 
-import functools
 import json
 import os
 import shutil
 
-from tabulate import tabulate
 from tinydb.queries import where
 import click
 import pyperclip
@@ -17,6 +15,7 @@ from .crypt import Cryptor
 from .database import Database
 from .importers import find_importer
 from .utils import genpass, get_version, load_config
+from .table import Table
 
 
 __version__ = get_version()
@@ -47,25 +46,6 @@ class AliasedGroup(click.Group):
         ctx.fail('Too many matches: %s' % ', '.join(sorted(matches)))
 
 
-class Table(object):
-    """Reprensent table outputs"""
-
-    def __init__(self, data):
-        self.data = data
-        self.tablefmt = config.table_format
-
-    def __getitem__(self, keys):
-        if isinstance(keys, str):
-            keys = (keys,)
-        return [[e[k] for k in keys]
-                for e in self.data]
-
-    def render(self, keys):
-        return tabulate(self[keys],
-                        headers=[k.title() for k in keys],
-                        tablefmt=self.tablefmt)
-
-
 def get_credential_or_abort(db, fullname):
     credential = db.get(where("fullname") == fullname)
     if not credential:
@@ -74,10 +54,11 @@ def get_credential_or_abort(db, fullname):
     return credential
 
 
-def ensure_database(db, passphrase):
+def ensure_is_database(path):
     try:
-        assert os.path.isdir(db._storage.path)
-        assert os.path.isfile(db._storage.path)
+        assert os.path.isdir(path)
+        assert '.keys' in os.listdir(path)
+        assert os.path.join(path, '.keys')
     except AssertionError:
         message = 'Not initialized database at {.path}'.format(config)
         raise click.ClickException(click.style(message, fg='yellow'))
@@ -94,21 +75,16 @@ def ensure_passphrase(db, passphrase):
 
 
 def print_table(credentials):
+    from .table import Table
+
     if credentials:
-        for credential in credentials:
-            credential['password'] = "*****"
-
-        for header, color in config.colors.items():
-            for credential in credentials:
-                credential[header] = click.style(credential[header], fg=color)
-
-        for credential in credentials:
-            credential['name'] = click.style(credential['name'], bold=True)
-            credential['login'] = click.style(credential['login'], bold=True)
-            credential['fullname'] = click.style(
-                credential['fullname'], bold=True)
-
-        click.echo(Table(credentials).render(config.headers))
+        table = Table(
+            config.headers,
+            table_format=config.table_format,
+            colors=config.colors,
+            hidden=['password']
+        )
+        click.echo(table.render(credentials))
 
 
 @click.group(cls=AliasedGroup if config.short_commands else click.Group,
@@ -120,6 +96,9 @@ def print_table(credentials):
 def cli(ctx, database):
     if database:
         config.path = database
+
+    if not ctx.invoked_subcommand == 'init':
+        ensure_is_database(config.path)
 
     if ctx.invoked_subcommand is None:
         db = Database(config.path)
@@ -152,7 +131,6 @@ def init(passphrase, force):
 @click.option('-c', '--comment', default="", help="Credential comment")
 def add(fullname, password, comment):
     db = Database(config.path)
-    ensure_database(db)
     try:
         login, name = split_fullname(fullname)
     except ValueError:
@@ -299,8 +277,9 @@ def status(full, days, passphrase):
             credentials = [c for c in credentials
                            if c["password"] or c["modified"]]
 
-        table = Table(credentials)
-        click.echo(table.render(["name", "login", "password", "modified"]))
+        table = Table(["name", "login", "password", "modified"],
+                      table_format=config.table_format)
+        click.echo(table.render(credentials))
 
 
 @cli.command(name="export", help="Export credentials in plain text")
