@@ -1,10 +1,10 @@
-import functools
 import tempfile
 try:
     import mock
 except ImportError:
     from unittest import mock
 
+import click
 from click.testing import CliRunner
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
@@ -232,3 +232,37 @@ def test_add_results_in_error_when_credential_already_exists(mocker, mock_db):
 
     assert result.exit_code is not 0
     assert result.output == message
+
+
+def test_get_credential_or_abort_sets_query_as_name(mocker, mock_db):
+    credential = {'name': 'fake_name'}
+    fullname = 'fullname'
+    mocker.patch('passpie.cli.split_fullname', side_effect=ValueError)
+    mock_where = mocker.patch('passpie.cli.where')
+    mocker.patch.object(mock_db, 'get', return_value=credential)
+    mocker.patch.object(mock_db, 'count', return_value=1)
+
+    result = cli.get_credential_or_abort(mock_db, fullname)
+
+    assert result == credential
+    assert mock_db.get.called
+    mock_db.get.assert_called_once_with(mock_where('name') == fullname)
+
+
+def test_get_credential_or_abort_errors_on_credential_not_found(mocker, mock_db):
+    mocker.patch.object(mock_db, 'get', return_value=None)
+
+    with pytest.raises(click.ClickException) as excinfo:
+        cli.get_credential_or_abort(mock_db, 'foo@bar')
+
+    assert 'not found' in excinfo.value.message
+
+
+def test_get_credential_or_abort_errors_on_multiple_credentials(mocker, mock_db):
+    mocker.patch.object(mock_db, 'get', return_value=[{}])
+    mocker.patch.object(mock_db, 'count', return_value=10)
+
+    with pytest.raises(click.ClickException) as excinfo:
+        cli.get_credential_or_abort(mock_db, 'foo@bar')
+
+    assert 'Multiple matches' in excinfo.value.message
