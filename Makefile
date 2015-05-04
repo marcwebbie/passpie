@@ -75,9 +75,9 @@ register:
 	python setup.py register
 
 check:
-	- flake8 $(PACKAGE) --exclude=\*_compat.py
-	- grep -inr "set_trace()" --color=auto $(PACKAGE)
-	- grep -inr "set_trace()" --color=auto $(PACKAGE_TESTS)
+	flake8 $(PACKAGE) --exclude=\*_compat.py
+	grep -inr "set_trace()" --color=auto $(PACKAGE) || true
+	grep -inr "set_trace()" --color=auto $(PACKAGE_TESTS) || true
 
 test-py2:
 	PYENV_VERSION=$(PY27) python -W ignore setup.py -q test
