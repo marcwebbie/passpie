@@ -49,16 +49,15 @@ class AliasedGroup(click.Group):
 def get_credential_or_abort(db, fullname):
     try:
         login, name = split_fullname(fullname)
-        credential = db.get(where("name") == name & (where("login") == login))
-        matches = db.count(where("name") == name & (where("login") == login))
+        query = (where("name") == name) & (where("login") == login)
     except ValueError:
-        credential = db.get(where("name") == fullname)
-        matches = db.count(where("name") == fullname)
+        query = where('name') == fullname
 
+    credential = db.get(query)
     if not credential:
         message = "Credential '{}' not found".format(fullname)
         raise click.ClickException(click.style(message, fg='red'))
-    elif matches > 1:
+    elif db.count(query) > 1:
         message = "Multiple matches for '{}'".format(fullname)
         raise click.ClickException(click.style(message, fg='red'))
 
