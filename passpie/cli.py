@@ -47,10 +47,21 @@ class AliasedGroup(click.Group):
 
 
 def get_credential_or_abort(db, fullname):
-    credential = db.get(where("fullname") == fullname)
+    try:
+        login, name = split_fullname(fullname)
+        credential = db.get(where("name") == name & (where("login") == login))
+        matches = db.count(where("name") == name & (where("login") == login))
+    except ValueError:
+        credential = db.get(where("name") == fullname)
+        matches = db.count(where("name") == fullname)
+
     if not credential:
         message = "Credential '{}' not found".format(fullname)
         raise click.ClickException(click.style(message, fg='red'))
+    elif matches > 1:
+        message = "Multiple matches for '{}'".format(fullname)
+        raise click.ClickException(click.style(message, fg='red'))
+
     return credential
 
 
@@ -200,6 +211,7 @@ def update(fullname, name, login, password, comment):
 def remove(fullname):
     db = Database(config.path)
     credential = get_credential_or_abort(db, fullname)
+
     if credential:
         click.confirm(
             'Remove credential: {}'.format(click.style(fullname, 'yellow')),
@@ -213,8 +225,9 @@ def remove(fullname):
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
 def copy(fullname, passphrase):
     db = Database(config.path)
-    credential = get_credential_or_abort(db, fullname)
     ensure_passphrase(db, passphrase)
+    credential = get_credential_or_abort(db, fullname)
+
     with Cryptor(config.path) as cryptor:
         decrypted = cryptor.decrypt(credential["password"],
                                     passphrase=passphrase)
@@ -243,6 +256,7 @@ def status(full, days, passphrase):
     db = Database(config.path)
     ensure_passphrase(db, passphrase)
     credentials = sorted(db.all(), key=lambda x: x["name"]+x["login"])
+
     with Cryptor(config.path) as cryptor:
         for cred in credentials:
             cred["password"] = cryptor.decrypt(cred["password"], passphrase)
@@ -289,7 +303,8 @@ def status(full, days, passphrase):
 def export_database(dbfile, as_json, passphrase):
     db = Database(config.path)
     ensure_passphrase(db, passphrase)
-    credentials = sorted(db.all(), key=lambda x: x["name"]+x["login"])
+    credentials = db.all()
+
     with Cryptor(config.path) as cryptor:
         for cred in credentials:
             cred["password"] = cryptor.decrypt(cred["password"], passphrase)
