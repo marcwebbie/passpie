@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-
+from functools import partial
 import json
 import os
 import shutil
@@ -24,11 +24,16 @@ USER_CONFIG_PATH = os.path.expanduser('~/.passpierc')
 DEFAULT_CONFIG = {
     'path': os.path.expanduser('~/.passpie'),
     'short_commands': False,
+    'genpass_length': 32,
+    'genpass_symbols': "_-#|+=",
     'table_format': 'fancy_grid',
     'headers': ['name', 'login', 'password', 'comment'],
     'colors': {'name': 'yellow', 'login': 'green'},
 }
 config = load_config(DEFAULT_CONFIG, USER_CONFIG_PATH)
+genpass = partial(genpass,
+                  length=config.genpass_length,
+                  special=config.genpass_symbols)
 
 
 class AliasedGroup(click.Group):

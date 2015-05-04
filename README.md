@@ -34,7 +34,7 @@
 + [ ] Import credentials from [1Password](https://agilebits.com/onepassword)
 + [x] Import credentials from [Pysswords](https://github.com/marcwebbie/pysswords)
 + [x] Randomly generated credential passwords
-+ [ ] Configurable random password generation
++ [x] Configurable random password generation
 + [x] Generate database status report
 + [ ] Undo/Redo updates to the database
 + [ ] Bulk update/remove credentials
@@ -262,6 +262,9 @@ You can override default passpie configuration with a `.passpierc` file on your 
 ```yaml
 path: /Users/john.doe/.passpie
 short_commands: true
+short_commands: true
+genpass_length: 32
+genpass_symbols: "_-#|+="
 table_format: fancy_grid
 headers:
   - name
@@ -278,6 +281,8 @@ Options:
 
 + path: path to database. Default: `~/.passpie`
 + short_commands: Use short commands aliases as in `passpie a` for `passpie add`
++ genpass_length: number. Default: `32`
++ genpass_symbols: characters. Default: `_-#|+="`
   - true
   - false
 + headers:
