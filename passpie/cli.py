@@ -74,16 +74,13 @@ def get_credential_or_abort(db, fullname):
     return credential
 
 
-def ensure_database(func):
-    @functools.wraps(func)
-    def decorator(*args, **kwargs):
-        keys_path = os.path.join(config.path, '.keys')
-        if os.path.isdir(config.path) and os.path.isfile(keys_path):
-            return func(*args, **kwargs)
-        else:
-            message = 'Not initialized database at {.path}'.format(config)
-            raise click.ClickException(click.style(message, fg='yellow'))
-    return decorator
+def ensure_database(db, passphrase):
+    try:
+        assert os.path.isdir(db._storage.path)
+        assert os.path.isfile(db._storage.path)
+    except AssertionError:
+        message = 'Not initialized database at {.path}'.format(config)
+        raise click.ClickException(click.style(message, fg='yellow'))
 
 
 def ensure_passphrase(db, passphrase):
@@ -153,9 +150,9 @@ def init(passphrase, force):
 @click.option('-r', '--random', 'password', flag_value=genpass())
 @click.password_option(help="Credential password")
 @click.option('-c', '--comment', default="", help="Credential comment")
-@ensure_database
 def add(fullname, password, comment):
     db = Database(config.path)
+    ensure_database(db)
     try:
         login, name = split_fullname(fullname)
     except ValueError:

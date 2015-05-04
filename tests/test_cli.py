@@ -1,3 +1,4 @@
+import functools
 import tempfile
 try:
     import mock
@@ -24,6 +25,7 @@ def mock_cfg(mocker):
 
 @pytest.fixture
 def mock_db(mocker):
+    mocker.patch('passpie.cli.ensure_database')
     credentials = [
         {'login': 'foo', 'name': 'bar', 'fullname': 'foo@bar',
          'password': '', 'comment': ''},
