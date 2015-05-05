@@ -9,7 +9,7 @@ import click
 import pyperclip
 import yaml
 
-from ._compat import FileExistsError
+from ._compat import FileExistsError, which
 from .credential import split_fullname, make_fullname
 from .crypt import Cryptor
 from .database import Database
@@ -49,6 +49,12 @@ class AliasedGroup(click.Group):
         elif len(matches) == 1:
             return click.Group.get_command(self, ctx, matches[0])
         ctx.fail('Too many matches: %s' % ', '.join(sorted(matches)))
+
+
+def ensure_gpg_installed():
+    if not which('gpg'):
+        message = 'GPG not installed. https://www.gnupg.org/'
+        raise click.ClickException(click.style(message, fg='yellow'))
 
 
 def get_credential_or_abort(db, fullname):
@@ -109,6 +115,8 @@ def print_table(credentials):
 @click.version_option(version=__version__)
 @click.pass_context
 def cli(ctx, database):
+    ensure_gpg_installed()
+
     if database:
         config.path = database
 

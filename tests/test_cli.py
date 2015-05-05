@@ -277,3 +277,14 @@ def test_add_credential_dont_exit_with_error_when_force(mocker, mock_db, mock_cr
 
     assert result.exit_code is 0
     assert mock_db.insert.called
+
+
+def test_raises_exception_when_gpg_not_installed(mocker):
+    mocker.patch('passpie.cli.which', return_value=None)
+    message = 'Error: GPG not installed. https://www.gnupg.org/\n'
+
+    runner = CliRunner()
+    result = runner.invoke(cli.cli)
+
+    assert result.exit_code != 0
+    assert result.output == message
