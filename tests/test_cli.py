@@ -370,6 +370,8 @@ def test_update_prompt_input_for_each_editable_field(mocker, mock_db, mock_crypt
     }
     mock_prompt = mocker.patch('passpie.cli.click.prompt',
                                return_value='')
+    mock_make_fullname = mocker.patch('passpie.cli.make_fullname',
+                                      return_value='foo@bar')
     mocker.patch('passpie.cli.get_credential_or_abort',
                  return_value=credential)
 
@@ -378,3 +380,4 @@ def test_update_prompt_input_for_each_editable_field(mocker, mock_db, mock_crypt
 
     assert result.exit_code == 0
     assert mock_prompt.call_count == 4
+    assert mock_make_fullname.called
