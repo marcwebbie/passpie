@@ -144,7 +144,8 @@ def init(passphrase, force):
 @click.option('-r', '--random', 'password', flag_value=genpass())
 @click.password_option(help="Credential password")
 @click.option('-c', '--comment', default="", help="Credential comment")
-def add(fullname, password, comment):
+@click.option('-f', '--force', is_flag=True, help="Force overwriting")
+def add(fullname, password, comment, force):
     db = Database(config.path)
     try:
         login, name = split_fullname(fullname)
@@ -153,7 +154,7 @@ def add(fullname, password, comment):
         raise click.ClickException(click.style(message, fg='yellow'))
 
     found = db.get((where("login") == login) & (where("name") == name))
-    if not found:
+    if force or not found:
         with Cryptor(config.path) as cryptor:
             encrypted = cryptor.encrypt(password)
 

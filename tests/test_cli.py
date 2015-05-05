@@ -266,3 +266,14 @@ def test_get_credential_or_abort_errors_on_multiple_credentials(mocker, mock_db)
         cli.get_credential_or_abort(mock_db, 'foo@bar')
 
     assert 'Multiple matches' in excinfo.value.message
+
+
+def test_add_credential_dont_exit_with_error_when_force(mocker, mock_db, mock_cryptor):
+    mocker.patch.object(mock_db, 'get', return_value={'name': 'foo'})
+    mocker.patch.object(mock_db, 'insert')
+
+    runner = CliRunner()
+    result = runner.invoke(cli.add, ['foo@bar', '--random', '--force'])
+
+    assert result.exit_code is 0
+    assert mock_db.insert.called
