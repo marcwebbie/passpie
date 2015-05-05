@@ -316,3 +316,23 @@ def test_ensure_database_returns_none_when_valid_database(mocker):
     result = cli.ensure_is_database('path')
 
     assert result is None
+
+
+def test_ensure_passphrase_raises_wrong_passphrase(mocker, mock_db, mock_cryptor):
+    mock_cryptor.check.side_effect = ValueError
+    mock_db._storage.path = 'path'
+
+    with pytest.raises(click.ClickException) as excinfo:
+        cli.ensure_passphrase(mock_db, 'passphrase')
+
+    assert 'Wrong passphrase' in excinfo.value.message
+
+
+def test_ensure_passphrase_returns_passphrase(mocker, mock_db, mock_cryptor):
+    mock_db._storage.path = 'path'
+    mock_cryptor.check.return_value = True
+    passphrase = 'passphrase'
+
+    result = cli.ensure_passphrase(mock_db, 'passphrase')
+
+    assert result == passphrase
