@@ -288,3 +288,31 @@ def test_raises_exception_when_gpg_not_installed(mocker):
 
     assert result.exit_code != 0
     assert result.output == message
+
+
+def test_ensure_database_raises_error_when_path_is_not_dir(mocker):
+    mocker.patch('passpie.cli.os.path.isdir', return_value=False)
+
+    with pytest.raises(click.ClickException) as excinfo:
+        cli.ensure_is_database('path')
+
+    assert 'Not initialized database' in excinfo.value.message
+
+
+def test_ensure_database_raises_error_when_path_is_not_valid(mocker):
+    mocker.patch('passpie.cli.os.path.isdir', return_value=True)
+    mocker.patch('passpie.cli.os.path.isfile', return_value=False)
+
+    with pytest.raises(click.ClickException) as excinfo:
+        cli.ensure_is_database('path')
+
+    assert 'Not initialized database' in excinfo.value.message
+
+
+def test_ensure_database_returns_none_when_valid_database(mocker):
+    mocker.patch('passpie.cli.os.path.isdir', return_value=True)
+    mocker.patch('passpie.cli.os.path.isfile', return_value=True)
+
+    result = cli.ensure_is_database('path')
+
+    assert result is None

@@ -78,8 +78,7 @@ def get_credential_or_abort(db, fullname):
 def ensure_is_database(path):
     try:
         assert os.path.isdir(path)
-        assert '.keys' in os.listdir(path)
-        assert os.path.join(path, '.keys')
+        assert os.path.isfile(os.path.join(path, '.keys'))
     except AssertionError:
         message = 'Not initialized database at {.path}'.format(config)
         raise click.ClickException(click.style(message, fg='yellow'))
