@@ -381,3 +381,14 @@ def test_update_prompt_input_for_each_editable_field(mocker, mock_db, mock_crypt
     assert result.exit_code == 0
     assert mock_prompt.call_count == 4
     assert mock_make_fullname.called
+
+
+def test_remove_dont_ask_confimation_when_yes_passed(mocker, mock_db):
+    mocker.patch.object(mock_db, 'remove')
+    mock_confirm = mocker.patch('passpie.cli.click.confirm')
+
+    runner = CliRunner()
+    result = runner.invoke(cli.remove, ['foo@bar', '--yes'])
+
+    assert result.exit_code == 0
+    assert mock_confirm.called is False

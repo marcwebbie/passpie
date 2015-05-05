@@ -220,15 +220,18 @@ def update(fullname, name, login, password, comment):
 
 @cli.command(help="Remove credential")
 @click.argument("fullname")
-def remove(fullname):
+@click.option("-y", "--yes", is_flag=True, help="Skip confirmation prompt")
+def remove(fullname, yes):
     db = Database(config.path)
     credential = get_credential_or_abort(db, fullname)
 
     if credential:
-        click.confirm(
-            'Remove credential: {}'.format(click.style(fullname, 'yellow')),
-            abort=True
-        )
+        if not yes:
+            click.confirm(
+                'Remove credential: {}'.format(
+                    click.style(fullname, 'yellow')),
+                abort=True
+            )
         db.remove(where('fullname') == credential["fullname"])
 
 
