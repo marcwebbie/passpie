@@ -16,3 +16,5 @@ exclude_lines =
     except ImportError
     raise AssertionError
     raise NotImplementedError
+
+    AliasedGroup

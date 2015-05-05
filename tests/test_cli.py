@@ -1,3 +1,4 @@
+from datetime import datetime
 import tempfile
 try:
     import mock
@@ -336,3 +337,44 @@ def test_ensure_passphrase_returns_passphrase(mocker, mock_db, mock_cryptor):
     result = cli.ensure_passphrase(mock_db, 'passphrase')
 
     assert result == passphrase
+
+
+def test_update_dont_prompt_when_any_option_passed(mocker, mock_db, mock_cryptor):
+    credential = {
+        'fullname': 'foo@bar',
+        'name': 'bar',
+        'login': 'foo',
+        'password': 's3cr3t',
+        'comment': '',
+        'modified': datetime.now(),
+    }
+    mock_prompt = mocker.patch('passpie.cli.click.prompt')
+    mocker.patch('passpie.cli.get_credential_or_abort',
+                 return_value=credential)
+
+    runner = CliRunner()
+    result = runner.invoke(cli.update, ['foo@bar', '--random'])
+
+    assert result.exit_code == 0
+    assert not mock_prompt.called
+
+
+def test_update_prompt_input_for_each_editable_field(mocker, mock_db, mock_cryptor):
+    credential = {
+        'fullname': 'foo@bar',
+        'name': 'bar',
+        'login': 'foo',
+        'password': 's3cr3t',
+        'comment': '',
+        'modified': datetime.now(),
+    }
+    mock_prompt = mocker.patch('passpie.cli.click.prompt',
+                               return_value='')
+    mocker.patch('passpie.cli.get_credential_or_abort',
+                 return_value=credential)
+
+    runner = CliRunner()
+    result = runner.invoke(cli.update, ['foo@bar'])
+
+    assert result.exit_code == 0
+    assert mock_prompt.call_count == 4
