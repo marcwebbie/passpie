@@ -31,14 +31,17 @@
 + [x] Change passphrase and re-encrypt database
 + [x] Export Passpie database to plain text file
 + [x] Import plain text Passpie database
-+ [ ] Import credentials from [1Password](https://agilebits.com/onepassword)
 + [x] Import credentials from [Pysswords](https://github.com/marcwebbie/pysswords)
 + [x] Randomly generated credential passwords
 + [x] Configurable random password generation
 + [x] Generate database status report
+
+Planned features:
+
 + [ ] Undo/Redo updates to the database
 + [ ] Bulk update/remove credentials
-
++ [ ] Import plain text [Keepass](http://keepass.info/)
++ [ ] Import credentials from [1Password](https://agilebits.com/onepassword)
 
 ## Installation
 
