@@ -47,10 +47,19 @@ Planned features:
 
 ### Stable version
 
-Make sure you have [GPG](https://www.gnupg.org/) and [pip](http://pip.readthedocs.org/en/latest/installing.html) installed:
+Make sure you have [GPG](https://www.gnupg.org/) installed:
+
+#### Using [pip](http://pip.readthedocs.org/en/latest/installing.html)
 
 ```bash
 pip install passpie
+```
+
+#### If you are on a mac you can install Passpie using [homebrew](http://brew.sh)
+
+```bash
+brew tap marcwebbie/passpie
+brew install passpie
 ```
 
 ### Development version
