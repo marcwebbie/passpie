@@ -55,7 +55,7 @@ Make sure you have [GPG](https://www.gnupg.org/) installed:
 pip install passpie
 ```
 
-#### If you are on a mac you can install Passpie using [homebrew](http://brew.sh)
+#### If you are on a mac you can install *Passpie* using [homebrew](http://brew.sh)
 
 ```bash
 brew tap marcwebbie/passpie
