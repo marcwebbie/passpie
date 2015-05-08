@@ -274,7 +274,6 @@ You can override default passpie configuration with a `.passpierc` file on your 
 ```yaml
 path: /Users/john.doe/.passpie
 short_commands: true
-short_commands: true
 genpass_length: 32
 genpass_symbols: "_-#|+="
 table_format: fancy_grid
