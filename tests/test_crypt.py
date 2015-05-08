@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import os
 
 from passpie.crypt import Cryptor, KEY_INPUT
@@ -131,3 +132,8 @@ class CryptTests(MockerTestCase):
 
         with self.assertRaises(ValueError):
             cryptor.check(passphrase, ensure=True)
+
+    def test_key_input_format_with_unicode_characters(self):
+        unicode_string = 'áçéèúü'
+
+        self.assertIsNotNone(KEY_INPUT.format(unicode_string))
