@@ -39,11 +39,7 @@ requirements_tests = [
     "mock"
 ]
 
-try:
-    import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst') + "\n"
-except(IOError, ImportError):
-    long_description = open('README.md').read() + "\n"
+long_description = open('README.md').read() + "\n"
 
 
 class PyTest(Command):
@@ -61,6 +57,12 @@ class PyTest(Command):
         sys.exit(errno)
 
 
+class PyTestCoverage(PyTest):
+
+    def initialize_options(self):
+        self.pytest_args = ['--cov', 'passpie']
+
+
 setup(
     name='passpie',
     version=__version__,
@@ -69,15 +71,15 @@ setup(
     long_description=long_description,
     author='Marcwebbie',
     author_email='marcwebbie@gmail.com',
-    url='https://github.com/marcwebbie/passpie',
-    download_url='https://pypi.python.org/pypi/passpie',
+    url='https://marcwebbie.github.io/passpie',
+    download_url='https://github.com/marcwebbie/passpie',
     packages=find_packages(),
     entry_points="""
         [console_scripts]
         passpie=passpie.cli:cli
     """,
     install_requires=requirements,
-    cmdclass={'test': PyTest},
+    cmdclass={'test': PyTest, 'coverage': PyTestCoverage},
     tests_require=requirements_tests,
     test_suite='tests',
     classifiers=[

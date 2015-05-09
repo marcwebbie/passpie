@@ -1,6 +1,6 @@
-# Passpie: Manage passwords from the terminal
+# Passpie: Manage login credentials from terminal
 
-[Passpie](https://marcwebbie.github.io/passpie) lets you manage your login credentials from the terminal with a coloroful/configurable cli interface. Password files are saved into [GnuPG](http://en.wikipedia.org/wiki/GNU_Privacy_Guard) encrypted files into the Database Path. Use your master passphrase to decrypt password files or copy passwords to clipboard.
+[Passpie](https://marcwebbie.github.io/passpie) lets you manage login credentials from the terminal with a coloroful/configurable cli interface. Password files are saved into yaml text files with passwords as [GnuPG](http://en.wikipedia.org/wiki/GNU_Privacy_Guard) encrypted strings. Use your master passphrase to decrypt login credentials files, copy passwords to clipboard and more...
 
 ![Passpie console interface](https://github.com/marcwebbie/passpie/raw/master/images/passpie.png)
 
