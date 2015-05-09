@@ -20,9 +20,9 @@
 
     <section class="main-content">
       <h1>
-<a id="passpie-manage-passwords-from-the-terminal" class="anchor" href="#passpie-manage-passwords-from-the-terminal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Passpie: Manage passwords from the terminal</h1>
+<a id="passpie-manage-login-credentials-from-terminal" class="anchor" href="#passpie-manage-login-credentials-from-terminal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Passpie: Manage login credentials from terminal</h1>
 
-<p><a href="https://marcwebbie.github.io/passpie">Passpie</a> lets you manage your login credentials from the terminal with a coloroful/configurable cli interface. Password files are saved into <a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard">GnuPG</a> encrypted files into the Database Path. Use your master passphrase to decrypt password files or copy passwords to clipboard.</p>
+<p><a href="https://marcwebbie.github.io/passpie">Passpie</a> lets you manage login credentials from the terminal with a coloroful/configurable cli interface. Password files are saved into yaml text files with passwords as <a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard">GnuPG</a> encrypted strings. Use your master passphrase to decrypt login credentials files, copy passwords to clipboard and more...</p>
 
 <p><img src="https://github.com/marcwebbie/passpie/raw/master/images/passpie.png" alt="Passpie console interface"></p>
 
@@ -90,7 +90,7 @@
 <div class="highlight highlight-bash"><pre>pip install passpie</pre></div>
 
 <h4>
-<a id="if-you-are-on-a-mac-you-can-install-passpie-using-homebrew" class="anchor" href="#if-you-are-on-a-mac-you-can-install-passpie-using-homebrew" aria-hidden="true"><span class="octicon octicon-link"></span></a>If you are on a mac you can install Passpie using <a href="http://brew.sh">homebrew</a>
+<a id="if-you-are-on-a-mac-you-can-install-passpie-using-homebrew" class="anchor" href="#if-you-are-on-a-mac-you-can-install-passpie-using-homebrew" aria-hidden="true"><span class="octicon octicon-link"></span></a>If you are on a mac you can install <em>Passpie</em> using <a href="http://brew.sh">homebrew</a>
 </h4>
 
 <div class="highlight highlight-bash"><pre>brew tap marcwebbie/passpie
@@ -102,6 +102,19 @@ brew install passpie</pre></div>
 <p>The <strong>latest development version</strong> can be installed directly from GitHub:</p>
 
 <div class="highlight highlight-bash"><pre>pip install --upgrade https://github.com/marcwebbie/passpie/tarball/master</pre></div>
+
+<h3>
+<a id="updating-passpie" class="anchor" href="#updating-passpie" aria-hidden="true"><span class="octicon octicon-link"></span></a>Updating Passpie</h3>
+
+<h4>
+<a id="with-pip" class="anchor" href="#with-pip" aria-hidden="true"><span class="octicon octicon-link"></span></a>With pip</h4>
+
+<div class="highlight highlight-bash"><pre>pip install -U passpie</pre></div>
+
+<h4>
+<a id="with-homebrew" class="anchor" href="#with-homebrew" aria-hidden="true"><span class="octicon octicon-link"></span></a>With homebrew</h4>
+
+<div class="highlight highlight-bash"><pre>brew upgrade passpie</pre></div>
 
 <h2>
 <a id="quickstart" class="anchor" href="#quickstart" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quickstart</h2>
@@ -300,7 +313,6 @@ passpie -D <span class="pl-k">~</span>/databases/junk_passwords</pre></div>
 <a id="example-passpierc" class="anchor" href="#example-passpierc" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example <code>.passpierc</code>:</h4>
 
 <div class="highlight highlight-yaml"><pre><span class="pl-s"><span class="pl-ent">path:</span> <span class="pl-s">/Users/john.doe/.passpie</span></span>
-<span class="pl-s"><span class="pl-ent">short_commands:</span> <span class="pl-s">true</span></span>
 <span class="pl-s"><span class="pl-ent">short_commands:</span> <span class="pl-s">true</span></span>
 <span class="pl-c1"><span class="pl-ent">genpass_length:</span> 32</span>
 <span class="pl-s"><span class="pl-ent">genpass_symbols:</span> <span class="pl-s"><span class="pl-pds">"</span>_-#|+=<span class="pl-pds">"</span></span></span>
