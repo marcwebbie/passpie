@@ -13,7 +13,7 @@ python:
 allow_failures:
   - python: pypy
 install:
-- python setup.py install
+- pip install -r requirements_tests.txt
 script:
 - python setup.py coverage
 after_success:

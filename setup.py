@@ -32,14 +32,14 @@ requirements = [
     'tinydb==2.3.1.post2'
 ]
 
-requirements_tests = [
+tests_requirements = [
     "pytest",
     "pytest-cov",
     "pytest-mock",
     "mock"
 ]
 
-long_description = open('README.md').read() + "\n"
+long_description = open('README.md').read() + "\n\n"
 
 
 class PyTest(Command):
@@ -80,7 +80,7 @@ setup(
     """,
     install_requires=requirements,
     cmdclass={'test': PyTest, 'coverage': PyTestCoverage},
-    tests_require=requirements_tests,
+    tests_requires=tests_requirements,
     test_suite='tests',
     classifiers=[
         'Development Status :: 4 - Beta',
