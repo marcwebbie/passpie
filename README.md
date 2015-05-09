@@ -70,6 +70,20 @@ The **latest development version** can be installed directly from GitHub:
 pip install --upgrade https://github.com/marcwebbie/passpie/tarball/master
 ```
 
+### Updating Passpie
+
+#### With pip
+
+```bash
+pip install -U passpie
+```
+
+#### With homebrew
+
+```bash
+brew upgrade passpie
+```
+
 ## Quickstart
 
 ```bash
