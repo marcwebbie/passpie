@@ -23,11 +23,21 @@ if sys.argv[-1] == 'tag':
     os.system("git push --tags")
     sys.exit()
 
+requirements = [
+    'click==4.0',
+    'gnupg==2.0.2',
+    'pyperclip==1.5.9',
+    'PyYAML==3.11',
+    'tabulate==0.7.5',
+    'tinydb==2.3.1.post2'
+]
 
-requirements_file = "requirements.txt"
-requirements = [pkg.strip() for pkg in open(requirements_file).readlines()]
-requirements_test_file = "requirements_test.txt"
-requirements_tests = [pkg.strip() for pkg in open(requirements_file).readlines()]
+requirements_tests = [
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "mock"
+]
 
 try:
     import pypandoc
