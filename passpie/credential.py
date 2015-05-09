@@ -2,7 +2,7 @@ import re
 
 
 def split_fullname(fullname):
-    rgx = re.compile(r"(?P<login>.*)?@(?P<name>.*)")
+    rgx = re.compile(r"(?P<login>.+)?@(?P<name>.+)")
     try:
         name = rgx.match(fullname).group("name")
         login = rgx.match(fullname).group("login")
