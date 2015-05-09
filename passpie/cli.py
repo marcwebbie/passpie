@@ -14,11 +14,11 @@ from .credential import split_fullname, make_fullname
 from .crypt import Cryptor
 from .database import Database
 from .importers import find_importer
-from .utils import genpass, get_version, load_config
+from .utils import genpass, load_config
 from .table import Table
 
 
-__version__ = get_version()
+__version__ = "0.1.1"
 
 USER_CONFIG_PATH = os.path.expanduser('~/.passpierc')
 DEFAULT_CONFIG = {
