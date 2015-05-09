@@ -2,6 +2,11 @@
 
 ## Versions
 
+### 0.1.2
+
++ **√** Add `--copy` to clipboard option on `add` command: Thanks to [@vitalk](https://github.com/vitalk)
++ **√** Add bumpversion for cleaner `--version` option.
+
 ### 0.1.1
 
 + **√** Bug fix on unicode characters for passphrase
