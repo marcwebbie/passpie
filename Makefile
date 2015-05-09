@@ -96,4 +96,14 @@ publish:
 tag:
 	python setup.py tag
 
-deploy: simulate register publish tag
+bump-patch:
+	bumpversion patch setup.py passpie/cli.py
+
+bump-minor:
+	bumpversion minor setup.py passpie/cli.py
+
+deploy-patch: simulate bump-patch register publish
+
+deploy-minor: simulate bump-minor register publish
+
+deploy: deploy-patch
