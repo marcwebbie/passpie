@@ -15,7 +15,7 @@ allow_failures:
 install:
 - python setup.py install
 script:
-  py.test --cov passpie
+- python setup.py coverage
 after_success:
-  - pip install codecov
-  - codecov
+- pip install codecov
+- codecov
