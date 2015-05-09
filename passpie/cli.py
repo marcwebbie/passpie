@@ -152,7 +152,8 @@ def init(passphrase, force):
 @click.password_option(help="Credential password")
 @click.option('-c', '--comment', default="", help="Credential comment")
 @click.option('-f', '--force', is_flag=True, help="Force overwriting")
-def add(fullname, password, comment, force):
+@click.option('-C', '--copy', is_flag=True, help="Copy password to clipboard")
+def add(fullname, password, comment, force, copy):
     db = Database(config.path)
     try:
         login, name = split_fullname(fullname)
@@ -172,6 +173,8 @@ def add(fullname, password, comment, force):
                           comment=comment,
                           modified=datetime.now())
         db.insert(credential)
+        if copy:
+            pyperclip.copy(password)
     else:
         message = "Credential {} already exists. --force to overwrite".format(
             fullname)

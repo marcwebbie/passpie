@@ -392,3 +392,13 @@ def test_remove_dont_ask_confimation_when_yes_passed(mocker, mock_db):
 
     assert result.exit_code == 0
     assert mock_confirm.called is False
+
+
+def test_add_with_copy_option_add_pass_to_clipboard(mocker, mock_db, mock_cryptor):
+    mock_pyperclip = mocker.patch('passpie.cli.pyperclip')
+
+    runner = CliRunner()
+    result = runner.invoke(cli.add, ['john.doe@spam', '--random', '--copy'])
+
+    assert result.exit_code == 0
+    assert mock_pyperclip.copy.called is True
