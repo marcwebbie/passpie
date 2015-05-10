@@ -88,30 +88,35 @@ brew upgrade passpie
 ## Quickstart
 
 ```bash
-# create a new credentials database.
+# initialize a new credentials database
 passpie init
 
-# add new credentials.
+# add some credentials
 passpie add foo@example.com
 passpie add bar@example.com
 
-# add credential with random password
+# add some credential with random passwords
 passpie add spam@egg.local --random
+passpie add bar@github.com --random
+passpie add spam@egg --random
+passpie add foo@github.com --random
+passpie add bar@github.com --random
 
-# edit credential "foo@example.com".
+# edit credential "foo@example.com"
 passpie update foo@example.com
 
-# copy password from credential "foo@example.com" into system clipboard.
+# copy password from credential "foo@example.com" to clipboard
 passpie copy foo@example.com
 
-# search credentials by string "exam".
+# search credentials by string "exam"
 passpie search exam
 
-# search credentials using regular expressions.
+# search credentials using regular expressions
 passpie search 'foo|bar'
 
-# remove credential "foo@example.com".
+# remove some credentials
 passpie remove foo@example.com
+passpie remove foo@github.com
 
 # check database status
 passpie status
@@ -119,14 +124,8 @@ passpie status
 # print all credentials as a table with hidden passwords
 passpie
 
-# specify other Passpie database. Option `-D` or `--database`
-passpie -D /path/to/other/database
-
 # shows help. Option `--help`
 passpie --help
-
-# shows version. Option `--version`
-passpie --version
 ```
 
 ## Usage
