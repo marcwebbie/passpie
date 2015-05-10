@@ -166,7 +166,7 @@ passpie add @banks/mybank --password 1234
 passpie add @banks/myotherbank --password 5678
 ```
 
-Listing the database would show:
+Listing credentials:
 
 ```bash
 $ passpie
@@ -227,14 +227,15 @@ passpie import passpie.db
 Passpie credentials handles multiple logins for each name which groups credentials by name:
 
 ```bash
-# create john credential
+# add some credentials
 passpie add jonh@example.com --comment "Jonh main mail" --random
-
-# create doe credential
 passpie add doe@example.com --comment "No comment" --random
+```
 
-# listing credentials
-passpie
+Listing credentials:
+
+```bash
+$ passpie
 ===========  =======  ==========  ===============
 name         login    password    comment
 ===========  =======  ==========  ===============
@@ -257,6 +258,7 @@ passpie add foo@opensource/npm.org --random
 Listing credentials:
 
 ```
+$ passpie
 ========================  =======  ==========  =========
 Name                      Login    Password    Comment
 ========================  =======  ==========  =========
@@ -290,11 +292,7 @@ passpie -D ~/credentials/junk add fake@example.com --random
 #### Listing passwords from specific database
 
 ```bash
-passpie -D ~/databases/junk
-```
-
-Output:
-```
+$ passpie -D ~/databases/junk
 ===========  =======  ==========  =========
 Name         Login    Password    Comment
 ===========  =======  ==========  =========
