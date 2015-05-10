@@ -291,7 +291,7 @@ passpie -D ~/credentials/junk add fake@example.com --random
 #### Listing passwords from specific database
 
 ```bash
-passpie -D ~/databases/junk_passwords
+passpie -D ~/databases/junk
 ```
 
 Output:
