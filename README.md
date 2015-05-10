@@ -1,6 +1,6 @@
 # Passpie: Manage login credentials from terminal
 
-[Passpie](https://marcwebbie.github.io/passpie) lets you manage login credentials from the terminal with a coloroful/configurable cli interface. Password files are saved into yaml text files with passwords as [GnuPG](http://en.wikipedia.org/wiki/GNU_Privacy_Guard) encrypted strings. Use your master passphrase to decrypt login credentials files, copy passwords to clipboard and more...
+[Passpie](https://marcwebbie.github.io/passpie) lets you manage login credentials from the terminal with a coloroful/configurable cli interface. Password files are saved into yaml text files with passwords as [GnuPG](http://en.wikipedia.org/wiki/GNU_Privacy_Guard) encrypted strings. Use your master passphrase to decrypt login credentials, copy passwords to clipboard and more...
 
 ![Passpie console interface](https://github.com/marcwebbie/passpie/raw/master/images/passpie.png)
 
@@ -39,9 +39,10 @@
 Planned features:
 
 + [ ] Undo/Redo updates to the database
-+ [ ] Bulk update/remove credentials
-+ [ ] Import plain text [Keepass](http://keepass.info/)
-+ [ ] Import credentials from [1Password](https://agilebits.com/onepassword)
++ [ ] Bulk update credentials
++ [ ] Bulk remove credentials
++ [ ] Import plain text credentials from [Keepass](http://keepass.info/)
++ [ ] Import plain text credentials from [1Password](https://agilebits.com/onepassword)
 
 ## Installation
 
@@ -130,6 +131,8 @@ passpie --version
 
 ## Usage
 
+Passpie is designed to help you manage you password on the terminal with an clean interface. Passpie detects if you are in a terminal that supports colors and switch it off accordingly
+
 ```bash
 Usage: passpie [OPTIONS] COMMAND [ARGS]...
 
@@ -151,15 +154,13 @@ Commands:
   update  Update credential
 ```
 
-## Tutorials
+### Diving into *fullname* syntax
 
-### 1. Diving into *fullname* syntax
-
-Passpie fullname syntax handles login and name for credentials in one go for faster adding and querying.
+Passpie credentials are referenced by `fullname`. fullname syntax handles login and name for credentials in one go for faster adding and querying of credentials.
 
 #### Structure of a fullname
 
-`login`@`name`. Login is optional,  when adding new credentials without login, login will be replaced by a `_` character:
+Fullnames are composed of `login`@`name`. Login is optional. If you don't pass any login when adding new credentials, credential login will be replaced by a `_` character:
 
 ```bash
 passpie add @banks/mybank --password 1234
@@ -178,53 +179,51 @@ banks/myotherbank  _        *****
 =================  =======  ==========  =========
 ```
 
-### 2. Syncing your database
+Since `login` is optional. You can query credentials using only name syntax, for example to update credential `@banks/mybank`:
+
+```bash
+passpie update @banks/mybank --random
+```
+
+Or even better, without using the `@` notation:
+
+```bash
+passpie update banks/mybank --random
+```
+
+### Syncing your database
 
 #### Dropbox
 
 Assuming you have passpie database on the default path `~/.passpie` and a Dropbox shared directory on path `~/Dropbox`
 
-##### 1. Move your Passpie database inside your Dropbox directory:
-
 ```bash
-mv ~/.passpie ~/Dropbox/passpie
-```
-
-##### 2. create a symbolic link to your shared `passpie` directory on the default path.
-
-```bash
-ln -s ~/Dropbox/passpie ~/.passpie
+mv ~/.passpie ~/Dropbox/passpie # move passpie db to dropbox
+ln -s ~/Dropbox/passpie ~/.passpie # make a link to the db
 ```
 
 #### Google Drive
 
 Assuming you have passpie database on the default path `~/.passpie` and a Google Drive shared directory on path `~/GoogleDrive`
 
-
-##### 1. move your Passpie database inside your Google Drive directory
-
 ```bash
-mv ~/.passpie ~/GoogleDrive/passpie
-```
-##### 2. create a symbolic link to your shared `passpie` directory on the default path.
-
-```bash
-ln -s ~/GoogleDrive/passpie ~.passpie
+mv ~/.passpie ~/GoogleDrive/passpie # move passpie db to dropbox
+ln -s ~/GoogleDrive/passpie ~.passpie # make a link to the db
 ```
 
-### 3. Exporting/Importing Passpie databases
+### Exporting a passpie database
 
 ```bash
-# export database to a passpie database file called passpie.db
-# Command: `export`
 passpie export passpie.db
+```
 
-# import database from passpie database file called passpie.db
-# Option: `import`
+### Importing a passpie database
+
+```bash
 passpie import passpie.db
 ```
 
-### 4. Grouping credentials by name
+### Grouping credentials by name
 
 Passpie credentials handles multiple logins for each name which groups credentials by name:
 
@@ -245,41 +244,66 @@ example.com  jonh     *****       Jonh main email
 ===========  =======  ==========  ===============
 ```
 
-### 5. Using multiple databases
+#### Subgroups
 
-Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using `-D` Passpie option.
+Fullname syntax supports subgrouping of credentials by name
 
-#### Creating databases on a given directory (ex: `~/databases`)
+```
+passpie add foo@opensource/github.com --random
+passpie add foo@opensource/python.org --random
+passpie add foo@opensource/bitbucket.org --random
+passpie add foo@opensource/npm.org --random
+```
+
+Listing credentials:
+
+```
+========================  =======  ==========  =========
+Name                      Login    Password    Comment
+========================  =======  ==========  =========
+opensource/bitbucket.org  foo      *****
+opensource/github.com     foo      *****
+opensource/npm.org        foo      *****
+opensource/python.org     foo      *****
+========================  =======  ==========  =========
+```
+
+### Multiple databases
+
+Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using `-D` or `--database` option.
+
+#### Creating databases
 
 ```bash
-# create personal Passpie database
-passpie -D ~/databases/personal_passwords init
-
-# create work Passpie database
-passpie -D ~/databases/work_passwords init
-
-# create junk Passpie database
-passpie -D ~/databases/junk_passwords init
+passpie -D ~/credentials/personal init
+passpie -D ~/credentials/work init
+passpie -D ~/credentials/junk init
 ```
 
 #### Adding passwords to specific database
 
 ```bash
-# add password to personal Passpie database
-passpie -D ~/databases/personal_passwords add my@example
-
-# add password to junk Passpie database
-passpie -D ~/databases/junk_passwords add other@example
+passpie -D ~/credentials/personal add johnd@github.com --random
+passpie -D ~/credentials/work add john.doe@example.com --random
+passpie -D ~/credentials/junk add fake@example.com --random
 ```
 
 #### Listing passwords from specific database
 
 ```bash
-# listing specific databases
 passpie -D ~/databases/junk_passwords
 ```
 
-### 6. Configuring passpie with `.passpierc`
+Output:
+```
+===========  =======  ==========  =========
+Name         Login    Password    Comment
+===========  =======  ==========  =========
+example.com  fake     *****
+===========  =======  ==========  =========
+```
+
+### Configuring passpie with `.passpierc`
 
 You can override default passpie configuration with a `.passpierc` file on your home directory. Passpie configuration files must be written as a valid [yaml](http://yaml.org/) file.
 
@@ -289,7 +313,7 @@ You can override default passpie configuration with a `.passpierc` file on your 
 path: /Users/john.doe/.passpie
 short_commands: true
 genpass_length: 32
-genpass_symbols: "_-#|+="
+genpass_symbols: "_-#|+= "
 table_format: fancy_grid
 headers:
   - name
@@ -302,34 +326,60 @@ colors:
   password: cyan
 ```
 
-Options:
+#### Global configuration
 
-+ path: path to database. Default: `~/.passpie`
-+ short_commands: Use short commands aliases as in `passpie a` for `passpie add`
-+ genpass_length: number. Default: `32`
-+ genpass_symbols: characters. Default: `_-#|+="`
-  - true
-  - false
-+ headers:
-  - fullname
+##### `path =`
+
+**default** ~/.passpie
+
+Path to passpie database
+
+##### `short_commands = (true | false)`
+
+**default** false
+
+Use passpie commands with short aliases. Like `passpie a` for `passpie add`
+
+##### `genpass_length =`
+
+**default:** `32`
+
+Length of randomly generated passwords with option `--random`
+
+##### `genpass_symbols =`
+
+**default:** `"_-#|+= "`
+
+Symbols used on random password generation
+
+##### `table_format = (fancy_grid | rst | simple | orgtbl | pipe | grid | plain | latex)`
+
+**default:** `fancy_grid`
+
+Table format when listing credentials
+
+##### `headers = (name | login | password | comment | fullname)`
+
+**default:**
+
+```
+headers:
   - name
   - login
   - password
   - comment
-+ table_format:
-  - rst
-  - simple
-  - orgtbl
-  - fancy_grid
-+ colors:
-  - black
-  - red
-  - green
-  - yellow
-  - blue
-  - magenta
-  - cyan
-  - white
+```
+
+##### `colors = (green | red | blue | white | cyan | magenta | yellow)`
+
+**default:**
+
+```
+colors:
+  name: yellow
+  login: green
+```
+
 
 ## Under The Hood
 
@@ -394,7 +444,9 @@ Feel free to comment, open a bug report or ask for new features on Passpie [issu
 If you want to contributing with code:
 
 - Fork the repository [https://github.com/marcwebbie/passpie/fork](https://github.com/marcwebbie/passpie/fork)
-- Read the [Makefile](https://github.com/marcwebbie/passpie/blob/master/Makefile)
+- Make sure to add tests
+- Create a pull request
+- [optional] Read the [Makefile](https://github.com/marcwebbie/passpie/blob/master/Makefile)
 
 
 ## Common issues
