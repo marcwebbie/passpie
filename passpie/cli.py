@@ -250,8 +250,7 @@ def copy(fullname, passphrase):
         decrypted = cryptor.decrypt(credential["password"],
                                     passphrase=passphrase)
         pyperclip.copy(decrypted)
-        click.secho("Password copied to clipboard".format(
-            credential["fullname"]), fg="yellow")
+        click.secho("Password copied to clipboard", fg="yellow")
 
 
 @cli.command(help="Search credentials by regular expressions")
