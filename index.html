@@ -22,7 +22,7 @@
       <h1>
 <a id="passpie-manage-login-credentials-from-terminal" class="anchor" href="#passpie-manage-login-credentials-from-terminal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Passpie: Manage login credentials from terminal</h1>
 
-<p><a href="https://marcwebbie.github.io/passpie">Passpie</a> lets you manage login credentials from the terminal with a coloroful/configurable cli interface. Password files are saved into yaml text files with passwords as <a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard">GnuPG</a> encrypted strings. Use your master passphrase to decrypt login credentials files, copy passwords to clipboard and more...</p>
+<p><a href="https://marcwebbie.github.io/passpie">Passpie</a> lets you manage login credentials from the terminal with a coloroful/configurable cli interface. Password files are saved into yaml text files with passwords as <a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard">GnuPG</a> encrypted strings. Use your master passphrase to decrypt login credentials, copy passwords to clipboard and more...</p>
 
 <p><img src="https://github.com/marcwebbie/passpie/raw/master/images/passpie.png" alt="Passpie console interface"></p>
 
@@ -68,10 +68,11 @@
 
 <ul>
 <li>[ ] Undo/Redo updates to the database</li>
-<li>[ ] Bulk update/remove credentials</li>
-<li>[ ] Import plain text <a href="http://keepass.info/">Keepass</a>
+<li>[ ] Bulk update credentials</li>
+<li>[ ] Bulk remove credentials</li>
+<li>[ ] Import plain text credentials from <a href="http://keepass.info/">Keepass</a>
 </li>
-<li>[ ] Import credentials from <a href="https://agilebits.com/onepassword">1Password</a>
+<li>[ ] Import plain text credentials from <a href="https://agilebits.com/onepassword">1Password</a>
 </li>
 </ul>
 
@@ -162,6 +163,8 @@ passpie --version</pre></div>
 <h2>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
 
+<p>Passpie is designed to help you manage you password on the terminal with an clean interface. Passpie detects if you are in a terminal that supports colors and switch it off accordingly</p>
+
 <div class="highlight highlight-bash"><pre>Usage: passpie [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -181,18 +184,15 @@ Commands:
   status  Diagnose database <span class="pl-k">for</span> <span class="pl-smi">improvements</span>
   update  Update credential</pre></div>
 
-<h2>
-<a id="tutorials" class="anchor" href="#tutorials" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tutorials</h2>
-
 <h3>
-<a id="1-diving-into-fullname-syntax" class="anchor" href="#1-diving-into-fullname-syntax" aria-hidden="true"><span class="octicon octicon-link"></span></a>1. Diving into <em>fullname</em> syntax</h3>
+<a id="diving-into-fullname-syntax" class="anchor" href="#diving-into-fullname-syntax" aria-hidden="true"><span class="octicon octicon-link"></span></a>Diving into <em>fullname</em> syntax</h3>
 
-<p>Passpie fullname syntax handles login and name for credentials in one go for faster adding and querying.</p>
+<p>Passpie credentials are referenced by <code>fullname</code>. fullname syntax handles login and name for credentials in one go for faster adding and querying of credentials.</p>
 
 <h4>
 <a id="structure-of-a-fullname" class="anchor" href="#structure-of-a-fullname" aria-hidden="true"><span class="octicon octicon-link"></span></a>Structure of a fullname</h4>
 
-<p><code>login</code>@<code>name</code>. Login is optional,  when adding new credentials without login, login will be replaced by a <code>_</code> character:</p>
+<p>Fullnames are composed of <code>login</code>@<code>name</code>. Login is optional. If you don't pass any login when adding new credentials, credential login will be replaced by a <code>_</code> character:</p>
 
 <div class="highlight highlight-bash"><pre>passpie add @banks/mybank --password 1234
 passpie add @banks/myotherbank --password 5678</pre></div>
@@ -207,52 +207,45 @@ banks/mybank       _        <span class="pl-k">*****</span>
 banks/myotherbank  _        <span class="pl-k">*****</span>
 =================  =======  ==========  =========</pre></div>
 
+<p>Since <code>login</code> is optional. You can query credentials using only name syntax, for example to update credential <code>@banks/mybank</code>:</p>
+
+<div class="highlight highlight-bash"><pre>passpie update @banks/mybank --random</pre></div>
+
+<p>Or even better, without using the <code>@</code> notation:</p>
+
+<div class="highlight highlight-bash"><pre>passpie update banks/mybank --random</pre></div>
+
 <h3>
-<a id="2-syncing-your-database" class="anchor" href="#2-syncing-your-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>2. Syncing your database</h3>
+<a id="syncing-your-database" class="anchor" href="#syncing-your-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Syncing your database</h3>
 
 <h4>
 <a id="dropbox" class="anchor" href="#dropbox" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dropbox</h4>
 
 <p>Assuming you have passpie database on the default path <code>~/.passpie</code> and a Dropbox shared directory on path <code>~/Dropbox</code></p>
 
-<h5>
-<a id="1-move-your-passpie-database-inside-your-dropbox-directory" class="anchor" href="#1-move-your-passpie-database-inside-your-dropbox-directory" aria-hidden="true"><span class="octicon octicon-link"></span></a>1. Move your Passpie database inside your Dropbox directory:</h5>
-
-<div class="highlight highlight-bash"><pre>mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/Dropbox/passpie</pre></div>
-
-<h5>
-<a id="2-create-a-symbolic-link-to-your-shared-passpie-directory-on-the-default-path" class="anchor" href="#2-create-a-symbolic-link-to-your-shared-passpie-directory-on-the-default-path" aria-hidden="true"><span class="octicon octicon-link"></span></a>2. create a symbolic link to your shared <code>passpie</code> directory on the default path.</h5>
-
-<div class="highlight highlight-bash"><pre>ln -s <span class="pl-k">~</span>/Dropbox/passpie <span class="pl-k">~</span>/.passpie</pre></div>
+<div class="highlight highlight-bash"><pre>mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/Dropbox/passpie <span class="pl-c"># move passpie db to dropbox</span>
+ln -s <span class="pl-k">~</span>/Dropbox/passpie <span class="pl-k">~</span>/.passpie <span class="pl-c"># make a link to the db</span></pre></div>
 
 <h4>
 <a id="google-drive" class="anchor" href="#google-drive" aria-hidden="true"><span class="octicon octicon-link"></span></a>Google Drive</h4>
 
 <p>Assuming you have passpie database on the default path <code>~/.passpie</code> and a Google Drive shared directory on path <code>~/GoogleDrive</code></p>
 
-<h5>
-<a id="1-move-your-passpie-database-inside-your-google-drive-directory" class="anchor" href="#1-move-your-passpie-database-inside-your-google-drive-directory" aria-hidden="true"><span class="octicon octicon-link"></span></a>1. move your Passpie database inside your Google Drive directory</h5>
-
-<div class="highlight highlight-bash"><pre>mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/GoogleDrive/passpie</pre></div>
-
-<h5>
-<a id="2-create-a-symbolic-link-to-your-shared-passpie-directory-on-the-default-path-1" class="anchor" href="#2-create-a-symbolic-link-to-your-shared-passpie-directory-on-the-default-path-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>2. create a symbolic link to your shared <code>passpie</code> directory on the default path.</h5>
-
-<div class="highlight highlight-bash"><pre>ln -s <span class="pl-k">~</span>/GoogleDrive/passpie <span class="pl-k">~</span>.passpie</pre></div>
+<div class="highlight highlight-bash"><pre>mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/GoogleDrive/passpie <span class="pl-c"># move passpie db to dropbox</span>
+ln -s <span class="pl-k">~</span>/GoogleDrive/passpie <span class="pl-k">~</span>.passpie <span class="pl-c"># make a link to the db</span></pre></div>
 
 <h3>
-<a id="3-exportingimporting-passpie-databases" class="anchor" href="#3-exportingimporting-passpie-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>3. Exporting/Importing Passpie databases</h3>
+<a id="exporting-a-passpie-database" class="anchor" href="#exporting-a-passpie-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Exporting a passpie database</h3>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># export database to a passpie database file called passpie.db</span>
-<span class="pl-c"># Command: `export`</span>
-passpie <span class="pl-k">export</span> passpie.db
-
-<span class="pl-c"># import database from passpie database file called passpie.db</span>
-<span class="pl-c"># Option: `import`</span>
-passpie import passpie.db</pre></div>
+<div class="highlight highlight-bash"><pre>passpie <span class="pl-k">export</span> passpie.db</pre></div>
 
 <h3>
-<a id="4-grouping-credentials-by-name" class="anchor" href="#4-grouping-credentials-by-name" aria-hidden="true"><span class="octicon octicon-link"></span></a>4. Grouping credentials by name</h3>
+<a id="importing-a-passpie-database" class="anchor" href="#importing-a-passpie-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Importing a passpie database</h3>
+
+<div class="highlight highlight-bash"><pre>passpie import passpie.db</pre></div>
+
+<h3>
+<a id="grouping-credentials-by-name" class="anchor" href="#grouping-credentials-by-name" aria-hidden="true"><span class="octicon octicon-link"></span></a>Grouping credentials by name</h3>
 
 <p>Passpie credentials handles multiple logins for each name which groups credentials by name:</p>
 
@@ -271,40 +264,64 @@ example.com  doe      <span class="pl-k">*****</span>       No comment
 example.com  jonh     <span class="pl-k">*****</span>       Jonh main email
 ===========  =======  ==========  ===============</pre></div>
 
-<h3>
-<a id="5-using-multiple-databases" class="anchor" href="#5-using-multiple-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>5. Using multiple databases</h3>
+<h4>
+<a id="subgroups" class="anchor" href="#subgroups" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subgroups</h4>
 
-<p>Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using <code>-D</code> Passpie option.</p>
+<p>Fullname syntax supports subgrouping of credentials by name</p>
+
+<pre><code>passpie add foo@opensource/github.com --random
+passpie add foo@opensource/python.org --random
+passpie add foo@opensource/bitbucket.org --random
+passpie add foo@opensource/npm.org --random
+</code></pre>
+
+<p>Listing credentials:</p>
+
+<pre><code>========================  =======  ==========  =========
+Name                      Login    Password    Comment
+========================  =======  ==========  =========
+opensource/bitbucket.org  foo      *****
+opensource/github.com     foo      *****
+opensource/npm.org        foo      *****
+opensource/python.org     foo      *****
+========================  =======  ==========  =========
+</code></pre>
+
+<h3>
+<a id="multiple-databases" class="anchor" href="#multiple-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>Multiple databases</h3>
+
+<p>Sometimes it is useful to have multiple databases with different passphrases for higher security. This can be done using <code>-D</code> or <code>--database</code> option.</p>
 
 <h4>
-<a id="creating-databases-on-a-given-directory-ex-databases" class="anchor" href="#creating-databases-on-a-given-directory-ex-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating databases on a given directory (ex: <code>~/databases</code>)</h4>
+<a id="creating-databases" class="anchor" href="#creating-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating databases</h4>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># create personal Passpie database</span>
-passpie -D <span class="pl-k">~</span>/databases/personal_passwords init
-
-<span class="pl-c"># create work Passpie database</span>
-passpie -D <span class="pl-k">~</span>/databases/work_passwords init
-
-<span class="pl-c"># create junk Passpie database</span>
-passpie -D <span class="pl-k">~</span>/databases/junk_passwords init</pre></div>
+<div class="highlight highlight-bash"><pre>passpie -D <span class="pl-k">~</span>/credentials/personal init
+passpie -D <span class="pl-k">~</span>/credentials/work init
+passpie -D <span class="pl-k">~</span>/credentials/junk init</pre></div>
 
 <h4>
 <a id="adding-passwords-to-specific-database" class="anchor" href="#adding-passwords-to-specific-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding passwords to specific database</h4>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># add password to personal Passpie database</span>
-passpie -D <span class="pl-k">~</span>/databases/personal_passwords add my@example
-
-<span class="pl-c"># add password to junk Passpie database</span>
-passpie -D <span class="pl-k">~</span>/databases/junk_passwords add other@example</pre></div>
+<div class="highlight highlight-bash"><pre>passpie -D <span class="pl-k">~</span>/credentials/personal add johnd@github.com --random
+passpie -D <span class="pl-k">~</span>/credentials/work add john.doe@example.com --random
+passpie -D <span class="pl-k">~</span>/credentials/junk add fake@example.com --random</pre></div>
 
 <h4>
 <a id="listing-passwords-from-specific-database" class="anchor" href="#listing-passwords-from-specific-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Listing passwords from specific database</h4>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># listing specific databases</span>
-passpie -D <span class="pl-k">~</span>/databases/junk_passwords</pre></div>
+<div class="highlight highlight-bash"><pre>passpie -D <span class="pl-k">~</span>/databases/junk_passwords</pre></div>
+
+<p>Output:</p>
+
+<pre><code>===========  =======  ==========  =========
+Name         Login    Password    Comment
+===========  =======  ==========  =========
+example.com  fake     *****
+===========  =======  ==========  =========
+</code></pre>
 
 <h3>
-<a id="6-configuring-passpie-with-passpierc" class="anchor" href="#6-configuring-passpie-with-passpierc" aria-hidden="true"><span class="octicon octicon-link"></span></a>6. Configuring passpie with <code>.passpierc</code>
+<a id="configuring-passpie-with-passpierc" class="anchor" href="#configuring-passpie-with-passpierc" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuring passpie with <code>.passpierc</code>
 </h3>
 
 <p>You can override default passpie configuration with a <code>.passpierc</code> file on your home directory. Passpie configuration files must be written as a valid <a href="http://yaml.org/">yaml</a> file.</p>
@@ -315,7 +332,7 @@ passpie -D <span class="pl-k">~</span>/databases/junk_passwords</pre></div>
 <div class="highlight highlight-yaml"><pre><span class="pl-s"><span class="pl-ent">path:</span> <span class="pl-s">/Users/john.doe/.passpie</span></span>
 <span class="pl-s"><span class="pl-ent">short_commands:</span> <span class="pl-s">true</span></span>
 <span class="pl-c1"><span class="pl-ent">genpass_length:</span> 32</span>
-<span class="pl-s"><span class="pl-ent">genpass_symbols:</span> <span class="pl-s"><span class="pl-pds">"</span>_-#|+=<span class="pl-pds">"</span></span></span>
+<span class="pl-s"><span class="pl-ent">genpass_symbols:</span> <span class="pl-s"><span class="pl-pds">"</span>_-#|+= <span class="pl-pds">"</span></span></span>
 <span class="pl-s"><span class="pl-ent">table_format:</span> <span class="pl-s">fancy_grid</span></span>
 <span class="pl-s"><span class="pl-ent">headers:</span></span>
   <span class="pl-s">- <span class="pl-s">name</span></span>
@@ -327,55 +344,72 @@ passpie -D <span class="pl-k">~</span>/databases/junk_passwords</pre></div>
   <span class="pl-s"><span class="pl-ent">name:</span> <span class="pl-s">yellow</span></span>
   <span class="pl-s"><span class="pl-ent">password:</span> <span class="pl-s">cyan</span></span></pre></div>
 
-<p>Options:</p>
+<h4>
+<a id="global-configuration" class="anchor" href="#global-configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Global configuration</h4>
 
-<ul>
-<li>path: path to database. Default: <code>~/.passpie</code>
-</li>
-<li>short_commands: Use short commands aliases as in <code>passpie a</code> for <code>passpie add</code>
-</li>
-<li>genpass_length: number. Default: <code>32</code>
-</li>
-<li>genpass_symbols: characters. Default: <code>_-#|+="</code>
+<h5>
+<a id="path-" class="anchor" href="#path-" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>path =</code>
+</h5>
 
-<ul>
-<li>true</li>
-<li>false</li>
-</ul>
-</li>
-<li>headers:
+<p><strong>default</strong> ~/.passpie</p>
 
-<ul>
-<li>fullname</li>
-<li>name</li>
-<li>login</li>
-<li>password</li>
-<li>comment</li>
-</ul>
-</li>
-<li>table_format:
+<p>Path to passpie database</p>
 
-<ul>
-<li>rst</li>
-<li>simple</li>
-<li>orgtbl</li>
-<li>fancy_grid</li>
-</ul>
-</li>
-<li>colors:
+<h5>
+<a id="short_commands--true--false" class="anchor" href="#short_commands--true--false" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>short_commands = (true | false)</code>
+</h5>
 
-<ul>
-<li>black</li>
-<li>red</li>
-<li>green</li>
-<li>yellow</li>
-<li>blue</li>
-<li>magenta</li>
-<li>cyan</li>
-<li>white</li>
-</ul>
-</li>
-</ul>
+<p><strong>default</strong> false</p>
+
+<p>Use passpie commands with short aliases. Like <code>passpie a</code> for <code>passpie add</code></p>
+
+<h5>
+<a id="genpass_length-" class="anchor" href="#genpass_length-" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>genpass_length =</code>
+</h5>
+
+<p><strong>default:</strong> <code>32</code></p>
+
+<p>Length of randomly generated passwords with option <code>--random</code></p>
+
+<h5>
+<a id="genpass_symbols-" class="anchor" href="#genpass_symbols-" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>genpass_symbols =</code>
+</h5>
+
+<p><strong>default:</strong> <code>"_-#|+= "</code></p>
+
+<p>Symbols used on random password generation</p>
+
+<h5>
+<a id="table_format--fancy_grid--rst--simple--orgtbl--pipe--grid--plain--latex" class="anchor" href="#table_format--fancy_grid--rst--simple--orgtbl--pipe--grid--plain--latex" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>table_format = (fancy_grid | rst | simple | orgtbl | pipe | grid | plain | latex)</code>
+</h5>
+
+<p><strong>default:</strong> <code>fancy_grid</code></p>
+
+<p>Table format when listing credentials</p>
+
+<h5>
+<a id="headers--name--login--password--comment--fullname" class="anchor" href="#headers--name--login--password--comment--fullname" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>headers = (name | login | password | comment | fullname)</code>
+</h5>
+
+<p><strong>default:</strong></p>
+
+<pre><code>headers:
+  - name
+  - login
+  - password
+  - comment
+</code></pre>
+
+<h5>
+<a id="colors--green--red--blue--white--cyan--magenta--yellow" class="anchor" href="#colors--green--red--blue--white--cyan--magenta--yellow" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>colors = (green | red | blue | white | cyan | magenta | yellow)</code>
+</h5>
+
+<p><strong>default:</strong></p>
+
+<pre><code>colors:
+  name: yellow
+  login: green
+</code></pre>
 
 <h2>
 <a id="under-the-hood" class="anchor" href="#under-the-hood" aria-hidden="true"><span class="octicon octicon-link"></span></a>Under The Hood</h2>
@@ -439,7 +473,9 @@ tree /tmp/passpie -la
 <ul>
 <li>Fork the repository <a href="https://github.com/marcwebbie/passpie/fork">https://github.com/marcwebbie/passpie/fork</a>
 </li>
-<li>Read the <a href="https://github.com/marcwebbie/passpie/blob/master/Makefile">Makefile</a>
+<li>Make sure to add tests</li>
+<li>Create a pull request</li>
+<li>[optional] Read the <a href="https://github.com/marcwebbie/passpie/blob/master/Makefile">Makefile</a>
 </li>
 </ul>
 
