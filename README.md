@@ -451,7 +451,7 @@ If you want to contributing with code:
 
 ## Common issues
 
-### Running passpie init raises `TypeError: init() got an unexpected keyword argument 'binary'`
++ `TypeError: init() got an unexpected keyword argument 'binary'`
 
 You probably have the `python-gnupg` package installed. Passpie depends on [isislovecruft](https://github.com/isislovecruft) fork of [python-gnupg](https://github.com/isislovecruft/python-gnupg)
 
@@ -460,6 +460,24 @@ To fix:
 ```
 pip uninstall python-gnupg
 pip install -U passpie
+```
+
++ `'GPG not installed. https://www.gnupg.org/'`
+
+You don't have gpg installed or it is not working as expected
+
+Make sure you have [gpg](https://www.gnupg.org/) installed:
+
+Ubuntu:
+
+```
+sudo apt-get install gpg
+```
+
+OSX:
+
+```
+brew install gpg
 ```
 
 
