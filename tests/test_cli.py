@@ -402,3 +402,21 @@ def test_add_with_copy_option_add_pass_to_clipboard(mocker, mock_db, mock_crypto
 
     assert result.exit_code == 0
     assert mock_pyperclip.copy.called is True
+
+
+def test_remove_credentials_in_bulk(mocker, mock_db):
+    credentials = [
+        {'fullname': 'foo@bar'},
+        {'fullname': 'foozy@bar'}
+    ]
+    mocker.patch.object(mock_db, 'remove')
+    mocker.patch('passpie.cli.get_credential_or_abort',
+                 return_value=credentials)
+
+
+    runner = CliRunner()
+    result = runner.invoke(cli.remove, ['foo@bar', '--yes'])
+
+    assert result.exit_code == 0
+    assert mock_db.remove.called
+    assert mock_db.remove.call_count == 2

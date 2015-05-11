@@ -57,22 +57,22 @@ def ensure_gpg_installed():
         raise click.ClickException(click.style(message, fg='yellow'))
 
 
-def get_credential_or_abort(db, fullname):
+def get_credential_or_abort(db, fullname, many=False):
     try:
         login, name = split_fullname(fullname)
         query = (where("name") == name) & (where("login") == login)
     except ValueError:
         query = where('name') == fullname
 
-    credential = db.get(query)
-    if not credential:
+    found = db.search(query) if many else db.get(query)
+    if not found:
         message = "Credential '{}' not found".format(fullname)
         raise click.ClickException(click.style(message, fg='red'))
-    elif db.count(query) > 1:
+    elif db.count(query) > 1 and not many:
         message = "Multiple matches for '{}'".format(fullname)
         raise click.ClickException(click.style(message, fg='red'))
 
-    return credential
+    return found
 
 
 def ensure_is_database(path):
@@ -175,6 +175,7 @@ def add(fullname, password, comment, force, copy):
         db.insert(credential)
         if copy:
             pyperclip.copy(password)
+            click.secho("Password copied to clipboard", fg="yellow")
     else:
         message = "Credential {} already exists. --force to overwrite".format(
             fullname)
@@ -226,16 +227,18 @@ def update(fullname, name, login, password, comment):
 @click.option("-y", "--yes", is_flag=True, help="Skip confirmation prompt")
 def remove(fullname, yes):
     db = Database(config.path)
-    credential = get_credential_or_abort(db, fullname)
+    credentials = get_credential_or_abort(db, fullname, many=True)
 
-    if credential:
+    if credentials:
         if not yes:
+            creds = ', '.join([c['fullname'] for c in credentials])
             click.confirm(
-                'Remove credential: {}'.format(
-                    click.style(fullname, 'yellow')),
+                'Remove credentials: ({})'.format(
+                    click.style(creds, 'yellow')),
                 abort=True
             )
-        db.remove(where('fullname') == credential["fullname"])
+        for credential in credentials:
+            db.remove(where('fullname') == credential['fullname'])
 
 
 @cli.command(help="Copy credential password to clipboard")
