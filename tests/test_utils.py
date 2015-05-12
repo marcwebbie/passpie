@@ -106,7 +106,7 @@ def test_get_version_returns_install_message_when_dist_not_found(mocker):
 
 
 def test_ensure_dependencies_raises_runtime_error_on_pyperclip(mocker):
-    mocker.patch('passpie.utils.imp.importlib.import_module',
+    mocker.patch('passpie.utils.import_module',
                  side_effect=ImportError)
 
     with pytest.raises(RuntimeError) as excinfo:
