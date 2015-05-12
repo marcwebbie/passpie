@@ -35,12 +35,12 @@
 + [x] Randomly generated credential passwords
 + [x] Configurable random password generation
 + [x] Generate database status report
++ [x] Bulk remove credentials
 
 Planned features:
 
 + [ ] Undo/Redo updates to the database
 + [ ] Bulk update credentials
-+ [ ] Bulk remove credentials
 + [ ] Import plain text credentials from [Keepass](http://keepass.info/)
 + [ ] Import plain text credentials from [1Password](https://agilebits.com/onepassword)
 
@@ -48,15 +48,15 @@ Planned features:
 
 ### Stable version
 
-Make sure you have [GPG](https://www.gnupg.org/) installed:
-
 #### Using [pip](http://pip.readthedocs.org/en/latest/installing.html)
 
 ```bash
 pip install passpie
 ```
 
-#### If you are on a mac you can install *Passpie* using [homebrew](http://brew.sh)
+> Make sure you have [GPG](https://www.gnupg.org/) installed, you may also need installed if you are on **linux** [xclip](http://doc.ubuntu-fr.org/xclip):
+
+#### If you are on a mac you can install using [homebrew](http://brew.sh)
 
 ```bash
 brew tap marcwebbie/passpie
@@ -197,7 +197,7 @@ passpie update banks/mybank --random
 Assuming you have passpie database on the default path `~/.passpie` and a Dropbox shared directory on path `~/Dropbox`
 
 ```bash
-mv ~/.passpie ~/Dropbox/passpie # move passpie db to dropbox
+mv ~/.passpie ~/Dropbox/passpie    # move passpie db to Dropbox
 ln -s ~/Dropbox/passpie ~/.passpie # make a link to the db
 ```
 
@@ -206,7 +206,7 @@ ln -s ~/Dropbox/passpie ~/.passpie # make a link to the db
 Assuming you have passpie database on the default path `~/.passpie` and a Google Drive shared directory on path `~/GoogleDrive`
 
 ```bash
-mv ~/.passpie ~/GoogleDrive/passpie # move passpie db to dropbox
+mv ~/.passpie ~/GoogleDrive/passpie   # move passpie db to Google Drive
 ln -s ~/GoogleDrive/passpie ~.passpie # make a link to the db
 ```
 
@@ -448,7 +448,7 @@ If you want to contributing with code:
 
 ## Common issues
 
-+ `TypeError: init() got an unexpected keyword argument 'binary'`
+### `TypeError: init() got an unexpected keyword argument 'binary'`
 
 You probably have the `python-gnupg` package installed. Passpie depends on [isislovecruft](https://github.com/isislovecruft) fork of [python-gnupg](https://github.com/isislovecruft/python-gnupg)
 
@@ -459,7 +459,7 @@ pip uninstall python-gnupg
 pip install -U passpie
 ```
 
-+ `'GPG not installed. https://www.gnupg.org/'`
+### `'GPG not installed. https://www.gnupg.org/'`
 
 You don't have gpg installed or it is not working as expected
 
@@ -476,6 +476,17 @@ OSX:
 ```
 brew install gpg
 ```
+
+### `xclip or xsel not installed`
+
+You don't have copy to clipboard support by default on some linux distributions.
+
+Ubuntu:
+
+```
+sudo apt-get install xclip
+```
+
 
 
 ## License ([MIT License](http://choosealicense.com/licenses/mit/))
