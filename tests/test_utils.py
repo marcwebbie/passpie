@@ -4,8 +4,15 @@ except:
     from unittest.mock import mock_open, MagicMock
 
 import yaml
+import pytest
 
-from passpie.utils import genpass, mkdir_open, load_config, get_version
+from passpie.utils import (
+    genpass,
+    mkdir_open,
+    load_config,
+    get_version,
+    ensure_dependencies
+)
 from .helpers import MockerTestCase
 
 
@@ -96,3 +103,22 @@ def test_get_version_returns_install_message_when_dist_not_found(mocker):
     version = get_version()
 
     assert version == message
+
+
+def test_ensure_dependencies_raises_runtime_error_on_pyperclip(mocker):
+    mocker.patch('passpie.utils.imp.importlib.import_module',
+                 side_effect=ImportError)
+
+    with pytest.raises(RuntimeError) as excinfo:
+        ensure_dependencies()
+
+    assert 'xclip or xsel is not installed.' == str(excinfo.value)
+
+
+def test_ensure_dependencies_raises_runtime_when_gpg_not_installed(mocker):
+    mocker.patch('passpie.utils.which', return_value=None)
+
+    with pytest.raises(RuntimeError) as excinfo:
+        ensure_dependencies()
+
+    assert 'GnuPG not installed. https://www.gnupg.org/' == str(excinfo.value)

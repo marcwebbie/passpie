@@ -6,15 +6,14 @@ import shutil
 
 from tinydb.queries import where
 import click
-import pyperclip
 import yaml
 
-from ._compat import FileExistsError, which
+from ._compat import FileExistsError
 from .credential import split_fullname, make_fullname
 from .crypt import Cryptor
 from .database import Database
 from .importers import find_importer
-from .utils import genpass, load_config
+from .utils import genpass, load_config, ensure_dependencies
 from .table import Table
 
 
@@ -49,12 +48,6 @@ class AliasedGroup(click.Group):
         elif len(matches) == 1:
             return click.Group.get_command(self, ctx, matches[0])
         ctx.fail('Too many matches: %s' % ', '.join(sorted(matches)))
-
-
-def ensure_gpg_installed():
-    if not which('gpg'):
-        message = 'GPG not installed. https://www.gnupg.org/'
-        raise click.ClickException(click.style(message, fg='yellow'))
 
 
 def get_credential_or_abort(db, fullname, many=False):
@@ -107,6 +100,12 @@ def print_table(credentials):
         click.echo(table.render(credentials))
 
 
+def copy_to_clipboard(text):
+    import pyperclip
+    pyperclip.copy(text)
+    click.secho("Password copied to clipboard", fg="yellow")
+
+
 @click.group(cls=AliasedGroup if config.short_commands else click.Group,
              invoke_without_command=True)
 @click.option('-D', '--database', help='Alternative database path',
@@ -114,7 +113,10 @@ def print_table(credentials):
 @click.version_option(version=__version__)
 @click.pass_context
 def cli(ctx, database):
-    ensure_gpg_installed()
+    try:
+        ensure_dependencies()
+    except RuntimeError as e:
+        raise click.ClickException(click.style(str(e), fg='red'))
 
     if database:
         config.path = database
@@ -174,8 +176,7 @@ def add(fullname, password, comment, force, copy):
                           modified=datetime.now())
         db.insert(credential)
         if copy:
-            pyperclip.copy(password)
-            click.secho("Password copied to clipboard", fg="yellow")
+            copy_to_clipboard(password)
     else:
         message = "Credential {} already exists. --force to overwrite".format(
             fullname)
@@ -252,8 +253,7 @@ def copy(fullname, passphrase):
     with Cryptor(config.path) as cryptor:
         decrypted = cryptor.decrypt(credential["password"],
                                     passphrase=passphrase)
-        pyperclip.copy(decrypted)
-        click.secho("Password copied to clipboard", fg="yellow")
+        copy_to_clipboard(decrypted)
 
 
 @cli.command(help="Search credentials by regular expressions")

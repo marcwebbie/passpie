@@ -1,5 +1,6 @@
 from argparse import Namespace
 from contextlib import contextmanager
+import imp
 from pkg_resources import get_distribution, DistributionNotFound
 import errno
 import logging
@@ -8,6 +9,9 @@ import random
 import string
 
 import yaml
+
+
+from ._compat import which
 
 
 def genpass(length=32, special="_-#|+="):
@@ -61,3 +65,15 @@ def load_config(default_config, user_config_path):
 
     config = Namespace(**default_config)
     return config
+
+
+def ensure_dependencies():
+    try:
+        assert which('gpg')
+    except AssertionError:
+        raise RuntimeError('GnuPG not installed. https://www.gnupg.org/')
+
+    try:
+        imp.importlib.import_module('pyperclip')
+    except:
+        raise RuntimeError('xclip or xsel is not installed.')

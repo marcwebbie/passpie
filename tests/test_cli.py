@@ -73,14 +73,14 @@ def test_cli_copy_credential_password_to_database(mocker, mock_db, mock_cryptor)
     fullname = 'foo@bar'
     password = 's3cr3t'
     mocker.patch('passpie.cli.ensure_passphrase')
-    mock_pyperclip = mocker.patch('passpie.cli.pyperclip')
+    mock_copy_to_clipboard = mocker.patch('passpie.cli.copy_to_clipboard')
     mock_cryptor.decrypt.return_value = password
     runner = CliRunner()
     result = runner.invoke(cli.copy, [fullname], input='passphrase')
 
     assert result.exit_code == 0
-    assert mock_pyperclip.copy.called
-    mock_pyperclip.copy.assert_called_once_with(password)
+    assert mock_copy_to_clipboard.called
+    mock_copy_to_clipboard.assert_called_once_with(password)
 
 
 def test_cli_reset_database_overwrite_old_keys(mocker, mock_db, mock_cryptor):
@@ -163,7 +163,7 @@ def test_init_has_success_when_keys_exits_and_force_is_passed(mocker, mock_crypt
 
 
 def test_copy_to_clipboard_decrypts_password_to_pass_to_pyperclip(mocker, mock_cryptor):
-    mock_pyperclip = mocker.patch('passpie.cli.pyperclip')
+    mock_copy_to_clipboard = mocker.patch('passpie.cli.copy_to_clipboard')
     mocker.patch('passpie.cli.get_credential_or_abort')
     mocker.patch('passpie.cli.ensure_passphrase')
     fullname = "foo@bar"
@@ -174,8 +174,7 @@ def test_copy_to_clipboard_decrypts_password_to_pass_to_pyperclip(mocker, mock_c
     result = runner.invoke(cli.copy, [fullname, "--passphrase", passphrase])
 
     assert result.exit_code is 0
-    assert result.output == "Password copied to clipboard\n"
-    mock_pyperclip.copy.assert_called_once_with(mock_password)
+    mock_copy_to_clipboard.assert_called_once_with(mock_password)
 
 
 def test_import_prints_nothing_when_no_importer_is_found(mocker, mock_cryptor):
@@ -281,8 +280,8 @@ def test_add_credential_dont_exit_with_error_when_force(mocker, mock_db, mock_cr
 
 
 def test_raises_exception_when_gpg_not_installed(mocker):
-    mocker.patch('passpie.cli.which', return_value=None)
-    message = 'Error: GPG not installed. https://www.gnupg.org/\n'
+    mocker.patch('passpie.utils.which', return_value=None)
+    message = 'Error: GnuPG not installed. https://www.gnupg.org/\n'
 
     runner = CliRunner()
     result = runner.invoke(cli.cli)
@@ -395,13 +394,13 @@ def test_remove_dont_ask_confimation_when_yes_passed(mocker, mock_db):
 
 
 def test_add_with_copy_option_add_pass_to_clipboard(mocker, mock_db, mock_cryptor):
-    mock_pyperclip = mocker.patch('passpie.cli.pyperclip')
+    mock_copy_to_clipboard = mocker.patch('passpie.cli.copy_to_clipboard')
 
     runner = CliRunner()
     result = runner.invoke(cli.add, ['john.doe@spam', '--random', '--copy'])
 
     assert result.exit_code == 0
-    assert mock_pyperclip.copy.called is True
+    assert mock_copy_to_clipboard.called is True
 
 
 def test_remove_credentials_in_bulk(mocker, mock_db):
@@ -412,7 +411,6 @@ def test_remove_credentials_in_bulk(mocker, mock_db):
     mocker.patch.object(mock_db, 'remove')
     mocker.patch('passpie.cli.get_credential_or_abort',
                  return_value=credentials)
-
 
     runner = CliRunner()
     result = runner.invoke(cli.remove, ['foo@bar', '--yes'])
