@@ -47,7 +47,10 @@ class AliasedGroup(click.Group):
             return None
         elif len(matches) == 1:
             return click.Group.get_command(self, ctx, matches[0])
-        ctx.fail('Too many matches: %s' % ', '.join(sorted(matches)))
+        message = 'Too many matches: %s' % ', '.join(
+            sorted([click.style(m, fg='yellow') for m in matches])
+        )
+        ctx.fail(message)
 
 
 def get_credential_or_abort(db, fullname, many=False):
