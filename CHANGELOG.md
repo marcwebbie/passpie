@@ -2,6 +2,11 @@
 
 ## Versions
 
+### 0.1.3
+
++ **√** Add remove in bulk using simple name syntax.
++ **√** Fix bug on missing xclip/xsel installation on ubuntu.
+
 ### 0.1.2
 
 + **√** Add `--copy` to clipboard option on `add` command: Thanks to [@vitalk](https://github.com/vitalk)
