@@ -11,7 +11,7 @@ from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 import pytest
 
-from passpie import cli
+from passpie import cli, completions
 from passpie.crypt import FileExistsError
 
 
@@ -418,3 +418,32 @@ def test_remove_credentials_in_bulk(mocker, mock_db):
     assert result.exit_code == 0
     assert mock_db.remove.called
     assert mock_db.remove.call_count == 2
+
+
+def test_cli_complete_chooses_bash_when_bash_passed_to_eval(mocker):
+    mock_sys = mocker.patch('passpie.cli.sys')
+    mock_click = mocker.patch('passpie.cli.click')
+    mock_sys.argv = ['passpie', 'bash']
+    cli.complete()
+
+    assert mock_click.echo.called is True
+    mock_click.echo.assert_called_once_with(completions.BASH)
+
+
+def test_cli_complete_chooses_zsh_when_bash_passed_to_eval(mocker):
+    mock_sys = mocker.patch('passpie.cli.sys')
+    mock_click = mocker.patch('passpie.cli.click')
+    mock_sys.argv = ['passpie', 'zsh']
+    cli.complete()
+
+    assert mock_click.echo.called is True
+    mock_click.echo.assert_called_once_with(completions.ZSH)
+
+
+def test_cli_complete_chooses_prints_nothing_when_not_supported(mocker):
+    mock_sys = mocker.patch('passpie.cli.sys')
+    mock_click = mocker.patch('passpie.cli.click')
+    mock_sys.argv = ['passpie', 'coolshel']
+    cli.complete()
+
+    assert mock_click.echo.called is False
