@@ -124,7 +124,6 @@ def complete():
         click.echo(completions.ZSH)
 
 
-
 @click.group(cls=AliasedGroup if config.short_commands else click.Group,
              invoke_without_command=True)
 @click.option('-D', '--database', help='Alternative database path',
