@@ -36,7 +36,7 @@
 + [x] Configurable random password generation
 + [x] Generate database status report
 + [x] Bulk remove credentials
-+ [x] Bash/Zsh [completion](#passpie-completion-bashzsh)
++ [x] Bash/Zsh [completion](#passpie-completion)
 
 Planned features:
 
