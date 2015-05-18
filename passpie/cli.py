@@ -112,6 +112,11 @@ def copy_to_clipboard(text):
 
 
 def complete():
+    """Prints completion strings to be evaluated
+
+    on bash: 'eval "$(passpie-complete bash -)"'
+    on zsh: 'eval "$(passpie-complete zsh -)"'
+    """
     shell = sys.argv[1]
     if shell == 'bash':
         click.echo(completions.BASH)
