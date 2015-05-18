@@ -62,6 +62,9 @@
 <li>[x] Randomly generated credential passwords</li>
 <li>[x] Configurable random password generation</li>
 <li>[x] Generate database status report</li>
+<li>[x] Bulk remove credentials</li>
+<li>[x] Bash/Zsh <a href="#passpie-completion">completion</a>
+</li>
 </ul>
 
 <p>Planned features:</p>
@@ -69,7 +72,6 @@
 <ul>
 <li>[ ] Undo/Redo updates to the database</li>
 <li>[ ] Bulk update credentials</li>
-<li>[ ] Bulk remove credentials</li>
 <li>[ ] Import plain text credentials from <a href="http://keepass.info/">Keepass</a>
 </li>
 <li>[ ] Import plain text credentials from <a href="https://agilebits.com/onepassword">1Password</a>
@@ -82,16 +84,18 @@
 <h3>
 <a id="stable-version" class="anchor" href="#stable-version" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stable version</h3>
 
-<p>Make sure you have <a href="https://www.gnupg.org/">GPG</a> installed:</p>
-
 <h4>
 <a id="using-pip" class="anchor" href="#using-pip" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using <a href="http://pip.readthedocs.org/en/latest/installing.html">pip</a>
 </h4>
 
 <div class="highlight highlight-bash"><pre>pip install passpie</pre></div>
 
+<blockquote>
+<p>Make sure you have <a href="https://www.gnupg.org/">GPG</a> installed, you may also need installed if you are on <strong>linux</strong> <a href="http://doc.ubuntu-fr.org/xclip">xclip</a>:</p>
+</blockquote>
+
 <h4>
-<a id="if-you-are-on-a-mac-you-can-install-passpie-using-homebrew" class="anchor" href="#if-you-are-on-a-mac-you-can-install-passpie-using-homebrew" aria-hidden="true"><span class="octicon octicon-link"></span></a>If you are on a mac you can install <em>Passpie</em> using <a href="http://brew.sh">homebrew</a>
+<a id="if-you-are-on-a-mac-you-can-install-using-homebrew" class="anchor" href="#if-you-are-on-a-mac-you-can-install-using-homebrew" aria-hidden="true"><span class="octicon octicon-link"></span></a>If you are on a mac you can install using <a href="http://brew.sh">homebrew</a>
 </h4>
 
 <div class="highlight highlight-bash"><pre>brew tap marcwebbie/passpie
@@ -120,30 +124,35 @@ brew install passpie</pre></div>
 <h2>
 <a id="quickstart" class="anchor" href="#quickstart" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quickstart</h2>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># create a new credentials database.</span>
+<div class="highlight highlight-bash"><pre><span class="pl-c"># initialize a new credentials database</span>
 passpie init
 
-<span class="pl-c"># add new credentials.</span>
+<span class="pl-c"># add some credentials</span>
 passpie add foo@example.com
 passpie add bar@example.com
 
-<span class="pl-c"># add credential with random password</span>
+<span class="pl-c"># add some credential with random passwords</span>
 passpie add spam@egg.<span class="pl-k">local</span> --random
+passpie add bar@github.com --random
+passpie add spam@egg --random
+passpie add foo@github.com --random
+passpie add bar@github.com --random
 
-<span class="pl-c"># edit credential "foo@example.com".</span>
+<span class="pl-c"># edit credential "foo@example.com"</span>
 passpie update foo@example.com
 
-<span class="pl-c"># copy password from credential "foo@example.com" into system clipboard.</span>
+<span class="pl-c"># copy password from credential "foo@example.com" to clipboard</span>
 passpie copy foo@example.com
 
-<span class="pl-c"># search credentials by string "exam".</span>
+<span class="pl-c"># search credentials by string "exam"</span>
 passpie search exam
 
-<span class="pl-c"># search credentials using regular expressions.</span>
+<span class="pl-c"># search credentials using regular expressions</span>
 passpie search <span class="pl-s"><span class="pl-pds">'</span>foo|bar<span class="pl-pds">'</span></span>
 
-<span class="pl-c"># remove credential "foo@example.com".</span>
+<span class="pl-c"># remove some credentials</span>
 passpie remove foo@example.com
+passpie remove foo@github.com
 
 <span class="pl-c"># check database status</span>
 passpie status
@@ -151,14 +160,8 @@ passpie status
 <span class="pl-c"># print all credentials as a table with hidden passwords</span>
 passpie
 
-<span class="pl-c"># specify other Passpie database. Option `-D` or `--database`</span>
-passpie -D /path/to/other/database
-
 <span class="pl-c"># shows help. Option `--help`</span>
-passpie --help
-
-<span class="pl-c"># shows version. Option `--version`</span>
-passpie --version</pre></div>
+passpie --help</pre></div>
 
 <h2>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
@@ -197,7 +200,7 @@ Commands:
 <div class="highlight highlight-bash"><pre>passpie add @banks/mybank --password 1234
 passpie add @banks/myotherbank --password 5678</pre></div>
 
-<p>Listing the database would show:</p>
+<p>Listing credentials:</p>
 
 <div class="highlight highlight-bash"><pre>$ passpie
 =================  =======  ==========  =========
@@ -223,7 +226,7 @@ banks/myotherbank  _        <span class="pl-k">*****</span>
 
 <p>Assuming you have passpie database on the default path <code>~/.passpie</code> and a Dropbox shared directory on path <code>~/Dropbox</code></p>
 
-<div class="highlight highlight-bash"><pre>mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/Dropbox/passpie <span class="pl-c"># move passpie db to dropbox</span>
+<div class="highlight highlight-bash"><pre>mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/Dropbox/passpie    <span class="pl-c"># move passpie db to Dropbox</span>
 ln -s <span class="pl-k">~</span>/Dropbox/passpie <span class="pl-k">~</span>/.passpie <span class="pl-c"># make a link to the db</span></pre></div>
 
 <h4>
@@ -231,7 +234,7 @@ ln -s <span class="pl-k">~</span>/Dropbox/passpie <span class="pl-k">~</span>/.p
 
 <p>Assuming you have passpie database on the default path <code>~/.passpie</code> and a Google Drive shared directory on path <code>~/GoogleDrive</code></p>
 
-<div class="highlight highlight-bash"><pre>mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/GoogleDrive/passpie <span class="pl-c"># move passpie db to dropbox</span>
+<div class="highlight highlight-bash"><pre>mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/GoogleDrive/passpie   <span class="pl-c"># move passpie db to Google Drive</span>
 ln -s <span class="pl-k">~</span>/GoogleDrive/passpie <span class="pl-k">~</span>.passpie <span class="pl-c"># make a link to the db</span></pre></div>
 
 <h3>
@@ -249,14 +252,13 @@ ln -s <span class="pl-k">~</span>/GoogleDrive/passpie <span class="pl-k">~</span
 
 <p>Passpie credentials handles multiple logins for each name which groups credentials by name:</p>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># create john credential</span>
+<div class="highlight highlight-bash"><pre><span class="pl-c"># add some credentials</span>
 passpie add jonh@example.com --comment <span class="pl-s"><span class="pl-pds">"</span>Jonh main mail<span class="pl-pds">"</span></span> --random
+passpie add doe@example.com --comment <span class="pl-s"><span class="pl-pds">"</span>No comment<span class="pl-pds">"</span></span> --random</pre></div>
 
-<span class="pl-c"># create doe credential</span>
-passpie add doe@example.com --comment <span class="pl-s"><span class="pl-pds">"</span>No comment<span class="pl-pds">"</span></span> --random
+<p>Listing credentials:</p>
 
-<span class="pl-c"># listing credentials</span>
-passpie
+<div class="highlight highlight-bash"><pre>$ passpie
 ===========  =======  ==========  ===============
 name         login    password    comment
 ===========  =======  ==========  ===============
@@ -277,7 +279,8 @@ passpie add foo@opensource/npm.org --random
 
 <p>Listing credentials:</p>
 
-<pre><code>========================  =======  ==========  =========
+<pre><code>$ passpie
+========================  =======  ==========  =========
 Name                      Login    Password    Comment
 ========================  =======  ==========  =========
 opensource/bitbucket.org  foo      *****
@@ -309,15 +312,32 @@ passpie -D <span class="pl-k">~</span>/credentials/junk add fake@example.com --r
 <h4>
 <a id="listing-passwords-from-specific-database" class="anchor" href="#listing-passwords-from-specific-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Listing passwords from specific database</h4>
 
-<div class="highlight highlight-bash"><pre>passpie -D <span class="pl-k">~</span>/databases/junk</pre></div>
-
-<p>Output:</p>
-
-<pre><code>===========  =======  ==========  =========
+<div class="highlight highlight-bash"><pre>$ passpie -D <span class="pl-k">~</span>/databases/junk
+===========  =======  ==========  =========
 Name         Login    Password    Comment
 ===========  =======  ==========  =========
-example.com  fake     *****
-===========  =======  ==========  =========
+example.com  fake     <span class="pl-k">*****</span>
+===========  =======  ==========  =========</pre></div>
+
+<h3>
+<a id="passpie-completion" class="anchor" href="#passpie-completion" aria-hidden="true"><span class="octicon octicon-link"></span></a>Passpie completion</h3>
+
+<p>You can activate passpie completion for <code>bash</code> or <code>zsh</code> shells.</p>
+
+<h4>
+<a id="bash" class="anchor" href="#bash" aria-hidden="true"><span class="octicon octicon-link"></span></a>bash</h4>
+
+<p>Add this line to your .bash_profile or .bashrc</p>
+
+<pre><code>eval "$(passpie-complete bash -)"
+</code></pre>
+
+<h4>
+<a id="zsh" class="anchor" href="#zsh" aria-hidden="true"><span class="octicon octicon-link"></span></a>zsh</h4>
+
+<p>Add this line to your .zshrc or .zpreztorc</p>
+
+<pre><code>eval "$(passpie-complete zsh -)"
 </code></pre>
 
 <h3>
@@ -483,7 +503,7 @@ tree /tmp/passpie -la
 <a id="common-issues" class="anchor" href="#common-issues" aria-hidden="true"><span class="octicon octicon-link"></span></a>Common issues</h2>
 
 <h3>
-<a id="running-passpie-init-raises-typeerror-init-got-an-unexpected-keyword-argument-binary" class="anchor" href="#running-passpie-init-raises-typeerror-init-got-an-unexpected-keyword-argument-binary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running passpie init raises <code>TypeError: init() got an unexpected keyword argument 'binary'</code>
+<a id="typeerror-init-got-an-unexpected-keyword-argument-binary" class="anchor" href="#typeerror-init-got-an-unexpected-keyword-argument-binary" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>TypeError: init() got an unexpected keyword argument 'binary'</code>
 </h3>
 
 <p>You probably have the <code>python-gnupg</code> package installed. Passpie depends on <a href="https://github.com/isislovecruft">isislovecruft</a> fork of <a href="https://github.com/isislovecruft/python-gnupg">python-gnupg</a></p>
@@ -492,6 +512,35 @@ tree /tmp/passpie -la
 
 <pre><code>pip uninstall python-gnupg
 pip install -U passpie
+</code></pre>
+
+<h3>
+<a id="gpg-not-installed-httpswwwgnupgorg" class="anchor" href="#gpg-not-installed-httpswwwgnupgorg" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>'GPG not installed. https://www.gnupg.org/'</code>
+</h3>
+
+<p>You don't have gpg installed or it is not working as expected</p>
+
+<p>Make sure you have <a href="https://www.gnupg.org/">gpg</a> installed:</p>
+
+<p>Ubuntu:</p>
+
+<pre><code>sudo apt-get install gpg
+</code></pre>
+
+<p>OSX:</p>
+
+<pre><code>brew install gpg
+</code></pre>
+
+<h3>
+<a id="xclip-or-xsel-not-installed" class="anchor" href="#xclip-or-xsel-not-installed" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>xclip or xsel not installed</code>
+</h3>
+
+<p>You don't have copy to clipboard support by default on some linux distributions.</p>
+
+<p>Ubuntu:</p>
+
+<pre><code>sudo apt-get install xclip
 </code></pre>
 
 <h2>
