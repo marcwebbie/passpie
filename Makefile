@@ -75,7 +75,7 @@ register:
 	python setup.py register
 
 check:
-	flake8 $(PACKAGE) --exclude=\*_compat.py
+	flake8
 	grep -inr "set_trace()" --color=auto $(PACKAGE) || true
 	grep -inr "set_trace()" --color=auto $(PACKAGE_TESTS) || true
 
