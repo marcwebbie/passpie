@@ -2,12 +2,14 @@ from datetime import datetime, timedelta
 from functools import partial
 import json
 import os
+import sys
 import shutil
 
 from tinydb.queries import where
 import click
 import yaml
 
+from . import completions
 from ._compat import FileExistsError
 from .credential import split_fullname, make_fullname
 from .crypt import Cryptor
@@ -107,6 +109,16 @@ def copy_to_clipboard(text):
     import pyperclip
     pyperclip.copy(text)
     click.secho("Password copied to clipboard", fg="yellow")
+
+
+def complete():
+    shell = sys.argv[1]
+    if shell == 'bash':
+        print(completions.BASH)
+    elif shell == 'zsh':
+        print(completions.ZSH)
+    else:
+        print()
 
 
 @click.group(cls=AliasedGroup if config.short_commands else click.Group,

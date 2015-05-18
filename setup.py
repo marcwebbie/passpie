@@ -74,10 +74,12 @@ setup(
     url='https://marcwebbie.github.io/passpie',
     download_url='https://github.com/marcwebbie/passpie',
     packages=find_packages(),
-    entry_points="""
-        [console_scripts]
-        passpie=passpie.cli:cli
-    """,
+    entry_points={
+        'console_scripts': [
+            'passpie=passpie.cli:cli',
+            'passpie-complete=passpie.cli:complete',
+        ]
+    },
     install_requires=requirements,
     cmdclass={'test': PyTest, 'coverage': PyTestCoverage},
     tests_requires=tests_requirements,

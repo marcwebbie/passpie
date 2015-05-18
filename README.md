@@ -36,6 +36,7 @@
 + [x] Configurable random password generation
 + [x] Generate database status report
 + [x] Bulk remove credentials
++ [x] Bash/Zsh completion
 
 Planned features:
 
@@ -299,6 +300,28 @@ Name         Login    Password    Comment
 example.com  fake     *****
 ===========  =======  ==========  =========
 ```
+
+### Passpie completion (bash/zsh)
+
+You can activate passpie completion for `bash` or `zsh` shells.
+
+#### bash
+
+Add this line to your .bash_profile or .bashrc
+
+```
+eval "$(passpie-complete bash -)"
+```
+
+
+#### zsh
+
+Add this line to your .zshrc or .zpreztorc
+
+```
+eval "$(passpie-complete zsh -)"
+```
+
 
 ### Configuring passpie with `.passpierc`
 
