@@ -2,6 +2,10 @@
 
 ## Versions
 
+### 0.1.4
+
++ **√** Completion on credential fullnames
+
 ### 0.1.3
 
 + **√** Add remove in bulk using simple name syntax.
