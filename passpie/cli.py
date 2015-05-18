@@ -114,11 +114,10 @@ def copy_to_clipboard(text):
 def complete():
     shell = sys.argv[1]
     if shell == 'bash':
-        print(completions.BASH)
+        click.echo(completions.BASH)
     elif shell == 'zsh':
-        print(completions.ZSH)
-    else:
-        print()
+        click.echo(completions.ZSH)
+
 
 
 @click.group(cls=AliasedGroup if config.short_commands else click.Group,
