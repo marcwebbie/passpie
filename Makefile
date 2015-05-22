@@ -14,8 +14,6 @@ PYPY = pypy-2.4.0
 
 .PHONY: configure setup-dev test test-py2 test-pypy wheel dist run install-python deploy register check simulate cov clean test-tools
 
-configure: scripts test-tools
-
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  setup-dev	=> to install all needed versions of pyenv"
@@ -30,6 +28,8 @@ help:
 	@echo "  test-pypy	=> to run all tests on python $(PYPY)"
 	@echo "  simulate	=> to simulate CI tests tasks"
 	@echo "  deploy		=> to push binary wheels to pypi servers"
+
+configure: scripts test-tools
 
 install:
 	pip install --editable .
