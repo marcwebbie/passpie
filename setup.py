@@ -26,10 +26,10 @@ if sys.argv[-1] == 'tag':
 requirements = [
     'click==4.0',
     'gnupg==2.0.2',
-    'pyperclip==1.5.9',
+    'pyperclip==1.5.10',
     'PyYAML==3.11',
     'tabulate==0.7.5',
-    'tinydb==2.3.1.post2'
+    'tinydb==2.3.2'
 ]
 
 tests_requirements = [
