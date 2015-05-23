@@ -2,6 +2,10 @@
 
 ## Versions
 
+### 0.1.5
+
++ **√** Bug fixes on installation issues
+
 ### 0.1.4
 
 + **√** Completion on credential fullnames
