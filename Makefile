@@ -88,7 +88,7 @@ test-pypy:
 test:
 	python -W ignore setup.py -q test
 
-simulate: check test test-py2 test-pypy
+simulate: test test-py2 test-pypy
 
 publish:
 	python setup.py publish
