@@ -19,7 +19,7 @@ from .utils import genpass, load_config, ensure_dependencies
 from .table import Table
 
 
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 
 USER_CONFIG_PATH = os.path.expanduser('~/.passpierc')
 DEFAULT_CONFIG = {
