@@ -111,19 +111,6 @@ def copy_to_clipboard(text):
     click.secho("Password copied to clipboard", fg="yellow")
 
 
-def complete():
-    """Prints completion strings to be evaluated
-
-    on bash: 'eval "$(passpie-complete bash -)"'
-    on zsh: 'eval "$(passpie-complete zsh -)"'
-    """
-    shell = sys.argv[1]
-    if shell == 'bash':
-        click.echo(completions.BASH)
-    elif shell == 'zsh':
-        click.echo(completions.ZSH)
-
-
 @click.group(cls=AliasedGroup if config.short_commands else click.Group,
              invoke_without_command=True)
 @click.option('-D', '--database', help='Alternative database path',
@@ -148,12 +135,21 @@ def cli(ctx, database):
         print_table(credentials)
 
 
+@cli.command(help='completion script')
+@click.argument('shell_name', type=click.Choice(completion.SHELLS))
+@click.option('--commands', default=None)
+def complete(shell_name, commands):
+    commands = ['add', 'copy', 'remove', 'update']
+    script = completion.script(shell_name, config.path, commands)
+    click.echo(script)
+
+
 @cli.command(help="Initialize new passpie database")
 @click.option('--passphrase', prompt=True, hide_input=True,
               confirmation_prompt=True)
 @click.option('--force', is_flag=True, help="force overwrite database")
 def init(passphrase, force):
-    if force:
+    if force and os.path.isdir(config.path):
         shutil.rmtree(config.path)
 
     try:

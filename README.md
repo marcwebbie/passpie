@@ -310,7 +310,7 @@ You can activate passpie completion for `bash` or `zsh` shells.
 Add this line to your .bash_profile or .bashrc
 
 ```
-eval "$(passpie-complete bash -)"
+eval "$(passpie complete bash -)"
 ```
 
 
@@ -319,7 +319,7 @@ eval "$(passpie-complete bash -)"
 Add this line to your .zshrc or .zpreztorc
 
 ```
-eval "$(passpie-complete zsh -)"
+eval "$(passpie complete zsh -)"
 ```
 
 

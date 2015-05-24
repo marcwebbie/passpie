@@ -77,7 +77,6 @@ setup(
     entry_points={
         'console_scripts': [
             'passpie=passpie.cli:cli',
-            'passpie-complete=passpie.cli:complete',
         ]
     },
     install_requires=requirements,
