@@ -9,8 +9,8 @@ from tinydb.queries import where
 import click
 import yaml
 
-from . import completions
-from ._compat import FileExistsError
+from . import completion, clipboard
+from ._compat import *
 from .credential import split_fullname, make_fullname
 from .crypt import Cryptor
 from .database import Database
@@ -106,8 +106,11 @@ def print_table(credentials):
 
 
 def copy_to_clipboard(text):
-    import pyperclip
-    pyperclip.copy(text)
+    try:
+        clipboard.copy(text)
+    except SystemError as exc:
+        message = str(exc)
+        raise click.ClickException(click.style(message, fg='red'))
     click.secho("Password copied to clipboard", fg="yellow")
 
 
@@ -256,10 +259,11 @@ def remove(fullname, yes):
             db.remove(where('fullname') == credential['fullname'])
 
 
-@cli.command(help="Copy credential password to clipboard")
+@cli.command(help="Copy credential password to clipboard/stdout")
 @click.argument("fullname")
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
-def copy(fullname, passphrase):
+@click.option("--to", default='clipboard', type=click.Choice(['stdout', 'clipboard']))
+def copy(fullname, passphrase, to):
     db = Database(config.path)
     ensure_passphrase(db, passphrase)
     credential = get_credential_or_abort(db, fullname)
@@ -267,7 +271,10 @@ def copy(fullname, passphrase):
     with Cryptor(config.path) as cryptor:
         decrypted = cryptor.decrypt(credential["password"],
                                     passphrase=passphrase)
-        copy_to_clipboard(decrypted)
+        if to == 'clipboard':
+            copy_to_clipboard(decrypted)
+        elif to == 'stdout':
+            click.echo(decrypted)
 
 
 @cli.command(help="Search credentials by regular expressions")
