@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 import os
 
-from passpie.crypt import Cryptor, KEY_INPUT
+from passpie.crypt import Cryptor, KEY_INPUT, make_key_input
 from passpie._compat import which, FileNotFoundError, FileExistsError
 from .helpers import MockerTestCase
 
@@ -99,7 +99,7 @@ class CryptTests(MockerTestCase):
         cryptor = Cryptor("path/to/database")
         cryptor._import_keys = self.Mock()
         encrypted = "encrypted data"
-        cryptor._gpg.encrypt.return_value = encrypted
+        cryptor._gpg.encrypt.return_value = self.Mock(data=encrypted)
 
         self.assertEqual(cryptor.encrypt("data"), str(encrypted))
 
@@ -107,7 +107,7 @@ class CryptTests(MockerTestCase):
         cryptor = Cryptor("path/to/database")
         cryptor._import_keys = self.Mock()
         decrypted = "decrypted data"
-        cryptor._gpg.decrypt.return_value = decrypted
+        cryptor._gpg.decrypt.return_value = self.Mock(data=decrypted)
 
         self.assertEqual(cryptor.decrypt("data", "passphrase"), str(decrypted))
 
@@ -134,7 +134,7 @@ class CryptTests(MockerTestCase):
         with self.assertRaises(ValueError):
             cryptor.check(passphrase, ensure=True)
 
-    def test_key_input_format_with_unicode_characters(self):
-        unicode_string = 'áçéèúü'
+    def test_make_key_input_format_with_unicode_characters(self):
+        unicode_passphrase = 'áçéèúü'
 
-        self.assertIsNotNone(KEY_INPUT.format(unicode_string))
+        self.assertIsNotNone(make_key_input(unicode_passphrase))

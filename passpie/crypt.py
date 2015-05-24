@@ -1,11 +1,11 @@
-from __future__ import unicode_literals
 import errno
 import os
 import shutil
 import tempfile
+
 import gnupg
 
-from ._compat import which, FileNotFoundError, FileExistsError
+from ._compat import *
 from .utils import mkdir_open
 
 
@@ -19,6 +19,14 @@ Name-Email: passpie@local
 Expire-Date: 0
 %commit
 """
+
+
+def make_key_input(passphrase):
+    try:
+        key_input = KEY_INPUT.format(passphrase)
+    except UnicodeEncodeError:
+        key_input = KEY_INPUT.format(passphrase.encode('utf-8'))
+    return key_input
 
 
 class Cryptor(object):
@@ -55,7 +63,8 @@ class Cryptor(object):
         if overwrite is False and os.path.exists(self.keys_path):
             raise FileExistsError("Keys found in path")
 
-        keys = self._gpg.gen_key(KEY_INPUT.format(passphrase))
+        key_input = make_key_input(passphrase)
+        keys = self._gpg.gen_key(key_input)
         pubkey = self._gpg.export_keys(keys.fingerprint)
         seckey = self._gpg.export_keys(keys.fingerprint, secret=True)
         with mkdir_open(self.keys_path, "w") as keyfile:
@@ -64,13 +73,13 @@ class Cryptor(object):
     def encrypt(self, data):
         self._import_keys()
         encrypted = self._gpg.encrypt(data, self.current_key)
-        return str(encrypted)
+        return encrypted.data
 
     def decrypt(self, data, passphrase):
         self._import_keys()
         self.check(passphrase, ensure=True)
         decrypted = self._gpg.decrypt(data, passphrase=passphrase)
-        return str(decrypted)
+        return decrypted.data
 
     def check(self, passphrase, ensure=False):
         self._import_keys()
