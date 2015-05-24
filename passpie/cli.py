@@ -235,7 +235,7 @@ def update(fullname, name, login, password, comment):
         values["modified"] = datetime.now()
         if values["password"] != credential["password"]:
             with Cryptor(config.path) as cryptor:
-                values["password"] = cryptor.encrypt(password)
+                values["password"] = cryptor.encrypt(values['password'])
         db = Database(config.path)
         db.update(values, (where("fullname") == credential["fullname"]))
 

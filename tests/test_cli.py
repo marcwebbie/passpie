@@ -449,3 +449,36 @@ def test_cli_complete_chooses_prints_nothing_when_not_supported(mocker):
 
     assert result.exit_code == 0
     assert mock_click.echo.called is True
+
+
+def test_update_password_from_prompt_encrypts_password(mocker, mock_cryptor, mock_db):
+    credential = {
+        'fullname': 'foo@bar',
+        'name': 'bar',
+        'login': 'foo',
+        'password': 's3cr3t',
+        'comment': '',
+        'modified': datetime.now(),
+    }
+    chosen_password = 'another_password'
+    prompt_values = [
+        credential['name'],
+        credential['login'],
+        chosen_password,  # password
+        chosen_password,  # repeat password
+        credential['comment'],
+    ]
+    mock_prompt = mocker.patch('passpie.cli.click.prompt',
+                               side_effect=prompt_values)
+    mock_make_fullname = mocker.patch('passpie.cli.make_fullname',
+                                      return_value='foo@bar')
+    mocker.patch('passpie.cli.get_credential_or_abort',
+                 return_value=credential)
+    mock_cryptor.encrypt.return_value = 'encrypted'
+
+    runner = CliRunner()
+    result = runner.invoke(cli.update, ['foo@bar'])
+
+    assert result.exit_code == 0
+    assert mock_cryptor.encrypt.called
+    mock_cryptor.encrypt.assert_called_once_with(chosen_password)
