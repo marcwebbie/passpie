@@ -2,6 +2,10 @@
 
 ## Versions
 
+### 0.2.1
+
++ **√** Fix update credential password from prompt
+
 ### 0.2
 
 + **√** Change completion script to passpie complete {zsh, bash}
