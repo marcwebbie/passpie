@@ -10,7 +10,7 @@ function _passpie()
         local words=("${COMP_WORDS[@]}")
         unset words[0]
         unset words[$COMP_CWORD]
-        COMPREPLY=( $(compgen -W "$(grep -r fullname {config_path} | sed 's/.*fullname:[ ]*//g')" -- "$word") )
+        COMPREPLY=( $(compgen -W "$(grep -Ehrio '[A-Z0-9._%+-]+@[A-Z0-9.-]+(@[A-Z0-9_\-\.]+)?' $HOME/.passpie)" -- "$word") )
     fi
 }
 complete -F _passpie 'passpie'
@@ -30,7 +30,7 @@ _passpie() {
   if [ "${#words}" -eq 2 ]; then
     completions="{commands}"
   else
-    completions="$(grep -r fullname {config_path} | sed 's/.*fullname:[ ]*//g')"
+    completions="$(grep -Ehrio '\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+(@[A-Z0-9_\-\.]+)?\\b' {config_path})"
   fi
 
   reply=(${(ps:\n:)completions})
@@ -46,7 +46,7 @@ def script(shell_name, config_path, commands):
         text = ZSH.replace('{commands}', '\n'.join(commands))
         text = text.replace('{config_path}', config_path)
     elif shell_name == 'bash':
-        text = BASH.replace('{commands}', '\n'.join(commands))
+        text = BASH.replace('{commands}', ' '.join(commands))
         text = text.replace('{config_path}', config_path)
 
     return text
