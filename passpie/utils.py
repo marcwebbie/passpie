@@ -72,8 +72,3 @@ def ensure_dependencies():
         assert which('gpg')
     except AssertionError:
         raise RuntimeError('GnuPG not installed. https://www.gnupg.org/')
-
-    try:
-        import_module('pyperclip')
-    except:
-        raise RuntimeError('xclip or xsel is not installed.')
