@@ -2,6 +2,12 @@
 
 ## Versions
 
+### 0.2
+
++ **√** Change completion script to passpie complete {zsh, bash}
++ **√** Fix unicode passwords handling
++ **√** Add `--to` option on `passpie copy`
+
 ### 0.1.5
 
 + **√** Bug fixes on installation issues
