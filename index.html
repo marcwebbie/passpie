@@ -52,7 +52,7 @@
 <li>[x] Search credentials by name, login or comments</li>
 <li>[x] Search with regular expression</li>
 <li>[x] Group credentials by name</li>
-<li>[x] Configuration from file. <code>~/.passpie</code>
+<li>[x] <a href="#configuring-passpie-with-passpierc">Configuration</a> from file. <code>~/.passpie</code>
 </li>
 <li>[x] Change passphrase and re-encrypt database</li>
 <li>[x] Export Passpie database to plain text file</li>
@@ -79,52 +79,9 @@
 </ul>
 
 <h2>
-<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
-
-<h3>
-<a id="stable-version" class="anchor" href="#stable-version" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stable version</h3>
-
-<h4>
-<a id="using-pip" class="anchor" href="#using-pip" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using <a href="http://pip.readthedocs.org/en/latest/installing.html">pip</a>
-</h4>
-
-<div class="highlight highlight-bash"><pre>pip install passpie</pre></div>
-
-<blockquote>
-<p>Make sure you have <a href="https://www.gnupg.org/">GPG</a> installed, you may also need installed if you are on <strong>linux</strong> <a href="http://doc.ubuntu-fr.org/xclip">xclip</a>:</p>
-</blockquote>
-
-<h4>
-<a id="if-you-are-on-a-mac-you-can-install-using-homebrew" class="anchor" href="#if-you-are-on-a-mac-you-can-install-using-homebrew" aria-hidden="true"><span class="octicon octicon-link"></span></a>If you are on a mac you can install using <a href="http://brew.sh">homebrew</a>
-</h4>
-
-<div class="highlight highlight-bash"><pre>brew tap marcwebbie/passpie
-brew install passpie</pre></div>
-
-<h3>
-<a id="development-version" class="anchor" href="#development-version" aria-hidden="true"><span class="octicon octicon-link"></span></a>Development version</h3>
-
-<p>The <strong>latest development version</strong> can be installed directly from GitHub:</p>
-
-<div class="highlight highlight-bash"><pre>pip install --upgrade https://github.com/marcwebbie/passpie/tarball/master</pre></div>
-
-<h3>
-<a id="updating-passpie" class="anchor" href="#updating-passpie" aria-hidden="true"><span class="octicon octicon-link"></span></a>Updating Passpie</h3>
-
-<h4>
-<a id="with-pip" class="anchor" href="#with-pip" aria-hidden="true"><span class="octicon octicon-link"></span></a>With pip</h4>
-
-<div class="highlight highlight-bash"><pre>pip install -U passpie</pre></div>
-
-<h4>
-<a id="with-homebrew" class="anchor" href="#with-homebrew" aria-hidden="true"><span class="octicon octicon-link"></span></a>With homebrew</h4>
-
-<div class="highlight highlight-bash"><pre>brew upgrade passpie</pre></div>
-
-<h2>
 <a id="quickstart" class="anchor" href="#quickstart" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quickstart</h2>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># initialize a new credentials database</span>
+<div class="highlight highlight-bash"><pre><span class="pl-c"># initialize a passpie database</span>
 passpie init
 
 <span class="pl-c"># add some credentials</span>
@@ -132,11 +89,13 @@ passpie add foo@example.com
 passpie add bar@example.com
 
 <span class="pl-c"># add some credential with random passwords</span>
-passpie add spam@egg.<span class="pl-k">local</span> --random
 passpie add bar@github.com --random
 passpie add spam@egg --random
 passpie add foo@github.com --random
 passpie add bar@github.com --random
+
+<span class="pl-c"># add spam@egg with random password and copy to clipboard</span>
+passpie add spam@egg.<span class="pl-k">local</span> --random --copy
 
 <span class="pl-c"># edit credential "foo@example.com"</span>
 passpie update foo@example.com
@@ -164,28 +123,45 @@ passpie
 passpie --help</pre></div>
 
 <h2>
-<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<p>Passpie is designed to help you manage you password on the terminal with an clean interface. Passpie detects if you are in a terminal that supports colors and switch it off accordingly</p>
+<h3>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies</h3>
 
-<div class="highlight highlight-bash"><pre>Usage: passpie [OPTIONS] COMMAND [ARGS]...
+<ul>
+<li>
+<code>[Linux, OSX, Windows]</code> <a href="https://www.gnupg.org/">GnuPG</a>
+</li>
+<li>
+<code>[Linux]</code> <a href="http://linux.die.net/man/1/xclip">xclip</a> or <a href="http://linux.die.net/man/1/xsel">xsel</a>
+</li>
+</ul>
 
-Options:
-  -D, --database PATH  Alternative database path
-  --version            Show the version and <span class="pl-c1">exit</span>.
-  --help               Show this message and <span class="pl-c1">exit</span>.
+<h3>
+<a id="stable-version" class="anchor" href="#stable-version" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stable version</h3>
 
-Commands:
-  add     Add new credential
-  copy    Copy credential password to clipboard
-  <span class="pl-k">export</span>  Export credentials <span class="pl-k">in</span> plain text
-  import  Import credentials from path
-  init    Initialize new passpie database
-  remove  Remove credential
-  reset   Renew passpie database and re-encrypt...
-  search  Search credentials by regular expressions
-  status  Diagnose database <span class="pl-k">for</span> <span class="pl-smi">improvements</span>
-  update  Update credential</pre></div>
+<h4>
+<a id="using-pip" class="anchor" href="#using-pip" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using <a href="http://pip.readthedocs.org/en/latest/installing.html">pip</a>
+</h4>
+
+<div class="highlight highlight-bash"><pre>pip install passpie</pre></div>
+
+<h4>
+<a id="if-you-are-on-a-mac-you-can-install-it-with-homebrew" class="anchor" href="#if-you-are-on-a-mac-you-can-install-it-with-homebrew" aria-hidden="true"><span class="octicon octicon-link"></span></a>If you are on a mac you can install it with <a href="http://brew.sh">homebrew</a>
+</h4>
+
+<div class="highlight highlight-bash"><pre>brew tap marcwebbie/passpie
+brew install passpie</pre></div>
+
+<h3>
+<a id="development-version" class="anchor" href="#development-version" aria-hidden="true"><span class="octicon octicon-link"></span></a>Development version</h3>
+
+<p>The <strong>latest development version</strong> can be installed directly from GitHub:</p>
+
+<div class="highlight highlight-bash"><pre>pip install --upgrade https://github.com/marcwebbie/passpie/tarball/master</pre></div>
+
+<h2>
+<a id="tutorials" class="anchor" href="#tutorials" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tutorials</h2>
 
 <h3>
 <a id="diving-into-fullname-syntax" class="anchor" href="#diving-into-fullname-syntax" aria-hidden="true"><span class="octicon octicon-link"></span></a>Diving into <em>fullname</em> syntax</h3>
@@ -224,7 +200,7 @@ banks/myotherbank  _        <span class="pl-k">*****</span>
 <h4>
 <a id="dropbox" class="anchor" href="#dropbox" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dropbox</h4>
 
-<p>Assuming you have passpie database on the default path <code>~/.passpie</code> and a Dropbox shared directory on path <code>~/Dropbox</code></p>
+<p>With default path <code>~/.passpie</code> and a Dropbox shared directory on path <code>~/Dropbox</code></p>
 
 <div class="highlight highlight-bash"><pre>mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/Dropbox/passpie    <span class="pl-c"># move passpie db to Dropbox</span>
 ln -s <span class="pl-k">~</span>/Dropbox/passpie <span class="pl-k">~</span>/.passpie <span class="pl-c"># make a link to the db</span></pre></div>
@@ -232,7 +208,7 @@ ln -s <span class="pl-k">~</span>/Dropbox/passpie <span class="pl-k">~</span>/.p
 <h4>
 <a id="google-drive" class="anchor" href="#google-drive" aria-hidden="true"><span class="octicon octicon-link"></span></a>Google Drive</h4>
 
-<p>Assuming you have passpie database on the default path <code>~/.passpie</code> and a Google Drive shared directory on path <code>~/GoogleDrive</code></p>
+<p>With default path <code>~/.passpie</code> and a Google Drive shared directory on path <code>~/GoogleDrive</code></p>
 
 <div class="highlight highlight-bash"><pre>mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/GoogleDrive/passpie   <span class="pl-c"># move passpie db to Google Drive</span>
 ln -s <span class="pl-k">~</span>/GoogleDrive/passpie <span class="pl-k">~</span>.passpie <span class="pl-c"># make a link to the db</span></pre></div>
