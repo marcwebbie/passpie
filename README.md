@@ -27,7 +27,7 @@
 + [x] Search credentials by name, login or comments
 + [x] Search with regular expression
 + [x] Group credentials by name
-+ [x] Configuration from file. `~/.passpie`
++ [x] [Configuration](#configuring-passpie-with-passpierc) from file. `~/.passpie`
 + [x] Change passphrase and re-encrypt database
 + [x] Export Passpie database to plain text file
 + [x] Import plain text Passpie database
@@ -45,51 +45,10 @@ Planned features:
 + [ ] Import plain text credentials from [Keepass](http://keepass.info/)
 + [ ] Import plain text credentials from [1Password](https://agilebits.com/onepassword)
 
-## Installation
-
-### Stable version
-
-#### Using [pip](http://pip.readthedocs.org/en/latest/installing.html)
-
-```bash
-pip install passpie
-```
-
-> Make sure you have [GPG](https://www.gnupg.org/) installed, you may also need installed if you are on **linux** [xclip](http://doc.ubuntu-fr.org/xclip):
-
-#### If you are on a mac you can install using [homebrew](http://brew.sh)
-
-```bash
-brew tap marcwebbie/passpie
-brew install passpie
-```
-
-### Development version
-
-The **latest development version** can be installed directly from GitHub:
-
-```bash
-pip install --upgrade https://github.com/marcwebbie/passpie/tarball/master
-```
-
-### Updating Passpie
-
-#### With pip
-
-```bash
-pip install -U passpie
-```
-
-#### With homebrew
-
-```bash
-brew upgrade passpie
-```
-
 ## Quickstart
 
 ```bash
-# initialize a new credentials database
+# initialize a passpie database
 passpie init
 
 # add some credentials
@@ -97,11 +56,13 @@ passpie add foo@example.com
 passpie add bar@example.com
 
 # add some credential with random passwords
-passpie add spam@egg.local --random
 passpie add bar@github.com --random
 passpie add spam@egg --random
 passpie add foo@github.com --random
 passpie add bar@github.com --random
+
+# add spam@egg with random password and copy to clipboard
+passpie add spam@egg.local --random --copy
 
 # edit credential "foo@example.com"
 passpie update foo@example.com
@@ -129,30 +90,37 @@ passpie
 passpie --help
 ```
 
-## Usage
+## Installation
 
-Passpie is designed to help you manage you password on the terminal with an clean interface. Passpie detects if you are in a terminal that supports colors and switch it off accordingly
+### Dependencies
+
++ `[Linux, OSX, Windows]` [GnuPG](https://www.gnupg.org/)
++ `[Linux]` [xclip](http://linux.die.net/man/1/xclip) or [xsel](http://linux.die.net/man/1/xsel)
+
+### Stable version
+
+#### Using [pip](http://pip.readthedocs.org/en/latest/installing.html)
 
 ```bash
-Usage: passpie [OPTIONS] COMMAND [ARGS]...
-
-Options:
-  -D, --database PATH  Alternative database path
-  --version            Show the version and exit.
-  --help               Show this message and exit.
-
-Commands:
-  add     Add new credential
-  copy    Copy credential password to clipboard
-  export  Export credentials in plain text
-  import  Import credentials from path
-  init    Initialize new passpie database
-  remove  Remove credential
-  reset   Renew passpie database and re-encrypt...
-  search  Search credentials by regular expressions
-  status  Diagnose database for improvements
-  update  Update credential
+pip install passpie
 ```
+
+#### If you are on a mac you can install it with [homebrew](http://brew.sh)
+
+```bash
+brew tap marcwebbie/passpie
+brew install passpie
+```
+
+### Development version
+
+The **latest development version** can be installed directly from GitHub:
+
+```bash
+pip install --upgrade https://github.com/marcwebbie/passpie/tarball/master
+```
+
+## Tutorials
 
 ### Diving into *fullname* syntax
 
@@ -195,7 +163,7 @@ passpie update banks/mybank --random
 
 #### Dropbox
 
-Assuming you have passpie database on the default path `~/.passpie` and a Dropbox shared directory on path `~/Dropbox`
+With default path `~/.passpie` and a Dropbox shared directory on path `~/Dropbox`
 
 ```bash
 mv ~/.passpie ~/Dropbox/passpie    # move passpie db to Dropbox
@@ -204,7 +172,7 @@ ln -s ~/Dropbox/passpie ~/.passpie # make a link to the db
 
 #### Google Drive
 
-Assuming you have passpie database on the default path `~/.passpie` and a Google Drive shared directory on path `~/GoogleDrive`
+With default path `~/.passpie` and a Google Drive shared directory on path `~/GoogleDrive`
 
 ```bash
 mv ~/.passpie ~/GoogleDrive/passpie   # move passpie db to Google Drive
@@ -315,7 +283,6 @@ Add this line to your .bash_profile or .bashrc
 if which passpie > /dev/null; then eval "$(passpie complete bash)"; fi
 ```
 
-
 #### zsh
 
 Add this line to your .zshrc or .zpreztorc
@@ -323,7 +290,6 @@ Add this line to your .zshrc or .zpreztorc
 ```
 if which passpie > /dev/null; then eval "$(passpie complete zsh)"; fi
 ```
-
 
 ### Configuring passpie with `.passpierc`
 
@@ -401,7 +367,6 @@ colors:
   name: yellow
   login: green
 ```
-
 
 ## Under The Hood
 
@@ -511,8 +476,6 @@ Ubuntu:
 ```
 sudo apt-get install xclip
 ```
-
-
 
 ## License ([MIT License](http://choosealicense.com/licenses/mit/))
 
