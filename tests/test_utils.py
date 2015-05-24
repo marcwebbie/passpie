@@ -105,16 +105,6 @@ def test_get_version_returns_install_message_when_dist_not_found(mocker):
     assert version == message
 
 
-def test_ensure_dependencies_raises_runtime_error_on_pyperclip(mocker):
-    mocker.patch('passpie.utils.import_module',
-                 side_effect=ImportError)
-
-    with pytest.raises(RuntimeError) as excinfo:
-        ensure_dependencies()
-
-    assert 'xclip or xsel is not installed.' == str(excinfo.value)
-
-
 def test_ensure_dependencies_raises_runtime_when_gpg_not_installed(mocker):
     mocker.patch('passpie.utils.which', return_value=None)
 
