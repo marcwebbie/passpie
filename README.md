@@ -303,7 +303,9 @@ example.com  fake     *****
 
 ### Passpie completion
 
-You can activate passpie completion for `bash` or `zsh` shells.
+You can activate passpie completion for `bash` or `zsh` shells
+
+> Check the generated script with `passpie complete {shell_name}`.
 
 #### bash
 
