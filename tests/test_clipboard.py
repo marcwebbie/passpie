@@ -73,3 +73,11 @@ def test_ensure_commands_raises_system_error_when_command_not_found(mocker):
 
     with pytest.raises(SystemError):
         clipboard.ensure_commands(clipboard.LINUX_COMMANDS)
+
+
+def test_ensure_commands_raises_system_error_when_no_command_args(mocker):
+    mocker.patch('passpie.clipboard.which', return_value=True)
+    mock_commands = {k: [] for k, _ in clipboard.LINUX_COMMANDS.items()}
+
+    with pytest.raises(SystemError):
+        clipboard.ensure_commands(mock_commands)
