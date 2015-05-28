@@ -11,8 +11,8 @@ from ._compat import which, is_python2
 text_type = unicode if is_python2() else str
 
 LINUX_COMMANDS = {
-    'xsel': [],
-    'xclip': []
+    'xsel': ['xsel', '-p'],
+    'xclip': ['xclip', '-i']
 }
 
 OSX_COMMANDS = {
@@ -57,7 +57,7 @@ def _copy_cygwin(text):
 
 def ensure_commands(commands):
     for command_name, command in commands.items():
-        if which(command_name):
+        if which(command_name) and command:
             return command
     else:
         raise SystemError('missing commands: ',
