@@ -105,10 +105,9 @@ passpie --help
 pip install passpie
 ```
 
-#### If you are on a mac you can install it with [homebrew](http://brew.sh)
+#### On a mac you can install it with [homebrew](http://brew.sh)
 
 ```bash
-brew tap marcwebbie/passpie
 brew install passpie
 ```
 
