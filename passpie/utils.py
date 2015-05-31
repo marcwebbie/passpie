@@ -69,6 +69,6 @@ def load_config(default_config, user_config_path):
 
 def ensure_dependencies():
     try:
-        assert which('gpg')
+        assert which('gpg') or which('gpg2')
     except AssertionError:
         raise RuntimeError('GnuPG not installed. https://www.gnupg.org/')

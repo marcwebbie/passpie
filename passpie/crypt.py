@@ -34,7 +34,6 @@ class Cryptor(object):
     def __init__(self, path):
         self.path = path
         self.keys_path = os.path.join(path, ".keys")
-        self._binary = which("gpg")
         self._homedir = tempfile.mkdtemp()
         self._gpg = gnupg.GPG(binary=self._binary, homedir=self._homedir)
 
@@ -43,6 +42,10 @@ class Cryptor(object):
 
     def __exit__(self, exc_ty, exc_val, exc_tb):
         shutil.rmtree(self._homedir)
+
+    @property
+    def _binary(self):
+        return which("gpg2") or which('gpg2')
 
     def _import_keys(self):
         try:

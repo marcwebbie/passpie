@@ -19,7 +19,6 @@ class CryptTests(MockerTestCase):
         cryptor = Cryptor(path)
         self.assertEqual(cryptor.path, path)
         self.assertEqual(cryptor.keys_path, os.path.join(path, ".keys"))
-        self.assertEqual(cryptor._binary, which("gpg"))
         self.assertEqual(cryptor._homedir, self.mock_tempfile.mkdtemp())
         self.assertEqual(cryptor._gpg, self.mock_gnupg.GPG())
 
@@ -138,3 +137,25 @@ class CryptTests(MockerTestCase):
         unicode_passphrase = 'áçéèúü'
 
         self.assertIsNotNone(make_key_input(unicode_passphrase))
+
+
+def test_crypt_binary_gpg2_is_chosen_when_gpg_is_not_installed(mocker):
+    mocker.patch('passpie.crypt.gnupg')
+    gpg2 = '/usr/bin/gpg2'
+    def fake_which(path):
+        if path == 'gpg2':
+            return gpg2
+    mock_which = mocker.patch('passpie.crypt.which', new=fake_which)
+    cryptor = Cryptor("path/to/database")
+
+    assert cryptor._binary == gpg2
+
+
+def test_crypt_binary_tries_which_on_gpg_and_gpg2_in_order(mocker):
+    mocker.patch('passpie.crypt.gnupg')
+    mock_which = mocker.patch('passpie.crypt.which')
+
+    cryptor = Cryptor("path/to/database")
+
+    mock_which.assert_any_call_with('gpg1')
+    mock_which.assert_any_call_with('gpg2')
