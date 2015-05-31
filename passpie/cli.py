@@ -139,7 +139,7 @@ def cli(ctx, database, verbose):
 @click.argument('shell_name', type=click.Choice(completion.SHELLS))
 @click.option('--commands', default=None)
 def complete(shell_name, commands):
-    commands = ['add', 'copy', 'remove', 'update']
+    commands = ['add', 'copy', 'remove', 'search', 'update']
     script = completion.script(shell_name, config.path, commands)
     click.echo(script)
 
