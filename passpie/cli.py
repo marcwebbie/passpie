@@ -315,7 +315,8 @@ def search(regex):
 @click.option("--full", is_flag=True, help="Show all entries")
 @click.option("--days", default=90, type=int, help="Elapsed days")
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
-def status(full, days, passphrase):
+@click.option("--display", is_flag=True, help="Display decrypted passwords", default=False)
+def status(full, days, passphrase, display):
     db = Database(config.path)
     ensure_passphrase(db, passphrase)
     credentials = sorted(db.all(), key=lambda x: x["name"] + x["login"])
@@ -339,7 +340,7 @@ def status(full, days, passphrase):
                 cred["repeated"] = ok_status
 
         for cred in credentials:
-            cred['password'] = cred['repeated']
+            cred['password_status'] = cred['repeated']
 
         # check modified time
         for cred in credentials:
@@ -353,9 +354,12 @@ def status(full, days, passphrase):
 
         if not full:
             credentials = [c for c in credentials
-                           if c["password"] != ok_status or c["modified"] != ok_status]
-        table = Table(["name", "login", "password", "modified"],
-                      table_format=config.table_format)
+                           if c["password_status"] != ok_status or c["modified"] != ok_status]
+
+        table_fields = ["name", "login", "password_status", "modified"]
+        if display:
+            table_fields.insert(table_fields.index("password_status"), "password")
+        table = Table(table_fields, table_format=config.table_format)
         click.echo(table.render(credentials))
 
 
