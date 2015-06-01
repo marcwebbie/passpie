@@ -13,7 +13,7 @@ from .utils import logger
 text_type = unicode if is_python2() else str
 
 LINUX_COMMANDS = {
-    'xsel': ['xsel', '-p'],
+    'xsel': ['xsel', '-ibps'],
     'xclip': ['xclip', '-i']
 }
 
