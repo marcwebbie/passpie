@@ -321,6 +321,7 @@ def status(full, days, passphrase):
             cred["password"] = cryptor.decrypt(cred["password"], passphrase)
 
     if credentials:
+        ok_status = click.style("OK", "green")
         # check passwords
         for cred in credentials:
             repeated = [
@@ -331,7 +332,7 @@ def status(full, days, passphrase):
                 password = "Same as: {}".format(repeated)
                 cred["repeated"] = click.style(password, "red")
             else:
-                cred["repeated"] = click.style("OK", "green")
+                cred["repeated"] = ok_status
 
         for cred in credentials:
             cred['password'] = cred['repeated']
@@ -344,12 +345,11 @@ def status(full, days, passphrase):
                 cred["modified"] = click.style(modified_time, "red")
 
             else:
-                cred["modified"] = click.style("OK", "green")
+                cred["modified"] = ok_status
 
         if not full:
             credentials = [c for c in credentials
-                           if c["password"] or c["modified"]]
-
+                           if c["password"] != ok_status or c["modified"] != ok_status]
         table = Table(["name", "login", "password", "modified"],
                       table_format=config.table_format)
         click.echo(table.render(credentials))
