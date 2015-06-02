@@ -72,3 +72,7 @@ def ensure_dependencies():
         assert which('gpg') or which('gpg2')
     except AssertionError:
         raise RuntimeError('GnuPG not installed. https://www.gnupg.org/')
+
+
+def reverse_enumerate(seq):
+    return [e for e in zip(reversed(range(len(list(seq)))), list(seq))]
