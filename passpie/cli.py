@@ -138,7 +138,7 @@ def cli(ctx, database):
         print_table(credentials)
 
 
-@cli.command(help='completion script')
+@cli.command(help='Shows completion scripts')
 @click.argument('shell_name', type=click.Choice(completion.SHELLS))
 @click.option('--commands', default=None)
 def complete(shell_name, commands):
