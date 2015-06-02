@@ -2,6 +2,11 @@
 
 ## Versions
 
+### 0.2.2
+
++ **√** Support `gpg2` binary
++ **√** Fix linux missing commands for copy to clipboard. thanks to @jpiron
+
 ### 0.2.1
 
 + **√** Fix update credential password from prompt
