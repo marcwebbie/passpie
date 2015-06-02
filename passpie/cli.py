@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import shutil
+import re
 
 from tinydb.queries import where
 import click
@@ -31,7 +32,8 @@ DEFAULT_CONFIG = {
     'table_format': 'fancy_grid',
     'headers': ['name', 'login', 'password', 'comment'],
     'colors': {'name': 'yellow', 'login': 'green'},
-    'repo': True
+    'repo': True,
+    'search_automatic_regex': False
 }
 config = load_config(DEFAULT_CONFIG, USER_CONFIG_PATH)
 genpass = partial(genpass,
@@ -298,6 +300,8 @@ def copy(fullname, passphrase, to):
 @cli.command(help="Search credentials by regular expressions")
 @click.argument("regex")
 def search(regex):
+    if config.search_automatic_regex and re.match("\w+", regex):
+        regex = ".*{}.*".format(regex)
     db = Database(config.path)
     credentials = db.search(
         where("name").matches(regex) |

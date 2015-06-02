@@ -454,6 +454,12 @@ Create a git repository on the database directory when git is available.
 
 [learn more](#version-control-your-database)
 
+##### `search_automatic_regex = (true | false)`
+
+**default:** false
+
+Automatically transform the search pattern into a regex if the search pattern is a word (ie: add .* prefix and suffix)
+
 ## Under The Hood
 
 ### Encryption
