@@ -2,6 +2,10 @@
 
 ## Versions
 
+### 0.3.1
+
++ **√** Minor fix on which command not following symlinks on gnupg
+
 ### 0.3
 
 + **√** Support version control passpie database with git
