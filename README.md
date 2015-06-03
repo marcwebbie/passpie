@@ -438,6 +438,14 @@ colors:
   login: green
 ```
 
+##### `git = (true | false)`
+
+**default:** true
+
+Create a git repository on the database directory when git is available.
+
+[learn more](#version-control-your-database)
+
 ## Under The Hood
 
 ### Encryption

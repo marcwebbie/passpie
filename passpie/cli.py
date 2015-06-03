@@ -31,6 +31,7 @@ DEFAULT_CONFIG = {
     'table_format': 'fancy_grid',
     'headers': ['name', 'login', 'password', 'comment'],
     'colors': {'name': 'yellow', 'login': 'green'},
+    'git': True
 }
 config = load_config(DEFAULT_CONFIG, USER_CONFIG_PATH)
 genpass = partial(genpass,
@@ -171,7 +172,7 @@ def init(passphrase, force, no_git):
     try:
         with Cryptor(config.path) as cryptor:
             cryptor.create_keys(passphrase)
-        if not no_git:
+        if config.git and not no_git:
             git = Git(config.path)
             git.init()
     except FileExistsError:
