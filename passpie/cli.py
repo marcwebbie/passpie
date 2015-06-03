@@ -163,15 +163,15 @@ def complete(shell_name, commands):
 @click.option('--passphrase', prompt=True, hide_input=True,
               confirmation_prompt=True)
 @click.option('--force', is_flag=True, help="Force overwrite database")
-@click.option('--log', is_flag=True, help="Initialize git repository")
-def init(passphrase, force, log):
+@click.option('--no-git', is_flag=True, help="Don't create a git repository")
+def init(passphrase, force, no_git):
     if force and os.path.isdir(config.path):
         shutil.rmtree(config.path)
 
     try:
         with Cryptor(config.path) as cryptor:
             cryptor.create_keys(passphrase)
-        if log:
+        if not no_git:
             git = Git(config.path)
             git.init()
     except FileExistsError:
@@ -212,7 +212,9 @@ def add(fullname, password, comment, force, copy):
             copy_to_clipboard(password)
 
         git = Git(config.path)
-        git.commit(message='Added {}'.format(credential['fullname']))
+        message = 'Added {}'.format(credential['fullname'])
+        git.commit(message=message)
+        logger.debug(message)
     else:
         message = "Credential {} already exists. --force to overwrite".format(
             fullname)
@@ -258,8 +260,10 @@ def update(fullname, name, login, password, comment):
         db = Database(config.path)
         db.update(values, (where("fullname") == credential["fullname"]))
 
+        message = 'Updated {}'.format(credential['fullname'])
+        logger.debug(message)
         git = Git(config.path)
-        git.commit(message='Updated {}'.format(credential['fullname']))
+        git.commit(message)
 
 
 @cli.command(help="Remove credential")
@@ -280,16 +284,18 @@ def remove(fullname, yes):
         for credential in credentials:
             db.remove(where('fullname') == credential['fullname'])
 
-        git = Git(config.path)
         fullnames = ', '.join(c['fullname'] for c in credentials)
-        gitmsg = 'Removed {}'.format(fullnames)
-        git.commit(message=gitmsg)
+        message = 'Removed {}'.format(fullnames)
+        logger.debug(message)
+        git = Git(config.path)
+        git.commit(message)
 
 
 @cli.command(help="Copy credential password to clipboard/stdout")
 @click.argument("fullname")
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
-@click.option("--to", default='clipboard', type=click.Choice(['stdout', 'clipboard']))
+@click.option("--to", default='clipboard',
+              type=click.Choice(['stdout', 'clipboard']))
 def copy(fullname, passphrase, to):
     db = Database(config.path)
     ensure_passphrase(db, passphrase)
@@ -441,8 +447,10 @@ def reset(passphrase):
         db.purge()
         db.insert_multiple(credentials)
 
-        git = Git(config.path)
-        git.commit(config.path, message='Reset database')
+    message = 'Reset database'
+    logger.debug(message)
+    git = Git(config.path)
+    git.commit(message)
 
 
 @cli.command(help='Shows passpie database changes history')
@@ -452,8 +460,10 @@ def log(reset_to, init):
     git = Git(config.path)
     if reset_to >= 0:
         git.reset(number=reset_to)
+        logger.debug('reset database to index: %s', reset_to)
     elif init:
         git.init()
+        logger.debug('initialized a git repository on: %s', config.path)
     else:
         for number, commit in git.commit_list():
             number = click.style(str(number), fg='magenta')
