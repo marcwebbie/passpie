@@ -8,20 +8,20 @@ from passpie.history import ensure_git, Git
 
 def test_ensure_git_logs_debug_for_git_not_installed(mocker):
     mocker.patch('passpie.history.which', return_value=None)
-    mock_logging = mocker.patch('passpie.history.logging')
+    mock_logger = mocker.patch('passpie.history.logger')
 
     @ensure_git()
     def func():
         pass
     result = func()
 
-    assert mock_logging.debug.called
+    assert mock_logger.debug.called
     assert result is None
 
 
 def test_ensure_returns_specified_return_value_when_exception(mocker):
     mocker.patch('passpie.history.which', return_value=None)
-    mock_logging = mocker.patch('passpie.history.logging')
+    mock_logger = mocker.patch('passpie.history.logger')
     return_value = 'return value'
 
     @ensure_git(return_value=return_value)
@@ -30,7 +30,7 @@ def test_ensure_returns_specified_return_value_when_exception(mocker):
     result = func()
 
     assert result == return_value
-    assert mock_logging.debug.called
+    assert mock_logger.debug.called
 
 
 def test_git_init_creates_a_repo_on_path_commiting_with_message(mocker):
