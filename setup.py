@@ -28,7 +28,8 @@ requirements = [
     'gnupg==2.0.2',
     'PyYAML==3.11',
     'tabulate==0.7.5',
-    'tinydb==2.3.2'
+    'tinydb==2.3.2',
+    'GitPython==1.0.1'
 ]
 
 tests_requirements = [
