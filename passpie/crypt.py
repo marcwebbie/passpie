@@ -45,7 +45,7 @@ class Cryptor(object):
 
     @property
     def _binary(self):
-        return which("gpg2") or which('gpg2')
+        return which("gpg") or which('gpg2')
 
     def _import_keys(self):
         try:

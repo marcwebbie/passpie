@@ -2,6 +2,10 @@
 
 ## Versions
 
+### 0.3.2
+
++ **√** Minor fix on cryptor find binary
+
 ### 0.3.1
 
 + **√** Minor fix on which command not following symlinks on gnupg
