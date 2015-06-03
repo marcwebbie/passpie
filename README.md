@@ -555,6 +555,19 @@ Ubuntu:
 sudo apt-get install xclip
 ```
 
+### `passpie init hangs`
+
+Sometimes it takes a long time because of entropy on the host machine. It was noticed a long time on an ubuntu server(even more if it is a virtual machine). You could try using `haveged` to generate enough entropy.
+
+On ubuntu:
+
+```
+sudo apt-get install haveged
+```
+
+> You could also try this solution right here: http://serverfault.com/questions/214605/gpg-not-enough-entropy
+
+
 ## License ([MIT License](http://choosealicense.com/licenses/mit/))
 
 The MIT License (MIT)
