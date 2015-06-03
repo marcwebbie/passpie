@@ -1,14 +1,11 @@
-from datetime import datetime
 import os
 
 import click
 
 try:
-    import kppy
     from kppy.database import KPDBv1
     from kppy.entries import v1Entry
     from kppy.exceptions import KPError
-    from kppy.groups import v1Group
     _found_kppy = True
 except ImportError:
     _found_kppy = False
