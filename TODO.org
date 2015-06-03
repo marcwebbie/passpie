@@ -1,3 +1,0 @@
-* Todos
-
-** TODO Warn user in creation in initialization of database in a not empty dir
