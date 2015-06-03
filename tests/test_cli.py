@@ -127,7 +127,8 @@ def test_cli_reset_purges_all_elements(mocker, mock_db, mock_cryptor):
     assert mock_db.purge.called
 
 
-def test_init_success(mock_cryptor):
+def test_init_success(mocker, mock_cryptor):
+    mocker.patch('passpie.cli.Git')
     passphrase = "PASS2pie"
     runner = CliRunner()
     result = runner.invoke(cli.init, ["--passphrase", passphrase])
@@ -138,6 +139,7 @@ def test_init_success(mock_cryptor):
 
 
 def test_init_prints_error_when_keys_exist(mocker, mock_cryptor):
+    mocker.patch('passpie.cli.Git')
     mock_cryptor.create_keys.side_effect = FileExistsError
     passphrase = "PASS2pie"
     path = cli.config.path
@@ -151,6 +153,7 @@ def test_init_prints_error_when_keys_exist(mocker, mock_cryptor):
 
 
 def test_init_has_success_when_keys_exits_and_force_is_passed(mocker, mock_cryptor):
+    mocker.patch('passpie.cli.Git')
     mock_shutil = mocker.patch('passpie.cli.shutil')
     passphrase = "PASS2pie"
 
