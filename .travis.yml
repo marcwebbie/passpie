@@ -1,9 +1,5 @@
-os:
-  - linux
-  - osx
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install xclip; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo easy_install pip; fi
+  sudo apt-get install xclip gpg
 language: python
 python:
   - 2.7
@@ -14,6 +10,7 @@ allow_failures:
   - python: pypy
 install:
 - pip install -r requirements_tests.txt
+- pip install .
 script:
 - python setup.py coverage
 after_success:
