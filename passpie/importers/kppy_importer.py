@@ -60,7 +60,7 @@ class KppyImporter(BaseImporter):
                         'name': group_names_str,
                         'login': entry.username,
                         'password': entry.password,
-                        'comment': entry.comment,
+                        'comment': (entry.comment or '').strip(),
                         'modified': entry.creation,
                     }
                     credentials.append(credential_dict)
