@@ -167,34 +167,38 @@ class TestWithAKeepassDb(object):
         credentials = importer.handle(str(kppy_db_filepath))
         assert credentials == [
             {
-                'comment': u'comment_example', 'name': u'john',
+                'comment': u'comment_example',
+                'name': u'Internet/example.com',
                 'modified': kppy_db.mock_creation_time,
                 'login': u'john', 'password': u'bond',
                 'fullname': 'john@Internet/example.com',
             },  {
-                'comment': u'comment_google', 'name': u'john',
+                'comment': u'comment_google',
+                'name': u'Internet/google.com',
                 'modified': kppy_db.mock_creation_time,
                 'login': u'john', 'password': u'james',
                 'fullname': 'john@Internet/google.com',
             },  {
                 'comment': u'comment_example',
-                'name': u'daniel',
+                'name': u'Internet/example.com',
                 'modified': kppy_db.mock_creation_time,
                 'login': u'daniel', 'password': u'007',
                 'fullname': 'daniel@Internet/example.com',
             },  {
-                'comment': u'comment_example', 'name': u'john',
+                'comment': u'comment_example',
+                'name': u'Internet/group1/example.com',
                 'modified': kppy_db.mock_creation_time,
                 'login': u'john', 'password': u'bond',
                 'fullname': 'john@Internet/group1/example.com',
             },  {
-                'comment': u'comment_google', 'name': u'john',
+                'comment': u'comment_google',
+                'name': u'Internet/group1/google.com',
                 'modified': kppy_db.mock_creation_time,
                 'login': u'john', 'password': u'james',
                 'fullname': 'john@Internet/group1/google.com',
             },  {
                 'comment': u'comment_example',
-                'name': u'daniel',
+                'name': u'Internet/group1/example.com',
                 'modified': kppy_db.mock_creation_time,
                 'login': u'daniel', 'password': u'007',
                 'fullname': 'daniel@Internet/group1/example.com',

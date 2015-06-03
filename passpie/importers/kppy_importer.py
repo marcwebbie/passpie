@@ -60,7 +60,7 @@ class KppyImporter(BaseImporter):
 
                     credential_dict = {
                         'fullname': entry_fullname,
-                        'name': entry.username,
+                        'name': group_names_str,
                         'login': entry.username,
                         'password': entry.password,
                         'comment': entry.comment,
