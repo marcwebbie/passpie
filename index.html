@@ -65,12 +65,12 @@
 <li>[x] Bulk remove credentials</li>
 <li>[x] Bash/Zsh <a href="#passpie-completion">completion</a>
 </li>
+<li>[x] <a href="#version-control-your-database">Undo/Redo changes</a> to the database. (requires <a href="https://git-scm.com/">git</a>)</li>
 </ul>
 
 <p>Planned features:</p>
 
 <ul>
-<li>[ ] Undo/Redo updates to the database</li>
 <li>[ ] Bulk update credentials</li>
 <li>[ ] Import plain text credentials from <a href="http://keepass.info/">Keepass</a>
 </li>
@@ -112,6 +112,12 @@ passpie search <span class="pl-s"><span class="pl-pds">'</span>foo|bar<span clas
 <span class="pl-c"># remove some credentials</span>
 passpie remove foo@example.com
 passpie remove foo@github.com
+
+<span class="pl-c"># see the database change history</span>
+passpie log
+
+<span class="pl-c"># reset to a previous version of the database</span>
+passpie --reset-to 5
 
 <span class="pl-c"># check database status</span>
 passpie status
@@ -192,6 +198,67 @@ banks/myotherbank  _        <span class="pl-k">*****</span>
 <p>Or even better, without using the <code>@</code> notation:</p>
 
 <div class="highlight highlight-bash"><pre>passpie update banks/mybank --random</pre></div>
+
+<h3>
+<a id="version-control-your-database" class="anchor" href="#version-control-your-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Version control your database</h3>
+
+<p>Passpie by default will create a <a href="https://git-scm.com/">git</a> repository on database initialization if <code>git</code> is available.</p>
+
+<div class="highlight highlight-bash"><pre>passpie init</pre></div>
+
+<p>To see the changes history, use passpie <code>log</code> command:</p>
+
+<div class="highlight highlight-bash"><pre>passpie log</pre></div>
+
+<p>example output:</p>
+
+<pre lang="text"><code>[13] Updated foo@bar
+[12] Updated foo@bar
+[11] Reset database
+[10] Removed foozy@bar
+[9] Updated hello@world
+[8] Added hello@world
+[7] Added foozy@bar
+[6] Updated test@github
+[5] Added foozy@bazzy
+[4] Updated test@github
+[3] Added foo@bar
+[2] Added spam@egg
+[1] Added test@github
+[0] Initialized database
+</code></pre>
+
+<h4>
+<a id="going-back-to-a-previous-version-of-the-database-changes" class="anchor" href="#going-back-to-a-previous-version-of-the-database-changes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Going back to a previous version of the database changes.</h4>
+
+<p>If you want to go back to a previous version of the database history: <code>passpie --reset-to N</code> where N is the index of the change.</p>
+
+<pre><code>passpie log --reset-to 5
+</code></pre>
+
+<blockquote>
+<p><em>Attention</em>: this is an operation that destroys data. Use it with caution. It is equivalent to do <code>git reset --hard</code></p>
+</blockquote>
+
+<h4>
+<a id="initializing-a-git-repository-on-an-existing-passpie-database" class="anchor" href="#initializing-a-git-repository-on-an-existing-passpie-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Initializing a git repository on an existing passpie database:</h4>
+
+<div class="highlight highlight-bash"><pre>passpie log --init</pre></div>
+
+<p>or if you have multiple databases:</p>
+
+<div class="highlight highlight-bash"><pre>passpie -D other_database log --init</pre></div>
+
+<blockquote>
+<p>This will create a git repository on passpie directory and create an initial commit <code>Initialized database</code></p>
+</blockquote>
+
+<h4>
+<a id="avoiding-git-initialization" class="anchor" href="#avoiding-git-initialization" aria-hidden="true"><span class="octicon octicon-link"></span></a>Avoiding git initialization</h4>
+
+<p>If you don't want to create a git repository on the passpie database. Initialize passpie with <code>--no-git</code> flag:</p>
+
+<div class="highlight highlight-bash"><pre>passpie init --no-git</pre></div>
 
 <h3>
 <a id="syncing-your-database" class="anchor" href="#syncing-your-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Syncing your database</h3>
@@ -410,6 +477,16 @@ example.com  fake     <span class="pl-k">*****</span>
   login: green
 </code></pre>
 
+<h5>
+<a id="git--true--false" class="anchor" href="#git--true--false" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>git = (true | false)</code>
+</h5>
+
+<p><strong>default:</strong> true</p>
+
+<p>Create a git repository on the database directory when git is available.</p>
+
+<p><a href="#version-control-your-database">learn more</a></p>
+
 <h2>
 <a id="under-the-hood" class="anchor" href="#under-the-hood" aria-hidden="true"><span class="octicon octicon-link"></span></a>Under The Hood</h2>
 
@@ -521,6 +598,21 @@ pip install -U passpie
 
 <pre><code>sudo apt-get install xclip
 </code></pre>
+
+<h3>
+<a id="passpie-init-hangs" class="anchor" href="#passpie-init-hangs" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>passpie init hangs</code>
+</h3>
+
+<p>Sometimes it takes a long time because of entropy on the host machine. It was noticed a long time on an ubuntu server(even more if it is a virtual machine). You could try using <code>haveged</code> to generate enough entropy.</p>
+
+<p>On ubuntu:</p>
+
+<pre><code>sudo apt-get install haveged
+</code></pre>
+
+<blockquote>
+<p>You could also try this solution right here: <a href="http://serverfault.com/questions/214605/gpg-not-enough-entropy">http://serverfault.com/questions/214605/gpg-not-enough-entropy</a></p>
+</blockquote>
 
 <h2>
 <a id="license-mit-license" class="anchor" href="#license-mit-license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License (<a href="http://choosealicense.com/licenses/mit/">MIT License</a>)</h2>
