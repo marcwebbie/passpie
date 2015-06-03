@@ -211,7 +211,7 @@ class TestWithAKeepassDb(object):
 
         bad_kdb = tmpdir.join('bad.kdb')
         with open(str(bad_kdb), 'wb') as f:
-            f.write('bad_db')
+            f.write(b'bad_db')
 
         importer = kppy_importer.KppyImporter()
         importer.log = Mock()
