@@ -32,12 +32,6 @@ requirements = [
     'GitPython==1.0.1'
 ]
 
-tests_requirements = [
-    "pytest",
-    "pytest-cov",
-    "pytest-mock",
-    "mock"
-]
 
 long_description = open('README.md').read() + "\n\n"
 
@@ -81,7 +75,6 @@ setup(
     },
     install_requires=requirements,
     cmdclass={'test': PyTest, 'coverage': PyTestCoverage},
-    tests_requires=tests_requirements,
     test_suite='tests',
     classifiers=[
         'Development Status :: 4 - Beta',
