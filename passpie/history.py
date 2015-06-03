@@ -7,6 +7,7 @@ from git.exc import InvalidGitRepositoryError
 from ._compat import which
 from .utils import reverse_enumerate
 
+logger = logging.getLogger('passpie')
 
 def ensure_git(return_value=None):
     def decorator(func):
@@ -16,11 +17,11 @@ def ensure_git(return_value=None):
                 try:
                     return func(*args, **kwargs)
                 except InvalidGitRepositoryError as e:
-                    logging.debug('"{}" is not a git repository'.format(e))
+                    logger.debug('"{}" is not a git repository'.format(e))
                 except Exception as e:
-                    logging.debug(str(e))
+                    logger.debug(str(e))
             else:
-                logging.debug('git is not installed')
+                logger.debug('git is not installed')
             return return_value
         return wrapper
     return decorator

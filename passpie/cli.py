@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 from functools import partial
 import json
+import logging
 import os
-import sys
 import shutil
 
 from tinydb.queries import where
@@ -17,6 +17,7 @@ from .database import Database
 from .importers import find_importer
 from .utils import genpass, load_config, ensure_dependencies
 from .table import Table
+from .history import Git
 
 
 __version__ = "0.2.2"
@@ -35,6 +36,13 @@ config = load_config(DEFAULT_CONFIG, USER_CONFIG_PATH)
 genpass = partial(genpass,
                   length=config.genpass_length,
                   special=config.genpass_symbols)
+
+logger = logging.getLogger('passpie')
+handler = logging.StreamHandler()
+formatter = logging.Formatter(
+    '%(name)s::%(levelname)s::%(module)s::%(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 
 class AliasedGroup(click.Group):
@@ -118,9 +126,10 @@ def copy_to_clipboard(text):
              invoke_without_command=True)
 @click.option('-D', '--database', help='Alternative database path',
               type=click.Path(dir_okay=True, writable=True, resolve_path=True))
+@click.option('-v', '--verbose', is_flag=True, help='Verbose output')
 @click.version_option(version=__version__)
 @click.pass_context
-def cli(ctx, database):
+def cli(ctx, database, verbose):
     try:
         ensure_dependencies()
     except RuntimeError as e:
@@ -129,12 +138,15 @@ def cli(ctx, database):
     if database:
         config.path = database
 
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
     if not ctx.invoked_subcommand == 'init':
         ensure_is_database(config.path)
 
     if ctx.invoked_subcommand is None:
         db = Database(config.path)
-        credentials = sorted(db.all(), key=lambda x: x["name"]+x["login"])
+        credentials = sorted(db.all(), key=lambda x: x["name"] + x["login"])
         print_table(credentials)
 
 
@@ -150,14 +162,18 @@ def complete(shell_name, commands):
 @cli.command(help="Initialize new passpie database")
 @click.option('--passphrase', prompt=True, hide_input=True,
               confirmation_prompt=True)
-@click.option('--force', is_flag=True, help="force overwrite database")
-def init(passphrase, force):
+@click.option('--force', is_flag=True, help="Force overwrite database")
+@click.option('--log', is_flag=True, help="Initialize git repository")
+def init(passphrase, force, log):
     if force and os.path.isdir(config.path):
         shutil.rmtree(config.path)
 
     try:
         with Cryptor(config.path) as cryptor:
             cryptor.create_keys(passphrase)
+        if log:
+            git = Git(config.path)
+            git.init()
     except FileExistsError:
         message = "Database exists in {}. `--force` to overwrite".format(
             config.path)
@@ -194,6 +210,9 @@ def add(fullname, password, comment, force, copy):
         db.insert(credential)
         if copy:
             copy_to_clipboard(password)
+
+        git = Git(config.path)
+        git.commit(message='Added {}'.format(credential['fullname']))
     else:
         message = "Credential {} already exists. --force to overwrite".format(
             fullname)
@@ -239,6 +258,9 @@ def update(fullname, name, login, password, comment):
         db = Database(config.path)
         db.update(values, (where("fullname") == credential["fullname"]))
 
+        git = Git(config.path)
+        git.commit(message='Updated {}'.format(credential['fullname']))
+
 
 @cli.command(help="Remove credential")
 @click.argument("fullname")
@@ -257,6 +279,11 @@ def remove(fullname, yes):
             )
         for credential in credentials:
             db.remove(where('fullname') == credential['fullname'])
+
+        git = Git(config.path)
+        fullnames = ', '.join(c['fullname'] for c in credentials)
+        gitmsg = 'Removed {}'.format(fullnames)
+        git.commit(message=gitmsg)
 
 
 @cli.command(help="Copy credential password to clipboard/stdout")
@@ -285,7 +312,7 @@ def search(regex):
         where("name").matches(regex) |
         where("login").matches(regex) |
         where("comment").matches(regex))
-    credentials = sorted(credentials, key=lambda x: x["name"]+x["login"])
+    credentials = sorted(credentials, key=lambda x: x["name"] + x["login"])
     print_table(credentials)
 
 
@@ -296,7 +323,7 @@ def search(regex):
 def status(full, days, passphrase):
     db = Database(config.path)
     ensure_passphrase(db, passphrase)
-    credentials = sorted(db.all(), key=lambda x: x["name"]+x["login"])
+    credentials = sorted(db.all(), key=lambda x: x["name"] + x["login"])
 
     with Cryptor(config.path) as cryptor:
         for cred in credentials:
@@ -383,6 +410,9 @@ def import_database(path):
                 cred['password'] = encrypted
         db.insert_multiple(credentials)
 
+        git = Git(config.path)
+        git.commit(message='Imported credentials from {}'.format(path))
+
 
 @cli.command(help='Renew passpie database and re-encrypt credentials')
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
@@ -410,3 +440,22 @@ def reset(passphrase):
         # remove old and insert re-encrypted credentials
         db.purge()
         db.insert_multiple(credentials)
+
+        git = Git(config.path)
+        git.commit(config.path, message='Reset database')
+
+
+@cli.command(help='Shows passpie database changes history')
+@click.option("--init", is_flag=True, help="Enable history tracking")
+@click.option("--reset-to", default=-1, help="Undo changes in database")
+def log(reset_to, init):
+    git = Git(config.path)
+    if reset_to >= 0:
+        git.reset(number=reset_to)
+    elif init:
+        git.init()
+    else:
+        for number, commit in git.commit_list():
+            number = click.style(str(number), fg='magenta')
+            message = commit.message.strip()
+            click.echo("[{}] {}".format(number, message))
