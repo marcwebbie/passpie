@@ -20,7 +20,7 @@ from .table import Table
 from .history import Git
 
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
 USER_CONFIG_PATH = os.path.expanduser('~/.passpierc')
 DEFAULT_CONFIG = {
