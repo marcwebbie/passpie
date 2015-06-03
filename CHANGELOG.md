@@ -2,6 +2,11 @@
 
 ## Versions
 
+### 0.3
+
++ **√** Support version control passpie database with git
++ **√** Minor bug fixes
+
 ### 0.2.2
 
 + **√** Support `gpg2` binary
