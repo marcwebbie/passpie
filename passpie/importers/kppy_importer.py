@@ -53,9 +53,13 @@ class KppyImporter(BaseImporter):
                 credentials = []
 
                 for entry in db.entries:
+                    group_names_str = self.compute_group_name(entry)
+
+                    entry_fullname = make_fullname(
+                        entry.username, group_names_str)
 
                     credential_dict = {
-                        'fullname': make_fullname(entry.username, entry.url),
+                        'fullname': entry_fullname,
                         'name': entry.username,
                         'login': entry.username,
                         'password': entry.password,
@@ -67,3 +71,21 @@ class KppyImporter(BaseImporter):
                 return credentials
             finally:
                 db.close()
+
+    @staticmethod
+    def compute_group_name(kp_entry):
+        if not isinstance(kp_entry, v1Entry):
+            raise TypeError('kp_entry is not a kppy.entries.v1Entry')
+
+        group_names = [kp_entry.url]
+
+        group = kp_entry.group
+        while group:
+            if group.title:
+                group_names.insert(0, group.title)
+            group = group.parent
+
+        group_names_str = '/'.join(
+            e.strip() for e in group_names if e)
+
+        return group_names_str

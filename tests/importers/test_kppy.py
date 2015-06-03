@@ -170,34 +170,34 @@ class TestWithAKeepassDb(object):
                 'comment': u'comment_example', 'name': u'john',
                 'modified': kppy_db.mock_creation_time,
                 'login': u'john', 'password': u'bond',
-                'fullname': 'john@example.com'
+                'fullname': 'john@Internet/example.com',
             },  {
                 'comment': u'comment_google', 'name': u'john',
                 'modified': kppy_db.mock_creation_time,
                 'login': u'john', 'password': u'james',
-                'fullname': 'john@google.com'
+                'fullname': 'john@Internet/google.com',
             },  {
                 'comment': u'comment_example',
                 'name': u'daniel',
                 'modified': kppy_db.mock_creation_time,
                 'login': u'daniel', 'password': u'007',
-                'fullname': 'daniel@example.com'
+                'fullname': 'daniel@Internet/example.com',
             },  {
                 'comment': u'comment_example', 'name': u'john',
                 'modified': kppy_db.mock_creation_time,
                 'login': u'john', 'password': u'bond',
-                'fullname': 'john@example.com'
+                'fullname': 'john@Internet/group1/example.com',
             },  {
                 'comment': u'comment_google', 'name': u'john',
                 'modified': kppy_db.mock_creation_time,
                 'login': u'john', 'password': u'james',
-                'fullname': 'john@google.com'
+                'fullname': 'john@Internet/group1/google.com',
             },  {
                 'comment': u'comment_example',
                 'name': u'daniel',
                 'modified': kppy_db.mock_creation_time,
                 'login': u'daniel', 'password': u'007',
-                'fullname': 'daniel@example.com'
+                'fullname': 'daniel@Internet/group1/example.com',
             }
         ]
 
