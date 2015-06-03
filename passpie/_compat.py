@@ -1,8 +1,17 @@
+import os
 import sys
 try:
-    from shutil import which
+    from shutil import which as _which
 except ImportError:
-    from distutils.spawn import find_executable as which
+    from distutils.spawn import find_executable as _which
+
+
+def which(binary):
+    path = _which(binary)
+    if path:
+        realpath = os.path.realpath(path)
+        return realpath
+    return None
 
 
 def is_python2():
