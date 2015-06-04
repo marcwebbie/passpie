@@ -128,7 +128,7 @@ def test_cli_reset_purges_all_elements(mocker, mock_db, mock_cryptor):
 
 
 def test_init_success(mocker, mock_cryptor):
-    mocker.patch('passpie.cli.Git')
+    mocker.patch('passpie.cli.Repository')
     passphrase = "PASS2pie"
     runner = CliRunner()
     result = runner.invoke(cli.init, ["--passphrase", passphrase])
@@ -139,7 +139,7 @@ def test_init_success(mocker, mock_cryptor):
 
 
 def test_init_prints_error_when_keys_exist(mocker, mock_cryptor):
-    mocker.patch('passpie.cli.Git')
+    mocker.patch('passpie.cli.Repository')
     mock_cryptor.create_keys.side_effect = FileExistsError
     passphrase = "PASS2pie"
     path = cli.config.path
@@ -153,7 +153,7 @@ def test_init_prints_error_when_keys_exist(mocker, mock_cryptor):
 
 
 def test_init_has_success_when_keys_exits_and_force_is_passed(mocker, mock_cryptor):
-    mocker.patch('passpie.cli.Git')
+    mocker.patch('passpie.cli.Repository')
     mock_shutil = mocker.patch('passpie.cli.shutil')
     passphrase = "PASS2pie"
 
@@ -485,3 +485,81 @@ def test_update_password_from_prompt_encrypts_password(mocker, mock_cryptor, moc
     assert result.exit_code == 0
     assert mock_cryptor.encrypt.called
     mock_cryptor.encrypt.assert_called_once_with(chosen_password)
+
+
+def test_log_with_reset_to_pass_reset_to_number_to_git_reset(mocker):
+    mocker.patch('passpie.cli.ensure_dependencies')
+    MockRepository = mocker.patch('passpie.cli.Repository')
+    mock_logger = mocker.patch('passpie.cli.logger')
+    mock_repo = MockRepository()
+    index = 0
+
+    runner = CliRunner()
+    result = runner.invoke(cli.log, ['--reset-to', index])
+
+    assert result.exit_code == 0
+    mock_repo.reset.assert_called_once_with(index)
+    assert mock_logger.debug.called
+
+
+def test_log_with_init_call_git_init_on_path(mocker):
+    mocker.patch('passpie.cli.ensure_dependencies')
+    MockRepository = mocker.patch('passpie.cli.Repository')
+    mock_logger = mocker.patch('passpie.cli.logger')
+    mock_repo = MockRepository()
+    index = 0
+
+    runner = CliRunner()
+    result = runner.invoke(cli.log, ['--init'])
+
+    assert result.exit_code == 0
+    assert mock_repo.init.called
+    assert mock_logger.debug.called
+
+
+def test_log_prints_commit_list_when_not_option_is_passed(mocker):
+    mocker.patch('passpie.cli.ensure_dependencies')
+    MockRepository = mocker.patch('passpie.cli.Repository')
+    mock_logger = mocker.patch('passpie.cli.logger')
+    mock_repo = MockRepository()
+    commits = [
+        (2, mocker.MagicMock(message='Third commit')),
+        (1, mocker.MagicMock(message='Second commit')),
+        (0, mocker.MagicMock(message='First commit'))
+    ]
+    index = 0
+    MockRepository().commit_list.return_value = commits
+
+    runner = CliRunner()
+    result = runner.invoke(cli.log)
+
+    assert result.exit_code == 0
+    for index, commit in commits:
+        assert "[{}] {}".format(index, commit.message) in result.output
+
+
+def test_cli_set_config_database_if_database_option_passed(mocker):
+    path = '/path/to/database'
+    mocker.patch('passpie.cli.ensure_dependencies')
+    mocker.patch('passpie.cli.ensure_is_database')
+    mocker.patch('passpie.cli.Database')
+    mocker.patch('passpie.cli.click.Path', new_callable=str)
+    mock_config = mocker.patch('passpie.cli.config')
+
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ['--database', path])
+
+    assert result.exit_code == 0
+    assert mock_config.path == path
+
+
+def test_cli_set_logger_level_to_debug_when_verbose_option(mocker):
+    mocker.patch('passpie.cli.ensure_dependencies')
+    mocker.patch('passpie.cli.ensure_is_database')
+    mock_logger = mocker.patch('passpie.cli.logger')
+
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ['--verbose'])
+
+    assert mock_logger.setLevel.called
+    mock_logger.setLevel.assert_called_once_with(cli.logging.DEBUG)
