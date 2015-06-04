@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import os
 
 from passpie.crypt import Cryptor, KEY_INPUT, make_key_input
-from passpie._compat import which, FileNotFoundError, FileExistsError
+from passpie._compat import which, FileNotFoundError, FileExistsError, is_python2
 from .helpers import MockerTestCase
 
 
@@ -163,8 +163,12 @@ def test_crypt_binary_tries_which_on_gpg_and_gpg2_in_order(mocker):
 
 def test_crypt_make_key_input_handles_unicode_encode_error(mocker):
     passphrase = 's3cr3t'
+    class ExpectedUnicodeException(UnicodeEncodeError):
+        def __init__(self):
+            pass
+
     side_effect = [
-        UnicodeEncodeError('', '', 0, 1, 'error'),
+        ExpectedUnicodeException,
         KEY_INPUT.format(passphrase)
     ]
     mock_key_input = mocker.patch('passpie.crypt.KEY_INPUT', new=mocker.MagicMock())
