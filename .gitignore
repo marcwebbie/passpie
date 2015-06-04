@@ -6,7 +6,7 @@
 .DS_Store
 .env
 *.swp
-.idea
+*idea.py
 
 *.egg
 /build/
