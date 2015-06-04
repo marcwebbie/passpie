@@ -159,3 +159,17 @@ def test_crypt_binary_tries_which_on_gpg_and_gpg2_in_order(mocker):
 
     mock_which.assert_any_call_with('gpg1')
     mock_which.assert_any_call_with('gpg2')
+
+
+def test_crypt_make_key_input_handles_unicode_encode_error(mocker):
+    passphrase = 's3cr3t'
+    side_effect = [
+        UnicodeEncodeError('', '', 0, 1, 'error'),
+        KEY_INPUT.format(passphrase)
+    ]
+    mock_key_input = mocker.patch('passpie.crypt.KEY_INPUT', new=mocker.MagicMock())
+    mock_key_input.format.side_effect = side_effect
+
+    key_input = make_key_input(passphrase)
+
+    assert key_input == KEY_INPUT.format(passphrase)
