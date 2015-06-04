@@ -4,7 +4,7 @@ from pkg_resources import get_distribution, DistributionNotFound
 import errno
 import logging
 import os
-import random
+from random import SystemRandom
 import string
 
 import yaml
@@ -18,7 +18,7 @@ def genpass(length=32, special="_-#|+="):
     """generates a password with random chararcters
     """
     chars = special + string.ascii_letters + string.digits + " "
-    return "".join(random.choice(chars) for _ in range(length))
+    return "".join(SystemRandom().choice(chars) for _ in range(length))
 
 
 @contextmanager
