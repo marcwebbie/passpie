@@ -17,7 +17,7 @@ from .database import Database
 from .importers import find_importer
 from .utils import genpass, load_config, ensure_dependencies
 from .table import Table
-from .history import Git
+from .history import Repository
 
 
 __version__ = "0.3.2"
@@ -31,7 +31,7 @@ DEFAULT_CONFIG = {
     'table_format': 'fancy_grid',
     'headers': ['name', 'login', 'password', 'comment'],
     'colors': {'name': 'yellow', 'login': 'green'},
-    'git': True
+    'repo': True
 }
 config = load_config(DEFAULT_CONFIG, USER_CONFIG_PATH)
 genpass = partial(genpass,
@@ -164,17 +164,17 @@ def complete(shell_name, commands):
 @click.option('--passphrase', prompt=True, hide_input=True,
               confirmation_prompt=True)
 @click.option('--force', is_flag=True, help="Force overwrite database")
-@click.option('--no-git', is_flag=True, help="Don't create a git repository")
-def init(passphrase, force, no_git):
+@click.option('--no-repo', is_flag=True, help="Don't create a repo repository")
+def init(passphrase, force, no_repo):
     if force and os.path.isdir(config.path):
         shutil.rmtree(config.path)
 
     try:
         with Cryptor(config.path) as cryptor:
             cryptor.create_keys(passphrase)
-        if config.git and not no_git:
-            git = Git(config.path)
-            git.init()
+        if config.repo and not no_repo:
+            repo = Repository(config.path)
+            repo.init()
     except FileExistsError:
         message = "Database exists in {}. `--force` to overwrite".format(
             config.path)
@@ -212,9 +212,9 @@ def add(fullname, password, comment, force, copy):
         if copy:
             copy_to_clipboard(password)
 
-        git = Git(config.path)
+        repo = Repository(config.path)
         message = 'Added {}'.format(credential['fullname'])
-        git.commit(message=message)
+        repo.commit(message=message)
         logger.debug(message)
     else:
         message = "Credential {} already exists. --force to overwrite".format(
@@ -263,8 +263,8 @@ def update(fullname, name, login, password, comment):
 
         message = 'Updated {}'.format(credential['fullname'])
         logger.debug(message)
-        git = Git(config.path)
-        git.commit(message)
+        repo = Repository(config.path)
+        repo.commit(message)
 
 
 @cli.command(help="Remove credential")
@@ -288,8 +288,8 @@ def remove(fullname, yes):
         fullnames = ', '.join(c['fullname'] for c in credentials)
         message = 'Removed {}'.format(fullnames)
         logger.debug(message)
-        git = Git(config.path)
-        git.commit(message)
+        repo = Repository(config.path)
+        repo.commit(message)
 
 
 @cli.command(help="Copy credential password to clipboard/stdout")
@@ -417,8 +417,8 @@ def import_database(path):
                 cred['password'] = encrypted
         db.insert_multiple(credentials)
 
-        git = Git(config.path)
-        git.commit(message='Imported credentials from {}'.format(path))
+        repo = Repository(config.path)
+        repo.commit(message='Imported credentials from {}'.format(path))
 
 
 @cli.command(help='Renew passpie database and re-encrypt credentials')
@@ -450,23 +450,23 @@ def reset(passphrase):
 
     message = 'Reset database'
     logger.debug(message)
-    git = Git(config.path)
-    git.commit(message)
+    repo = Repository(config.path)
+    repo.commit(message)
 
 
 @cli.command(help='Shows passpie database changes history')
 @click.option("--init", is_flag=True, help="Enable history tracking")
 @click.option("--reset-to", default=-1, help="Undo changes in database")
 def log(reset_to, init):
-    git = Git(config.path)
+    repo = Repository(config.path)
     if reset_to >= 0:
-        git.reset(number=reset_to)
-        logger.debug('reset database to index: %s', reset_to)
+        repo.reset(reset_to)
+        logger.debug('reset database repository to index: %s', reset_to)
     elif init:
-        git.init()
-        logger.debug('initialized a git repository on: %s', config.path)
+        repo.init()
+        logger.debug('initialized a repository on: %s', config.path)
     else:
-        for number, commit in git.commit_list():
+        for number, commit in repo.commit_list():
             number = click.style(str(number), fg='magenta')
             message = commit.message.strip()
             click.echo("[{}] {}".format(number, message))
