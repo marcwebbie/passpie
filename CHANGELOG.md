@@ -2,6 +2,11 @@
 
 ## Versions
 
+### 0.3.3
+
++ **√** Fix issue on `reset-to` not reseting from `passpie log`
++ **√** Fix issue on copy to clipboard on `cygwin` platform
+
 ### 0.3.2
 
 + **√** Minor fix on cryptor find binary
