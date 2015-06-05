@@ -73,6 +73,7 @@ def empty_kppy_db(request, tmpdir):
     assert isinstance(tmpdir, py.path.local)
     kdb_path = tmpdir.join('test_db.kdb')
 
+    kppy_importer.prepare_pycrypto_for_import()
     from kppy.database import KPDBv1, KPError
     db = KPDBv1(str(kdb_path), password='test_pass', new=True)
 
@@ -86,6 +87,7 @@ class TestWithAKeepassDb(object):
 
     @pytest.fixture(autouse=True)
     def kppy_db(self, request, empty_kppy_db):
+        kppy_importer.prepare_pycrypto_for_import()
         from kppy.database import KPDBv1, KPError
         from kppy.groups import v1Group
         assert isinstance(empty_kppy_db, KPDBv1)
