@@ -69,18 +69,18 @@ def test_cli_remove_delete_credential_found_by_database(mock_db):
     assert 'foo' not in result_print.output
 
 
-def test_cli_copy_credential_password_to_database(mocker, mock_db, mock_cryptor):
+def test_cli_copy_credential_password_to_clipboard(mocker, mock_db, mock_cryptor):
     fullname = 'foo@bar'
     password = 's3cr3t'
     mocker.patch('passpie.cli.ensure_passphrase')
-    mock_copy_to_clipboard = mocker.patch('passpie.cli.copy_to_clipboard')
+    mock_clipboard = mocker.patch('passpie.cli.clipboard')
     mock_cryptor.decrypt.return_value = password
     runner = CliRunner()
     result = runner.invoke(cli.copy, [fullname], input='passphrase')
 
     assert result.exit_code == 0
-    assert mock_copy_to_clipboard.called
-    mock_copy_to_clipboard.assert_called_once_with(password)
+    assert mock_clipboard.copy.called
+    mock_clipboard.copy.assert_called_once_with(password)
 
 
 def test_cli_reset_database_overwrite_old_keys(mocker, mock_db, mock_cryptor):
@@ -165,8 +165,8 @@ def test_init_has_success_when_keys_exits_and_force_is_passed(mocker, mock_crypt
     mock_shutil.rmtree.assert_called_once_with(cli.config.path)
 
 
-def test_copy_to_clipboard_decrypts_password_to_pass_to_pyperclip(mocker, mock_cryptor):
-    mock_copy_to_clipboard = mocker.patch('passpie.cli.copy_to_clipboard')
+def test_copy_decrypts_password(mocker, mock_cryptor):
+    mock_clipboard = mocker.patch('passpie.cli.clipboard')
     mocker.patch('passpie.cli.get_credential_or_abort')
     mocker.patch('passpie.cli.ensure_passphrase')
     fullname = "foo@bar"
@@ -177,7 +177,7 @@ def test_copy_to_clipboard_decrypts_password_to_pass_to_pyperclip(mocker, mock_c
     result = runner.invoke(cli.copy, [fullname, "--passphrase", passphrase])
 
     assert result.exit_code is 0
-    mock_copy_to_clipboard.assert_called_once_with(mock_password)
+    mock_clipboard.copy.assert_called_once_with(mock_password)
 
 
 def test_import_prints_nothing_when_no_importer_is_found(mocker, mock_cryptor):
@@ -397,13 +397,13 @@ def test_remove_dont_ask_confimation_when_yes_passed(mocker, mock_db):
 
 
 def test_add_with_copy_option_add_pass_to_clipboard(mocker, mock_db, mock_cryptor):
-    mock_copy_to_clipboard = mocker.patch('passpie.cli.copy_to_clipboard')
+    mock_clipboard = mocker.patch('passpie.cli.clipboard')
 
     runner = CliRunner()
     result = runner.invoke(cli.add, ['john.doe@spam', '--random', '--copy'])
 
     assert result.exit_code == 0
-    assert mock_copy_to_clipboard.called is True
+    assert mock_clipboard.copy.called
 
 
 def test_remove_credentials_in_bulk(mocker, mock_db):

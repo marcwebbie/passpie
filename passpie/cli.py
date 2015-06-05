@@ -107,15 +107,6 @@ def print_table(credentials):
         click.echo(table.render(credentials))
 
 
-def copy_to_clipboard(text):
-    try:
-        clipboard.copy(text)
-    except SystemError as exc:
-        message = str(exc)
-        raise click.ClickException(click.style(message, fg='red'))
-    click.secho("Password copied to clipboard", fg="yellow")
-
-
 @click.group(cls=AliasedGroup if config.short_commands else click.Group,
              invoke_without_command=True)
 @click.option('-D', '--database', help='Alternative database path',
@@ -203,7 +194,7 @@ def add(fullname, password, comment, force, copy):
                           modified=datetime.now())
         db.insert(credential)
         if copy:
-            copy_to_clipboard(password)
+            clipboard.copy(password)
 
         repo = Repository(config.path)
         message = 'Added {}'.format(credential['fullname'])
@@ -299,7 +290,7 @@ def copy(fullname, passphrase, to):
         decrypted = cryptor.decrypt(credential["password"],
                                     passphrase=passphrase)
         if to == 'clipboard':
-            copy_to_clipboard(decrypted)
+            clipboard.copy(decrypted)
         elif to == 'stdout':
             click.echo(decrypted)
 
