@@ -563,3 +563,24 @@ def test_cli_set_logger_level_to_debug_when_verbose_option(mocker):
 
     assert mock_logger.setLevel.called
     mock_logger.setLevel.assert_called_once_with(cli.logging.DEBUG)
+
+
+def test_cli_copy_to_stdout_with_to_stdout_option(mocker, mock_cryptor):
+    credential = {
+        'password': 's3cr3t'
+    }
+    mocker.patch('passpie.cli.ensure_passphrase')
+    mocker.patch('passpie.cli.Database')
+    mocker.patch('passpie.cli.get_credential_or_abort',
+                 return_value=credential)
+    mock_cryptor.decrypt.return_value = credential['password']
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.copy,
+        ['foo@bar', '--to', 'stdout', '--passphrase', 'passphrase']
+    )
+
+    print(result.output)
+    assert result.exit_code == 0
+    assert result.output.strip() == credential['password']
