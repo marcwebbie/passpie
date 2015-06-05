@@ -5,7 +5,9 @@ parts of this code from pyperclip: https://github.com/asweigart/pyperclip
 from subprocess import Popen, PIPE
 import ctypes
 import platform
+
 from ._compat import which, is_python2
+from .utils import logger
 
 
 text_type = unicode if is_python2() else str

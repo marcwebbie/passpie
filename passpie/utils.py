@@ -11,7 +11,15 @@ import yaml
 
 from ._compat import which
 
+
 import_module = __import__
+
+logger = logging.getLogger('passpie')
+handler = logging.StreamHandler()
+formatter = logging.Formatter(
+    '%(name)s::%(levelname)s::%(module)s::%(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 
 def genpass(length=32, special="_-#|+="):

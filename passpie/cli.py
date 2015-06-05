@@ -15,7 +15,7 @@ from .credential import split_fullname, make_fullname
 from .crypt import Cryptor
 from .database import Database
 from .importers import find_importer
-from .utils import genpass, load_config, ensure_dependencies
+from .utils import genpass, load_config, ensure_dependencies, logger
 from .table import Table
 from .history import Repository
 
@@ -37,13 +37,6 @@ config = load_config(DEFAULT_CONFIG, USER_CONFIG_PATH)
 genpass = partial(genpass,
                   length=config.genpass_length,
                   special=config.genpass_symbols)
-
-logger = logging.getLogger('passpie')
-handler = logging.StreamHandler()
-formatter = logging.Formatter(
-    '%(name)s::%(levelname)s::%(module)s::%(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 
 
 class AliasedGroup(click.Group):

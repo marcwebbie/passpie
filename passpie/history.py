@@ -5,9 +5,7 @@ from git import Repo
 from git.exc import InvalidGitRepositoryError
 
 from ._compat import which
-from .utils import reverse_enumerate
-
-logger = logging.getLogger('passpie')
+from .utils import reverse_enumerate, logger
 
 
 def ensure_git(return_value=None):
