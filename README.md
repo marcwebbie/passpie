@@ -353,6 +353,14 @@ Add this line to your .bash_profile or .bashrc
 if which passpie > /dev/null; then eval "$(passpie complete bash)"; fi
 ```
 
+#### fish
+
+Add this line to your ~/.config/fish/config.fish
+
+```
+if which passpie > /dev/null 2>&1; eval (passpie complete fish | tr '\n' ';'); end
+```
+
 #### zsh
 
 Add this line to your .zshrc or .zpreztorc

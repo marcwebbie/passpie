@@ -16,6 +16,35 @@ function _passpie()
 complete -F _passpie 'passpie'
 """
 
+FISH = """
+function __fish_passpie_credentials
+  grep -Ehrio '[A-Z0-9._%+-]+@[A-Z0-9.-]+(@[A-Z0-9_\-\.]+)?' {config_path}
+end
+
+function __fish_passpie_needs_command
+  set cmd (commandline -opc)
+  if [ (count $cmd) -eq 1 -a $cmd[1] = 'passpie' ]
+    return 0
+  end
+  return 1
+end
+
+function __fish_passpie_using_command
+  set cmd (commandline -opc)
+  if [ (count $cmd) -gt 1 ]
+    for arg in $argv
+      if [ $arg = $cmd[2] ]
+        return 0
+      end
+    end
+  end
+  return 1
+end
+
+complete -f -c passpie -n '__fish_passpie_needs_command' -a '{commands}' --description 'Manage a credential'
+complete -f -c passpie -n '__fish_passpie_using_command {commands}' -a '(__fish_passpie_credentials)' --description 'Credential'
+"""
+
 ZSH = """
 if [[ ! -o interactive ]]; then
     return
@@ -37,13 +66,16 @@ _passpie() {
 }
 """
 
-SHELLS = ['zsh', 'bash']
+SHELLS = ['zsh', 'fish', 'bash']
 
 
 def script(shell_name, config_path, commands):
     text = ''
     if shell_name == 'zsh':
         text = ZSH.replace('{commands}', '\n'.join(commands))
+        text = text.replace('{config_path}', config_path)
+    elif shell_name == 'fish':
+        text = FISH.replace('{commands}', ' '.join(commands))
         text = text.replace('{config_path}', config_path)
     elif shell_name == 'bash':
         text = BASH.replace('{commands}', ' '.join(commands))
