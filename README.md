@@ -1,6 +1,6 @@
 # Passpie: Manage login credentials from terminal
 
-[Passpie](https://marcwebbie.github.io/passpie) lets you manage login credentials from the terminal with a coloroful/configurable cli interface. Password files are saved into yaml text files with passwords as [GnuPG](http://en.wikipedia.org/wiki/GNU_Privacy_Guard) encrypted strings. Use your master passphrase to decrypt login credentials, copy passwords to clipboard and more...
+[Passpie](https://marcwebbie.github.io/passpie) lets you manage login credentials from the terminal with a colorful/configurable cli interface. Password files are saved into yaml text files with passwords as [GnuPG](http://en.wikipedia.org/wiki/GNU_Privacy_Guard) encrypted strings. Use your master passphrase to decrypt login credentials, copy passwords to clipboard and more...
 
 ![Passpie console interface](https://github.com/marcwebbie/passpie/raw/master/images/passpie.png)
 
@@ -353,6 +353,14 @@ Add this line to your .bash_profile or .bashrc
 if which passpie > /dev/null; then eval "$(passpie complete bash)"; fi
 ```
 
+#### fish
+
+Add this line to your ~/.config/fish/config.fish
+
+```
+if which passpie > /dev/null 2>&1; eval (passpie complete fish | tr '\n' ';'); end
+```
+
 #### zsh
 
 Add this line to your .zshrc or .zpreztorc
@@ -462,7 +470,7 @@ passpie --database "/path/to/another/database/" init
 
 ### Database structure
 
-Passpie database is structured in a directory hierachy. Every
+Passpie database is structured in a directory hierarchy. Every
 credential is a `.pass` file inside a directory named after a credential group.
 
 An empty database would look like this:
