@@ -10,7 +10,7 @@ function _passpie()
         local words=("${COMP_WORDS[@]}")
         unset words[0]
         unset words[$COMP_CWORD]
-        COMPREPLY=( $(compgen -W "$(grep -Ehrio '[A-Z0-9._%+-]+@[A-Z0-9.-]+(@[A-Z0-9_\-\.]+)?' {config_path})" -- "$word") )
+        COMPREPLY=( $(compgen -W "$(grep -EhriIo '[A-Z0-9._%+-]+@[A-Z0-9.-]+(@[A-Z0-9_\-\.]+)?' {config_path})" -- "$word") )
     fi
 }
 complete -F _passpie 'passpie'
@@ -18,7 +18,7 @@ complete -F _passpie 'passpie'
 
 FISH = """
 function __fish_passpie_credentials
-  grep -Ehrio '[A-Z0-9._%+-]+@[A-Z0-9.-]+(@[A-Z0-9_\-\.]+)?' {config_path}
+  grep -EhriIo '[A-Z0-9._%+-]+@[A-Z0-9.-]+(@[A-Z0-9_\-\.]+)?' {config_path}
 end
 
 function __fish_passpie_needs_command
@@ -59,7 +59,7 @@ _passpie() {
   if [ "${#words}" -eq 2 ]; then
     completions="{commands}"
   else
-    completions="$(grep -Ehrio '\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+(@[A-Z0-9_\-\.]+)?\\b' {config_path})"
+    completions="$(grep -EhriIo '\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+(@[A-Z0-9_\-\.]+)?\\b' {config_path})"
   fi
 
   reply=(${(ps:\n:)completions})
