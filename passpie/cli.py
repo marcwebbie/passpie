@@ -33,7 +33,8 @@ DEFAULT_CONFIG = {
     'headers': ['name', 'login', 'password', 'comment'],
     'colors': {'name': 'yellow', 'login': 'green'},
     'repo': True,
-    'search_automatic_regex': False
+    'search_automatic_regex': False,
+    'status_repeated_passwords_limit': 5
 }
 config = load_config(DEFAULT_CONFIG, USER_CONFIG_PATH)
 genpass = partial(genpass,
@@ -333,7 +334,10 @@ def status(full, days, passphrase, display):
                 c["fullname"] for c in credentials
                 if c["password"] == cred["password"] and c != cred
             ]
-            if repeated:
+            if repeated and len(repeated) >= config.status_repeated_passwords_limit:
+                password = "Same as {} other credentials".format(len(repeated))
+                cred["repeated"] = click.style(password, "red")
+            elif repeated:
                 password = "Same as: {}".format(repeated)
                 cred["repeated"] = click.style(password, "red")
             else:
