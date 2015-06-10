@@ -4,7 +4,7 @@ from passpie import completion
 def test_script_returns_zsh_script_when_zsh_shell_name(mocker):
     shell_name = 'zsh'
     config_path = '/tmp'
-    commands = ['add', 'remove', 'update', 'remove']
+    commands = ['add', 'remove', 'update', 'remove', 'search']
     text = completion.script(shell_name=shell_name,
                              config_path=config_path,
                              commands=commands)
@@ -16,7 +16,7 @@ def test_script_returns_zsh_script_when_zsh_shell_name(mocker):
 def test_script_returns_bash_script_when_bash_shell_name(mocker):
     shell_name = 'bash'
     config_path = '/tmp'
-    commands = ['add', 'remove', 'update', 'remove']
+    commands = ['add', 'remove', 'update', 'remove', 'search']
     text = completion.script(shell_name=shell_name,
                              config_path=config_path,
                              commands=commands)

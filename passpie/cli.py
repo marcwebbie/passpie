@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import shutil
+import re
 
 from tinydb.queries import where
 import click
@@ -31,7 +32,9 @@ DEFAULT_CONFIG = {
     'table_format': 'fancy_grid',
     'headers': ['name', 'login', 'password', 'comment'],
     'colors': {'name': 'yellow', 'login': 'green'},
-    'repo': True
+    'repo': True,
+    'search_automatic_regex': False,
+    'status_repeated_passwords_limit': 5
 }
 config = load_config(DEFAULT_CONFIG, USER_CONFIG_PATH)
 genpass = partial(genpass,
@@ -139,7 +142,7 @@ def cli(ctx, database, verbose):
 @click.argument('shell_name', type=click.Choice(completion.SHELLS))
 @click.option('--commands', default=None)
 def complete(shell_name, commands):
-    commands = ['add', 'copy', 'remove', 'update']
+    commands = ['add', 'copy', 'remove', 'search', 'update']
     script = completion.script(shell_name, config.path, commands)
     click.echo(script)
 
@@ -298,6 +301,8 @@ def copy(fullname, passphrase, to):
 @cli.command(help="Search credentials by regular expressions")
 @click.argument("regex")
 def search(regex):
+    if config.search_automatic_regex and re.match("\w+", regex):
+        regex = ".*{}.*".format(regex)
     db = Database(config.path)
     credentials = db.search(
         where("name").matches(regex) |
@@ -311,7 +316,8 @@ def search(regex):
 @click.option("--full", is_flag=True, help="Show all entries")
 @click.option("--days", default=90, type=int, help="Elapsed days")
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
-def status(full, days, passphrase):
+@click.option("--display", is_flag=True, help="Display decrypted passwords", default=False)
+def status(full, days, passphrase, display):
     db = Database(config.path)
     ensure_passphrase(db, passphrase)
     credentials = sorted(db.all(), key=lambda x: x["name"] + x["login"])
@@ -321,20 +327,24 @@ def status(full, days, passphrase):
             cred["password"] = cryptor.decrypt(cred["password"], passphrase)
 
     if credentials:
+        ok_status = click.style("OK", "green")
         # check passwords
         for cred in credentials:
             repeated = [
                 c["fullname"] for c in credentials
                 if c["password"] == cred["password"] and c != cred
             ]
-            if repeated:
+            if repeated and len(repeated) >= config.status_repeated_passwords_limit:
+                password = "Same as {} other credentials".format(len(repeated))
+                cred["repeated"] = click.style(password, "red")
+            elif repeated:
                 password = "Same as: {}".format(repeated)
                 cred["repeated"] = click.style(password, "red")
             else:
-                cred["repeated"] = click.style("OK", "green")
+                cred["repeated"] = ok_status
 
         for cred in credentials:
-            cred['password'] = cred['repeated']
+            cred['password_status'] = cred['repeated']
 
         # check modified time
         for cred in credentials:
@@ -344,14 +354,16 @@ def status(full, days, passphrase):
                 cred["modified"] = click.style(modified_time, "red")
 
             else:
-                cred["modified"] = click.style("OK", "green")
+                cred["modified"] = ok_status
 
         if not full:
             credentials = [c for c in credentials
-                           if c["password"] or c["modified"]]
+                           if c["password_status"] != ok_status or c["modified"] != ok_status]
 
-        table = Table(["name", "login", "password", "modified"],
-                      table_format=config.table_format)
+        table_fields = ["name", "login", "password_status", "modified"]
+        if display:
+            table_fields.insert(table_fields.index("password_status"), "password")
+        table = Table(table_fields, table_format=config.table_format)
         click.echo(table.render(credentials))
 
 

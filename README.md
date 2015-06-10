@@ -454,6 +454,18 @@ Create a git repository on the database directory when git is available.
 
 [learn more](#version-control-your-database)
 
+##### `search_automatic_regex = (true | false)`
+
+**default:** false
+
+Automatically transform the search pattern into a regex if the search pattern is a word (ie: add .* prefix and suffix)
+
+##### `status_repeated_passwords_limit=`
+
+**default:** 5
+
+Set an upper limit to display the number of credentials with the same password instead of displaying the credentials themselves. This is avoid the uggly table rendering when the passords list doesn't fit on one line. Currently [Tabulate](https://pypi.python.org/pypi/tabulate) doesn't handle line wraps.
+
 ## Under The Hood
 
 ### Encryption
