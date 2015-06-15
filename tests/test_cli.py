@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 import tempfile
 try:
     import mock
@@ -539,7 +540,7 @@ def test_log_prints_commit_list_when_not_option_is_passed(mocker):
 
 
 def test_cli_set_config_database_if_database_option_passed(mocker):
-    path = '/path/to/database'
+    path = os.path.realpath('/path/to/database')
     mocker.patch('passpie.cli.ensure_dependencies')
     mocker.patch('passpie.cli.ensure_is_database')
     mocker.patch('passpie.cli.Database')
