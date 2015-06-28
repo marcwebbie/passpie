@@ -455,6 +455,37 @@ def test_cli_complete_chooses_prints_nothing_when_not_supported(mocker):
     assert mock_click.echo.called is True
 
 
+def test_cli_complete_guesses_shell_when_no_shell_provided__psutil_2(mocker):
+    mock_click = mocker.patch('passpie.cli.click')
+    BASH = 'function _passpie()...'
+    mocker.patch.multiple('passpie.completion', BASH=BASH)
+    mock_proc = mocker.patch('passpie.completion.Process')
+    mock_proc.return_value.parent.return_value.name.return_value = 'bash'
+
+    runner = CliRunner()
+    result = runner.invoke(cli.complete)
+
+    assert result.exit_code == 0
+    assert mock_click.echo.called is True
+    mock_click.echo.assert_called_with(BASH)
+
+
+def test_cli_complete_guesses_shell_when_no_shell_provided__psutil_1(mocker):
+    mock_click = mocker.patch('passpie.cli.click')
+    BASH = 'function _passpie()...'
+    mocker.patch.multiple('passpie.completion', BASH=BASH)
+    mock_proc = mocker.patch('passpie.completion.Process')
+    mock_proc.return_value.parent.side_effect = TypeError
+    mock_proc.return_value.parent.name = 'bash'
+
+    runner = CliRunner()
+    result = runner.invoke(cli.complete)
+
+    assert result.exit_code == 0
+    assert mock_click.echo.called is True
+    mock_click.echo.assert_called_with(BASH)
+
+
 def test_update_password_from_prompt_encrypts_password(mocker, mock_cryptor, mock_db):
     credential = {
         'fullname': 'foo@bar',

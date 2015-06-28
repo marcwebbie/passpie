@@ -1,3 +1,8 @@
+import os
+
+from psutil import Process
+
+
 BASH = """
 function _passpie()
 {
@@ -77,6 +82,11 @@ SHELLS = ['zsh', 'fish', 'bash']
 
 
 def script(shell_name, config_path, commands):
+    if not shell_name:
+        try:
+            shell_name = Process(os.getpid()).parent().name()
+        except TypeError:
+            shell_name = Process(os.getpid()).parent.name
     text = ''
     if shell_name == 'zsh':
         text = ZSH.replace('{commands}', '\n'.join(commands))
