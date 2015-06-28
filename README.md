@@ -360,6 +360,7 @@ Add this line to your ~/.config/fish/config.fish
 ```
 if which passpie > /dev/null 2>&1; eval (passpie complete | tr '\n' ';'); end
 ```
+<!-- Keep an eye on: https://github.com/fish-shell/fish-shell/issues/159 -->
 
 #### zsh
 
