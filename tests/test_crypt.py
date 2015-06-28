@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import os
 
 from passpie.crypt import Cryptor, KEY_INPUT, make_key_input
-from passpie._compat import which, FileNotFoundError, FileExistsError, is_python2
+from passpie._compat import FileNotFoundError, FileExistsError
 from .helpers import MockerTestCase
 
 

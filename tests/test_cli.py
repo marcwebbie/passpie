@@ -12,7 +12,7 @@ from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 import pytest
 
-from passpie import cli, completion
+from passpie import cli
 from passpie.crypt import FileExistsError
 
 
