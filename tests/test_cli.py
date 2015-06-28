@@ -426,23 +426,41 @@ def test_remove_credentials_in_bulk(mocker, mock_db):
 
 def test_cli_complete_chooses_bash_when_bash_passed_to_eval(mocker):
     mock_click = mocker.patch('passpie.cli.click')
+    BASH = 'function _passpie()...'
+    mocker.patch.multiple('passpie.completion', BASH=BASH)
 
     runner = CliRunner()
     result = runner.invoke(cli.complete, ['bash'])
 
     assert result.exit_code == 0
     assert mock_click.echo.called is True
+    mock_click.echo.assert_called_with(BASH)
 
 
-def test_cli_complete_chooses_zsh_when_bash_passed_to_eval(mocker):
-    mock_sys = mocker.patch('passpie.cli.sys')
+def test_cli_complete_chooses_fish_when_fish_passed_to_eval(mocker):
     mock_click = mocker.patch('passpie.cli.click')
+    FISH = 'function _passpie_credentials...'
+    mocker.patch.multiple('passpie.completion', FISH=FISH)
 
     runner = CliRunner()
-    result = runner.invoke(cli.complete, ['bash'])
+    result = runner.invoke(cli.complete, ['fish'])
 
     assert result.exit_code == 0
     assert mock_click.echo.called is True
+    mock_click.echo.assert_called_with(FISH)
+
+
+def test_cli_complete_chooses_zsh_when_zsh_passed_to_eval(mocker):
+    mock_click = mocker.patch('passpie.cli.click')
+    ZSH = 'if [[ ! -o interactive ]]; then...'
+    mocker.patch.multiple('passpie.completion', ZSH=ZSH)
+
+    runner = CliRunner()
+    result = runner.invoke(cli.complete, ['zsh'])
+
+    assert result.exit_code == 0
+    assert mock_click.echo.called is True
+    mock_click.echo.assert_called_with(ZSH)
 
 
 def test_cli_complete_chooses_prints_nothing_when_not_supported(mocker):
@@ -484,6 +502,18 @@ def test_cli_complete_guesses_shell_when_no_shell_provided__psutil_1(mocker):
     assert result.exit_code == 0
     assert mock_click.echo.called is True
     mock_click.echo.assert_called_with(BASH)
+
+
+def test_cli_complete_shows_usage_when_bad_shell_passed_to_eval(mocker):
+    mock_click = mocker.patch('passpie.cli.click')
+
+    runner = CliRunner()
+    result = runner.invoke(cli.complete, ['csh'])
+
+    assert result.exit_code != 0
+    assert 'usage: complete' in result.output.lower()
+    assert 'invalid choice: csh' in result.output.lower()
+    assert mock_click.echo.called is False
 
 
 def test_update_password_from_prompt_encrypts_password(mocker, mock_cryptor, mock_db):
