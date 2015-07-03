@@ -3,6 +3,8 @@ import os
 import glob
 import logging
 
+import pkg_resources
+
 
 class BaseImporter(object):
 
@@ -28,6 +30,17 @@ def _import_all_importer_files():
     __import__(__name__, globals(), locals(), __all__, 0)
 
 
+def _get_importers_from_entry_points():
+    for ep in pkg_resources.iter_entry_points('passpie_importers'):
+        try:
+            module = __import__(ep.module_name, globals(), locals(), ep.attrs, 0)
+            klass = getattr(module, ep.attrs[0])
+            if klass is not BaseImporter and issubclass(klass, BaseImporter):
+                yield klass
+        except (ImportError, AttributeError):
+            pass
+
+
 def get_all():
     """Get all subclasses of BaseImporter from module and return and generator
     """
@@ -39,6 +52,9 @@ def get_all():
         for klass_name, klass in inspect.getmembers(module, inspect.isclass):
             if klass is not BaseImporter and issubclass(klass, BaseImporter):
                 yield klass
+
+    for klass in _get_importers_from_entry_points():
+        yield klass
 
 
 def get_instances():
