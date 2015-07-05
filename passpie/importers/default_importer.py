@@ -1,4 +1,5 @@
 import yaml
+from yaml.reader import ReaderError
 from yaml.scanner import ScannerError
 
 from passpie.importers import BaseImporter
@@ -15,7 +16,7 @@ class DefaultImporter(BaseImporter):
 
         try:
             dict_content = yaml.load(file_content)
-        except ScannerError:
+        except (ReaderError, ScannerError):
             return False
 
         try:
