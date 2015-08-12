@@ -83,7 +83,7 @@ def ensure_is_database(path):
         assert os.path.isdir(path)
         assert os.path.isfile(os.path.join(path, '.keys'))
     except AssertionError:
-        message = 'No initialized database at {.path}'.format(config)
+        message = 'Not initialized database at {.path}'.format(config)
         raise click.ClickException(click.style(message, fg='yellow'))
 
 
