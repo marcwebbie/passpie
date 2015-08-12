@@ -1,5 +1,4 @@
 from functools import wraps
-import logging
 
 from git import Repo
 from git.exc import InvalidGitRepositoryError
