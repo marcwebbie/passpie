@@ -29,7 +29,8 @@ requirements = [
     'PyYAML==3.11',
     'tabulate==0.7.5',
     'tinydb==2.3.2',
-    'GitPython==1.0.1'
+    'GitPython==1.0.1',
+    'psutil==3.0.1',
 ]
 
 

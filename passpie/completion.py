@@ -1,3 +1,8 @@
+import os
+
+from psutil import Process
+
+
 BASH = """
 function _passpie()
 {
@@ -18,15 +23,15 @@ complete -F _passpie 'passpie'
 """
 
 FISH = """
-function __fish_passpie_credentials
+function _passpie_credentials
   grep -EhriIo '[A-Z0-9._%+-]+@[A-Z0-9.-]+(@[A-Z0-9_\-\.]+)?' {config_path}
 end
 
-function __fish_passpie_credential_names
+function _passpie_credential_names
   ls -1 {config_path}
 end
 
-function __fish_passpie_needs_command
+function _passpie_needs_command
   set cmd (commandline -opc)
   if [ (count $cmd) -eq 1 -a $cmd[1] = 'passpie' ]
     return 0
@@ -34,7 +39,7 @@ function __fish_passpie_needs_command
   return 1
 end
 
-function __fish_passpie_using_command
+function _passpie_using_command
   set cmd (commandline -opc)
   if [ (count $cmd) -gt 1 ]
     for arg in $argv
@@ -46,9 +51,9 @@ function __fish_passpie_using_command
   return 1
 end
 
-complete -f -c passpie -n '__fish_passpie_needs_command' -a '{commands}' --description 'Manage a credential'
-complete -f -c passpie -n '__fish_passpie_using_command {commands}' -a '(__fish_passpie_credentials)
-                                                                        (__fish_passpie_credential_names)' --description 'Credential'
+complete -f -c passpie -n '_passpie_needs_command' -a '{commands}' --description 'Manage a credential'
+complete -f -c passpie -n '_passpie_using_command {commands}' -a '(_passpie_credentials)
+                                                                  (_passpie_credential_names)' --description 'Credential'
 """
 
 ZSH = """
@@ -77,6 +82,11 @@ SHELLS = ['zsh', 'fish', 'bash']
 
 
 def script(shell_name, config_path, commands):
+    if not shell_name:
+        try:
+            shell_name = Process(os.getpid()).parent().name()
+        except TypeError:
+            shell_name = Process(os.getpid()).parent.name
     text = ''
     if shell_name == 'zsh':
         text = ZSH.replace('{commands}', '\n'.join(commands))

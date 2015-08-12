@@ -343,14 +343,14 @@ example.com  fake     *****
 
 You can activate passpie completion for `bash` or `zsh` shells
 
-> Check the generated script with `passpie complete {shell_name}`.
+> Check the generated script with `passpie complete`.
 
 #### bash
 
 Add this line to your .bash_profile or .bashrc
 
 ```
-if which passpie > /dev/null; then eval "$(passpie complete bash)"; fi
+if which passpie > /dev/null; then eval "$(passpie complete)"; fi
 ```
 
 #### fish
@@ -358,15 +358,16 @@ if which passpie > /dev/null; then eval "$(passpie complete bash)"; fi
 Add this line to your ~/.config/fish/config.fish
 
 ```
-if which passpie > /dev/null 2>&1; eval (passpie complete fish | tr '\n' ';'); end
+if which passpie > /dev/null 2>&1; eval (passpie complete | tr '\n' ';'); end
 ```
+<!-- Keep an eye on: https://github.com/fish-shell/fish-shell/issues/159 -->
 
 #### zsh
 
 Add this line to your .zshrc or .zpreztorc
 
 ```
-if which passpie > /dev/null; then eval "$(passpie complete zsh)"; fi
+if which passpie > /dev/null; then eval "$(passpie complete)"; fi
 ```
 
 ### Configuring passpie with `.passpierc`
