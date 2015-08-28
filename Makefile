@@ -57,7 +57,7 @@ clean:
 	rm -rf __pycache__ || true
 
 cov:
-	py.test --cov .
+	py.test --cov passpie --cov-config .coveragerc --cov-report=term-missing
 
 dist:
 	pip install wheel
