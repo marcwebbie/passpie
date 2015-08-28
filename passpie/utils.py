@@ -95,13 +95,3 @@ def tempdir():
     yield path
     if os.path.exists(path):
         shutil.rmtree(path)
-
-
-def logged(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        text = '{} called with args: {}, kwargs: {}'.format(
-            func.__name__, args, kwargs)
-        logger.debug(text)
-        return func(*args, **kwargs)
-    return wrapper
