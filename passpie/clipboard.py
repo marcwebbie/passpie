@@ -1,13 +1,12 @@
+import ctypes
+import platform
 """
 parts of this code from pyperclip: https://github.com/asweigart/pyperclip
 """
 
-from subprocess import Popen, PIPE
-import ctypes
-import platform
-
-from ._compat import which, is_python2
+from . import process
 from .utils import logger
+from ._compat import *
 
 
 text_type = unicode if is_python2() else str
@@ -21,6 +20,13 @@ OSX_COMMANDS = {
     'pbcopy': ['pbcopy', 'w']
 }
 
+def ensure_commands(commands):
+    for command_name, command in commands.items():
+        if which(command_name) and command:
+            return command
+    else:
+        raise SystemError('missing commands: ',
+                          ' or '.join(commands))
 
 def _copy_windows(text):
     GMEM_DDESHARE = 0x2000
@@ -57,25 +63,14 @@ def _copy_cygwin(text):
     d.user32.CloseClipboard()
 
 
-def ensure_commands(commands):
-    for command_name, command in commands.items():
-        if which(command_name) and command:
-            return command
-    else:
-        raise SystemError('missing commands: ',
-                          ' or '.join(commands))
-
-
 def _copy_osx(text):
     command = ensure_commands(OSX_COMMANDS)
-    p = Popen(command, stdin=PIPE, close_fds=True)
-    p.communicate(input=text)
+    process.call(command, input=text)
 
 
 def _copy_linux(text):
     command = ensure_commands(LINUX_COMMANDS)
-    p = Popen(command, stdin=PIPE, close_fds=True)
-    p.communicate(input=text)
+    process.call(command, input=text)
 
 
 def copy(text):
