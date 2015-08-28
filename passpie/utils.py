@@ -1,6 +1,5 @@
 from argparse import Namespace
 from contextlib import contextmanager
-from functools import wraps
 from pkg_resources import get_distribution, DistributionNotFound
 from random import SystemRandom
 import errno
