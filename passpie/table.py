@@ -27,4 +27,5 @@ class Table(object):
             rows.append(row)
 
         headers = [click.style(h.title(), bold=True) for h in self.headers]
-        return tabulate(rows, headers, tablefmt=self.table_format)
+        if rows:
+            return tabulate(rows, headers, tablefmt=self.table_format)
