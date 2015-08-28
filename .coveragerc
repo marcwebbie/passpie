@@ -1,6 +1,7 @@
 [report]
 omit =
     */tests*.py
+    passpie/__init__.py
     setup.py
     */_compat.py
 
