@@ -370,11 +370,11 @@ Add this line to your .zshrc or .zpreztorc
 if which passpie > /dev/null; then eval "$(passpie complete)"; fi
 ```
 
-### Configuring passpie with `.passpierc`
+### Configuring passpie with `~/.passpierc`
 
 You can override default passpie configuration with a `.passpierc` file on your home directory. Passpie configuration files must be written as a valid [yaml](http://yaml.org/) file.
 
-#### Example `.passpierc`:
+#### Example `~/.passpierc`:
 
 ```yaml
 path: /Users/john.doe/.passpie
