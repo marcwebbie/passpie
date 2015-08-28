@@ -25,7 +25,6 @@ if sys.argv[-1] == 'tag':
 
 requirements = [
     'click==4.0',
-    'gnupg==2.0.2',
     'PyYAML==3.11',
     'tabulate==0.7.5',
     'tinydb==2.3.2',
