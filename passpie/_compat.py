@@ -5,6 +5,11 @@ try:
 except ImportError:
     from distutils.spawn import find_executable as _which
 
+try:
+  basestring
+except NameError:
+  basestring = str
+
 
 def which(binary):
     path = _which(binary)
