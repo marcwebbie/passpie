@@ -1,11 +1,14 @@
 from argparse import Namespace
 from contextlib import contextmanager
+from functools import wraps
 from pkg_resources import get_distribution, DistributionNotFound
+from random import SystemRandom
 import errno
 import logging
 import os
-from random import SystemRandom
+import shutil
 import string
+import tempfile
 
 import yaml
 
@@ -84,3 +87,21 @@ def ensure_dependencies():
 
 def reverse_enumerate(seq):
     return [e for e in zip(reversed(range(len(list(seq)))), list(seq))]
+
+
+@contextmanager
+def tempdir():
+    path = tempfile.mkdtemp()
+    yield path
+    if os.path.exists(path):
+        shutil.rmtree(path)
+
+
+def logged(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        text = '{} called with args: {}, kwargs: {}'.format(
+            func.__name__, args, kwargs)
+        logger.debug(text)
+        return func(*args, **kwargs)
+    return wrapper
