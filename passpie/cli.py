@@ -285,185 +285,85 @@ def remove(fullname, yes):
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
 @click.option("--to", default='clipboard',
               type=click.Choice(['stdout', 'clipboard']))
-def copy(fullname, passphrase, to):
-    db = Database(config.path)
-    ensure_passphrase(db, passphrase)
-    credential = get_credential_or_abort(db, fullname)
+@click.option("--clear", default=0)
+@pass_db
+def copy(db, fullname, passphrase, to, clear):
+    clear = clear if clear else config['copy_timeout']
+    credential = db.credential(fullname)
+    if not credential:
+        message = "Credential '{}' not found".format(fullname)
+        raise click.ClickException(click.style(message, fg='red'))
 
-    with Cryptor(config.path) as cryptor:
-        decrypted = cryptor.decrypt(credential["password"],
-                                    passphrase=passphrase)
+    with GPG(db.path) as gpg:
+        decrypted = gpg.decrypt(credential["password"], passphrase=passphrase)
         if to == 'clipboard':
-            clipboard.copy(decrypted)
+            clipboard.copy(decrypted, clear)
         elif to == 'stdout':
             click.echo(decrypted)
 
 
 @cli.command(help="Search credentials by regular expressions")
 @click.argument("regex")
-def search(regex):
-    if config.search_automatic_regex and re.match("\w+", regex):
-        regex = ".*{}.*".format(regex)
-    db = Database(config.path)
-    credentials = db.search(
-        where("name").matches(regex) |
-        where("login").matches(regex) |
-        where("comment").matches(regex))
-    credentials = sorted(credentials, key=lambda x: x["name"] + x["login"])
-    print_table(credentials)
-
-
-@cli.command(help="Diagnose database for improvements")
-@click.option("--full", is_flag=True, help="Show all entries")
-@click.option("--days", default=90, type=int, help="Elapsed days")
-@click.option("--passphrase", prompt="Passphrase", hide_input=True)
-@click.option("--display", is_flag=True, help="Display decrypted passwords", default=False)
-def status(full, days, passphrase, display):
-    db = Database(config.path)
-    ensure_passphrase(db, passphrase)
-    credentials = sorted(db.all(), key=lambda x: x["name"] + x["login"])
-
-    with Cryptor(config.path) as cryptor:
-        for cred in credentials:
-            cred["password"] = cryptor.decrypt(cred["password"], passphrase)
-
+@pass_db
+def search(db, regex):
+    credentials = db.matches(regex)
     if credentials:
-        ok_status = click.style("OK", "green")
-        # check passwords
-        for cred in credentials:
-            repeated = [
-                c["fullname"] for c in credentials
-                if c["password"] == cred["password"] and c != cred
-            ]
-            if repeated and len(repeated) >= config.status_repeated_passwords_limit:
-                password = "Same as {} other credentials".format(len(repeated))
-                cred["repeated"] = click.style(password, "red")
-            elif repeated:
-                password = "Same as: {}".format(repeated)
-                cred["repeated"] = click.style(password, "red")
-            else:
-                cred["repeated"] = ok_status
-
-        for cred in credentials:
-            cred['password_status'] = cred['repeated']
-
-        # check modified time
-        for cred in credentials:
-            modified_delta = (datetime.now() - cred["modified"])
-            if modified_delta > timedelta(days=days):
-                modified_time = "{} days ago".format(modified_delta.days)
-                cred["modified"] = click.style(modified_time, "red")
-
-            else:
-                cred["modified"] = ok_status
-
-        if not full:
-            credentials = [c for c in credentials
-                           if c["password_status"] != ok_status or c["modified"] != ok_status]
-
-        table_fields = ["name", "login", "password_status", "modified"]
-        if display:
-            table_fields.insert(table_fields.index("password_status"), "password")
-        table = Table(table_fields, table_format=config.table_format)
+        table = Table(
+            config['headers'],
+            table_format=config['table_format'],
+            colors=config['colors'],
+            hidden=['password']
+        )
         click.echo(table.render(credentials))
-
-
-@cli.command(name="export", help="Export credentials in plain text")
-@click.argument("dbfile", type=click.File("w"))
-@click.option("--json", "as_json", is_flag=True, help="Export as JSON")
-@click.option("--passphrase", prompt="Passphrase", hide_input=True)
-def export_database(dbfile, as_json, passphrase):
-    db = Database(config.path)
-    ensure_passphrase(db, passphrase)
-    credentials = db.all()
-
-    with Cryptor(config.path) as cryptor:
-        for cred in credentials:
-            cred["password"] = cryptor.decrypt(cred["password"], passphrase)
-
-    if as_json:
-        for cred in credentials:
-            cred["modified"] = str(cred["modified"])
-        dict_content = {
-            'handler': 'passpie',
-            'version': 1.0,
-            'credentials': [dict(x) for x in credentials],
-        }
-        content = json.dumps(dict_content, indent=2)
-    else:
-        dict_content = {
-            'handler': 'passpie',
-            'version': 1.0,
-            'credentials': [dict(x) for x in credentials],
-        }
-        content = yaml.dump(dict_content, default_flow_style=False)
-
-    dbfile.write(content)
-
-
-@cli.command(name="import", help="Import credentials from path")
-@click.argument("path", type=click.Path())
-def import_database(path):
-    importer = find_importer(path)
-    if importer:
-        credentials = importer.handle(path)
-        db = Database(config.path)
-        with Cryptor(config.path) as cryptor:
-            for cred in credentials:
-                encrypted = cryptor.encrypt(cred['password'])
-                cred['password'] = encrypted
-        db.insert_multiple(credentials)
-
-        repo = Repository(config.path)
-        repo.commit(message='Imported credentials from {}'.format(path))
 
 
 @cli.command(help='Renew passpie database and re-encrypt credentials')
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
-def reset(passphrase):
-    db = Database(config.path)
-    ensure_passphrase(db, passphrase)
-    new_passphrase = click.prompt('New passphrase',
-                                  hide_input=True, confirmation_prompt=True)
-
-    credentials = db.all()
+@pass_db
+def reset(db, passphrase):
+    credentials = db.credentials()
     if credentials:
-        with Cryptor(config.path) as cryptor:
+        with GPG(config.path) as gpg:
             # decrypt passwords
             for cred in credentials:
-                cred["password"] = cryptor.decrypt(cred["password"],
-                                                   passphrase)
+                cred["password"] = gpg.decrypt(cred["password"], passphrase)
 
-            # recreate keys
-            cryptor.create_keys(new_passphrase, overwrite=True)
+            # recreate keys if exists
+            if db.has_keys():
+                new_passphrase = click.prompt('New passphrase',
+                                              hide_input=True,
+                                              confirmation_prompt=True)
+                create_keys(new_passphrase)
 
             # encrypt passwords
             for cred in credentials:
-                cred["password"] = cryptor.encrypt(cred["password"])
+                cred["password"] = gpg.encrypt(cred["password"])
 
         # remove old and insert re-encrypted credentials
         db.purge()
         db.insert_multiple(credentials)
 
-    message = 'Reset database'
-    logger.debug(message)
-    repo = Repository(config.path)
-    repo.commit(message)
+        # commit
+        repo = Repository(db.path)
+        repo.commit(message='Reset database')
 
 
 @cli.command(help='Shows passpie database changes history')
 @click.option("--init", is_flag=True, help="Enable history tracking")
 @click.option("--reset-to", default=-1, help="Undo changes in database")
-def log(reset_to, init):
-    repo = Repository(config.path)
+@pass_db
+def log(db, reset_to, init):
+    repo = Repository(db.path)
     if reset_to >= 0:
         repo.reset(reset_to)
-        logger.debug('reset database repository to index: %s', reset_to)
     elif init:
         repo.init()
-        logger.debug('initialized a repository on: %s', config.path)
     else:
-        for number, commit in repo.commit_list():
+        commits = []
+        for number, message in enumerate(repo.commit_list()):
             number = click.style(str(number), fg='magenta')
-            message = commit.message.strip()
-            click.echo("[{}] {}".format(number, message))
+            message = message.strip()
+            commits.append("[{}] {}".format(number, message))
+
+        for commit in reversed(commits):
+            print(commit)
