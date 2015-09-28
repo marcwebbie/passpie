@@ -1,8 +1,9 @@
-import ctypes
-import platform
 """
 parts of this code from pyperclip: https://github.com/asweigart/pyperclip
 """
+import ctypes
+import platform
+import time
 
 from . import process
 from .utils import logger
@@ -20,6 +21,7 @@ OSX_COMMANDS = {
     'pbcopy': ['pbcopy', 'w']
 }
 
+
 def ensure_commands(commands):
     for command_name, command in commands.items():
         if which(command_name) and command:
@@ -28,7 +30,8 @@ def ensure_commands(commands):
         raise SystemError('missing commands: ',
                           ' or '.join(commands))
 
-def _copy_windows(text):
+
+def _copy_windows(text, clear=0):
     GMEM_DDESHARE = 0x2000
     CF_UNICODETEXT = 13
     d = ctypes.windll  # cdll expects 4 more bytes in user32.OpenClipboard(0)
@@ -46,7 +49,7 @@ def _copy_windows(text):
     d.user32.CloseClipboard()
 
 
-def _copy_cygwin(text):
+def _copy_cygwin(text, clear=0):
     GMEM_DDESHARE = 0x2000
     CF_UNICODETEXT = 13
     d = ctypes.cdll
@@ -63,26 +66,40 @@ def _copy_cygwin(text):
     d.user32.CloseClipboard()
 
 
-def _copy_osx(text):
+def _copy_osx(text, clear=0):
     command = ensure_commands(OSX_COMMANDS)
     process.call(command, input=text)
+    for dot in ['.' for _ in range(clear)]:
+        sys.stdout.write(dot)
+        sys.stdout.flush()
+        time.sleep(1)
+    else:
+        process.call(command, input='')
+        print('')
 
 
-def _copy_linux(text):
+def _copy_linux(text, clear=0):
     command = ensure_commands(LINUX_COMMANDS)
     process.call(command, input=text)
+    for dot in ['.' for _ in range(clear)]:
+        sys.stdout.write(dot)
+        sys.stdout.flush()
+        time.sleep(1)
+    else:
+        process.call(command, input='')
+        print('')
 
 
-def copy(text):
+def copy(text, clear=0):
     platform_name = platform.system().lower()
     if platform_name == 'darwin':
-        _copy_osx(text)
+        _copy_osx(text, clear)
     elif platform_name == 'linux':
-        _copy_linux(text)
+        _copy_linux(text, clear)
     elif platform_name == 'windows':
-        _copy_windows(text)
+        _copy_windows(text, clear)
     elif 'cygwin' in platform_name.lower():
-        _copy_cygwin(text)
+        _copy_cygwin(text, clear)
     else:
         msg = "platform '{}' copy to clipboard not supported".format(
             platform_name)
