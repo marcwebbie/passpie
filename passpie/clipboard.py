@@ -31,6 +31,16 @@ def ensure_commands(commands):
                           ' or '.join(commands))
 
 
+def clean(command, delay):
+    for dot in ['.' for _ in range(delay)]:
+        sys.stdout.write(dot)
+        sys.stdout.flush()
+        time.sleep(1)
+    else:
+        process.call(command, input='')
+        print('')
+
+
 def _copy_windows(text, clear=0):
     GMEM_DDESHARE = 0x2000
     CF_UNICODETEXT = 13
@@ -69,25 +79,16 @@ def _copy_cygwin(text, clear=0):
 def _copy_osx(text, clear=0):
     command = ensure_commands(OSX_COMMANDS)
     process.call(command, input=text)
-    for dot in ['.' for _ in range(clear)]:
-        sys.stdout.write(dot)
-        sys.stdout.flush()
-        time.sleep(1)
-    else:
-        process.call(command, input='')
-        print('')
+    if clear:
+        clean(command, delay=clear)
 
 
 def _copy_linux(text, clear=0):
     command = ensure_commands(LINUX_COMMANDS)
     process.call(command, input=text)
-    for dot in ['.' for _ in range(clear)]:
-        sys.stdout.write(dot)
-        sys.stdout.flush()
-        time.sleep(1)
-    else:
-        process.call(command, input='')
-        print('')
+    clean(command, delay=clear)
+    if clear:
+        clean(command, delay=clear)
 
 
 def copy(text, clear=0):

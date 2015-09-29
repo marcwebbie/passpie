@@ -53,6 +53,7 @@ def test_crypt_export_keys_calls_gpg_command_on_export_keys(mocker):
                              return_value=(output, ''))
     mocker.patch('passpie.crypt.which', return_value='gpg')
     homedir = 'mock_homedir'
+
     secret = False
     command = [
         'gpg',

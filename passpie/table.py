@@ -4,16 +4,18 @@ import click
 
 class Table(object):
 
-    def __init__(self, headers, table_format='rst', colors=None, hidden=None):
+    def __init__(self, headers, table_format='rst', colors=None, hidden=None, missing=None):
         self.headers = headers
         self.colors = colors if colors else {}
         self.hidden = hidden if hidden else []
         self.table_format = table_format
+        self.missing = missing
 
     def colorize(self, key, text):
         return click.style(text, fg=self.colors.get(key))
 
     def render(self, data):
+        data = sorted(data, key=lambda c: c[self.headers[0]])
         rows = []
         for entry in data:
             row = []
@@ -28,4 +30,8 @@ class Table(object):
 
         headers = [click.style(h.title(), bold=True) for h in self.headers]
         if rows:
-            return tabulate(rows, headers, tablefmt=self.table_format)
+            return tabulate(rows,
+                            headers,
+                            tablefmt=self.table_format,
+                            missingval=self.missing,
+                            numalign='left')

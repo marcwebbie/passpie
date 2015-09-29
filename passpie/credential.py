@@ -12,4 +12,8 @@ def split_fullname(fullname):
 
 
 def make_fullname(login, name):
-    return "{}@{}".format("_" if login is None else login, name)
+    fullname = "{}@{}".format("_" if login is None else login, name)
+    try:
+        return fullname.encode('utf-8')
+    except (AttributeError, UnicodeEncodeError):
+        return fullname
