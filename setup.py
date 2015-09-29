@@ -9,7 +9,7 @@ except ImportError:
     from distutils.core import setup, Command, find_packages
 
 
-__version__ = "0.3.3"
+__version__ = "1.0"
 
 
 if sys.argv[-1] == 'publish':
@@ -24,12 +24,10 @@ if sys.argv[-1] == 'tag':
     sys.exit()
 
 requirements = [
-    'click==4.0',
+    'click==5.1',
     'PyYAML==3.11',
     'tabulate==0.7.5',
-    'tinydb==2.3.2',
-    'GitPython==1.0.1',
-    'psutil==3.0.1',
+    'tinydb==2.4',
 ]
 
 

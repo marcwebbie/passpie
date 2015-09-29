@@ -29,6 +29,9 @@ def call(*args, **kwargs):
 
     with Proc(*args, **kwargs) as proc:
         output, error = proc.communicate(input=kwargs_input)
-        if isinstance(output, basestring):
+        try:
             output = output.decode('utf-8')
+            error = error.decode('utf-8')
+        except AttributeError:
+            pass
         return output, error

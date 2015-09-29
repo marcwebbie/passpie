@@ -1,7 +1,7 @@
-from argparse import Namespace
 from contextlib import contextmanager
 from pkg_resources import get_distribution, DistributionNotFound
 from random import SystemRandom
+import copy
 import errno
 import logging
 import os
@@ -58,23 +58,13 @@ def get_version():
         return _dist.version
 
 
-def load_config(default_config, user_config_path):
+def read_config(path):
     try:
-        with open(user_config_path) as config_file:
-            config_content = config_file.read()
-    except IOError as e:
-        logging.debug('Not a valid path for config {}'.format(e))
-        return Namespace(**default_config)
-
-    try:
-        user_config = yaml.load(config_content)
-        default_config.update(user_config)
-    except yaml.scanner.ScannerError as e:
-        logging.debug('Malformed user configuration file {}'.format(e))
-        return Namespace(**default_config)
-
-    config = Namespace(**default_config)
-    return config
+        with open(path) as config_file:
+            content = config_file.read()
+    except IOError:
+        logger.debug('config file "%s" not found' % path)
+    return content if content else {}
 
 
 def ensure_dependencies():
@@ -84,13 +74,14 @@ def ensure_dependencies():
         raise RuntimeError('GnuPG not installed. https://www.gnupg.org/')
 
 
-def reverse_enumerate(seq):
-    return [e for e in zip(reversed(range(len(list(seq)))), list(seq))]
-
-
 @contextmanager
 def tempdir():
     path = tempfile.mkdtemp()
     yield path
     if os.path.exists(path):
         shutil.rmtree(path)
+
+
+def touch(path):
+    with open(path, "w"):
+        pass

@@ -1,11 +1,12 @@
-import re
 import os
+import re
 import shutil
 import tempfile
 
-from .utils import tempdir, logger
 from . import process
-from ._compat import *
+from .utils import logger, tempdir
+
+from passpie.utils import which
 
 
 GPG_HOMEDIR = os.path.expanduser('~/.gnupg')
@@ -20,6 +21,7 @@ Name-Email: passpie@local
 Expire-Date: 0
 %commit
 """
+
 
 def make_key_input(passphrase, key_length):
     try:
@@ -69,10 +71,10 @@ def create_keys(passphrase, path=None, key_length=4096):
 
 class GPG(object):
 
-    def __init__(self, path, fingerprint=None):
+    def __init__(self, path, recipient=None):
         self.homedir = GPG_HOMEDIR
         self.homedir_is_temp = False
-        self.fingerprint = fingerprint
+        self._recipient = recipient
         path = os.path.expanduser(path)
         self.keys_path = os.path.join(path, ".keys")
         if os.path.isfile(self.keys_path):
@@ -104,8 +106,8 @@ class GPG(object):
         return output
 
     def recipient(self, secret=False):
-        if self.fingerprint:
-            return self.fingerprint
+        if self._recipient:
+            return self._recipient
         visibility = 'secret' if secret else 'public'
         command = [
             which('gpg2') or which('gpg'),
@@ -120,9 +122,12 @@ class GPG(object):
 
         rgx = re.compile(r'(([0-9A-F]{4}\s*?){10})')
         for line in output.splitlines():
+            print(line)
             mobj = rgx.search(line)
             if mobj:
-                return mobj.group().replace(' ', '')
+                fingerprint = mobj.group().replace(' ', '')
+                print(fingerprint)
+                return fingerprint
 
         return ''
 
