@@ -14,7 +14,7 @@ from .table import Table
 from .utils import genpass, mkdir_open
 
 
-__version__ = "1.0"
+__version__ = "0.3.3"
 pass_db = click.make_pass_decorator(Database)
 
 
