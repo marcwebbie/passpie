@@ -7,9 +7,6 @@ from ._compat import which
 from .utils import touch
 
 
-logger = logging.getLogger(__name__)
-
-
 def ensure_git(return_value=None):
     def decorator(func):
         @wraps(func)
@@ -18,9 +15,9 @@ def ensure_git(return_value=None):
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
-                    logger.debug(str(e))
+                    logging.debug(str(e))
             else:
-                logger.debug('git is not installed')
+                logging.debug('git is not installed')
             return return_value
         return wrapper
     return decorator
