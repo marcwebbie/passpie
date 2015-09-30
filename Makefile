@@ -102,8 +102,13 @@ bump-patch:
 bump-minor:
 	bumpversion minor setup.py passpie/cli.py
 
+bump-major:
+	bumpversion major setup.py passpie/cli.py
+
 deploy-patch: simulate bump-patch register publish tag
 
 deploy-minor: simulate bump-minor register publish tag
+
+deploy-major: simulate bump-major register publish tag
 
 deploy: deploy-patch
