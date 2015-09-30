@@ -4,8 +4,6 @@ import os
 
 import yaml
 
-logger = logging.getLogger(__name__)
-
 
 DEFAULT_CONFIG_PATH = os.path.join(os.path.expanduser('~'), '.passpierc')
 DB_DEFAULT_PATH = os.path.join(os.path.expanduser('~'), '.passpie')
@@ -32,10 +30,10 @@ def read_config(path):
             content = config_file.read()
         config = yaml.load(content)
     except IOError:
-        logger.debug('config file "%s" not found' % path)
+        logging.debug('config file "%s" not found' % path)
         return {}
     except yaml.scanner.ScannerError as e:
-        logging.debug('Malformed user configuration file {}'.format(e))
+        logging.error('Malformed user configuration file {}'.format(e))
         return {}
 
     return config
