@@ -102,6 +102,8 @@ def init(db, force, no_git, recipient):
         repo = Repository(db.path)
         logging.info('init git repository in %s' % db.path)
         repo.init()
+        repo.commit(message='Initialized git repository', add=True)
+
     click.echo("Initialized database in {}".format(db.path))
 
 
@@ -370,9 +372,10 @@ def purge(db, yes):
 def log(db, reset_to, init):
     repo = Repository(db.path)
     if reset_to >= 0:
-        repo.reset(reset_to)
+        repo.reset(index=reset_to)
     elif init:
         repo.init()
+        repo.commit(message='Initialized git repository', add=True)
     else:
         commits = []
         for number, message in enumerate(repo.commit_list()):
