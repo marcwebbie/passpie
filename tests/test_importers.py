@@ -1,8 +1,4 @@
 from collections import namedtuple
-try:
-    from mock import Mock, mock_open
-except ImportError:
-    from unittest.mock import Mock, mock_open
 import os
 import shutil
 import sys
@@ -15,9 +11,17 @@ from passpie.importers.default_importer import DefaultImporter
 from passpie.importers.pysswords_importer import PysswordsImporter
 
 
+def mock_open():
+    try:
+        from mock import mock_open as mopen
+    except:
+        from unittest.mock import mock_open as mopen
+    return mopen()
+
+
 def test_find_importer_returns_first_match_default_importer(mocker):
-    mock_importer = Mock()
-    mock_importer2 = Mock()
+    mock_importer = mocker.Mock()
+    mock_importer2 = mocker.Mock()
     mock_importer.match.return_value = False
     mock_importer2.match.return_value = True
 
@@ -114,9 +118,9 @@ def test_base_importer_log_calls_logging_debug_with_message(mocker):
 
 
 def test_get_instances_returns_instances_of_all_found_importers(mocker):
-    Importer = Mock()
-    Importer2 = Mock()
-    Importer3 = Mock()
+    Importer = mocker.Mock()
+    Importer2 = mocker.Mock()
+    Importer3 = mocker.Mock()
     mocker.patch('passpie.importers.get_all',
                  return_value=[Importer, Importer2, Importer3])
 
@@ -131,7 +135,7 @@ def test_pysswords_returns_false_with_logging_when_not_installed(mocker):
     to_patch = 'passpie.importers.pysswords_importer.found_pysswords'
     mocker.patch(to_patch, return_value=False)
     importer = PysswordsImporter()
-    importer.log = Mock()
+    importer.log = mocker.Mock()
 
     result = importer.match('filepath')
     assert result is False
@@ -145,7 +149,7 @@ def test_pysswords_returns_false_with_logging_when_path_not_dir(mocker):
     mock_os = mocker.patch('passpie.importers.pysswords_importer.os')
     mock_os.path.is_dir.return_value = False
     importer = PysswordsImporter()
-    importer.log = Mock()
+    importer.log = mocker.Mock()
 
     result = importer.match('filepath')
     assert result is False
@@ -160,7 +164,7 @@ def test_pysswords_returns_false_with_logging_when_keys_not_in_path(mocker):
     mock_os.path.is_dir.return_value = True
     mock_os.listdir.return_value = []
     importer = PysswordsImporter()
-    importer.log = Mock()
+    importer.log = mocker.Mock()
 
     result = importer.match('filepath')
     assert result is False
