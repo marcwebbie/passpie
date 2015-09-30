@@ -2,11 +2,11 @@
 parts of this code from pyperclip: https://github.com/asweigart/pyperclip
 """
 import ctypes
+import logging
 import platform
 import time
 
 from . import process
-from .utils import logger
 from ._compat import *
 
 
@@ -37,7 +37,7 @@ def clean(command, delay):
         sys.stdout.flush()
         time.sleep(1)
     else:
-        process.call(command, input='')
+        process.call(command, input=' ')
         print('')
 
 
@@ -86,7 +86,6 @@ def _copy_osx(text, clear=0):
 def _copy_linux(text, clear=0):
     command = ensure_commands(LINUX_COMMANDS)
     process.call(command, input=text)
-    clean(command, delay=clear)
     if clear:
         clean(command, delay=clear)
 
@@ -104,6 +103,6 @@ def copy(text, clear=0):
     else:
         msg = "platform '{}' copy to clipboard not supported".format(
             platform_name)
-        logger.error(msg)
+        logging.error(msg)
         return
-    logger.debug('text copied to clipboard')
+    logging.debug('text copied to clipboard')

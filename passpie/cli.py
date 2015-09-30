@@ -6,7 +6,7 @@ import shutil
 import click
 import yaml
 
-from . import clipboard, completion, config, checkers
+from . import clipboard, completion, config, checkers, importers
 from .crypt import GPG, create_keys
 from .database import Database
 from .history import Repository
@@ -14,26 +14,32 @@ from .table import Table
 from .utils import genpass, mkdir_open
 
 
-logger = logging.getLogger(__name__)
-
 __version__ = "1.0"
-
-
 pass_db = click.make_pass_decorator(Database)
 
 
 @click.group(invoke_without_command=True)
 @click.option('-D', '--database', help='Alternative database path',
               type=click.Path(dir_okay=True, writable=True, resolve_path=True))
+@click.option('-v', '--verbose', help='Activate verbose output', count=True)
 @click.version_option(version=__version__)
 @click.pass_context
-def cli(ctx, database):
+def cli(ctx, database, verbose):
     db_config = config.load()
     if database:
         db_config['path'] = database
 
     db = Database(db_config)
     ctx.obj = db
+
+    if verbose == 1:
+        logging_level = logging.INFO
+    elif verbose > 1:
+        logging_level = logging.DEBUG
+    else:
+        logging_level = logging.CRITICAL
+    logging.basicConfig(format="%(levelname)s:passpie.%(module)s:%(message)s",
+                        level=logging_level)
 
     if ctx.invoked_subcommand is None:
         credentials = db.credentials()
@@ -66,8 +72,10 @@ def init(db, force, no_repo, recipient):
     if force:
         if os.path.isdir(db.path):
             shutil.rmtree(db.path)
+            logging.info('removed directory %s' % db.path)
         elif os.path.isfile(db.path):
             os.remove(db.path)
+            logging.info('removed file %s' % db.path)
     elif os.path.isdir(db.path):
         message = "Path exists '{}'. `--force` to overwrite".format(
             db.path)
@@ -77,7 +85,10 @@ def init(db, force, no_repo, recipient):
 
     if recipient:
         config.create(db.path, default=False, recipient=recipient)
+        logging.info('create .passpierc file at %s' % db.path)
     else:
+        config.create(db.path, default=False, recipient=recipient)
+        logging.info('create .passpierc file at %s' % db.path)
         config.create(db.path, default=False)
         with mkdir_open(os.path.join(db.config['path'], '.keys'), 'w'):
             pass
@@ -117,6 +128,7 @@ def add(db, fullname, password, comment, force, copy):
 
     if copy:
         clipboard.copy(password)
+        click.secho('Password copied to clipboard', color='yellow')
 
     repo = Repository(db.path)
     message = 'Added {}{}'.format(fullname, ' [--force]' if force else '')
@@ -141,6 +153,7 @@ def copy(db, fullname, passphrase, to, clear):
         decrypted = gpg.decrypt(credential["password"], passphrase=passphrase)
         if to == 'clipboard':
             clipboard.copy(decrypted, clear)
+            click.secho('Password copied to clipboard', fg='yellow')
         elif to == 'stdout':
             click.echo(decrypted)
 

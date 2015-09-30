@@ -1,10 +1,11 @@
+import logging
 import os
 import re
 import shutil
 import tempfile
 
 from . import process
-from .utils import logger, tempdir
+from .utils import tempdir
 
 from passpie.utils import which
 
@@ -74,7 +75,6 @@ class GPG(object):
     def __init__(self, path, recipient=None):
         self.homedir = GPG_HOMEDIR
         self.homedir_is_temp = False
-        self._recipient = recipient
         path = os.path.expanduser(path)
         self.keys_path = os.path.join(path, ".keys")
         if os.path.isfile(self.keys_path):
@@ -82,17 +82,19 @@ class GPG(object):
             self.homedir_is_temp = True
             self.path = self.homedir
             self.import_keys(self.keys_path)
-        else:
+        elif recipient:
+            self._recipient = recipient
             self.path = path
+        else:
+            raise
 
     def __enter__(self):
-        logger.debug('__enter__: {}'.format(self))
         return self
 
     def __exit__(self, exc_ty, exc_val, exc_tb):
         if self.homedir and os.path.exists(self.homedir) and self.homedir_is_temp:
-            logger.debug('__exit__: {}'.format(self))
-            logger.debug('deleting: {}'.format(self.homedir))
+            logging.debug('__exit__: {}'.format(self))
+            logging.debug('deleting: {}'.format(self.homedir))
             shutil.rmtree(self.homedir)
 
     def import_keys(self, keys_path):
@@ -118,7 +120,7 @@ class GPG(object):
         ]
         output, error = process.call(command)
         if error:
-            logger.debug(error)
+            logging.debug(error)
 
         rgx = re.compile(r'(([0-9A-F]{4}\s*?){10})')
         for line in output.splitlines():
@@ -144,7 +146,7 @@ class GPG(object):
         ]
         output, error = process.call(command, input=data)
         if error:
-            logger.debug(error)
+            logging.debug(error)
         return output
 
     def decrypt(self, data, passphrase, fingerprint=None):
@@ -160,10 +162,10 @@ class GPG(object):
             '-o', '-',
             '-d', '-',
         ]
-        logger.debug('decrypting with: {}'.format(self))
+        logging.debug('decrypting with: {}'.format(self))
         output, error = process.call(command, input=data)
         if error:
-            logger.debug(error)
+            logging.debug(error)
         return output
 
     def __str__(self):
