@@ -65,10 +65,10 @@ def complete(shell_name, commands):
 
 @cli.command(help="Initialize new passpie database")
 @click.option('--force', is_flag=True, help="Force overwrite database")
-@click.option('--no-repo', is_flag=True, help="Don't create a git repository")
-@click.option('--recipient', help="Keyring recipient")
+@click.option('--no-git', is_flag=True, help="Don't create a git repository")
+@click.option('--recipient', help="Keyring default recipient")
 @pass_db
-def init(db, force, no_repo, recipient):
+def init(db, force, no_git, recipient):
     if force:
         if os.path.isdir(db.path):
             shutil.rmtree(db.path)
@@ -84,11 +84,11 @@ def init(db, force, no_repo, recipient):
     os.makedirs(db.path)
 
     if recipient:
-        config.create(db.path, default=False, recipient=recipient)
         logging.info('create .passpierc file at %s' % db.path)
+        config.create(db.path, default=False, recipient=recipient)
     else:
-        config.create(db.path, default=False, recipient=recipient)
         logging.info('create .passpierc file at %s' % db.path)
+        config.create(db.path, default=False, recipient=recipient)
         config.create(db.path, default=False)
         with mkdir_open(os.path.join(db.config['path'], '.keys'), 'w'):
             pass
@@ -98,8 +98,10 @@ def init(db, force, no_repo, recipient):
         create_keys(passphrase, db.config['path'],
                     key_length=db.config['key_length'])
 
-    repo = Repository(db.path)
-    repo.init()
+    if not no_git:
+        repo = Repository(db.path)
+        logging.info('init git repository in %s' % db.path)
+        repo.init()
     click.echo("Initialized database in {}".format(db.path))
 
 
