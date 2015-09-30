@@ -29,22 +29,19 @@ class Repository(object):
         self.path = path
 
     @ensure_git()
-    def init(self, message='Initialized git repository'):
+    def init(self):
         cmd = ['git', 'init', self.path]
-        touch(os.path.join(self.path, '.gitkeep'))
         process.call(cmd, cwd=self.path)
-        self.add(all=True)
-        self.commit(message)
 
     @ensure_git()
-    def add(self, all=True):
+    def add(self, all=False):
         cmd = ['git', 'add', '--all', '.']
         process.call(cmd, cwd=self.path)
 
     @ensure_git()
     def commit(self, message, add=True):
         if add:
-            self.add()
+            self.add(all=True)
         cmd = ['git', 'commit', '-m', message]
         process.call(cmd, cwd=self.path)
 
@@ -53,3 +50,19 @@ class Repository(object):
         cmd = ['git', 'log', '--reverse', '--pretty=format:%s']
         output, _ = process.call(cmd, cwd=self.path)
         return output.splitlines()
+
+    @ensure_git(return_value=[])
+    def sha_list(self):
+        cmd = ['git', 'log', '--reverse', '--pretty=format:%h']
+        output, _ = process.call(cmd, cwd=self.path)
+        return output.splitlines()
+
+    @ensure_git()
+    def reset(self, to_index):
+        try:
+            sha = self.sha_list()[to_index]
+        except IndexError:
+            logging.info('commit on index "{}" not found'.format(to_index))
+
+        cmd = ['git', 'reset', '--hard', sha]
+        process.call(cmd, cwd=self.path)
