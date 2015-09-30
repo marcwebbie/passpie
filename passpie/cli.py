@@ -372,7 +372,8 @@ def purge(db, yes):
 def log(db, reset_to, init):
     repo = Repository(db.path)
     if reset_to >= 0:
-        repo.reset(index=reset_to)
+        logging.info('reset database to index %s', reset_to)
+        repo.reset(reset_to)
     elif init:
         repo.init()
         repo.commit(message='Initialized git repository', add=True)
