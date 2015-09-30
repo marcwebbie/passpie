@@ -267,6 +267,23 @@ def status(db, full, days, passphrase):
         click.echo(table.render(credentials))
 
 
+@cli.command(name="import", help="Import credentials from path")
+@click.argument("filepath", type=click.Path())
+@pass_db
+def import_database(db, filepath):
+    importer = importers.find_importer(filepath)
+    if importer:
+        credentials = importer.handle(filepath)
+        with GPG(db.path, recipient=db.config['recipient']) as gpg:
+            for cred in credentials:
+                encrypted = gpg.encrypt(cred['password'])
+                cred['password'] = encrypted
+        db.insert_multiple(credentials)
+
+        repo = Repository(db.path)
+        repo.commit(message='Imported credentials from {}'.format(filepath))
+
+
 @cli.command(name="export", help="Export credentials in plain text")
 @click.argument("filepath", type=click.File("w"))
 @click.option("--json", "as_json", is_flag=True, help="Export as JSON")
