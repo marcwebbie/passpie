@@ -23,6 +23,7 @@ if sys.argv[-1] == 'tag':
     os.system("git push --tags")
     sys.exit()
 
+
 requirements = [
     'click==5.1',
     'PyYAML==3.11',
