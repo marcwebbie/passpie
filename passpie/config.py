@@ -50,7 +50,7 @@ def create(path, default=True, **kwargs):
 
 def load():
     if not os.path.isfile(DEFAULT_CONFIG_PATH):
-        create(DEFAULT_CONFIG['path'], default=True)
+        create(DEFAULT_CONFIG_PATH, default=True)
     global_config = read_config(DEFAULT_CONFIG_PATH)
     config = copy.deepcopy(DEFAULT_CONFIG)
     config.update(global_config)
