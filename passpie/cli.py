@@ -347,6 +347,20 @@ def reset(db, passphrase):
         repo.commit(message='Reset database')
 
 
+@cli.command(help='Remove all credentials from database')
+@click.option("-y", "--yes", is_flag=True, help="Skip confirmation prompt")
+@pass_db
+def purge(db, yes):
+    if db.credentials():
+        if not yes:
+            alert = "Purge '{}' credentials".format(len(db.credentials()))
+            yes = click.confirm(click.style(alert, 'yellow'), abort=True)
+        if yes:
+            db.purge()
+            repo = Repository(db.path)
+            repo.commit(message='Purged database')
+
+
 @cli.command(help='Shows passpie database changes history')
 @click.option("--init", is_flag=True, help="Enable history tracking")
 @click.option("--reset-to", default=-1, help="Undo changes in database")
