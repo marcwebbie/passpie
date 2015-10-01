@@ -646,9 +646,3 @@
 #     print(result.output)
 #     assert result.exit_code == 0
 #     assert result.output.strip() == credential['password']
-
-
-def test_user_create_database_with_keys():
-    _as_a_user()
-    _when_i_run_passpie_init()
-    _i_should_see_a_directory_created()
