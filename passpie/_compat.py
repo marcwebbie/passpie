@@ -6,9 +6,14 @@ except ImportError:
     from distutils.spawn import find_executable as _which
 
 try:
-  basestring
+    basestring
 except NameError:
-  basestring = str
+    basestring = str
+
+try:
+    unicode = unicode
+except NameError:
+    unicode = str
 
 
 def which(binary):
