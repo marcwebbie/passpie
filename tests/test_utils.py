@@ -1,6 +1,6 @@
 import pytest
 
-from passpie.utils import genpass, mkdir_open, ensure_dependencies
+from passpie.utils import genpass, mkdir_open, ensure_dependencies, touch
 
 
 def mock_open():
@@ -47,3 +47,14 @@ def test_ensure_dependencies_raises_runtime_when_gpg_not_installed(mocker):
         ensure_dependencies()
 
     assert 'GnuPG not installed. https://www.gnupg.org/' == str(excinfo.value)
+
+
+def test_touch_open_file_on_path(mocker):
+    mock_builtin_open = mocker.patch("passpie.utils.open",
+                                     mock_open(),
+                                     create=True)
+    path = 'path'
+    touch(path)
+
+    assert mock_builtin_open.called
+    mock_builtin_open.assert_called_once_with(path, 'w')
