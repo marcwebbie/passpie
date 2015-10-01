@@ -87,7 +87,7 @@ class GPG(object):
         try:
             shutil.rmtree(self.temp_homedir)
             logging.debug('removed temp homedir at: %s' % self.temp_homedir)
-        except OSError:
+        except (OSError, TypeError):
             pass
 
     def import_keys(self, keys_path):
