@@ -35,7 +35,7 @@ def test_copy_calls_copy_osx_when_on_darwin_system(mocker):
     assert mock_copy_osx.called is True
     assert mock_copy_linux.called is False
     assert mock_copy_windows.called is False
-    mock_copy_osx.assert_called_once_with('text')
+    mock_copy_osx.assert_called_once_with('text', 0)
 
 
 def test_copy_calls_copy_linux_when_on_linux_system(mocker):
@@ -50,7 +50,7 @@ def test_copy_calls_copy_linux_when_on_linux_system(mocker):
     assert mock_copy_linux.called is True
     assert mock_copy_osx.called is False
     assert mock_copy_windows.called is False
-    mock_copy_linux.assert_called_once_with('text')
+    mock_copy_linux.assert_called_once_with('text', 0)
 
 
 def test_copy_calls_copy_windows_when_on_windows_system(mocker):
@@ -65,7 +65,7 @@ def test_copy_calls_copy_windows_when_on_windows_system(mocker):
     assert mock_copy_windows.called is True
     assert mock_copy_osx.called is False
     assert mock_copy_linux.called is False
-    mock_copy_windows.assert_called_once_with('text')
+    mock_copy_windows.assert_called_once_with('text', 0)
 
 
 def test_copy_calls_copy_cygwin_when_on_cygwin_system(mocker):
@@ -76,12 +76,12 @@ def test_copy_calls_copy_cygwin_when_on_cygwin_system(mocker):
     clipboard.copy(text)
 
     assert mock_copy_cygwin.called
-    mock_copy_cygwin.assert_called_once_with(text)
+    mock_copy_cygwin.assert_called_once_with(text, 0)
 
 
 def test_logs_error_msg_when_platform_not_supported(mocker):
     mocker.patch('passpie.clipboard.platform.system', return_value='unknown')
-    mock_logger = mocker.patch('passpie.clipboard.logger')
+    mock_logger = mocker.patch('passpie.clipboard.logging')
 
     clipboard.copy('text')
     assert mock_logger.error.called
