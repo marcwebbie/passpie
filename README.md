@@ -38,12 +38,16 @@
 + [x] Bulk remove credentials
 + [x] Bash/Zsh [completion](#passpie-completion)
 + [x] [Undo/Redo changes](#version-control-your-database) to the database. (requires [git](https://git-scm.com/))
++ [x] Purge database
++ [x] Using a default gpg key recipient
++ [x] Per database `.passpierc` configuration files
 
 Planned features:
 
 + [ ] Bulk update credentials
 + [ ] Import plain text credentials from [Keepass](http://keepass.info/)
 + [ ] Import plain text credentials from [1Password](https://agilebits.com/onepassword)
++ [ ] Import plain text credentials from [lastpass](https://agilebits.com/onepassword)
 
 ## Quickstart
 
@@ -537,17 +541,6 @@ If you want to contributing with code:
 
 ## Common issues
 
-### `TypeError: init() got an unexpected keyword argument 'binary'`
-
-You probably have the `python-gnupg` package installed. Passpie depends on [isislovecruft](https://github.com/isislovecruft) fork of [python-gnupg](https://github.com/isislovecruft/python-gnupg)
-
-To fix:
-
-```
-pip uninstall python-gnupg
-pip install -U passpie
-```
-
 ### `'GPG not installed. https://www.gnupg.org/'`
 
 You don't have gpg installed or it is not working as expected
@@ -568,7 +561,7 @@ brew install gpg
 
 ### `xclip or xsel not installed`
 
-You don't have copy to clipboard support by default on some linux distributions.
+You don't have *copy to clipboard* support by default on some linux distributions.
 
 Ubuntu:
 
@@ -586,7 +579,7 @@ On ubuntu:
 sudo apt-get install haveged
 ```
 
-> You could also try this solution right here: http://serverfault.com/questions/214605/gpg-not-enough-entropy
+> You could also try this solution: http://serverfault.com/questions/214605/gpg-not-enough-entropy
 
 
 ## License ([MIT License](http://choosealicense.com/licenses/mit/))
