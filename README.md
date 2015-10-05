@@ -245,8 +245,8 @@ ln -s ~/Dropbox/passpie ~/.passpie # make a link to the db
 With default path `~/.passpie` and a Google Drive shared directory on path `~/GoogleDrive`
 
 ```bash
-mv ~/.passpie ~/GoogleDrive/passpie   # move passpie db to Google Drive
-ln -s ~/GoogleDrive/passpie ~.passpie # make a link to the db
+mv ~/.passpie ~/GoogleDrive/passpie    # move passpie db to Google Drive
+ln -s ~/GoogleDrive/passpie ~/.passpie # make a link to the db
 ```
 
 ### Exporting a passpie database
