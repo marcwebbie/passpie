@@ -103,8 +103,8 @@ def test_create_keys_if_path_is_passed_create_file_homedir(mocker, mock_call):
     assert keysfile.write.called
     assert mock_rename.called is True
     assert mock_rename.called is True
-    keysfile.write.assert_any_call_with('PUBLIC')
-    keysfile.write.assert_any_call_with('PRIVATE')
+    keysfile.write.assert_any_call('PUBLIC')
+    keysfile.write.assert_any_call('PRIVATE')
 
 
 def test_encrypt_calls_gpg_encrypt_command_with_recipient(mocker, mock_call):
