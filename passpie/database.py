@@ -2,11 +2,12 @@ from datetime import datetime
 import os
 import shutil
 
-from tinydb import TinyDB, Storage, where
+from tinydb import Storage, TinyDB, where
 import yaml
 
+from .credential import make_fullname, split_fullname
 from .utils import mkdir_open
-from .credential import split_fullname, make_fullname
+from . import config
 
 
 class PasspieStorage(Storage):
@@ -50,12 +51,11 @@ class PasspieStorage(Storage):
 
 class Database(TinyDB):
 
-    def __init__(self, config, *args, **kwargs):
-        self.config = config
-        self.path = self.config['path']
+    def __init__(self, path=None):
+        self.path = path or config.DB_DEFAULT_PATH
+        self.config = config.load(self.path)
         PasspieStorage.extension = self.config['extension']
-        kwargs.setdefault('storage', PasspieStorage)
-        super(Database, self).__init__(self.path, *args, **kwargs)
+        super(Database, self).__init__(self.path, storage=PasspieStorage)
 
     def has_keys(self):
         return os.path.exists(os.path.join(self.path, '.keys'))

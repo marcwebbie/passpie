@@ -11,7 +11,7 @@ from .crypt import GPG, create_keys
 from .database import Database
 from .history import Repository
 from .table import Table
-from .utils import genpass, mkdir_open
+from .utils import genpass, mkdir_open, ensure_dependencies
 
 
 __version__ = "0.3.3"
@@ -20,16 +20,25 @@ pass_db = click.make_pass_decorator(Database)
 
 @click.group(invoke_without_command=True)
 @click.option('-D', '--database', help='Alternative database path',
-              type=click.Path(dir_okay=True, writable=True, resolve_path=True))
+              type=click.Path(dir_okay=True, writable=True, resolve_path=True),
+              default=config.DB_DEFAULT_PATH)
 @click.option('-v', '--verbose', help='Activate verbose output', count=True)
 @click.version_option(version=__version__)
 @click.pass_context
 def cli(ctx, database, verbose):
-    db_config = config.load()
-    if database:
-        db_config['path'] = database
+    try:
+        ensure_dependencies()
+    except:
+        message = "GnuPG not installed"
+        raise click.ClickException(click.style(message, fg='red'))
 
-    db = Database(db_config)
+    if not os.path.exists(database) and ctx.invoked_subcommand != 'init':
+        raise click.ClickException("Database not initialized at: {}".format(database))
+
+    if not os.path.exists(config.DEFAULT_CONFIG_PATH):
+        config.create_default('~/.passpierc')
+
+    db = Database(database)
     ctx.obj = db
 
     if verbose == 1:
@@ -82,21 +91,18 @@ def init(db, force, no_git, recipient):
         raise click.ClickException(click.style(message, fg='yellow'))
 
     os.makedirs(db.path)
-
     if recipient:
-        logging.info('create .passpierc file at %s' % db.path)
-        config.create(db.path, default=False, recipient=recipient)
+        logging.info('create .config file at %s' % db.path)
+        config.create(os.path.join(db.path, '.config'), default=False, recipient=recipient)
     else:
         logging.info('create .passpierc file at %s' % db.path)
-        config.create(db.path, default=False, recipient=recipient)
-        config.create(db.path, default=False)
-        with mkdir_open(os.path.join(db.config['path'], '.keys'), 'w'):
+        config.create(os.path.join(db.path, '.config'), default=False)
+        with mkdir_open(os.path.join(db.path, '.keys'), 'w'):
             pass
         passphrase = click.prompt('Passphrase',
                                   hide_input=True,
                                   confirmation_prompt=True)
-        create_keys(passphrase, db.config['path'],
-                    key_length=db.config['key_length'])
+        create_keys(passphrase, db.path, key_length=db.config['key_length'])
 
     if not no_git:
         repo = Repository(db.path)

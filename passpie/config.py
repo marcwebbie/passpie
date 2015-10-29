@@ -4,11 +4,12 @@ import os
 
 import yaml
 
+from . import crypt
+
 
 DEFAULT_CONFIG_PATH = os.path.join(os.path.expanduser('~'), '.passpierc')
 DB_DEFAULT_PATH = os.path.join(os.path.expanduser('~'), '.passpie')
 DEFAULT_CONFIG = {
-    'path': DB_DEFAULT_PATH,
     'short_commands': False,
     'key_length': 4096,
     'genpass_length': 32,
@@ -20,7 +21,8 @@ DEFAULT_CONFIG = {
     'status_repeated_passwords_limit': 5,
     'copy_timeout': 0,
     'extension': '.pass',
-    'recipient': None
+    'recipient': None,
+    'homedir': crypt.GPG_HOMEDIR
 }
 
 
@@ -39,21 +41,20 @@ def read_config(path):
     return config
 
 
-def create(path, default=True, **kwargs):
-    config_path = os.path.join(os.path.expanduser(path), '.passpierc')
-    with open(config_path, 'w') as config_file:
-        if default:
-            config_file.write(yaml.dump(DEFAULT_CONFIG, default_flow_style=False))
-        else:
-            config_file.write(yaml.dump(kwargs, default_flow_style=False))
+def create(path, **kwargs):
+    with open(os.path.expanduser(path), 'w') as config_file:
+        config_file.write(yaml.dump(kwargs, default_flow_style=False))
 
 
-def load():
-    if not os.path.isfile(DEFAULT_CONFIG_PATH):
-        create(DEFAULT_CONFIG_PATH, default=True)
-    global_config = read_config(DEFAULT_CONFIG_PATH)
+def create_default(path):
+    with open(os.path.expanduser(path), 'w') as config_file:
+        config_file.write(yaml.dump(DEFAULT_CONFIG, default_flow_style=False))
+
+
+def load(database_path):
     config = copy.deepcopy(DEFAULT_CONFIG)
+    global_config = read_config(DEFAULT_CONFIG_PATH)
+    local_config = read_config(os.path.join(database_path, '.config'))
     config.update(global_config)
-    local_config = read_config(os.path.join(config['path'], '.passpierc'))
     config.update(local_config)
     return config

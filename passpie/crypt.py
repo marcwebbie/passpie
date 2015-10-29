@@ -1,11 +1,8 @@
 import logging
 import os
 import re
-import shutil
-import tempfile
 
 from . import process
-from .utils import tempdir, touch
 from ._compat import *
 
 from passpie.utils import which
@@ -59,62 +56,60 @@ def create_keys(passphrase, path=None, key_length=4096):
         output, error = process.call(command, input=key_input)
 
         if path:
-            keys_path = os.path.join(temp_homedir, 'keys')
-            keysfile = touch(keys_path)
-            keysfile.write(export_keys(temp_homedir))
-            keysfile.write(export_keys(temp_homedir, secret=True))
-
-            new_path = os.path.join(os.path.expanduser(path), '.keys')
-            os.rename(keys_path, new_path)
+            keys_path = os.path.join(os.path.expanduser(path), '.keys')
+            with open(keys_path, 'w') as keysfile:
+                keysfile.write(export_keys(temp_homedir))
+                keysfile.write(export_keys(temp_homedir, secret=True))
         else:
             return output
+
+
+def import_keys(keys_path, homedir_path):
+    command = [
+        which('gpg2') or which('gpg'),
+        '--no-tty',
+        '--homedir', homedir_path,
+        '--import', keys_path
+    ]
+    output, error = process.call(command)
+    for filename in os.listdir(homedir_path):
+        os.chmod(os.path.join(homedir_path, filename), 0600)
+    return output
 
 
 class GPG(object):
 
     def __init__(self, path, recipient=None):
         self.path = os.path.expanduser(path)
-        self.keys_path = os.path.join(path, ".keys")
-        self.homedir = GPG_HOMEDIR
-        self.temp_homedir = None
         self._recipient = recipient
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_ty, exc_val, exc_tb):
-        logging.debug('__exit__: {}'.format(self))
-        try:
-            shutil.rmtree(self.temp_homedir)
-            logging.debug('removed temp homedir at: %s' % self.temp_homedir)
-        except (OSError, TypeError):
-            pass
+        pass
 
-    def import_keys(self, keys_path):
-        command = [
-            which('gpg2') or which('gpg'),
-            '--no-tty',
-            '--homedir', self.homedir,
-            '--import', self.keys_path
-        ]
-        output, error = process.call(command)
-        if error:
-            logging.error(error)
-        return output
+    def homedir(self):
+        keys_path = os.path.join(self.path, '.keys')
+        if os.path.exists(keys_path):
+            local_homedir_path = os.path.join(self.path, '.homedir')
+            if not os.path.exists(local_homedir_path):
+                os.makedirs(local_homedir_path, 0700)
+                import_keys(keys_path, local_homedir_path)
+            return local_homedir_path
+        else:
+            return GPG_HOMEDIR
 
     def default_recipient(self, secret):
-        self.temp_homedir = tempfile.mkdtemp()
-        self.import_keys(self.keys_path)
-
         command = [
             which('gpg2') or which('gpg'),
             '--no-tty',
             '--list-{}-keys'.format('secret' if secret else 'public'),
             '--fingerprint',
-            '--homedir', self.temp_homedir,
+            '--homedir', self.homedir(),
         ]
         output, error = process.call(command)
-        if error:
+        if 'ERROR' in error:
             logging.error(error)
             return ''
 
@@ -142,11 +137,11 @@ class GPG(object):
             '--always-trust',
             '--armor',
             '--recipient', self.recipient(),
-            '--homedir', self.homedir,
+            '--homedir', self.homedir(),
             '--encrypt'
         ]
         output, error = process.call(command, input=data)
-        if error:
+        if 'ERROR' in error:
             logging.error(error)
         return output
 
@@ -157,14 +152,14 @@ class GPG(object):
             '--no-tty',
             '--always-trust',
             '--recipient', self.recipient(secret=True),
-            '--homedir', self.homedir,
+            '--homedir', self.homedir(),
             '--passphrase', passphrase,
             '--emit-version',
             '-o', '-',
             '-d', '-',
         ]
         output, error = process.call(command, input=data)
-        if error:
+        if 'ERROR' in error:
             logging.error(error)
         return output
 
