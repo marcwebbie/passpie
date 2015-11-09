@@ -535,6 +535,32 @@ If you want to contributing with code:
 - [optional] Read the [Makefile](https://github.com/marcwebbie/passpie/blob/master/Makefile)
 
 
+### Plugins
+
+You can write plugins that extend Passpie's functionality. Passpie will find plugins by searching for setuptools entrypoints.
+
+Current supported plugin types:
+
+* `passpie_importers` - `plugin_name=<dotted import path to class>` - points to classes that implement Passpie importers
+
+Example importer plugin:
+
+In your setup.py add to the `entry_points` kwparam of the `setup` function call, a field called `passpie_importers` whose value is a list of strings. Each string contains a name (of the importer), then the `=` sign and then a dotted import path to the class which implements the importer.
+
+```python
+from setuptools import setup
+
+setup(
+    ...
+    entry_points={
+        'passpie_importers': [
+            'keepass=passpie_keepass.passpie_keepass:KppyImporter',
+        ],
+    },
+)
+```
+
+
 ## Common issues
 
 ### `TypeError: init() got an unexpected keyword argument 'binary'`
