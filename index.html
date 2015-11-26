@@ -1,28 +1,47 @@
-<!DOCTYPE html>
-<html lang="en-us">
+<!doctype html>
+<html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Passpie by marcwebbie</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   </head>
   <body>
-    <section class="page-header">
-      <h1 class="project-name">Passpie</h1>
-      <h2 class="project-tagline">Passpie: manage login credentials from the terminal</h2>
-      <a href="https://github.com/marcwebbie/passpie" class="btn">View on GitHub</a>
-      <a href="https://github.com/marcwebbie/passpie/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/marcwebbie/passpie/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/marcwebbie/passpie">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/marcwebbie/passpie/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/marcwebbie/passpie/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
-    <section class="main-content">
-      <h1>
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Passpie</h1>
+          <p>Passpie: manage login credentials from the terminal</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/marcwebbie">marcwebbie</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
 <a id="passpie-manage-login-credentials-from-terminal" class="anchor" href="#passpie-manage-login-credentials-from-terminal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Passpie: Manage login credentials from terminal</h1>
 
-<p><a href="https://marcwebbie.github.io/passpie">Passpie</a> lets you manage login credentials from the terminal with a coloroful/configurable cli interface. Password files are saved into yaml text files with passwords as <a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard">GnuPG</a> encrypted strings. Use your master passphrase to decrypt login credentials, copy passwords to clipboard and more...</p>
+<p><a href="https://marcwebbie.github.io/passpie">Passpie</a> lets you manage login credentials from the terminal with a colorful/configurable cli interface. Password files are saved into yaml text files with passwords as <a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard">GnuPG</a> encrypted strings. Use your master passphrase to decrypt login credentials, copy passwords to clipboard and more...</p>
 
 <p><img src="https://github.com/marcwebbie/passpie/raw/master/images/passpie.png" alt="Passpie console interface"></p>
 
@@ -81,7 +100,7 @@
 <h2>
 <a id="quickstart" class="anchor" href="#quickstart" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quickstart</h2>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># initialize a passpie database</span>
+<div class="highlight highlight-source-shell"><pre><span class="pl-c"># initialize a passpie database</span>
 passpie init
 
 <span class="pl-c"># add some credentials</span>
@@ -150,20 +169,20 @@ passpie --help</pre></div>
 <a id="using-pip" class="anchor" href="#using-pip" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using <a href="http://pip.readthedocs.org/en/latest/installing.html">pip</a>
 </h4>
 
-<div class="highlight highlight-bash"><pre>pip install passpie</pre></div>
+<div class="highlight highlight-source-shell"><pre>pip install passpie</pre></div>
 
 <h4>
 <a id="on-a-mac-you-can-install-it-with-homebrew" class="anchor" href="#on-a-mac-you-can-install-it-with-homebrew" aria-hidden="true"><span class="octicon octicon-link"></span></a>On a mac you can install it with <a href="http://brew.sh">homebrew</a>
 </h4>
 
-<div class="highlight highlight-bash"><pre>brew install passpie</pre></div>
+<div class="highlight highlight-source-shell"><pre>brew install passpie</pre></div>
 
 <h3>
 <a id="development-version" class="anchor" href="#development-version" aria-hidden="true"><span class="octicon octicon-link"></span></a>Development version</h3>
 
 <p>The <strong>latest development version</strong> can be installed directly from GitHub:</p>
 
-<div class="highlight highlight-bash"><pre>pip install --upgrade https://github.com/marcwebbie/passpie/tarball/master</pre></div>
+<div class="highlight highlight-source-shell"><pre>pip install --upgrade https://github.com/marcwebbie/passpie/tarball/master</pre></div>
 
 <h2>
 <a id="tutorials" class="anchor" href="#tutorials" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tutorials</h2>
@@ -178,12 +197,12 @@ passpie --help</pre></div>
 
 <p>Fullnames are composed of <code>login</code>@<code>name</code>. Login is optional. If you don't pass any login when adding new credentials, credential login will be replaced by a <code>_</code> character:</p>
 
-<div class="highlight highlight-bash"><pre>passpie add @banks/mybank --password 1234
+<div class="highlight highlight-source-shell"><pre>passpie add @banks/mybank --password 1234
 passpie add @banks/myotherbank --password 5678</pre></div>
 
 <p>Listing credentials:</p>
 
-<div class="highlight highlight-bash"><pre>$ passpie
+<div class="highlight highlight-source-shell"><pre>$ passpie
 =================  =======  ==========  =========
 Name               Login    Password    Comment
 =================  =======  ==========  =========
@@ -193,22 +212,22 @@ banks/myotherbank  _        <span class="pl-k">*****</span>
 
 <p>Since <code>login</code> is optional. You can query credentials using only name syntax, for example to update credential <code>@banks/mybank</code>:</p>
 
-<div class="highlight highlight-bash"><pre>passpie update @banks/mybank --random</pre></div>
+<div class="highlight highlight-source-shell"><pre>passpie update @banks/mybank --random</pre></div>
 
 <p>Or even better, without using the <code>@</code> notation:</p>
 
-<div class="highlight highlight-bash"><pre>passpie update banks/mybank --random</pre></div>
+<div class="highlight highlight-source-shell"><pre>passpie update banks/mybank --random</pre></div>
 
 <h3>
 <a id="version-control-your-database" class="anchor" href="#version-control-your-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Version control your database</h3>
 
 <p>Passpie by default will create a <a href="https://git-scm.com/">git</a> repository on database initialization if <code>git</code> is available.</p>
 
-<div class="highlight highlight-bash"><pre>passpie init</pre></div>
+<div class="highlight highlight-source-shell"><pre>passpie init</pre></div>
 
 <p>To see the changes history, use passpie <code>log</code> command:</p>
 
-<div class="highlight highlight-bash"><pre>passpie log</pre></div>
+<div class="highlight highlight-source-shell"><pre>passpie log</pre></div>
 
 <p>example output:</p>
 
@@ -243,11 +262,11 @@ banks/myotherbank  _        <span class="pl-k">*****</span>
 <h4>
 <a id="initializing-a-git-repository-on-an-existing-passpie-database" class="anchor" href="#initializing-a-git-repository-on-an-existing-passpie-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Initializing a git repository on an existing passpie database:</h4>
 
-<div class="highlight highlight-bash"><pre>passpie log --init</pre></div>
+<div class="highlight highlight-source-shell"><pre>passpie log --init</pre></div>
 
 <p>or if you have multiple databases:</p>
 
-<div class="highlight highlight-bash"><pre>passpie -D other_database log --init</pre></div>
+<div class="highlight highlight-source-shell"><pre>passpie -D other_database log --init</pre></div>
 
 <blockquote>
 <p>This will create a git repository on passpie directory and create an initial commit <code>Initialized database</code></p>
@@ -258,7 +277,7 @@ banks/myotherbank  _        <span class="pl-k">*****</span>
 
 <p>If you don't want to create a git repository on the passpie database. Initialize passpie with <code>--no-git</code> flag:</p>
 
-<div class="highlight highlight-bash"><pre>passpie init --no-git</pre></div>
+<div class="highlight highlight-source-shell"><pre>passpie init --no-git</pre></div>
 
 <h3>
 <a id="syncing-your-database" class="anchor" href="#syncing-your-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Syncing your database</h3>
@@ -268,7 +287,7 @@ banks/myotherbank  _        <span class="pl-k">*****</span>
 
 <p>With default path <code>~/.passpie</code> and a Dropbox shared directory on path <code>~/Dropbox</code></p>
 
-<div class="highlight highlight-bash"><pre>mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/Dropbox/passpie    <span class="pl-c"># move passpie db to Dropbox</span>
+<div class="highlight highlight-source-shell"><pre>mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/Dropbox/passpie    <span class="pl-c"># move passpie db to Dropbox</span>
 ln -s <span class="pl-k">~</span>/Dropbox/passpie <span class="pl-k">~</span>/.passpie <span class="pl-c"># make a link to the db</span></pre></div>
 
 <h4>
@@ -276,31 +295,31 @@ ln -s <span class="pl-k">~</span>/Dropbox/passpie <span class="pl-k">~</span>/.p
 
 <p>With default path <code>~/.passpie</code> and a Google Drive shared directory on path <code>~/GoogleDrive</code></p>
 
-<div class="highlight highlight-bash"><pre>mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/GoogleDrive/passpie   <span class="pl-c"># move passpie db to Google Drive</span>
+<div class="highlight highlight-source-shell"><pre>mv <span class="pl-k">~</span>/.passpie <span class="pl-k">~</span>/GoogleDrive/passpie   <span class="pl-c"># move passpie db to Google Drive</span>
 ln -s <span class="pl-k">~</span>/GoogleDrive/passpie <span class="pl-k">~</span>.passpie <span class="pl-c"># make a link to the db</span></pre></div>
 
 <h3>
 <a id="exporting-a-passpie-database" class="anchor" href="#exporting-a-passpie-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Exporting a passpie database</h3>
 
-<div class="highlight highlight-bash"><pre>passpie <span class="pl-k">export</span> passpie.db</pre></div>
+<div class="highlight highlight-source-shell"><pre>passpie <span class="pl-k">export</span> passpie.db</pre></div>
 
 <h3>
 <a id="importing-a-passpie-database" class="anchor" href="#importing-a-passpie-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Importing a passpie database</h3>
 
-<div class="highlight highlight-bash"><pre>passpie import passpie.db</pre></div>
+<div class="highlight highlight-source-shell"><pre>passpie import passpie.db</pre></div>
 
 <h3>
 <a id="grouping-credentials-by-name" class="anchor" href="#grouping-credentials-by-name" aria-hidden="true"><span class="octicon octicon-link"></span></a>Grouping credentials by name</h3>
 
 <p>Passpie credentials handles multiple logins for each name which groups credentials by name:</p>
 
-<div class="highlight highlight-bash"><pre><span class="pl-c"># add some credentials</span>
+<div class="highlight highlight-source-shell"><pre><span class="pl-c"># add some credentials</span>
 passpie add jonh@example.com --comment <span class="pl-s"><span class="pl-pds">"</span>Jonh main mail<span class="pl-pds">"</span></span> --random
 passpie add doe@example.com --comment <span class="pl-s"><span class="pl-pds">"</span>No comment<span class="pl-pds">"</span></span> --random</pre></div>
 
 <p>Listing credentials:</p>
 
-<div class="highlight highlight-bash"><pre>$ passpie
+<div class="highlight highlight-source-shell"><pre>$ passpie
 ===========  =======  ==========  ===============
 name         login    password    comment
 ===========  =======  ==========  ===============
@@ -340,21 +359,21 @@ opensource/python.org     foo      *****
 <h4>
 <a id="creating-databases" class="anchor" href="#creating-databases" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating databases</h4>
 
-<div class="highlight highlight-bash"><pre>passpie -D <span class="pl-k">~</span>/credentials/personal init
+<div class="highlight highlight-source-shell"><pre>passpie -D <span class="pl-k">~</span>/credentials/personal init
 passpie -D <span class="pl-k">~</span>/credentials/work init
 passpie -D <span class="pl-k">~</span>/credentials/junk init</pre></div>
 
 <h4>
 <a id="adding-passwords-to-specific-database" class="anchor" href="#adding-passwords-to-specific-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding passwords to specific database</h4>
 
-<div class="highlight highlight-bash"><pre>passpie -D <span class="pl-k">~</span>/credentials/personal add johnd@github.com --random
+<div class="highlight highlight-source-shell"><pre>passpie -D <span class="pl-k">~</span>/credentials/personal add johnd@github.com --random
 passpie -D <span class="pl-k">~</span>/credentials/work add john.doe@example.com --random
 passpie -D <span class="pl-k">~</span>/credentials/junk add fake@example.com --random</pre></div>
 
 <h4>
 <a id="listing-passwords-from-specific-database" class="anchor" href="#listing-passwords-from-specific-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Listing passwords from specific database</h4>
 
-<div class="highlight highlight-bash"><pre>$ passpie -D <span class="pl-k">~</span>/databases/junk
+<div class="highlight highlight-source-shell"><pre>$ passpie -D <span class="pl-k">~</span>/databases/junk
 ===========  =======  ==========  =========
 Name         Login    Password    Comment
 ===========  =======  ==========  =========
@@ -367,7 +386,7 @@ example.com  fake     <span class="pl-k">*****</span>
 <p>You can activate passpie completion for <code>bash</code> or <code>zsh</code> shells</p>
 
 <blockquote>
-<p>Check the generated script with <code>passpie complete {shell_name}</code>.</p>
+<p>Check the generated script with <code>passpie complete</code>.</p>
 </blockquote>
 
 <h4>
@@ -375,15 +394,25 @@ example.com  fake     <span class="pl-k">*****</span>
 
 <p>Add this line to your .bash_profile or .bashrc</p>
 
-<pre><code>if which passpie &gt; /dev/null; then eval "$(passpie complete bash)"; fi
+<pre><code>if which passpie &gt; /dev/null; then eval "$(passpie complete)"; fi
 </code></pre>
+
+<h4>
+<a id="fish" class="anchor" href="#fish" aria-hidden="true"><span class="octicon octicon-link"></span></a>fish</h4>
+
+<p>Add this line to your ~/.config/fish/config.fish</p>
+
+<pre><code>if which passpie &gt; /dev/null 2&gt;&amp;1; eval (passpie complete | tr '\n' ';'); end
+</code></pre>
+
+
 
 <h4>
 <a id="zsh" class="anchor" href="#zsh" aria-hidden="true"><span class="octicon octicon-link"></span></a>zsh</h4>
 
 <p>Add this line to your .zshrc or .zpreztorc</p>
 
-<pre><code>if which passpie &gt; /dev/null; then eval "$(passpie complete zsh)"; fi
+<pre><code>if which passpie &gt; /dev/null; then eval "$(passpie complete)"; fi
 </code></pre>
 
 <h3>
@@ -395,7 +424,7 @@ example.com  fake     <span class="pl-k">*****</span>
 <h4>
 <a id="example-passpierc" class="anchor" href="#example-passpierc" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example <code>.passpierc</code>:</h4>
 
-<div class="highlight highlight-yaml"><pre><span class="pl-s"><span class="pl-ent">path:</span> <span class="pl-s">/Users/john.doe/.passpie</span></span>
+<div class="highlight highlight-source-yaml"><pre><span class="pl-s"><span class="pl-ent">path:</span> <span class="pl-s">/Users/john.doe/.passpie</span></span>
 <span class="pl-s"><span class="pl-ent">short_commands:</span> <span class="pl-s">true</span></span>
 <span class="pl-c1"><span class="pl-ent">genpass_length:</span> 32</span>
 <span class="pl-s"><span class="pl-ent">genpass_symbols:</span> <span class="pl-s"><span class="pl-pds">"</span>_-#|+= <span class="pl-pds">"</span></span></span>
@@ -487,6 +516,22 @@ example.com  fake     <span class="pl-k">*****</span>
 
 <p><a href="#version-control-your-database">learn more</a></p>
 
+<h5>
+<a id="search_automatic_regex--true--false" class="anchor" href="#search_automatic_regex--true--false" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>search_automatic_regex = (true | false)</code>
+</h5>
+
+<p><strong>default:</strong> false</p>
+
+<p>Automatically transform the search pattern into a regex if the search pattern is a word (ie: add .* prefix and suffix)</p>
+
+<h5>
+<a id="status_repeated_passwords_limit" class="anchor" href="#status_repeated_passwords_limit" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>status_repeated_passwords_limit=</code>
+</h5>
+
+<p><strong>default:</strong> 5</p>
+
+<p>Set an upper limit to display the number of credentials with the same password instead of displaying the credentials themselves. This is avoid the uggly table rendering when the passords list doesn't fit on one line. Currently <a href="https://pypi.python.org/pypi/tabulate">Tabulate</a> doesn't handle line wraps.</p>
+
 <h2>
 <a id="under-the-hood" class="anchor" href="#under-the-hood" aria-hidden="true"><span class="octicon octicon-link"></span></a>Under The Hood</h2>
 
@@ -500,17 +545,17 @@ example.com  fake     <span class="pl-k">*****</span>
 
 <p>The default database path is at <code>~/.passpie</code>. If you want to change the database path, add <code>--database</code> option to passpie. Together with <code>init</code> you can create arbitrary databases.</p>
 
-<div class="highlight highlight-bash"><pre>passpie --database <span class="pl-s"><span class="pl-pds">"</span>/path/to/another/database/<span class="pl-pds">"</span></span> init</pre></div>
+<div class="highlight highlight-source-shell"><pre>passpie --database <span class="pl-s"><span class="pl-pds">"</span>/path/to/another/database/<span class="pl-pds">"</span></span> init</pre></div>
 
 <h3>
 <a id="database-structure" class="anchor" href="#database-structure" aria-hidden="true"><span class="octicon octicon-link"></span></a>Database structure</h3>
 
-<p>Passpie database is structured in a directory hierachy. Every
+<p>Passpie database is structured in a directory hierarchy. Every
 credential is a <code>.pass</code> file inside a directory named after a credential group.</p>
 
 <p>An empty database would look like this:</p>
 
-<div class="highlight highlight-bash"><pre>passpie --database /tmp/passpie init
+<div class="highlight highlight-source-shell"><pre>passpie --database /tmp/passpie init
 
 tree /tmp/passpie -la
 <span class="pl-c"># /tmp/passpie</span>
@@ -518,7 +563,7 @@ tree /tmp/passpie -la
 
 <p>After adding a new credential the database would look like this:</p>
 
-<div class="highlight highlight-bash"><pre>passpie --database /tmp/passpie add octocat@github.com
+<div class="highlight highlight-source-shell"><pre>passpie --database /tmp/passpie add octocat@github.com
 <span class="pl-c"># Password: **********</span>
 
 tree /tmp/passpie -la
@@ -529,7 +574,7 @@ tree /tmp/passpie -la
 
 <p>If we add more credentials to group github.com. Directory structure would be:</p>
 
-<div class="highlight highlight-bash"><pre>passpie --database /tmp/passpie add octocat2@github.com
+<div class="highlight highlight-source-shell"><pre>passpie --database /tmp/passpie add octocat2@github.com
 <span class="pl-c"># Password: **********</span>
 
 tree /tmp/passpie -la
@@ -554,6 +599,33 @@ tree /tmp/passpie -la
 <li>[optional] Read the <a href="https://github.com/marcwebbie/passpie/blob/master/Makefile">Makefile</a>
 </li>
 </ul>
+
+<h3>
+<a id="plugins" class="anchor" href="#plugins" aria-hidden="true"><span class="octicon octicon-link"></span></a>Plugins</h3>
+
+<p>You can write plugins that extend Passpie's functionality. Passpie will find plugins by searching for setuptools entrypoints.</p>
+
+<p>Current supported plugin types:</p>
+
+<ul>
+<li>
+<code>passpie_importers</code> - <code>plugin_name=&lt;dotted import path to class&gt;</code> - points to classes that implement Passpie importers</li>
+</ul>
+
+<p>Example importer plugin:</p>
+
+<p>In your setup.py add to the <code>entry_points</code> kwparam of the <code>setup</code> function call, a field called <code>passpie_importers</code> whose value is a list of strings. Each string contains a name (of the importer), then the <code>=</code> sign and then a dotted import path to the class which implements the importer.</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">from</span> setuptools <span class="pl-k">import</span> setup
+
+setup(
+    ...
+    <span class="pl-smi">entry_points</span><span class="pl-k">=</span>{
+        <span class="pl-s"><span class="pl-pds">'</span>passpie_importers<span class="pl-pds">'</span></span>: [
+            <span class="pl-s"><span class="pl-pds">'</span>keepass=passpie_keepass.passpie_keepass:KppyImporter<span class="pl-pds">'</span></span>,
+        ],
+    },
+)</pre></div>
 
 <h2>
 <a id="common-issues" class="anchor" href="#common-issues" aria-hidden="true"><span class="octicon octicon-link"></span></a>Common issues</h2>
@@ -639,16 +711,11 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+      </section>
 
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/marcwebbie/passpie">Passpie</a> is maintained by <a href="https://github.com/marcwebbie">marcwebbie</a>.</span>
-
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
-      </footer>
-
-    </section>
-
-            <script type="text/javascript">
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -661,4 +728,3 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 
   </body>
 </html>
-
