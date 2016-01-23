@@ -37,17 +37,3 @@ def test_script_returns_bash_script_when_bash_shell_name(mocker):
 
     for line in completion.BASH.split('\n')[:3]:
         assert line in text
-
-
-def test_script_without_shellname_handles_typeerror_on_process(mocker):
-    mock_process = mocker.patch('passpie.completion.Process',
-                                side_effect=[TypeError, mocker.Mock()])
-    shell_name = None
-    config_path = tempfile.gettempdir()
-    commands = ['add', 'remove', 'update', 'remove', 'search']
-    text = completion.script(shell_name=shell_name,
-                             config_path=config_path,
-                             commands=commands)
-
-    assert mock_process.called is True
-    assert text is not None
