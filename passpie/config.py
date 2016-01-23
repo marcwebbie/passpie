@@ -42,13 +42,10 @@ def read_global_config():
     return read_config(DEFAULT_PATH)
 
 
-def create(path, default=True, **kwargs):
-    config_path = os.path.join(os.path.expanduser(path), '.passpierc')
+def create(path, defaults={}, filename='.config'):
+    config_path = os.path.join(os.path.expanduser(path), filename)
     with open(config_path, 'w') as config_file:
-        if default:
-            config_file.write(yaml.dump(DEFAULT, default_flow_style=False))
-        else:
-            config_file.write(yaml.dump(kwargs, default_flow_style=False))
+        config_file.write(yaml.dump(defaults, default_flow_style=False))
 
 
 def load(path, **overrides):
