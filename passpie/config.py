@@ -5,10 +5,9 @@ import os
 import yaml
 
 
-DEFAULT_CONFIG_PATH = os.path.join(os.path.expanduser('~'), '.passpierc')
-DB_DEFAULT_PATH = os.path.join(os.path.expanduser('~'), '.passpie')
-DEFAULT_CONFIG = {
-    'path': DB_DEFAULT_PATH,
+DEFAULT_PATH = os.path.join(os.path.expanduser('~/.passpierc'))
+DEFAULT = {
+    'path': DEFAULT_PATH,
     'short_commands': False,
     'key_length': 4096,
     'genpass_length': 32,
@@ -39,21 +38,26 @@ def read_config(path):
     return config
 
 
+def read_global_config():
+    return read_config(DEFAULT_PATH)
+
+
 def create(path, default=True, **kwargs):
     config_path = os.path.join(os.path.expanduser(path), '.passpierc')
     with open(config_path, 'w') as config_file:
         if default:
-            config_file.write(yaml.dump(DEFAULT_CONFIG, default_flow_style=False))
+            config_file.write(yaml.dump(DEFAULT, default_flow_style=False))
         else:
             config_file.write(yaml.dump(kwargs, default_flow_style=False))
 
 
-def load():
-    if not os.path.isfile(DEFAULT_CONFIG_PATH):
-        create(DEFAULT_CONFIG_PATH, default=True)
-    global_config = read_config(DEFAULT_CONFIG_PATH)
-    config = copy.deepcopy(DEFAULT_CONFIG)
-    config.update(global_config)
-    local_config = read_config(os.path.join(config['path'], '.passpierc'))
-    config.update(local_config)
-    return config
+def load(path, **overrides):
+    local_config_path = os.path.join(os.path.expanduser(path), '.config')
+    configuration = copy.deepcopy(DEFAULT)
+    if os.path.exists(DEFAULT_PATH):
+        configuration.update(read_global_config())
+    if os.path.exists(local_config_path):
+        configuration.update(read_config(local_config_path))
+    if overrides:
+        configuration.update(overrides)
+    return configuration
