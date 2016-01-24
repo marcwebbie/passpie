@@ -10,10 +10,9 @@ python:
 allow_failures:
   - python: pypy
 install:
-- pip install -r requirements_tests.txt
-- pip install .
+- make develop
 script:
-- python setup.py coverage
+- python coverage
 after_success:
 - pip install codecov
 - codecov
