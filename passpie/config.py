@@ -15,6 +15,8 @@ DEFAULT = {
     'key_length': 4096,
     'genpass_length': 32,
     'genpass_symbols': "_-#|+=",
+    'homedir': os.path.join(os.path.expanduser('~/.gnupg')),
+    'recipient': 'passpie@local',
     'table_format': 'fancy_grid',
     'headers': ['name', 'login', 'password', 'comment'],
     'colors': {'name': 'yellow', 'login': 'green'},
