@@ -1,6 +1,9 @@
+import logging
+import os
 from subprocess import Popen, PIPE
 
-from ._compat import *
+
+DEVNULL = open(os.devnull, 'w')
 
 
 class Proc(Popen):
@@ -22,8 +25,13 @@ class Proc(Popen):
 
 
 def call(*args, **kwargs):
+    if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
+        stderr = PIPE
+    else:
+        stderr = DEVNULL
+
+    kwargs.setdefault('stderr', stderr)
     kwargs.setdefault('stdout', PIPE)
-    kwargs.setdefault('stderr', PIPE)
     kwargs.setdefault('stdin', PIPE)
     kwargs.setdefault('shell', False)
     kwargs_input = kwargs.pop('input', None)
