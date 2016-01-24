@@ -10,9 +10,9 @@ python:
 allow_failures:
   - python: pypy
 install:
-- make develop
+  - make develop
 script:
-- python coverage
+  - make coverage
 after_success:
-- pip install codecov
-- codecov
+  - pip install codecov
+  - codecov
