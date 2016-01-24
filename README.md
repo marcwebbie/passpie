@@ -28,10 +28,9 @@
 + [x] Search with regular expression
 + [x] Group credentials by name
 + [x] [Configuration](#configuring-passpie-with-passpierc) from file. `~/.passpie`
++ [x] [Local configuration](#local-database-configuration) `.config` files
 + [x] Change passphrase and re-encrypt database
 + [x] Export Passpie database to plain text file
-+ [x] Import plain text Passpie database
-+ [x] Import credentials from [Pysswords](https://github.com/marcwebbie/pysswords)
 + [x] Randomly generated credential passwords
 + [x] Configurable random password generation
 + [x] Generate database status report
@@ -39,15 +38,17 @@
 + [x] Bash/Zsh [completion](#passpie-completion)
 + [x] [Undo/Redo changes](#version-control-your-database) to the database. (requires [git](https://git-scm.com/))
 + [x] Purge database
-+ [x] Using a default gpg key recipient
-+ [x] Per database `.passpierc` configuration files
++ [x] Set a personal gpg key recipient
++ [x] Per database keyring
 
-Planned features:
+Importers:
 
-+ [ ] Bulk update credentials
-+ [ ] Import plain text credentials from [Keepass](http://keepass.info/)
-+ [ ] Import plain text credentials from [1Password](https://agilebits.com/onepassword)
-+ [ ] Import plain text credentials from [lastpass](https://agilebits.com/onepassword)
++ [x] Passpie default importer
++ [x] [Pysswords](https://github.com/marcwebbie/pysswords) importer
++ [ ] Custom csv importer
++ [ ] [Keepass](http://keepass.info/) importer
++ [ ] [1Password](https://agilebits.com/onepassword) importer
++ [ ] [lastpass](https://lastpass.com) importer
 
 ## Quickstart
 
@@ -374,9 +375,13 @@ Add this line to your .zshrc or .zpreztorc
 if which passpie > /dev/null; then eval "$(passpie complete)"; fi
 ```
 
-### Configuring passpie with `~/.passpierc`
+### Configuring passpie with `~/.passpierc` or `DATABASE_PATH/.config`
 
 You can override default passpie configuration with a `.passpierc` file on your home directory. Passpie configuration files must be written as a valid [yaml](http://yaml.org/) file.
+
+#### Local database configuration
+
+You can also add database specific configuration by creating a file called `.config`.
 
 #### Example `~/.passpierc`:
 
@@ -385,6 +390,8 @@ path: /Users/john.doe/.passpie
 short_commands: true
 genpass_length: 32
 genpass_symbols: "_-#|+= "
+recipient: passpie@local
+homedir: /Users/john.doe/.gnupg
 table_format: fancy_grid
 headers:
   - name
@@ -422,6 +429,24 @@ Length of randomly generated passwords with option `--random`
 **default:** `"_-#|+= "`
 
 Symbols used on random password generation
+
+##### `homedir =`
+
+**default** ~/.gnupg
+
+**required:** False
+
+Path to gnupg homedir
+
+> This path will not be used if .keys are found on database path
+
+##### `recipient =`
+
+**default** passpie@local
+
+**required:** False
+
+Default gpg recipient to encrypt/decrypt credentials
 
 ##### `table_format = (fancy_grid | rst | simple | orgtbl | pipe | grid | plain | latex)`
 
