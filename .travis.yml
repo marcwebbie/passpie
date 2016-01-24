@@ -6,9 +6,7 @@ python:
   - 2.7
   - 3.3
   - 3.4
-  - pypy
-allow_failures:
-  - python: pypy
+  - 3.5
 install:
   - make develop
 script:
