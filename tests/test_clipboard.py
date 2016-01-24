@@ -95,7 +95,6 @@ def test_ensure_commands_logs_error_when_command_not_found(mocker):
     clipboard.ensure_commands(clipboard.LINUX_COMMANDS)
 
     assert mock_logging.error.called
-    mock_logging.error.assert_called_once_with('missing commands: ', 'xsel or xclip')
 
 
 def test_ensure_commands_returns_command(mocker):
