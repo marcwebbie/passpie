@@ -2,10 +2,9 @@ import logging
 import os
 import re
 import shutil
-import tempfile
 
 from . import process
-from .utils import tempdir, touch
+from .utils import tempdir
 from ._compat import *
 
 from passpie.utils import which
@@ -47,7 +46,7 @@ def export_keys(homedir, secret=False):
 
 
 def create_keys(passphrase, path=None, key_length=4096):
-    with tempdir() as temp_homedir:
+    with tempdir('create_keys') as temp_homedir:
         command = [
             which('gpg2') or which('gpg'),
             '--batch',
@@ -60,14 +59,49 @@ def create_keys(passphrase, path=None, key_length=4096):
 
         if path:
             keys_path = os.path.join(temp_homedir, 'keys')
-            keysfile = touch(keys_path)
-            keysfile.write(export_keys(temp_homedir))
-            keysfile.write(export_keys(temp_homedir, secret=True))
+            with open(keys_path, 'w') as keysfile:
+                keysfile.write(export_keys(temp_homedir))
+                keysfile.write(export_keys(temp_homedir, secret=True))
 
             new_path = os.path.join(os.path.expanduser(path), '.keys')
             os.rename(keys_path, new_path)
         else:
             return output
+
+
+def import_keys(homedir, keys_path):
+    command = [
+        which('gpg2') or which('gpg'),
+        '--no-tty',
+        '--homedir', homedir,
+        '--import', keys_path
+    ]
+    output, error = process.call(command)
+    if error:
+        logging.error(error)
+    return output
+
+
+def get_default_recipient(homedir, secret):
+    command = [
+        which('gpg2') or which('gpg'),
+        '--no-tty',
+        '--list-{}-keys'.format('secret' if secret else 'public'),
+        '--fingerprint',
+        '--homedir', homedir,
+    ]
+    output, error = process.call(command)
+    if error:
+        logging.error(error)
+        return ''
+    for line in output.splitlines():
+        try:
+            mobj = re.search(r'(([0-9A-F]{4}\s*?){10})', line)
+            fingerprint = mobj.group().replace(' ', '')
+            return fingerprint
+        except (AttributeError, IndexError):
+            continue
+    return ''
 
 
 class GPG(object):
@@ -76,7 +110,6 @@ class GPG(object):
         self.path = os.path.expanduser(path)
         self.keys_path = os.path.join(path, ".keys")
         self.homedir = GPG_HOMEDIR
-        self.temp_homedir = None
         self._recipient = recipient
 
     def __enter__(self):
@@ -84,55 +117,19 @@ class GPG(object):
 
     def __exit__(self, exc_ty, exc_val, exc_tb):
         logging.debug('__exit__: {}'.format(self))
-        try:
-            shutil.rmtree(self.temp_homedir)
-            logging.debug('removed temp homedir at: %s' % self.temp_homedir)
-        except (OSError, TypeError):
-            pass
-
-    def import_keys(self, keys_path):
-        command = [
-            which('gpg2') or which('gpg'),
-            '--no-tty',
-            '--homedir', self.homedir,
-            '--import', self.keys_path
-        ]
-        output, error = process.call(command)
-        if error:
-            logging.error(error)
-        return output
-
-    def default_recipient(self, secret):
-        self.temp_homedir = tempfile.mkdtemp()
-        self.import_keys(self.keys_path)
-
-        command = [
-            which('gpg2') or which('gpg'),
-            '--no-tty',
-            '--list-{}-keys'.format('secret' if secret else 'public'),
-            '--fingerprint',
-            '--homedir', self.temp_homedir,
-        ]
-        output, error = process.call(command)
-        if error:
-            logging.error(error)
-            return ''
-
-        for line in output.splitlines():
-            try:
-                mobj = re.search(r'(([0-9A-F]{4}\s*?){10})', line)
-                fingerprint = mobj.group().replace(' ', '')
-                return fingerprint
-            except (AttributeError, IndexError):
-                continue
-
-        return ''
 
     def recipient(self, secret=False):
         if self._recipient:
-            return self._recipient
+            # 1. use self.recipient if not None
+            recipient = self._recipient
+        elif self.keys_path:
+            # 2. use default key from .keys if .keys_exist
+            with tempdir('homedir') as homedir:
+                recipient = get_default_recipient(homedir, secret)
         else:
-            return self.default_recipient(secret)
+            # 3. use default key from default homedir
+            recipient = get_default_recipient(GPG_HOMEDIR, secret)
+        return recipient
 
     def encrypt(self, data):
         command = [
