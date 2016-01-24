@@ -7,11 +7,11 @@ import click
 import yaml
 
 from . import clipboard, completion, config, checkers, importers
-from .crypt import GPG, create_keys
+from .crypt import create_keys, encrypt, decrypt
 from .database import Database
 from .history import Repository
 from .table import Table
-from .utils import genpass, mkdir_open
+from .utils import genpass, ensure_dependencies
 
 
 __version__ = "0.3.3"
@@ -25,13 +25,25 @@ pass_db = click.make_pass_decorator(Database)
 @click.version_option(version=__version__)
 @click.pass_context
 def cli(ctx, database, verbose):
-    db_config = config.load()
-    if database:
-        db_config['path'] = database
+    try:
+        ensure_dependencies()
+    except RuntimeError as e:
+        raise click.ClickException(click.style(str(e), fg='red'))
 
-    db = Database(db_config)
+    # Override configuration
+    config_overrides = {}
+    if database:
+        config_overrides['path'] = database
+
+    # Setup configuration
+    configuration = config.load(**config_overrides)
+
+    # Setup database
+    db = Database(configuration['path'], configuration['extension'])
+    db.config = configuration
     ctx.obj = db
 
+    # Verbose
     if verbose == 1:
         logging_level = logging.INFO
     elif verbose > 1:
@@ -41,13 +53,14 @@ def cli(ctx, database, verbose):
     logging.basicConfig(format="%(levelname)s:passpie.%(module)s:%(message)s",
                         level=logging_level)
 
+    # List credentials
     if ctx.invoked_subcommand is None:
         credentials = db.credentials()
         if credentials:
             table = Table(
-                db.config['headers'],
-                table_format=db.config['table_format'],
-                colors=db.config['colors'],
+                configuration['headers'],
+                table_format=configuration['table_format'],
+                colors=configuration['colors'],
                 hidden=['password']
             )
             click.echo(table.render(credentials))
@@ -76,27 +89,24 @@ def init(db, force, no_git, recipient):
         elif os.path.isfile(db.path):
             os.remove(db.path)
             logging.info('removed file %s' % db.path)
-    elif os.path.isdir(db.path):
-        message = "Path exists '{}'. `--force` to overwrite".format(
-            db.path)
-        raise click.ClickException(click.style(message, fg='yellow'))
 
-    os.makedirs(db.path)
+    try:
+        os.makedirs(db.path)
+    except SystemError:
+        message = "Path exists '{}'. `--force` to overwrite".format(db.path)
+        raise click.ClickException(click.style(message, fg='yellow'))
 
     if recipient:
         logging.info('create .passpierc file at %s' % db.path)
-        config.create(db.path, default=False, recipient=recipient)
+        config.create(db.path, defaults=dict(recipient=recipient))
     else:
         logging.info('create .passpierc file at %s' % db.path)
-        config.create(db.path, default=False, recipient=recipient)
-        config.create(db.path, default=False)
-        with mkdir_open(os.path.join(db.config['path'], '.keys'), 'w'):
-            pass
+        config.create(db.path, defaults={})
         passphrase = click.prompt('Passphrase',
                                   hide_input=True,
                                   confirmation_prompt=True)
-        create_keys(passphrase, db.config['path'],
-                    key_length=db.config['key_length'])
+        keys_filepath = os.path.join(db.config['path'], '.keys')
+        create_keys(passphrase, keys_filepath, key_length=db.config['key_length'])
 
     if not no_git:
         repo = Repository(db.path)
@@ -126,9 +136,8 @@ def add(db, fullname, password, comment, force, copy):
             fullname)
         raise click.ClickException(click.style(message, fg='yellow'))
 
-    with GPG(db.path, recipient=db.config['recipient']) as gpg:
-        encrypted = gpg.encrypt(password)
-        db.add(fullname=fullname, password=encrypted, comment=comment)
+    encrypted = encrypt(password, recipient=db.config['recipient'], homedir=db.config['homedir'])
+    db.add(fullname=fullname, password=encrypted, comment=comment)
 
     if copy:
         clipboard.copy(password)
@@ -153,13 +162,17 @@ def copy(db, fullname, passphrase, to, clear):
         message = "Credential '{}' not found".format(fullname)
         raise click.ClickException(click.style(message, fg='red'))
 
-    with GPG(db.path, recipient=db.config['recipient']) as gpg:
-        decrypted = gpg.decrypt(credential["password"], passphrase=passphrase)
-        if to == 'clipboard':
-            clipboard.copy(decrypted, clear)
+    encrypted = credential["password"]
+    decrypted = decrypt(encrypted,
+                        recipient=db.config['recipient'],
+                        passphrase=passphrase,
+                        homedir=db.config['homedir'])
+    if to == 'clipboard':
+        clipboard.copy(decrypted, clear)
+        if not clear:
             click.secho('Password copied to clipboard', fg='yellow')
-        elif to == 'stdout':
-            click.echo(decrypted)
+    elif to == 'stdout':
+        click.echo(decrypted)
 
 
 @cli.command(help="Update credential")
@@ -197,8 +210,8 @@ def update(db, fullname, name, login, password, comment):
 
     if values != credential:
         if values["password"] != credential["password"]:
-            with GPG(db.path, recipient=db.config['recipient']) as gpg:
-                values["password"] = gpg.encrypt(values['password'])
+            encrypted = encrypt(password, recipient=db.config['recipient'], homedir=db.config['homedir'])
+            values['password'] = encrypted
         db.update(values, fullname)
         repo = Repository(db.path)
         repo.commit('Updated {}'.format(credential['fullname']))
@@ -250,9 +263,12 @@ def search(db, regex):
 def status(db, full, days, passphrase):
     credentials = db.credentials()
 
-    with GPG(db.path, recipient=db.config['recipient']) as gpg:
-        for cred in credentials:
-            cred["password"] = gpg.decrypt(cred["password"], passphrase)
+    for cred in credentials:
+        decrypted = decrypt(cred['password'],
+                            recipient=db.config['recipient'],
+                            passphrase=passphrase,
+                            homedir=db.config['homedir'])
+        cred["password"] = decrypted
 
     if credentials:
         limit = db.config['status_repeated_passwords_limit']
@@ -278,10 +294,9 @@ def import_database(db, filepath):
     importer = importers.find_importer(filepath)
     if importer:
         credentials = importer.handle(filepath)
-        with GPG(db.path, recipient=db.config['recipient']) as gpg:
-            for cred in credentials:
-                encrypted = gpg.encrypt(cred['password'])
-                cred['password'] = encrypted
+        for cred in credentials:
+            encrypted = encrypt(cred['password'], recipient=db.config['recipient'], homedir=db.config['homedir'])
+            cred['password'] = encrypted
         db.insert_multiple(credentials)
 
         repo = Repository(db.path)
@@ -296,9 +311,12 @@ def import_database(db, filepath):
 def export_database(db, filepath, as_json, passphrase):
     credentials = db.all()
 
-    with GPG(db.path, recipient=db.config['recipient']) as gpg:
-        for cred in credentials:
-            cred["password"] = gpg.decrypt(cred["password"], passphrase)
+    for cred in credentials:
+        decrypted = decrypt(cred['password'],
+                            recipient=db.config['recipient'],
+                            passphrase=passphrase,
+                            homedir=db.config['homedir'])
+        cred["password"] = decrypted
 
     if as_json:
         for cred in credentials:
@@ -326,21 +344,26 @@ def export_database(db, filepath, as_json, passphrase):
 def reset(db, passphrase):
     credentials = db.credentials()
     if credentials:
-        with GPG(db.path, recipient=db.config['recipient']) as gpg:
-            # decrypt passwords
-            for cred in credentials:
-                cred["password"] = gpg.decrypt(cred["password"], passphrase)
+        # decrypt all credentials
+        for cred in credentials:
+            decrypted = decrypt(cred['password'],
+                                recipient=db.config['recipient'],
+                                passphrase=passphrase,
+                                homedir=db.config['homedir'])
+            cred["password"] = decrypted
 
-            # recreate keys if exists
-            if db.has_keys():
-                new_passphrase = click.prompt('New passphrase',
-                                              hide_input=True,
-                                              confirmation_prompt=True)
-                create_keys(new_passphrase)
+        # recreate keys if exists
+        if db.has_keys():
+            new_passphrase = click.prompt('New passphrase',
+                                          hide_input=True,
+                                          confirmation_prompt=True)
+            create_keys(new_passphrase)
 
-            # encrypt passwords
-            for cred in credentials:
-                cred["password"] = gpg.encrypt(cred["password"])
+        # encrypt passwords
+        for cred in credentials:
+            cred['password'] = encrypt(cred['password'],
+                                       recipient=db.config['recipient'],
+                                       homedir=db.config['homedir'])
 
         # remove old and insert re-encrypted credentials
         db.purge()
