@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 import shutil
 
-from tinydb import TinyDB, Storage, where
+from tinydb import TinyDB, Storage, where, Query
 import yaml
 
 from .utils import mkdir_open
@@ -50,12 +50,10 @@ class PasspieStorage(Storage):
 
 class Database(TinyDB):
 
-    def __init__(self, config, *args, **kwargs):
-        self.config = config
-        self.path = self.config['path']
-        PasspieStorage.extension = self.config['extension']
-        kwargs.setdefault('storage', PasspieStorage)
-        super(Database, self).__init__(self.path, *args, **kwargs)
+    def __init__(self, path, extension='.pass', storage=PasspieStorage):
+        self.path = path
+        PasspieStorage.extension = extension
+        super(Database, self).__init__(self.path, storage=storage)
 
     def has_keys(self):
         return os.path.exists(os.path.join(self.path, '.keys'))
@@ -75,7 +73,7 @@ class Database(TinyDB):
         self.insert(credential)
         return credential
 
-    def update(self, values, fullname):
+    def update(self, fullname, values):
         values['fullname'] = make_fullname(values["login"], values["name"])
         values['modified'] = datetime.now()
         self.table().update(values, (where("fullname") == fullname))
@@ -97,9 +95,10 @@ class Database(TinyDB):
         self.table().remove(where('fullname') == fullname)
 
     def matches(self, regex):
+        Credential = Query()
         credentials = self.search(
-            where("name").contains(regex) |
-            where("login").contains(regex) |
-            where("comment").contains(regex)
+            Credential.name.matches(regex) |
+            Credential.login.matches(regex) |
+            Credential.comment.matches(regex)
         )
         return sorted(credentials, key=lambda x: x["name"] + x["login"])

@@ -1,4 +1,8 @@
+from tinydb import where, Query
+from tinydb.storages import MemoryStorage
+
 from passpie.database import PasspieStorage
+from passpie.database import Database
 from .helpers import MockerTestCase
 
 
@@ -63,3 +67,85 @@ class StorageTests(MockerTestCase):
                                           credentials[0]["login"])
         self.mock_shutil.rmtree.assert_called_once_with(
             self.mock_os.path.dirname(credpath))
+
+
+def test_database_has_keys_returns_true_when_file_dot_keys_found_in_db_path(mocker):
+    db = Database(path='path', extension='.pass')
+    mock_exists = mocker.patch('passpie.database.os.path.exists', return_value=True)
+    mock_join = mocker.patch('passpie.database.os.path.join')
+
+    assert db.has_keys() is True
+    mock_exists.assert_called_once_with(mock_join('path', '.keys'))
+
+
+def test_database_credential_with_fullname_does_a_db_where_with_split_fullname(mocker):
+    db = Database(path='path', extension='.pass')
+    mocker.patch('passpie.database.split_fullname', return_value=('login', 'name'))
+    mock_get = mocker.patch.object(db, 'get', return_value=[{}])
+
+    result = db.credential('login@name')
+    assert db.get.called
+    assert result == [{}]
+    db.get.assert_called_once_with((where('login') == 'login') & (where('name') == 'name'))
+
+
+def test_database_add_insert_credential_to_database(mocker):
+    db = Database(path='path', extension='.pass')
+    mock_get = mocker.patch.object(db, 'insert')
+    mocker.patch('passpie.database.split_fullname', return_value=('login', 'name'))
+    mock_datetime = mocker.patch('passpie.database.datetime')
+    credential = dict(fullname='login@name',
+                      name='name',
+                      login='login',
+                      password='password',
+                      comment='comment',
+                      modified=mock_datetime.now())
+
+    db.add(fullname='login@name', password='password', comment='comment')
+    assert db.insert.called
+    db.insert.assert_called_once_with(credential)
+
+
+def test_database_update_uses_table_update_credential_to_database(mocker):
+    db = Database(path='path', extension='.pass')
+    mocker.patch.object(db, 'table', mocker.MagicMock())
+    mocker.patch('passpie.database.make_fullname', return_value='login@name')
+    mock_datetime = mocker.patch('passpie.database.datetime')
+    values = {
+        'login': 'login',
+        'name': 'name',
+        'comment': 'new comment'
+    }
+
+    db.update(fullname='login@name', values=values)
+
+    assert db.table().update.called
+    db.table().update.assert_called_once_with(values, (where('fullname') == 'login@name'))
+
+
+def test_database_remove_uses_table_remove_credential_from_database(mocker):
+    db = Database(path='path', extension='.pass')
+    mocker.patch.object(db, 'table', mocker.MagicMock())
+    mocker.patch('passpie.database.make_fullname', return_value='login@name')
+
+    db.remove(fullname='login@name')
+
+    assert db.table().remove.called
+    db.table().remove.assert_called_once_with((where('fullname') == 'login@name'))
+
+
+def test_database_matches_uses_table_remove_credential_from_database(mocker):
+    db = Database(path='path', extension='.pass')
+    mocker.patch.object(db, 'search', mocker.MagicMock())
+    mocker.patch('passpie.database.make_fullname', return_value='login@name')
+    regex = '.*'
+    Credential = Query()
+    result = db.matches(regex=regex)
+
+    assert db.search.called
+    assert isinstance(result, list)
+    db.search.assert_called_once_with(
+        Credential.name.matches(regex) |
+        Credential.login.matches(regex) |
+        Credential.comment.matches(regex)
+    )
