@@ -20,7 +20,7 @@ def test_config_read_opens_path_and_load_yaml_content(mocker):
 
 
 def test_config_read_logs_debug_when_config_file_not_found_and_returns_default(mocker):
-    mocker.patch('passpie.config.open', side_effect=IOError)
+    mocker.patch('passpie.config.open', side_effect=IOError, create=True)
     mock_logging = mocker.patch('passpie.config.logging')
 
     result = passpie.config.read('path')
@@ -30,7 +30,7 @@ def test_config_read_logs_debug_when_config_file_not_found_and_returns_default(m
 
 
 def test_config_read_logs_error_when_config_file_malformed_found_and_returns_empty(mocker):
-    mocker.patch('passpie.config.open', side_effect=yaml.scanner.ScannerError)
+    mocker.patch('passpie.config.open', side_effect=yaml.scanner.ScannerError, create=True)
     mock_logging = mocker.patch('passpie.config.logging')
 
     result = passpie.config.read('path')
