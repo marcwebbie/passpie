@@ -79,16 +79,7 @@ class Database(TinyDB):
         self.table().update(values, (where("fullname") == fullname))
 
     def credentials(self, fullname=None):
-        if fullname:
-            try:
-                login, name = split_fullname(fullname)
-                query = (where("name") == name) & (where("login") == login)
-            except ValueError:
-                query = where('name') == fullname
-                found = self.search(query)
-        else:
-            found = self.all()
-
+        found = self.all()
         return sorted(found, key=lambda x: x["name"] + x["login"])
 
     def remove(self, fullname):

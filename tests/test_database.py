@@ -134,6 +134,15 @@ def test_database_remove_uses_table_remove_credential_from_database(mocker):
     db.table().remove.assert_called_once_with((where('fullname') == 'login@name'))
 
 
+def test_credentials_returns_sorted_list_credentials(mocker):
+    db = Database(path='path', extension='.pass')
+    mocker.patch.object(db, 'all', mocker.MagicMock())
+    mock_sorted = mocker.patch('passpie.database.sorted')
+
+    credentials = db.credentials()
+    assert credentials == mock_sorted()
+
+
 def test_database_matches_uses_table_remove_credential_from_database(mocker):
     db = Database(path='path', extension='.pass')
     mocker.patch.object(db, 'search', mocker.MagicMock())
