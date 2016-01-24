@@ -4,10 +4,13 @@ import os
 
 import yaml
 
+from .utils import tempdir
+from .crypt import ensure_keys, import_keys, get_default_recipient
+
 
 DEFAULT_PATH = os.path.join(os.path.expanduser('~/.passpierc'))
 DEFAULT = {
-    'path': DEFAULT_PATH,
+    'path': os.path.join(os.path.expanduser('~/.passpie')),
     'short_commands': False,
     'key_length': 4096,
     'genpass_length': 32,
@@ -48,8 +51,19 @@ def create(path, defaults={}, filename='.config'):
         config_file.write(yaml.dump(defaults, default_flow_style=False))
 
 
-def load(path, **overrides):
-    local_config_path = os.path.join(os.path.expanduser(path), '.config')
+def setup_crypt(configuration):
+    keys_filepath = ensure_keys(configuration['path'])
+    if keys_filepath:
+        configuration['homedir'] = tempdir()
+        import_keys(keys_filepath, configuration['homedir'])
+    if not configuration['recipient']:
+        configuration['recipient'] = get_default_recipient(configuration['homedir'])
+    return configuration
+
+
+def load(**overrides):
+    database_path = overrides.get('path', DEFAULT['path'])
+    local_config_path = os.path.join(os.path.expanduser(database_path), '.config')
     configuration = copy.deepcopy(DEFAULT)
     if os.path.exists(DEFAULT_PATH):
         configuration.update(read_global_config())
@@ -57,4 +71,6 @@ def load(path, **overrides):
         configuration.update(read(local_config_path))
     if overrides:
         configuration.update(overrides)
+
+    configuration = setup_crypt(configuration)
     return configuration
