@@ -2,6 +2,8 @@ import logging
 import os
 from subprocess import Popen, PIPE
 
+from ._compat import *
+
 
 DEVNULL = open(os.devnull, 'w')
 
