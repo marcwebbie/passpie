@@ -23,23 +23,23 @@ DEFAULT = {
 }
 
 
-def read_config(path):
+def read(path):
     try:
         with open(path) as config_file:
             content = config_file.read()
         config = yaml.load(content)
     except IOError:
         logging.debug('config file "%s" not found' % path)
-        return {}
-    except yaml.scanner.ScannerError as e:
-        logging.error('Malformed user configuration file {}'.format(e))
+        return DEFAULT
+    except yaml.scanner.ScannerError:
+        logging.error('Malformed user configuration file: {}'.format(path))
         return {}
 
     return config
 
 
 def read_global_config():
-    return read_config(DEFAULT_PATH)
+    return read(DEFAULT_PATH)
 
 
 def create(path, defaults={}, filename='.config'):
@@ -54,7 +54,7 @@ def load(path, **overrides):
     if os.path.exists(DEFAULT_PATH):
         configuration.update(read_global_config())
     if os.path.exists(local_config_path):
-        configuration.update(read_config(local_config_path))
+        configuration.update(read(local_config_path))
     if overrides:
         configuration.update(overrides)
     return configuration
