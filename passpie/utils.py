@@ -2,9 +2,8 @@ from contextlib import contextmanager
 from random import SystemRandom
 import errno
 import os
-import shutil
-import string
 import tempfile
+import string
 
 from ._compat import which
 
@@ -40,12 +39,8 @@ def ensure_dependencies():
         raise RuntimeError('GnuPG not installed. https://www.gnupg.org/')
 
 
-@contextmanager
 def tempdir():
-    path = tempfile.mkdtemp()
-    yield path
-    if os.path.exists(path):
-        shutil.rmtree(path)
+    return tempfile.mkdtemp()
 
 
 def touch(path):
