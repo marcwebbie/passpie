@@ -8,9 +8,12 @@ from passpie.credential import make_fullname
 
 try:
     from pysswords.db import Database
-    found_pysswords = lambda: True
+
+    def found_pysswords():
+        return True
 except ImportError:
-    found_pysswords = lambda: False
+    def found_pysswords():
+        return False
 
 
 class PysswordsImporter(BaseImporter):

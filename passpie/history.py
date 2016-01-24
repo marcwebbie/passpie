@@ -1,10 +1,8 @@
 from functools import wraps
 import logging
-import os
 
 from . import process
 from ._compat import which
-from .utils import touch
 
 
 def ensure_git(return_value=None):

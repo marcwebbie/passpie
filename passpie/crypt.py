@@ -1,8 +1,5 @@
-import logging
 import os
 import re
-import shutil
-import tempfile
 
 from . import process
 from .utils import tempdir
