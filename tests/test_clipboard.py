@@ -89,19 +89,13 @@ def test_logs_error_msg_when_platform_not_supported(mocker):
     mock_logger.error.assert_called_once_with(msg)
 
 
-def test_ensure_commands_raises_system_error_when_command_not_found(mocker):
+def test_ensure_commands_logs_error_when_command_not_found(mocker):
     mocker.patch('passpie.clipboard.which', return_value=False)
+    mock_logging = mocker.patch('passpie.clipboard.logging')
+    clipboard.ensure_commands(clipboard.LINUX_COMMANDS)
 
-    with pytest.raises(SystemError):
-        clipboard.ensure_commands(clipboard.LINUX_COMMANDS)
-
-
-def test_ensure_commands_raises_system_error_when_no_command_args(mocker):
-    mocker.patch('passpie.clipboard.which', return_value=True)
-    mock_commands = {k: [] for k, _ in clipboard.LINUX_COMMANDS.items()}
-
-    with pytest.raises(SystemError):
-        clipboard.ensure_commands(mock_commands)
+    assert mock_logging.error.called
+    mock_logging.error.assert_called_once_with('missing commands: ', 'xsel or xclip')
 
 
 def test_ensure_commands_returns_command(mocker):

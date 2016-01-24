@@ -27,8 +27,7 @@ def ensure_commands(commands):
         if which(command_name) and command:
             return command
     else:
-        raise SystemError('missing commands: ',
-                          ' or '.join(commands))
+        logging.error('missing commands: ', ' or '.join(commands))
 
 
 def clean(command, delay):
@@ -37,7 +36,7 @@ def clean(command, delay):
         sys.stdout.flush()
         time.sleep(1)
     else:
-        process.call(command, input=' ')
+        process.call(command, input='\b')
         print('')
 
 
