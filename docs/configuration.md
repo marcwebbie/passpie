@@ -1,47 +1,173 @@
-# Configuring passpie
+# Configuring Passpie
 
-You can override default passpie configuration with a `.passpierc` file in your home directory. Passpie configuration files must be written as a valid [yaml](http://yaml.org/) file.
+#### `path`
 
-> You can also add database specific configuration by creating a file called `.config`.
-
-## Example `~/.passpierc`:
+Path to default database
 
 ```yaml
+# default
 path: ~/.passpie
-homedir: ~/.gnupg
-autopull: false
+```
+
+#### `homedir`
+
+Path to gnupg homedir
+
+> Ignored if `.keys` exists in database
+
+#### `recipient`
+
+Default gpg recipient to encrypt/decrypt credentials using keychains. This should be either recipient fingerprint or email.
+
+```yaml
+# default
+recipient: passpie@local
+```
+
+> Ignored if `.keys` exists in database
+
+#### `key_length`
+
+Key generation length. The lengths range from 1024 to 4096 bits
+
+#### `repo`
+
+Create a git repo by default when database is initialized
+
+```yaml
+# default
+repo: true
+```
+
+#### `autopull`
+
+Automatically pull changes from git remote repository. This setting should be a list of remote
+
+```yaml
+# default
+autopull: null
+```
+
+This setting should be a list containing `remote` and  `branch` to pull.
+
+```yaml
+autopull:
+- origin  # remote
+- master  # branch
+```
+
+#### `copy_timeout`
+
+Automatically clear clipboard when timeout is expired. Timeout is in seconds
+
+```
+#default
 copy_timeout: 0
+```
+
+#### `short_commands`
+
+Use passpie commands with short aliases. Like `passpie a` for `passpie add`
+
+```yaml
+# default
+short_commands: false
+```
+
+##### Choices:
+
+- true
+- false
+
+#### `status_repeated_passwords_limit`
+
+```yaml
+# default
+status_repeated_passwords_limit: 0
+```
+
+Repeat credential fullname on status list
+
+#### `extension`
+
+Credential files configurable extension
+
+```yaml
+# default
 extension: .pass
+```
+
+#### `genpass_pattern`
+
+Regular expression pattern to password generation
+
+```yaml
+# default
 genpass_pattern: "[a-z]{5} [-_+=*&%$#]{5} [A-Z]{5}"
+```
+
+Regular expression pattern used to generate random passwords
+
+#### `headers`
+
+Credential columns to be printed
+
+```yaml
+# default
 headers:
   - name
   - login
   - password
   - comment
-colors:
-  login: green
-  name: yellow
-key_length: 4096
-recipient: null
-repo: true
-short_commands: false
-status_repeated_passwords_limit: 5
+```
+
+##### Choices:
+
+- name
+- login
+- password
+- comment
+
+#### `table_format`
+
+Defines how the Table is formated
+
+```yaml
+# default
 table_format: fancy_grid
 ```
 
-| Option                          | Default                              | Description                                                                 |
-|---------------------------------|--------------------------------------|-----------------------------------------------------------------------------|
-| path                            | ~/.passpie                           | Path to default database                                                    |
-| homedir                         | ~/.gnupg                             |                                                                             |
-| recipient                       | null                                 | Default gpg recipient to encrypt/decrypt credentials using keychains        |
-| key_length                      | 4096                                 | Key generation length                                                       |
-| repo                            | true                                 | Create a git repo by default                                                |
-| autopull                        | false                                | Automatically pull changes from git remote repository                       |
-| copy_timeout                    | 0                                    | Automatically clear copy to clipboard commands                              |
-| short_commands                  | false                                | Use passpie commands with short aliases. Like `passpie a` for `passpie add` |
-| status_repeated_passwords_limit | 5                                    | Repeat credential fullname on status list                                   |
-| extension                       | .pass                                | Credential files configurable extension                                     |
-| genpass_pattern                 | [a-z]{10} [-_+=*&%$#]{10} [A-Z]{10}  | Regular expression pattern used to generate random passwords                |
-| headers                         | [name, login, password, comment]     | Values: (name, login, password, comment, fullname)                          |
-| table_format                    | fancy_grid                           | Table format when listing credentials                                       |
-| colors                          | {'login': 'green', 'name': 'yellow'} | Values: (green, red, blue, white, cyan, magenta, yellow)                    |
+##### Choices:
+
+- plain
+- simple
+- grid
+- fancy_grid
+- pipe
+- orgtbl
+- jira
+- psql
+- rst
+- mediawiki
+- moinmoin
+- html
+- latex
+- latex_booktabs
+- textile
+
+#### `colors`
+
+Column data colors
+
+##### Default: `{"login": "green", "name": "yellow"}`
+
+##### Choices:
+
+- black
+- red
+- green
+- yellow
+- blue
+- magenta
+- cyan
+- white

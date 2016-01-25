@@ -105,11 +105,67 @@ passpie --help
 | **`status`**   | Diagnose database for improvements                    |
 | **`update`**   | Update credential                                     |
 
+## Configuring passpie
 
-## Learn more
+### Global
+
+You can override passpie default configuration with a **passpierc** file. Global user settings are read from the `~/.passpierc`
+
+> Note that Passpie configuration files must be written as a valid [yaml](http://yaml.org/) file.
+
+### Per-database
+
+You can also add database specific configuration by creating a file called `.config` inside database directory. These files are automatically created when initializing databases.
+
+### Example:
+
+```yaml
+path: ~/.passpie
+homedir: ~/.gnupg
+autopull: null
+copy_timeout: 0
+extension: .pass
+genpass_pattern: "[a-z]{5} [-_+=*&%$#]{5} [A-Z]{5}"
+headers:
+  - name
+  - login
+  - password
+  - comment
+colors:
+  login: green
+  name: yellow
+key_length: 4096
+recipient: passpie@local
+repo: true
+short_commands: false
+status_repeated_passwords_limit: 5
+table_format: fancy_grid
+```
+
+### Fields
+
+| Option                                                                                     | Description                                                                 |
+|--------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| [path](./docs/configuration.md#path)                                                       | Path to default database                                                    |
+| [homedir](./docs/configuration.md#homedir)                                                 | Path to gnupg homedir                                                       |
+| [recipient](./docs/configuration.md#recipient)                                             | Default gpg recipient to encrypt/decrypt credentials using keychains        |
+| [key_length](./docs/configuration.md#key_length)                                           | Key generation length                                                       |
+| [repo](./docs/configuration.md#repo)                                                       | Create a git repo by default                                                |
+| [autopull](./docs/configuration.md#autopull)                                               | Automatically pull changes from git remote repository                       |
+| [copy_timeout](./docs/configuration.md#copy_timeout)                                       | Automatically clear copy to clipboard commands                              |
+| [short_commands](./docs/configuration.md#short_commands)                                   | Use passpie commands with short aliases. Like `passpie a` for `passpie add` |
+| [status_repeated_passwords_limit](./docs/configuration.md#status_repeated_passwords_limit) | Repeat credential fullname on status list                                   |
+| [extension](./docs/configuration.md#extension)                                             | Credential files configurable extension                                     |
+| [genpass_pattern](./docs/configuration.md#genpass_pattern)                                 | Regular expression pattern used to generate random passwords                |
+| [headers](./docs/configuration.md#headers)                                                 | Credential columns to be printed                                            |
+| [table_format](./docs/configuration.md#table_format)                                       | Defines how the Table is formated                                           |
+| [colors](./docs/configuration.md#colors)                                                   | Column data colors                                                          |
+
+> More configuration details on [configuring passpie](./docs/configuration.md)
+
+## Tutorials
 
 - [Diving into *fullname* syntax](./docs/fullname.md)
-- [Configuration](./docs/configuration.md)
 - [Grouping Credentials](./docs/grouping.md)
 - [Multiple Databases](./docs/multiple_databases.md)
 - [Syncing Credentials](./docs/syncing.md)
