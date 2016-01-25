@@ -34,6 +34,22 @@ class AliasedGroup(click.Group):
         ctx.fail('Too many matches: %s' % ', '.join(sorted(matches)))
 
 
+def ensure_passphrase(passphrase, config):
+    encrypted = encrypt('OK', recipient=config['recipient'], homedir=config['homedir'])
+    decrypted = decrypt(encrypted,
+                        recipient=config['recipient'],
+                        passphrase=passphrase,
+                        homedir=config['homedir'])
+    if not decrypted == 'OK':
+        message = "Wrong passphrase"
+        message_full = "Wrong passphrase for recipient: {} in homedir: {}".format(
+            config['recipient'],
+            config['homedir'],
+        )
+        logging.error(message_full)
+        raise click.ClickException(click.style(message, fg='red'))
+
+
 @click.group(invoke_without_command=True,
              cls=AliasedGroup if config.load()['short_commands'] else Group)
 @click.option('-D', '--database', help='Alternative database path',
@@ -171,10 +187,12 @@ def add(db, fullname, password, random, pattern, comment, force, copy):
 @click.argument("fullname")
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
 @click.option("--to", default='clipboard',
-              type=click.Choice(['stdout', 'clipboard']))
-@click.option("--clear", default=0)
+              type=click.Choice(['stdout', 'clipboard']),
+              help="Copy password destination")
+@click.option("--clear", default=0, help="Automatically clear password from clipboard")
 @pass_db
 def copy(db, fullname, passphrase, to, clear):
+    ensure_passphrase(passphrase, db.config)
     clear = clear if clear else db.config['copy_timeout']
     credential = db.credential(fullname)
     if not credential:
@@ -282,6 +300,7 @@ def search(db, regex):
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
 @pass_db
 def status(db, full, days, passphrase):
+    ensure_passphrase(passphrase, db.config)
     credentials = db.credentials()
 
     for cred in credentials:
@@ -329,6 +348,7 @@ def import_database(db, filepath):
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
 @pass_db
 def export_database(db, filepath, as_json, passphrase):
+    ensure_passphrase(passphrase, db.config)
     credentials = db.all()
 
     for cred in credentials:
@@ -362,6 +382,7 @@ def export_database(db, filepath, as_json, passphrase):
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
 @pass_db
 def reset(db, passphrase):
+    ensure_passphrase(passphrase, db.config)
     credentials = db.credentials()
     if credentials:
         # decrypt all credentials
