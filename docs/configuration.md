@@ -33,7 +33,7 @@ table_format: fancy_grid
 |---------------------------------|--------------------------------------|-----------------------------------------------------------------------------|
 | path                            | ~/.passpie                           | Path to default database                                                    |
 | homedir                         | ~/.gnupg                             |                                                                             |
-| recipient                       | null                                 | Default gpg recipient to encrypt/decrypt credentials                        |
+| recipient                       | null                                 | Default gpg recipient to encrypt/decrypt credentials using keychains        |
 | key_length                      | 4096                                 | Key generation length                                                       |
 | repo                            | true                                 | Create a git repo by default                                                |
 | autopull                        | false                                | Automatically pull changes from git remote repository                       |
