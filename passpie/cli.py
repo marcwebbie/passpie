@@ -67,7 +67,7 @@ def cli(ctx, database, verbose):
             click.echo(table.render(credentials))
 
 
-@cli.command(help='Shows completion scripts')
+@cli.command(help='Generate completion scripts for shells')
 @click.argument('shell_name', type=click.Choice(completion.SHELLS),
                 default=None, required=False)
 @click.option('--commands', default=None)
@@ -117,7 +117,7 @@ def init(db, force, no_git, recipient):
     click.echo("Initialized database in {}".format(db.path))
 
 
-@cli.command()
+@cli.command(help='Add new credential to database')
 @click.argument("fullname")
 @click.option('-r', '--random', 'password', is_flag=True)
 @click.password_option(help="Credential password")
