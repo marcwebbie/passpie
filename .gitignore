@@ -27,3 +27,4 @@
 /data.db
 /forks
 /TODO.org
+.cache/*
