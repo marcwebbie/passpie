@@ -52,11 +52,11 @@ def test_config_load_gets_settings_from_local_config_when_exists(mocker):
 
 def test_config_load_overrides_global_config_with_local_config_vars(mocker):
     global_config = {
-        'genpass_length': 16,
+        'genpass_pattern': "[\w]{16}",
         'short_commands': True
     }
     local_config = {
-        'genpass_length': 32
+        'genpass_pattern': "[\w]{32}"
     }
     mocker.patch('passpie.config.os.path.exists', return_value=True)
     mocker.patch('passpie.config.read', return_value=local_config)
@@ -64,17 +64,17 @@ def test_config_load_overrides_global_config_with_local_config_vars(mocker):
 
     configuration = passpie.config.load()
     assert configuration is not None
-    assert configuration['genpass_length'] == local_config['genpass_length']
+    assert configuration['genpass_pattern'] == local_config['genpass_pattern']
     assert configuration['short_commands'] == global_config['short_commands']
 
 def test_config_load_has_default_config_loaded(mocker):
     default_config = passpie.config.DEFAULT
     global_config = {
-        'genpass_length': 16,
+        'genpass_pattern': "[\w]{16}",
         'short_commands': True
     }
     local_config = {
-        'genpass_length': 32
+        'genpass_pattern': "[\w]{32}"
     }
     mocker.patch('passpie.config.os.path.exists', return_value=True)
     mocker.patch('passpie.config.read', return_value=local_config)
@@ -89,11 +89,11 @@ def test_config_load_has_default_config_loaded(mocker):
 def test_config_load_has_default_config_loaded(mocker):
     default_config = passpie.config.DEFAULT
     global_config = {
-        'genpass_length': 16,
+        'genpass_pattern': "[\w]{16}",
         'short_commands': True
     }
     local_config = {
-        'genpass_length': 32
+        'genpass_pattern': "[\w]{32}"
     }
     mocker.patch('passpie.config.os.path.exists', return_value=True)
     mocker.patch('passpie.config.read', return_value=local_config)
@@ -108,23 +108,23 @@ def test_config_load_has_default_config_loaded(mocker):
 
 def test_config_load_with_overrides_override_loaded_config(mocker):
     global_config = {
-        'genpass_length': 16,
+        'genpass_pattern': "[\w]{16}",
         'short_commands': True
     }
     local_config = {
-        'genpass_length': 32
+        'genpass_pattern': "[\w]{32}"
     }
 
     short_commands=False
-    genpass_length=10
+    genpass_pattern=10
     mocker.patch('passpie.config.os.path.exists', return_value=True)
     mocker.patch('passpie.config.read', return_value=local_config)
     mocker.patch('passpie.config.read_global_config', return_value=global_config)
 
-    overrides = dict(short_commands=short_commands, genpass_length=genpass_length)
+    overrides = dict(short_commands=short_commands, genpass_pattern=genpass_pattern)
     configuration = passpie.config.load(**overrides)
     assert configuration is not None
-    assert configuration['genpass_length'] == genpass_length
+    assert configuration['genpass_pattern'] == genpass_pattern
     assert configuration['short_commands'] == short_commands
 
 

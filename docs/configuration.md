@@ -12,8 +12,7 @@ homedir: ~/.gnupg
 autopull: false
 copy_timeout: 0
 extension: .pass
-genpass_length: 32
-genpass_symbols: _-#+=
+genpass_pattern: "[a-z]{5} [-_+=*&%$#]{5} [A-Z]{5}"
 headers:
   - name
   - login
@@ -42,8 +41,7 @@ table_format: fancy_grid
 | short_commands                  | false                                | Use passpie commands with short aliases. Like `passpie a` for `passpie add` |
 | status_repeated_passwords_limit | 5                                    | Repeat credential fullname on status list                                   |
 | extension                       | .pass                                | Credential files extension                                                  |
-| genpass_length                  | 32                                   | Length of randomly generated passwords with option `--random`               |
-| genpass_symbols                 | _-#+=                                | Symbols used on random password generation                                  |
+| genpass_pattern                 | [a-z]{10} [-_+=*&%$#]{10} [A-Z]{10}  | Regular expression pattern used to generate random passwords                |
 | headers                         | [name, login, password, comment]     | Values: (name, login, password, comment, fullname)                          |
 | table_format                    | fancy_grid                           | Table format when listing credentials                                       |
 | colors                          | {'login': 'green', 'name': 'yellow'} | Values: (green, red, blue, white, cyan, magenta, yellow)                    |

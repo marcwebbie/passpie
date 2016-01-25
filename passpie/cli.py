@@ -121,14 +121,15 @@ def init(db, force, no_git, recipient):
 @click.argument("fullname")
 @click.option('-p', '--password', help="Credential password")
 @click.option('-r', '--random', is_flag=True, help="Randonly generate password")
+@click.option('-P', '--pattern', help="Random password regex pattern")
 @click.option('-c', '--comment', default="", help="Credential comment")
 @click.option('-f', '--force', is_flag=True, help="Force overwriting")
 @click.option('-C', '--copy', is_flag=True, help="Copy password to clipboard")
 @pass_db
-def add(db, fullname, password, random, comment, force, copy):
+def add(db, fullname, password, random, pattern, comment, force, copy):
     if random:
-        password = genpass(db.config['genpass_length'],
-                           db.config['genpass_symbols'])
+        pattern = pattern if pattern else db.config['genpass_pattern']
+        password = genpass(pattern=pattern)
     elif not password:
         password = click.prompt('Password', hide_input=True, confirmation_prompt=True)
 
@@ -183,16 +184,17 @@ def copy(db, fullname, passphrase, to, clear):
 @click.option("--comment", help="Credential new comment")
 @click.option("--password", help="Credential new password")
 @click.option('--random', is_flag=True, help="Credential new randomly generated password")
+@click.option('-P', '--pattern', help="Random password regex pattern")
 @pass_db
-def update(db, fullname, name, login, password, random, comment):
+def update(db, fullname, name, login, password, random, pattern, comment):
     credential = db.credential(fullname)
     if not credential:
         message = "Credential '{}' not found".format(fullname)
         raise click.ClickException(click.style(message, fg='red'))
 
     if random:
-        password = genpass(db.config['genpass_length'],
-                           db.config['genpass_symbols'])
+        pattern = pattern if pattern else db.config['genpass_pattern']
+        password = genpass(pattern=pattern)
 
     values = credential.copy()
     if any([name, login, password, random, comment]):

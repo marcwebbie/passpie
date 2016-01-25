@@ -12,7 +12,7 @@ def mock_open():
 
 
 def test_genpass_generates_a_password_with_length_32(mocker):
-    password = genpass()
+    password = genpass("\w{32}")
     assert len(password) == 32
 
 

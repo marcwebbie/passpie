@@ -1,9 +1,9 @@
 from contextlib import contextmanager
-from random import SystemRandom
 import errno
 import os
 import tempfile
-import string
+
+import rstr
 
 from ._compat import which
 
@@ -11,11 +11,10 @@ from ._compat import which
 import_module = __import__
 
 
-def genpass(length=32, special="_-#|+="):
+def genpass(pattern=r'[\w]{32}'):
     """generates a password with random chararcters
     """
-    chars = special + string.ascii_letters + string.digits + " "
-    return "".join(SystemRandom().choice(chars) for _ in range(length))
+    return rstr.xeger(pattern)
 
 
 @contextmanager
