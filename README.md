@@ -112,6 +112,7 @@ passpie --help
 - [Version Control With Git](./docs/syncing.md)
 - [Exporting Credentials](#)
 - [Importing Credentials](./docs/importing.md)
+- [Contributing](./docs/contributing.md)
 
 
 ## Common issues
