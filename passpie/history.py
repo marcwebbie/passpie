@@ -23,12 +23,25 @@ def ensure_git(return_value=None):
 
 class Repository(object):
 
-    def __init__(self, path):
+    def __init__(self, path, autopull=False):
         self.path = path
+        self.autopull = autopull
+        if autopull:
+            self.pull_rebase(*autopull)
 
     @ensure_git()
     def init(self):
         cmd = ['git', 'init', self.path]
+        process.call(cmd, cwd=self.path)
+
+    @ensure_git()
+    def pull_rebase(self, remote='origin', branch='master'):
+        cmd = ['git', 'pull', '--rebase', remote, branch]
+        process.call(cmd, cwd=self.path)
+
+    @ensure_git()
+    def push(self, remote='origin', branch='master'):
+        cmd = ['git', 'push']
         process.call(cmd, cwd=self.path)
 
     @ensure_git()

@@ -41,6 +41,7 @@ def cli(ctx, database, verbose):
     # Setup database
     db = Database(configuration['path'], configuration['extension'])
     db.config = configuration
+    db.repo = Repository(db.path, autopull=db.config['autopull'])
     ctx.obj = db
 
     # Verbose
@@ -109,10 +110,9 @@ def init(db, force, no_git, recipient):
         create_keys(passphrase, keys_filepath, key_length=db.config['key_length'])
 
     if not no_git:
-        repo = Repository(db.path)
         logging.info('init git repository in %s' % db.path)
-        repo.init()
-        repo.commit(message='Initialized git repository', add=True)
+        db.repo.init()
+        db.repo.commit(message='Initialized git repository', add=True)
 
     click.echo("Initialized database in {}".format(db.path))
 
@@ -143,9 +143,8 @@ def add(db, fullname, password, comment, force, copy):
         clipboard.copy(password)
         click.secho('Password copied to clipboard', color='yellow')
 
-    repo = Repository(db.path)
     message = 'Added {}{}'.format(fullname, ' [--force]' if force else '')
-    repo.commit(message=message)
+    db.repo.commit(message=message)
 
 
 @cli.command(help="Copy credential password to clipboard/stdout")
@@ -213,8 +212,7 @@ def update(db, fullname, name, login, password, comment):
             encrypted = encrypt(password, recipient=db.config['recipient'], homedir=db.config['homedir'])
             values['password'] = encrypted
         db.update(values, fullname)
-        repo = Repository(db.path)
-        repo.commit('Updated {}'.format(credential['fullname']))
+        db.repo.commit('Updated {}'.format(credential['fullname']))
 
 
 @cli.command(help="Remove credential")
@@ -236,8 +234,7 @@ def remove(db, fullname, yes):
             db.remove(credential['fullname'])
 
         fullnames = ', '.join(c['fullname'] for c in credentials)
-        repo = Repository(db.path)
-        repo.commit('Removed {}'.format(fullnames))
+        db.repo.commit('Removed {}'.format(fullnames))
 
 
 @cli.command(help="Search credentials by regular expressions")
@@ -299,8 +296,7 @@ def import_database(db, filepath):
             cred['password'] = encrypted
         db.insert_multiple(credentials)
 
-        repo = Repository(db.path)
-        repo.commit(message='Imported credentials from {}'.format(filepath))
+        db.repo.commit(message='Imported credentials from {}'.format(filepath))
 
 
 @cli.command(name="export", help="Export credentials in plain text")
@@ -370,8 +366,7 @@ def reset(db, passphrase):
         db.insert_multiple(credentials)
 
         # commit
-        repo = Repository(db.path)
-        repo.commit(message='Reset database')
+        db.repo.commit(message='Reset database')
 
 
 @cli.command(help='Remove all credentials from database')
@@ -384,8 +379,7 @@ def purge(db, yes):
             yes = click.confirm(click.style(alert, 'yellow'), abort=True)
         if yes:
             db.purge()
-            repo = Repository(db.path)
-            repo.commit(message='Purged database')
+            db.repo.commit(message='Purged database')
 
 
 @cli.command(help='Shows passpie database changes history')
@@ -393,16 +387,15 @@ def purge(db, yes):
 @click.option("--reset-to", default=-1, help="Undo changes in database")
 @pass_db
 def log(db, reset_to, init):
-    repo = Repository(db.path)
     if reset_to >= 0:
         logging.info('reset database to index %s', reset_to)
-        repo.reset(reset_to)
+        db.repo.reset(reset_to)
     elif init:
-        repo.init()
-        repo.commit(message='Initialized git repository', add=True)
+        db.repo.init()
+        db.repo.commit(message='Initialized git repository', add=True)
     else:
         commits = []
-        for number, message in enumerate(repo.commit_list()):
+        for number, message in enumerate(db.repo.commit_list()):
             number = click.style(str(number), fg='magenta')
             message = message.strip()
             commits.append("[{}] {}".format(number, message))

@@ -21,6 +21,7 @@ DEFAULT = {
     'headers': ['name', 'login', 'password', 'comment'],
     'colors': {'name': 'yellow', 'login': 'green'},
     'repo': True,
+    'autopull': False,
     'status_repeated_passwords_limit': 5,
     'copy_timeout': 0,
     'extension': '.pass',
