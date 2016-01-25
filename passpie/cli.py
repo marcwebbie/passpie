@@ -4,6 +4,7 @@ import os
 import shutil
 
 import click
+from click.decorators import Group
 import yaml
 
 from . import clipboard, completion, config, checkers, importers
@@ -18,7 +19,23 @@ __version__ = "0.3.3"
 pass_db = click.make_pass_decorator(Database)
 
 
-@click.group(invoke_without_command=True)
+class AliasedGroup(click.Group):
+
+    def get_command(self, ctx, cmd_name):
+        rv = click.Group.get_command(self, ctx, cmd_name)
+        if rv is not None:
+            return rv
+        matches = [x for x in self.list_commands(ctx)
+                   if x.startswith(cmd_name)]
+        if not matches:
+            return None
+        elif len(matches) == 1:
+            return click.Group.get_command(self, ctx, matches[0])
+        ctx.fail('Too many matches: %s' % ', '.join(sorted(matches)))
+
+
+@click.group(invoke_without_command=True,
+             cls=AliasedGroup if config.load()['short_commands'] else Group)
 @click.option('-D', '--database', help='Alternative database path',
               type=click.Path(dir_okay=True, writable=True, resolve_path=True))
 @click.option('-v', '--verbose', help='Activate verbose output', count=True)
