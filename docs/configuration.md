@@ -40,7 +40,7 @@ table_format: fancy_grid
 | copy_timeout                    | 0                                    | Automatically clear copy to clipboard commands                              |
 | short_commands                  | false                                | Use passpie commands with short aliases. Like `passpie a` for `passpie add` |
 | status_repeated_passwords_limit | 5                                    | Repeat credential fullname on status list                                   |
-| extension                       | .pass                                | Credential files extension                                                  |
+| extension                       | .pass                                | Credential files configurable extension                                     |
 | genpass_pattern                 | [a-z]{10} [-_+=*&%$#]{10} [A-Z]{10}  | Regular expression pattern used to generate random passwords                |
 | headers                         | [name, login, password, comment]     | Values: (name, login, password, comment, fullname)                          |
 | table_format                    | fancy_grid                           | Table format when listing credentials                                       |
