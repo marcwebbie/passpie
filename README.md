@@ -42,6 +42,10 @@ passpie add spam@egg --random
 passpie add foo@github.com --random
 passpie add bar@github.com --random
 
+# add credentials with random password patterns
+passpie add jane.doe@example.com --pattern '[0-9]{5}[a-z]{5}' --random
+passpie add john.doe@example.com --pattern '[0-9]{5}[a-z]{5}' --random
+
 # add spam@egg with random password and copy to clipboard
 passpie add spam@egg.local --random --copy
 
