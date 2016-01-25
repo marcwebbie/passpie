@@ -1,6 +1,6 @@
 before_install:
   - sudo apt-get update --fix-missing
-  - sudo apt-get install xclip gnupg2
+  - sudo apt-get install xsel gnupg2
 language: python
 python:
   - 2.7
