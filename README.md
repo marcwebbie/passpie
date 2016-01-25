@@ -152,7 +152,7 @@ table_format: fancy_grid
 | [key_length](./docs/configuration.md#key_length)                                           | Key generation length                                                       |
 | [repo](./docs/configuration.md#repo)                                                       | Create a git repo by default                                                |
 | [autopull](./docs/configuration.md#autopull)                                               | Automatically pull changes from git remote repository                       |
-| [copy_timeout](./docs/configuration.md#copy_timeout)                                       | Automatically clear copy to clipboard commands                              |
+| [copy_timeout](./docs/configuration.md#copy_timeout)                                       | Automatically clear password from clipboard                                 |
 | [short_commands](./docs/configuration.md#short_commands)                                   | Use passpie commands with short aliases. Like `passpie a` for `passpie add` |
 | [status_repeated_passwords_limit](./docs/configuration.md#status_repeated_passwords_limit) | Repeat credential fullname on status list                                   |
 | [extension](./docs/configuration.md#extension)                                             | Credential files configurable extension                                     |
