@@ -119,16 +119,18 @@ def init(db, force, no_git, recipient):
 
 @cli.command(help='Add new credential to database')
 @click.argument("fullname")
-@click.option('-r', '--random', 'password', is_flag=True)
-@click.password_option(help="Credential password")
+@click.option('-p', '--password', help="Credential password")
+@click.option('-r', '--random', is_flag=True, help="Randonly generate password")
 @click.option('-c', '--comment', default="", help="Credential comment")
 @click.option('-f', '--force', is_flag=True, help="Force overwriting")
 @click.option('-C', '--copy', is_flag=True, help="Copy password to clipboard")
 @pass_db
-def add(db, fullname, password, comment, force, copy):
-    if password is True:
+def add(db, fullname, password, random, comment, force, copy):
+    if random:
         password = genpass(db.config['genpass_length'],
                            db.config['genpass_symbols'])
+    elif not password:
+        password = click.prompt('Password', hide_input=True, confirmation_prompt=True)
 
     found = db.credential(fullname=fullname)
     if found and not force:
@@ -180,17 +182,20 @@ def copy(db, fullname, passphrase, to, clear):
 @click.option("--login", help="Credential new login")
 @click.option("--comment", help="Credential new comment")
 @click.option("--password", help="Credential new password")
-@click.option('--random', 'password', flag_value=genpass(),
-              help="Credential new randomly generated password")
+@click.option('--random', is_flag=True, help="Credential new randomly generated password")
 @pass_db
-def update(db, fullname, name, login, password, comment):
+def update(db, fullname, name, login, password, random, comment):
     credential = db.credential(fullname)
     if not credential:
         message = "Credential '{}' not found".format(fullname)
         raise click.ClickException(click.style(message, fg='red'))
 
+    if random:
+        password = genpass(db.config['genpass_length'],
+                           db.config['genpass_symbols'])
+
     values = credential.copy()
-    if any([name, login, password, comment]):
+    if any([name, login, password, random, comment]):
         values["name"] = name if name else credential["name"]
         values["login"] = login if login else credential["login"]
         values["password"] = password if password else credential["password"]
