@@ -114,8 +114,9 @@ def complete(shell_name, commands):
 @click.option('--force', is_flag=True, help="Force overwrite database")
 @click.option('--no-git', is_flag=True, help="Don't create a git repository")
 @click.option('--recipient', help="Keyring default recipient")
+@click.option('--passphrase', help="Database passphrase")
 @pass_db
-def init(db, force, no_git, recipient):
+def init(db, force, no_git, recipient, passphrase):
     if force:
         if os.path.isdir(db.path):
             shutil.rmtree(db.path)
@@ -136,9 +137,10 @@ def init(db, force, no_git, recipient):
     else:
         logging.info('create .passpierc file at %s' % db.path)
         config.create(db.path, defaults={})
-        passphrase = click.prompt('Passphrase',
-                                  hide_input=True,
-                                  confirmation_prompt=True)
+        if not passphrase:
+            passphrase = click.prompt('Passphrase',
+                                      hide_input=True,
+                                      confirmation_prompt=True)
         keys_filepath = os.path.join(db.config['path'], '.keys')
         create_keys(passphrase, keys_filepath, key_length=db.config['key_length'])
 
