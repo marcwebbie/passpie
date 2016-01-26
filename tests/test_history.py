@@ -1,5 +1,5 @@
 import pytest
-from passpie.history import ensure_git, Repository
+from passpie.history import ensure_git, Repository, clone
 
 
 @pytest.fixture
@@ -65,6 +65,28 @@ def test_git_pull_rebase_calls_expected_command_when_remote_branch_is_passed(moc
     repo.pull_rebase(remote='another_origin', branch='another_branch')
 
     mock_process.call.assert_called_once_with(cmd, cwd=repo.path)
+
+
+def test_git_clone_calls_expected_command_with_repository_url(mocker, mock_process):
+    mock_tempdir = mocker.patch('passpie.history.tempdir', return_value='tempdir')
+    dest = 'tempdir'
+    url = 'https://foo@example.com/user/repo.git'
+    cmd = ['git', 'clone', url, dest]
+    clone(url)
+
+    assert mock_tempdir.called
+    mock_process.call.assert_called_once_with(cmd)
+
+
+def test_git_clone_calls_expected_command_with_repository_url_and_destination(mocker, mock_process):
+    mock_tempdir = mocker.patch('passpie.history.tempdir', return_value='tempdir')
+    url = 'https://foo@example.com/user/repo.git'
+    dest = "some/path"
+    cmd = ['git', 'clone', url, dest]
+    clone(url, dest)
+
+    assert not mock_tempdir.called
+    mock_process.call.assert_called_once_with(cmd)
 
 
 def test_git_push_calls_expected_command(mocker, mock_process):

@@ -1,8 +1,7 @@
 from tinydb import where, Query
 from tinydb.storages import MemoryStorage
 
-from passpie.database import PasspieStorage
-from passpie.database import Database
+from passpie.database import Database, is_repo_url, PasspieStorage
 from .helpers import MockerTestCase
 
 
@@ -69,17 +68,35 @@ class StorageTests(MockerTestCase):
             self.mock_os.path.dirname(credpath))
 
 
+def test_database_initialization_creates_tempdir_and_clone_when_path_is_repo_url(mocker):
+    assert is_repo_url('https://foo@example.com/user/repo.git')
+    assert is_repo_url('https://github.com/marcwebbie/passpie.git')
+    assert is_repo_url('git@github.com:marcwebbie/passpie.git')
+    assert not is_repo_url('http://example.com')
+    assert not is_repo_url(None)
+    assert not is_repo_url('')
+    assert not is_repo_url('++++++++++++++')
+
+
 def test_database_has_keys_returns_true_when_file_dot_keys_found_in_db_path(mocker):
-    db = Database(path='path', extension='.pass')
+    config = {
+        'path': 'path',
+        'extension': '.pass',
+    }
     mock_exists = mocker.patch('passpie.database.os.path.exists', return_value=True)
     mock_join = mocker.patch('passpie.database.os.path.join')
+    db = Database(config)
 
     assert db.has_keys() is True
     mock_exists.assert_called_once_with(mock_join('path', '.keys'))
 
 
 def test_database_credential_with_fullname_does_a_db_where_with_split_fullname(mocker):
-    db = Database(path='path', extension='.pass')
+    config = {
+        'path': 'path',
+        'extension': '.pass',
+    }
+    db = Database(config)
     mocker.patch('passpie.database.split_fullname', return_value=('login', 'name'))
     mock_get = mocker.patch.object(db, 'get', return_value=[{}])
 
@@ -90,7 +107,11 @@ def test_database_credential_with_fullname_does_a_db_where_with_split_fullname(m
 
 
 def test_database_add_insert_credential_to_database(mocker):
-    db = Database(path='path', extension='.pass')
+    config = {
+        'path': 'path',
+        'extension': '.pass',
+    }
+    db = Database(config)
     mock_get = mocker.patch.object(db, 'insert')
     mocker.patch('passpie.database.split_fullname', return_value=('login', 'name'))
     mock_datetime = mocker.patch('passpie.database.datetime')
@@ -107,7 +128,11 @@ def test_database_add_insert_credential_to_database(mocker):
 
 
 def test_database_add_with_empty_login_logs_error_and_return_none(mocker):
-    db = Database(path='path', extension='.pass')
+    config = {
+        'path': 'path',
+        'extension': '.pass',
+    }
+    db = Database(config)
     mocker.patch('passpie.database.split_fullname', return_value=(None, 'name'))
     mock_logging = mocker.patch('passpie.database.logging')
 
@@ -118,7 +143,11 @@ def test_database_add_with_empty_login_logs_error_and_return_none(mocker):
 
 
 def test_database_update_uses_table_update_credential_to_database(mocker):
-    db = Database(path='path', extension='.pass')
+    config = {
+        'path': 'path',
+        'extension': '.pass',
+    }
+    db = Database(config)
     mocker.patch.object(db, 'table', mocker.MagicMock())
     mocker.patch('passpie.database.make_fullname', return_value='login@name')
     mock_datetime = mocker.patch('passpie.database.datetime')
@@ -135,7 +164,11 @@ def test_database_update_uses_table_update_credential_to_database(mocker):
 
 
 def test_database_remove_uses_table_remove_credential_from_database(mocker):
-    db = Database(path='path', extension='.pass')
+    config = {
+        'path': 'path',
+        'extension': '.pass',
+    }
+    db = Database(config)
     mocker.patch.object(db, 'table', mocker.MagicMock())
     mocker.patch('passpie.database.make_fullname', return_value='login@name')
 
@@ -146,7 +179,11 @@ def test_database_remove_uses_table_remove_credential_from_database(mocker):
 
 
 def test_credentials_returns_sorted_list_credentials(mocker):
-    db = Database(path='path', extension='.pass')
+    config = {
+        'path': 'path',
+        'extension': '.pass',
+    }
+    db = Database(config)
     mocker.patch.object(db, 'all', mocker.MagicMock())
     mock_sorted = mocker.patch('passpie.database.sorted', create=True)
 
@@ -155,7 +192,11 @@ def test_credentials_returns_sorted_list_credentials(mocker):
 
 
 def test_credentials_filter_credentials_by_login_and_name_when_full_fullname_passed(mocker):
-    db = Database(path='path', extension='.pass')
+    config = {
+        'path': 'path',
+        'extension': '.pass',
+    }
+    db = Database(config)
     mocker.patch('passpie.database.split_fullname', return_value=('foo', 'example.com'))
     mocker.patch.object(db, 'search')
     mocker.patch.object(db, 'all')
@@ -170,7 +211,11 @@ def test_credentials_filter_credentials_by_login_and_name_when_full_fullname_pas
 
 
 def test_credentials_filter_credentials_by_login_and_name_when_empty_login_fullname_passed(mocker):
-    db = Database(path='path', extension='.pass')
+    config = {
+        'path': 'path',
+        'extension': '.pass',
+    }
+    db = Database(config)
     mocker.patch.object(db, 'search')
     mocker.patch.object(db, 'all')
     mocker.patch('passpie.database.split_fullname', return_value=('', 'example.com'))
@@ -185,7 +230,11 @@ def test_credentials_filter_credentials_by_login_and_name_when_empty_login_fulln
 
 
 def test_credentials_filter_credentials_by_login_and_name_when_name_only_fullname_passed(mocker):
-    db = Database(path='path', extension='.pass')
+    config = {
+        'path': 'path',
+        'extension': '.pass',
+    }
+    db = Database(config)
     mocker.patch.object(db, 'search')
     mocker.patch.object(db, 'all')
     mocker.patch('passpie.database.split_fullname', return_value=(None, 'example.com'))
@@ -200,7 +249,11 @@ def test_credentials_filter_credentials_by_login_and_name_when_name_only_fullnam
 
 
 def test_database_matches_uses_table_remove_credential_from_database(mocker):
-    db = Database(path='path', extension='.pass')
+    config = {
+        'path': 'path',
+        'extension': '.pass',
+    }
+    db = Database(config)
     mocker.patch.object(db, 'search', mocker.MagicMock())
     mocker.patch('passpie.database.make_fullname', return_value='login@name')
     regex = '.*'

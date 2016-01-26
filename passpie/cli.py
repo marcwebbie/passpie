@@ -9,10 +9,10 @@ import yaml
 
 from . import clipboard, completion, config, checkers, importers
 from .crypt import create_keys, encrypt, decrypt
-from .database import Database
-from .history import Repository
+from .database import Database, is_repo_url
 from .table import Table
 from .utils import genpass, ensure_dependencies
+from .history import clone
 
 
 __version__ = "1.0.2"
@@ -52,7 +52,7 @@ def ensure_passphrase(passphrase, config):
 
 @click.group(invoke_without_command=True,
              cls=AliasedGroup if config.load()['short_commands'] else Group)
-@click.option('-D', '--database', help='Alternative database path',
+@click.option('-D', '--database', help='Database path or url to remote repository',
               type=click.Path(dir_okay=True, writable=True, resolve_path=True))
 @click.option('-v', '--verbose', help='Activate verbose output', count=True)
 @click.version_option(version=__version__)
@@ -66,15 +66,13 @@ def cli(ctx, database, verbose):
     # Override configuration
     config_overrides = {}
     if database:
-        config_overrides['path'] = database
+        config_overrides['path'] = clone(url=database) if is_repo_url(database) else database
 
     # Setup configuration
     configuration = config.load(**config_overrides)
 
     # Setup database
-    db = Database(configuration['path'], configuration['extension'])
-    db.config = configuration
-    db.repo = Repository(db.path, autopull=db.config['autopull'])
+    db = Database(configuration)
     ctx.obj = db
 
     # Verbose

@@ -1,13 +1,23 @@
 from datetime import datetime
 import logging
 import os
+import re
 import shutil
 
 from tinydb import TinyDB, Storage, where, Query
 import yaml
 
 from .utils import mkdir_open
+from .history import Repository
 from .credential import split_fullname, make_fullname
+
+
+def is_repo_url(path):
+    if path:
+        return re.match(
+            r'((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?',
+            path
+        )
 
 
 class PasspieStorage(Storage):
@@ -51,9 +61,13 @@ class PasspieStorage(Storage):
 
 class Database(TinyDB):
 
-    def __init__(self, path, extension='.pass', storage=PasspieStorage):
-        self.path = path
-        PasspieStorage.extension = extension
+    def __init__(self, config, storage=PasspieStorage):
+        self.config = config
+        self.path = config['path']
+        self.repo = Repository(self.path,
+                               autopull=config.get('autopull'),
+                               autopush=config.get('autopush'))
+        PasspieStorage.extension = config['extension']
         super(Database, self).__init__(self.path, storage=storage)
 
     def has_keys(self):

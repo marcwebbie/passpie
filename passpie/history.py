@@ -2,7 +2,7 @@ from functools import wraps
 import logging
 
 from . import process
-from ._compat import which
+from .utils import which, tempdir
 
 
 def ensure_git(return_value=None):
@@ -19,6 +19,14 @@ def ensure_git(return_value=None):
             return return_value
         return wrapper
     return decorator
+
+
+@ensure_git()
+def clone(url, dest=None):
+    dest = dest if dest else tempdir()
+    cmd = ['git', 'clone', url, dest]
+    process.call(cmd)
+    return dest
 
 
 class Repository(object):
