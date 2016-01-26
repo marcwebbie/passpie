@@ -104,3 +104,44 @@ def test_ensure_commands_returns_command(mocker):
     result = clipboard.ensure_commands(commands)
 
     assert result == commands['xclip']
+
+
+def test_clear_sleep_for_delay_seconds(mocker):
+    mocker.patch('passpie.clipboard.process')
+    mocker.patch('passpie.clipboard.sys.stdout')
+    mocker.patch('passpie.clipboard.print', create=True)
+    mock_time = mocker.patch('passpie.clipboard.time')
+
+    clipboard.clean('some command', delay=5)
+    assert mock_time.sleep.call_count == 5
+
+
+def test_clear_calls_command_to_clear_with_whitespace_char(mocker):
+    mocker.patch('passpie.clipboard.sys.stdout')
+    mocker.patch('passpie.clipboard.print', create=True)
+    mocker.patch('passpie.clipboard.time')
+    mock_process = mocker.patch('passpie.clipboard.process')
+
+    clipboard.clean('some command', delay=5)
+    assert mock_process.call.called
+    mock_process.call.assert_called_once_with('some command', input='\b')
+
+
+def test_clear_is_called_when_clear_is_passed_to_copy_osx(mocker):
+    mocker.patch('passpie.clipboard.ensure_commands', return_value='command')
+    mocker.patch('passpie.clipboard.process')
+    mock_clean = mocker.patch('passpie.clipboard.clean')
+
+    clipboard._copy_osx('text', clear=5)
+    assert mock_clean.called
+    mock_clean.assert_called_once_with('command', delay=5)
+
+
+def test_clear_is_called_when_clear_is_passed_to_copy_linux(mocker):
+    mocker.patch('passpie.clipboard.ensure_commands', return_value='command')
+    mocker.patch('passpie.clipboard.process')
+    mock_clean = mocker.patch('passpie.clipboard.clean')
+
+    clipboard._copy_linux('text', clear=5)
+    assert mock_clean.called
+    mock_clean.assert_called_once_with('command', delay=5)
