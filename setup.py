@@ -10,6 +10,12 @@ except ImportError:
 
 
 __version__ = "1.0.0"
+long_description = open('README.md').read() + "\n\n"
+
+
+if sys.argv[-1] == 'register':
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
 
 
 if sys.argv[-1] == 'publish':
@@ -31,9 +37,6 @@ requirements = [
     'tinydb==3.1.1',
     'rstr==2.2.3',
 ]
-
-
-long_description = open('README.md').read() + "\n\n"
 
 
 class PyTest(Command):
@@ -65,7 +68,7 @@ setup(
     long_description=long_description,
     author='Marcwebbie',
     author_email='marcwebbie@gmail.com',
-    url='https://marcwebbie.github.io/passpie',
+    url='https://github.com/marcwebbie/passpie',
     download_url='https://github.com/marcwebbie/passpie',
     packages=find_packages(),
     entry_points={
