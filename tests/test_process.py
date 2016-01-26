@@ -1,5 +1,5 @@
 import pytest
-from passpie.process import Proc, call
+from passpie.process import Proc, call, DEVNULL, PIPE
 
 
 @pytest.fixture
@@ -13,6 +13,30 @@ def test_call_uses_proc_communicate_with_input(mocker, mock_popen):
     call(['echo', 'hello'])
     assert MockProc().__enter__.called is True
     assert MockProc().__exit__.called is True
+
+
+def test_call_sets_stderr_as_devnull_when_logger_level_is_not_debug(mocker, mock_popen):
+    MockProc = mocker.patch('passpie.process.Proc')
+    MockProc().__enter__.return_value.communicate.return_value = ('', '')
+    mock_logging = mocker.patch('passpie.process.logging')
+    mock_logging.getLogger().getEffectiveLevel.return_value = 0
+    mock_logging.DEBUG = 10
+
+    call(['echo', 'hello'])
+    args, kwargs = MockProc.call_args
+    assert kwargs['stderr'] == DEVNULL
+
+
+def test_call_sets_stderr_as_pipe_when_logger_level_is_set_to_debug(mocker, mock_popen):
+    MockProc = mocker.patch('passpie.process.Proc')
+    MockProc().__enter__.return_value.communicate.return_value = ('', '')
+    mock_logging = mocker.patch('passpie.process.logging')
+    mock_logging.getLogger().getEffectiveLevel.return_value = 10
+    mock_logging.DEBUG = 10
+
+    call(['echo', 'hello'])
+    args, kwargs = MockProc.call_args
+    assert kwargs['stderr'] == PIPE
 
 
 def test_call_output_and_error_are_utf8_decoded(mocker, mock_popen):
