@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 import os
 import shutil
 
@@ -64,6 +65,9 @@ class Database(TinyDB):
 
     def add(self, fullname, password, comment):
         login, name = split_fullname(fullname)
+        if login is None:
+            logging.error('Cannot add credential with empty login. use "@<name>" syntax')
+            return None
         credential = dict(fullname=fullname,
                           name=name,
                           login=login,
@@ -79,8 +83,16 @@ class Database(TinyDB):
         self.table().update(values, (where("fullname") == fullname))
 
     def credentials(self, fullname=None):
-        found = self.all()
-        return sorted(found, key=lambda x: x["name"] + x["login"])
+        if fullname:
+            login, name = split_fullname(fullname)
+            Credential = Query()
+            if login is None:
+                creds = self.search(Credential.name == name)
+            else:
+                creds = self.search((Credential.login == login) & (Credential.name == name))
+        else:
+            creds = self.all()
+        return sorted(creds, key=lambda x: x["name"] + x["login"])
 
     def remove(self, fullname):
         self.table().remove(where('fullname') == fullname)

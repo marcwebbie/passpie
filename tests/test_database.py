@@ -106,6 +106,17 @@ def test_database_add_insert_credential_to_database(mocker):
     db.insert.assert_called_once_with(credential)
 
 
+def test_database_add_with_empty_login_logs_error_and_return_none(mocker):
+    db = Database(path='path', extension='.pass')
+    mocker.patch('passpie.database.split_fullname', return_value=(None, 'name'))
+    mock_logging = mocker.patch('passpie.database.logging')
+
+    result = db.add(fullname='login@name', password='password', comment='comment')
+    assert result is None
+    mock_logging.error.assert_called_once_with(
+        'Cannot add credential with empty login. use "@<name>" syntax')
+
+
 def test_database_update_uses_table_update_credential_to_database(mocker):
     db = Database(path='path', extension='.pass')
     mocker.patch.object(db, 'table', mocker.MagicMock())
@@ -141,6 +152,51 @@ def test_credentials_returns_sorted_list_credentials(mocker):
 
     credentials = db.credentials()
     assert credentials == mock_sorted()
+
+
+def test_credentials_filter_credentials_by_login_and_name_when_full_fullname_passed(mocker):
+    db = Database(path='path', extension='.pass')
+    mocker.patch('passpie.database.split_fullname', return_value=('foo', 'example.com'))
+    mocker.patch.object(db, 'search')
+    mocker.patch.object(db, 'all')
+    Credential = Query()
+
+    credentials = db.credentials(fullname="foo@example.com")
+    assert db.search.called is True
+    assert db.all.called is False
+    db.search.assert_called_once_with(
+        (Credential.login == 'foo') & (Credential.name == 'example.com')
+    )
+
+
+def test_credentials_filter_credentials_by_login_and_name_when_empty_login_fullname_passed(mocker):
+    db = Database(path='path', extension='.pass')
+    mocker.patch.object(db, 'search')
+    mocker.patch.object(db, 'all')
+    mocker.patch('passpie.database.split_fullname', return_value=('', 'example.com'))
+    Credential = Query()
+
+    credentials = db.credentials(fullname="@example.com")
+    assert db.search.called is True
+    assert db.all.called is False
+    db.search.assert_called_once_with(
+        (Credential.login == "") & (Credential.name == "example.com")
+    )
+
+
+def test_credentials_filter_credentials_by_login_and_name_when_name_only_fullname_passed(mocker):
+    db = Database(path='path', extension='.pass')
+    mocker.patch.object(db, 'search')
+    mocker.patch.object(db, 'all')
+    mocker.patch('passpie.database.split_fullname', return_value=(None, 'example.com'))
+    Credential = Query()
+
+    credentials = db.credentials(fullname="@example.com")
+    assert db.search.called is True
+    assert db.all.called is False
+    db.search.assert_called_once_with(
+        (Credential.name == "example.com")
+    )
 
 
 def test_database_matches_uses_table_remove_credential_from_database(mocker):
