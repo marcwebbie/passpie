@@ -23,7 +23,7 @@ def ensure_git(return_value=None):
 
 class Repository(object):
 
-    def __init__(self, path, autopull=False):
+    def __init__(self, path, autopull=None):
         self.path = path
         self.autopull = autopull
         if autopull:
@@ -41,12 +41,15 @@ class Repository(object):
 
     @ensure_git()
     def push(self, remote='origin', branch='master'):
-        cmd = ['git', 'push']
+        cmd = ['git', 'push', remote, branch]
         process.call(cmd, cwd=self.path)
 
     @ensure_git()
     def add(self, all=False):
-        cmd = ['git', 'add', '--all', '.']
+        if all is True:
+            cmd = ['git', 'add', '--all', '.']
+        else:
+            cmd = ['git', 'add', '.']
         process.call(cmd, cwd=self.path)
 
     @ensure_git()

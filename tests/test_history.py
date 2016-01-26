@@ -43,11 +43,77 @@ def test_git_init_creates_a_repository_on_path(mocker, mock_process):
     mock_process.call.assert_called_once_with(cmd, cwd=repo.path)
 
 
+def test_calls_pull_rebase_on_initialization_when_autopull_is_passed(mocker, mock_process):
+    mocker.patch.object(Repository, 'pull_rebase')
+    autopull = ['origin', 'master']
+    repo = Repository('path', autopull)
+    assert repo.pull_rebase.called
+    repo.pull_rebase.assert_called_once_with(*autopull)
+
+
+def test_git_pull_rebase_calls_expected_command(mocker, mock_process):
+    cmd = ['git', 'pull', '--rebase', 'origin', 'master']
+    repo = Repository('path')
+    repo.pull_rebase()
+
+    mock_process.call.assert_called_once_with(cmd, cwd=repo.path)
+
+
+def test_git_pull_rebase_calls_expected_command_when_remote_branch_is_passed(mocker, mock_process):
+    cmd = ['git', 'pull', '--rebase', 'another_origin', 'another_branch']
+    repo = Repository('path')
+    repo.pull_rebase(remote='another_origin', branch='another_branch')
+
+    mock_process.call.assert_called_once_with(cmd, cwd=repo.path)
+
+
+def test_git_push_calls_expected_command(mocker, mock_process):
+    cmd = ['git', 'push', 'origin', 'master']
+    repo = Repository('path')
+    repo.push()
+
+    mock_process.call.assert_called_once_with(cmd, cwd=repo.path)
+
+
+def test_git_push_calls_expected_command_when_remote_branch_is_passed(mocker, mock_process):
+    cmd = ['git', 'push', 'another_origin', 'another_branch']
+    repo = Repository('path')
+    repo.push(remote='another_origin', branch='another_branch')
+
+    mock_process.call.assert_called_once_with(cmd, cwd=repo.path)
+
+
+def test_git_add_has_call_with_expected_command(mocker, mock_process):
+    cmd = ['git', 'add', '.']
+    repo = Repository('path')
+    repo.add()
+
+    mock_process.call.assert_called_once_with(cmd, cwd=repo.path)
+
+
+def test_git_add_has_call_with_expected_command_with_all_flag_when_all_is_true(mocker, mock_process):
+    cmd = ['git', 'add', '--all', '.']
+    repo = Repository('path')
+    repo.add(all=True)
+
+    mock_process.call.assert_called_once_with(cmd, cwd=repo.path)
+
+
+def test_git_sha_list_has_call_with_expected_command(mocker, mock_process):
+    output = 'a\nb'
+    mock_process.call.return_value = (output, '')
+    cmd = ['git', 'log', '--reverse', '--pretty=format:%h']
+    repo = Repository('path')
+    result = repo.sha_list()
+
+    assert result == output.splitlines()
+    mock_process.call.assert_called_once_with(cmd, cwd=repo.path)
+
+
 def test_git_commit_creates_commit_with_message(mocker, mock_process):
-    path = 'some_path'
     message = 'Initial commit'
     cmd = ['git', 'commit', '-m', message]
-    repo = Repository(path)
+    repo = Repository('path')
     mocker.patch.object(repo, 'add')
 
     repo.commit(message)
@@ -62,9 +128,8 @@ def test_git_commit_list_has_expected_commit_list(mocker, mock_process):
         'initial commit'
     ]
     mock_process.call.return_value = ("\n".join(commit_list), 'no error')
-    path = 'some_path'
     cmd = ['git', 'log', '--reverse', '--pretty=format:%s']
-    repo = Repository(path)
+    repo = Repository('path')
     commits = repo.commit_list()
 
     assert len(repo.commit_list()) == len(commits)
