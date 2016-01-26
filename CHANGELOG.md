@@ -2,6 +2,10 @@
 
 ## Versions
 
+### 1.0.2
+
++ **√** Fix passpie update command values in wrong order
+
 ### 1.0.1
 
 + **√** Fix missing `--passphrase` option to init
