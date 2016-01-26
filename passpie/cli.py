@@ -15,7 +15,7 @@ from .table import Table
 from .utils import genpass, ensure_dependencies
 
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 pass_db = click.make_pass_decorator(Database)
 
 
