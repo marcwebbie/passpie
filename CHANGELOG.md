@@ -2,6 +2,19 @@
 
 ## Versions
 
+### 1.0
+
++ **√** Fix runtime permission issues
++ **√** Add local database config files with `.config`
++ **√** Add auto-pull git remote history. fixes #72
++ **√** Support default system keychain via config `recipient`. fixes #45
++ **√** Support filename extension `.pass` configurable. fixes #47
++ **√** Support regex pattern generated passwords. fixes #62
++ **√** Fix --random/--password error when passing from command. fixes #82
++ **√** Improve ensure passphrase function
++ **√** Fix fullname filtering credentials
+
+
 ### 0.3.3
 
 + **√** Fix issue on `reset-to` not reseting from `passpie log`
