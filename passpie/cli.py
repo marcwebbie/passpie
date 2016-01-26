@@ -255,7 +255,7 @@ def update(db, fullname, name, login, password, random, pattern, comment):
         if values["password"] != credential["password"]:
             encrypted = encrypt(password, recipient=db.config['recipient'], homedir=db.config['homedir'])
             values['password'] = encrypted
-        db.update(values, fullname)
+        db.update(fullname=fullname, values=values)
         db.repo.commit('Updated {}'.format(credential['fullname']))
 
 
