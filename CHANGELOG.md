@@ -2,7 +2,11 @@
 
 ## Versions
 
-### 1.0
+### 1.0.1
+
++ **√** Fix missing `--passphrase` option to init
+
+### 1.0.0
 
 + **√** Fix runtime permission issues
 + **√** Add local database config files with `.config`
