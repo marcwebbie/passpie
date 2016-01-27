@@ -75,7 +75,12 @@ class Database(TinyDB):
 
     def credential(self, fullname):
         login, name = split_fullname(fullname)
-        return self.get((where("login") == login) & (where("name") == name))
+        Credential = Query()
+        if login is None:
+            creds = self.get(Credential.name == name)
+        else:
+            creds = self.get((Credential.login == login) & (Credential.name == name))
+        return creds
 
     def add(self, fullname, password, comment):
         login, name = split_fullname(fullname)

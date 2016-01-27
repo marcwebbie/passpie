@@ -106,6 +106,37 @@ def test_database_credential_with_fullname_does_a_db_where_with_split_fullname(m
     db.get.assert_called_once_with((where('login') == 'login') & (where('name') == 'name'))
 
 
+def test_database_credential_with_fullname_does_a_db_get_with_filtering_name_only(mocker):
+    config = {
+        'path': 'path',
+        'extension': '.pass',
+    }
+    db = Database(config)
+    mocker.patch('passpie.database.split_fullname', return_value=(None, 'example.com'))
+    mock_get = mocker.patch.object(db, 'get', return_value=[{}])
+    Credential = Query()
+
+    result = db.credential('login@name')
+
+    assert db.get.called
+    db.get.assert_called_once_with(Credential.name == "example.com")
+
+
+def test_database_credential_with_fullname_does_a_db_where_with_split_fullname(mocker):
+    config = {
+        'path': 'path',
+        'extension': '.pass',
+    }
+    db = Database(config)
+    mocker.patch('passpie.database.split_fullname', return_value=('login', 'name'))
+    mock_get = mocker.patch.object(db, 'get', return_value=[{}])
+
+    result = db.credential('login@name')
+    assert db.get.called
+    assert result == [{}]
+    db.get.assert_called_once_with((where('login') == 'login') & (where('name') == 'name'))
+
+
 def test_database_add_insert_credential_to_database(mocker):
     config = {
         'path': 'path',

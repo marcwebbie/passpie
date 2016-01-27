@@ -3,7 +3,7 @@ import re
 
 def split_fullname(fullname):
     regex = re.compile(r'(?:(?P<login>.+?(?:\@.+?)?)@(?P<name>.+?$))')
-    regex_name_only = re.compile(r'(?P<at>@)?(?P<name>[\w\-\_\.]+$)')
+    regex_name_only = re.compile(r'(?P<at>@)?(?P<name>.+?$)')
 
     if regex.match(fullname):
         mobj = regex.match(fullname)
