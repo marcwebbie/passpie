@@ -243,7 +243,7 @@ You can also add database specific configuration by creating a file called `.con
 
 ## Bugs & Questions
 
-You can file bugs in our github issues tracker, and ask any technical questions on Stack Overflow using the pydub tag. We keep an eye on both.
+You can file bugs in our github [issues tracker](https://github.com/marcwebbie/passpie/issues), and ask any technical questions on Stack Overflow using the passpie tag.
 
 
 ## Common issues
