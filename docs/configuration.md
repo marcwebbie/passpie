@@ -41,7 +41,7 @@ repo: true
 
 #### `autopull`
 
-Automatically pull changes from git remote repository. This setting should be a list of remote
+Automatically pull changes from git remote repository. This setting should be a list of remote/branch
 
 ```yaml
 # default
@@ -55,6 +55,25 @@ autopull:
 - origin  # remote
 - master  # branch
 ```
+
+#### `autopush`
+
+Automatically push to a git remote repository. This setting should be a list of remote/branch
+
+```yaml
+# default
+autopush: null
+```
+
+This setting should be a list containing `remote` and  `branch` to pull.
+
+```yaml
+autopull:
+- origin  # remote
+- master  # branch
+```
+
+> Useful when used with a volatile database. `passpie -D https://foo@example.com/user/repo.git --autopush "origin/master"`
 
 #### `copy_timeout`
 

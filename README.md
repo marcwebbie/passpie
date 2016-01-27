@@ -42,10 +42,6 @@ passpie add spam@egg --random
 passpie add foo@github.com --random
 passpie add bar@github.com --random
 
-# add credentials with random password patterns
-passpie add jane.doe@example.com --pattern '[0-9]{5}[a-z]{5}' --random
-passpie add john.doe@example.com --pattern '[0-9]{5}[a-z]{5}' --random
-
 # add spam@egg with random password and copy to clipboard
 passpie add spam@egg.local --random --copy
 
@@ -86,6 +82,47 @@ passpie purge
 # shows help. Option `--help`
 passpie --help
 ```
+
+Randomizing credentials:
+
+```fish
+# Adding credential with random password pattern
+passpie add john.doe@example.com --random --pattern '[0-9]{5}[a-z]{5}'
+
+# Updating credential with random password pattern
+passpie update john.doe@example.com --random --pattern "[0-9\#\$\%\w\ ]{32}"
+
+# Adding credential with random password and copy generated password to clipboard
+passpie add john.doe@example.com --copy --random --pattern '[0-9]{5}[a-z]{5}'
+```
+
+Playing with *volatile* database.
+
+
+```fish
+# Listing credentials from a remote database
+passpie -D https://foo@example.com/user/repo.git
+
+# Adding credentials to a remote database and autopushing changes
+passpie -D https://foo@example.com/user/repo.git --autopush "origin/master" add foo+nouveau@example.com
+
+# Exporting environment variables
+export PASSPIE_DATABASE=https://foo@example.com/user/repo.git
+export PASSPIE_AUTOPULL=origin/master
+export PASSPIE_AUTOPUSH=origin/master
+
+# List remote credentials
+passpie
+
+# Copy remote `foo@example.com` password
+passpie copy foo@example.com
+
+# Add credential with random password directly to remote
+passpie add foo+nouveau@example.com --random --pattern "[0-9\#\$\%\w\ ]{32}"
+passpie add foo+nouveau@example.com --random --pattern "[0-9\#\$\%\w\ ]{32}"
+```
+
+----
 
 ## Commands
 
