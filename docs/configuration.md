@@ -21,7 +21,7 @@ Default gpg recipient to encrypt/decrypt credentials using keychains. This shoul
 
 ```yaml
 # default
-recipient: passpie@local
+recipient: null
 ```
 
 > Ignored if `.keys` exists in database
