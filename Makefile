@@ -3,7 +3,7 @@ PACKAGE_TESTS=tests
 
 all: check coverage
 
-test:
+test: clean
 	python -W ignore setup.py -q test
 
 install:
@@ -24,7 +24,7 @@ clean:
 	rm -rf dist || true
 	rm -rf __pycache__ || true
 
-coverage:
+coverage: clean
 	py.test --cov passpie --cov-config .coveragerc --cov-report=term-missing
 
 dist:
