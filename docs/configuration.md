@@ -1,5 +1,31 @@
 # Configuring Passpie
 
+### Example:
+
+```yaml
+path: ~/.passpie
+homedir: ~/.gnupg
+autopull: null
+autopush: null
+copy_timeout: 0
+extension: .pass
+genpass_pattern: "[a-z]{5} [-_+=*&%$#]{5} [A-Z]{5}"
+headers:
+  - name
+  - login
+  - password
+  - comment
+colors:
+  login: green
+  name: yellow
+key_length: 4096
+recipient: passpie@local
+repo: true
+short_commands: false
+status_repeated_passwords_limit: 5
+table_format: fancy_grid
+```
+
 #### `path`
 
 Path to default database

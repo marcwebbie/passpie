@@ -9,83 +9,94 @@
 
 ## Installation
 
-```fish
+```bash
 pip install passpie
 ```
 
 Or on a *mac*, with [homebrew](http://brew.sh):
 
-```fish
+```bash
 brew install passpie
 ```
 
-Or to install the *latest development* version:
-
-```fish
+> Or to install the *latest development* version:
+```bash
 pip install -U https://github.com/marcwebbie/passpie/tarball/master
 ```
 
-
 ## Quickstart
 
-```fish
-# initialize a passpie database
+```bash
 passpie init
-
-# add some credentials
-passpie add foo@example.com
-passpie add bar@example.com
-
-# add some credential with random passwords
-passpie add bar@github.com --random
-passpie add spam@egg --random
-passpie add foo@github.com --random
-passpie add bar@github.com --random
-
-# add spam@egg with random password and copy to clipboard
-passpie add spam@egg.local --random --copy
-
-# edit credential "foo@example.com"
-passpie update foo@example.com
-
-# copy password from credential "foo@example.com" to clipboard
+passpie add foo@example.com --random --pattern '[0-9]{5}[a-z]{5}'
+passpie add bar@example.com --random --pattern '[0-9]{5}[a-z]{5}'
 passpie copy foo@example.com
-
-# copy password to clipboard with clearing clipboard after 10 seconds
-passpie copy foo@example.com --clear 10
-
-# search credentials by string "exam"
-passpie search exam
-
-# search credentials using regular expressions
-passpie search 'foo|bar'
-
-# remove some credentials
-passpie remove foo@example.com
-passpie remove foo@github.com
-
-# see the database change history
-passpie log
-
-# reset to a previous version of the database
-passpie --reset-to 5
-
-# check database status
-passpie status
-
-# print all credentials as a table with hidden passwords
 passpie
-
-# purge all credentials from database
-passpie purge
-
-# shows help. Option `--help`
-passpie --help
 ```
 
-Randomizing credentials:
+`outputs`:
 
-```fish
+```bash
+╒═════════════╤═════════╤════════════╤═══════════╕
+│ Name        │ Login   │ Password   │ Comment   │
+╞═════════════╪═════════╪════════════╪═══════════╡
+│ example.com │ bar     │ *****      │           │
+├─────────────┼─────────┼────────────┼───────────┤
+│ example.com │ foo     │ *****      │           │
+╘═════════════╧═════════╧════════════╧═══════════╛
+```
+
+### Usage
+
+| Command        | Description                                           |
+|----------------|-------------------------------------------------------|
+| **`add`**      | Add new credential to database                        |
+| **`complete`** | Generate completion scripts for shells                |
+| **`copy`**     | Copy credential password to clipboard/stdout          |
+| **`export`**   | Export credentials in plain text                      |
+| **`import`**   | Import credentials from file                          |
+| **`init`**     | Initialize new passpie database                       |
+| **`log`**      | Shows passpie database changes history                |
+| **`purge`**    | Remove all credentials from database                  |
+| **`remove`**   | Remove credential                                     |
+| **`reset`**    | Renew passpie database and re-encrypt all credentials |
+| **`search`**   | Search credentials by regular expressions             |
+| **`status`**   | Diagnose database for improvements                    |
+| **`update`**   | Update credential                                     |
+
+Initializing a passpie database:
+
+```bash
+passpie init
+```
+
+Adding credentials
+
+```bash
+# Adding a credential. You will be promped to enter a password
+passpie add foo@example.com
+
+# Adding a credential with comments
+passpie add foo+commented@example.com --comment "Commented credential"
+
+# Force re-adding a credential
+passpie add foo+commented@example.com --force
+```
+
+Grouping credentials
+
+```bash
+passpie add foo@opensource/github.com --random
+passpie add foo@opensource/python.org --random
+passpie add foo@opensource/bitbucket.org --random
+passpie add foo@opensource/npm.org --random
+```
+
+> Learn more: [Grouping Credentials](./docs/grouping.md)
+
+Randomizing passwords
+
+```bash
 # Adding credential with random password pattern
 passpie add john.doe@example.com --random --pattern '[0-9]{5}[a-z]{5}'
 
@@ -96,10 +107,73 @@ passpie update john.doe@example.com --random --pattern "[0-9\#\$\%\w\ ]{32}"
 passpie add john.doe@example.com --copy --random --pattern '[0-9]{5}[a-z]{5}'
 ```
 
+Using multiple databases
+
+```bash
+# Creating multiple databases
+mkdir ~/credentials
+passpie -D ~/credentials/personal init
+passpie -D ~/credentials/work init
+passpie -D ~/credentials/junk init
+
+# Inserting credentials into specific databases
+passpie -D ~/credentials/personal add johnd@github.com --random
+passpie -D ~/credentials/work add john.doe@example.com --random
+passpie -D ~/credentials/junk add fake@example.com --random
+```
+
+Updating and removing credentials
+
+```bash
+# Update credential. You will be promped with changes
+passpie update foo@example.com
+
+# Update credential to a random password. Skip prompts
+passpie update -y --random foo@example.com
+
+# Remove credential
+passpie remove foo@example.com
+
+# Remove credential. Skip prompts
+passpie remove -y foo@example.com
+```
+
+Searching credentials
+
+```bash
+# search credentials by string "exam"
+passpie search exam
+
+# search credentials using regular expressions
+passpie search '[fF]oo|bar'
+```
+
+Version control and sync databases
+
+```bash
+# see the database change history
+passpie log
+
+# reset to a previous version of the database
+passpie --reset-to 5
+
+# Initialize git history on an existing database
+passpie log --init
+```
+
+Reseting and purging a database
+
+```bash
+# Delete all credentials from database
+passpie purge
+
+# Redefine passphrase and reencrypt all credentials from database
+passpie reset
+```
+
 Playing with *volatile* database.
 
-
-```fish
+```bash
 # Listing credentials from a remote database
 passpie -D https://foo@example.com/user/repo.git
 
@@ -122,26 +196,6 @@ passpie add foo+nouveau@example.com --random --pattern "[0-9\#\$\%\w\ ]{32}"
 passpie add foo+nouveau@example.com --random --pattern "[0-9\#\$\%\w\ ]{32}"
 ```
 
-----
-
-## Commands
-
-| Command        | Description                                           |
-|----------------|-------------------------------------------------------|
-| **`add`**      | Add new credential to database                        |
-| **`complete`** | Generate completion scripts for shells                |
-| **`copy`**     | Copy credential password to clipboard/stdout          |
-| **`export`**   | Export credentials in plain text                      |
-| **`import`**   | Import credentials from file                          |
-| **`init`**     | Initialize new passpie database                       |
-| **`log`**      | Shows passpie database changes history                |
-| **`purge`**    | Remove all credentials from database                  |
-| **`remove`**   | Remove credential                                     |
-| **`reset`**    | Renew passpie database and re-encrypt all credentials |
-| **`search`**   | Search credentials by regular expressions             |
-| **`status`**   | Diagnose database for improvements                    |
-| **`update`**   | Update credential                                     |
-
 ## Configuring passpie
 
 ### Global
@@ -153,32 +207,6 @@ You can override passpie default configuration with a **passpierc** file. Global
 ### Per-database
 
 You can also add database specific configuration by creating a file called `.config` inside database directory. These files are automatically created when initializing databases.
-
-### Example:
-
-```yaml
-path: ~/.passpie
-homedir: ~/.gnupg
-autopull: null
-autopush: null
-copy_timeout: 0
-extension: .pass
-genpass_pattern: "[a-z]{5} [-_+=*&%$#]{5} [A-Z]{5}"
-headers:
-  - name
-  - login
-  - password
-  - comment
-colors:
-  login: green
-  name: yellow
-key_length: 4096
-recipient: passpie@local
-repo: true
-short_commands: false
-status_repeated_passwords_limit: 5
-table_format: fancy_grid
-```
 
 ### Fields
 
@@ -201,7 +229,7 @@ table_format: fancy_grid
 
 > More configuration details on [configuring passpie](./docs/configuration.md)
 
-## Tutorials
+## Learn more
 
 - [Diving into *fullname* syntax](./docs/fullname.md)
 - [Grouping Credentials](./docs/grouping.md)
@@ -211,6 +239,11 @@ table_format: fancy_grid
 - [Exporting Credentials](#)
 - [Importing Credentials](./docs/importing.md)
 - [Contributing](./docs/contributing.md)
+
+
+## Bugs & Questions
+
+You can file bugs in our github issues tracker, and ask any technical questions on Stack Overflow using the pydub tag. We keep an eye on both.
 
 
 ## Common issues
