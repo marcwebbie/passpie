@@ -142,7 +142,7 @@ def init(db, force, no_git, recipient, passphrase):
 
     try:
         os.makedirs(db.path)
-    except SystemError:
+    except (SystemError, OSError):
         message = "Path exists '{}'. `--force` to overwrite".format(db.path)
         raise click.ClickException(click.style(message, fg='yellow'))
 
