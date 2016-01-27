@@ -160,6 +160,7 @@ You can also add database specific configuration by creating a file called `.con
 path: ~/.passpie
 homedir: ~/.gnupg
 autopull: null
+autopush: null
 copy_timeout: 0
 extension: .pass
 genpass_pattern: "[a-z]{5} [-_+=*&%$#]{5} [A-Z]{5}"
