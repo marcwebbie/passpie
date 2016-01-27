@@ -194,7 +194,7 @@ def add(db, fullname, password, random, pattern, comment, force, copy):
 
     if copy:
         clipboard.copy(password)
-        click.secho('Password copied to clipboard', color='yellow')
+        click.secho('Password copied to clipboard', fg='yellow')
 
     message = 'Added {}{}'.format(fullname, ' [--force]' if force else '')
     db.repo.commit(message=message)
