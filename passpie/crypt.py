@@ -110,6 +110,7 @@ def get_default_recipient(homedir, secret=False):
 
 
 def encrypt(data, recipient, homedir):
+    recipient = recipient if recipient else get_default_recipient(homedir)
     command = [
         which('gpg2') or which('gpg'),
         '--batch',
@@ -120,12 +121,12 @@ def encrypt(data, recipient, homedir):
         '--homedir', homedir,
         '--encrypt'
     ]
-
     output, _ = process.call(command, input=data)
     return output
 
 
 def decrypt(data, recipient, passphrase, homedir):
+    recipient = recipient if recipient else get_default_recipient(homedir)
     command = [
         which('gpg2') or which('gpg'),
         '--batch',
