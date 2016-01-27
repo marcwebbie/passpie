@@ -1,9 +1,9 @@
 PACKAGE=passpie
 PACKAGE_TESTS=tests
 
-all: check coverage
+all: clean develop check coverage check-release
 
-test: clean
+test:
 	python -W ignore setup.py -q test
 
 install:
@@ -24,7 +24,7 @@ clean:
 	rm -rf dist || true
 	rm -rf __pycache__ || true
 
-coverage: clean
+coverage:
 	py.test --cov passpie --cov-config .coveragerc --cov-report=term-missing
 
 dist:
@@ -47,8 +47,6 @@ check:
 	grep -inr "set_trace()" --color=auto $(PACKAGE) || true
 	grep -inr "set_trace()" --color=auto $(PACKAGE_TESTS) || true
 
-simulate: check test
-
 publish:
 	python setup.py publish
 
@@ -64,10 +62,17 @@ bump-minor:
 bump-major:
 	bumpversion major setup.py passpie/cli.py
 
-deploy-patch: simulate bump-patch register publish tag
+check-release:
+	@echo "Commits not included in last version"
+	@echo "======================"
+	git log `git describe --tags --abbrev=0`..HEAD --oneline
 
-deploy-minor: simulate bump-minor register publish tag
+deploy-patch: check test bump-patch register publish tag
 
-deploy-major: simulate bump-major register publish tag
+deploy-minor: check test bump-minor register publish tag
+
+deploy-major: check test bump-major register publish tag
 
 deploy: deploy-patch
+
+.SILENT:
