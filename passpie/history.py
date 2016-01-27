@@ -31,8 +31,9 @@ def clone(url, dest=None):
 
 class Repository(object):
 
-    def __init__(self, path, autopull=None):
+    def __init__(self, path, autopull=None, autopush=None):
         self.path = path
+        self.autopush = autopush
         self.autopull = autopull
         if autopull:
             self.pull_rebase(*autopull)
@@ -66,6 +67,8 @@ class Repository(object):
             self.add(all=True)
         cmd = ['git', 'commit', '-m', message]
         process.call(cmd, cwd=self.path)
+        if self.autopush:
+            self.push()
 
     @ensure_git(return_value=[])
     def commit_list(self):

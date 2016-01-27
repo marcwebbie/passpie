@@ -144,6 +144,16 @@ def test_git_commit_creates_commit_with_message(mocker, mock_process):
     mock_process.call.assert_called_once_with(cmd, cwd=repo.path)
 
 
+def test_git_commit_calls_push_when_autopush_set(mocker, mock_process):
+    message = 'Initial commit'
+    cmd = ['git', 'commit', '-m', message]
+    repo = Repository('path', autopush=['origin', 'master'])
+    mocker.patch.object(repo, 'push')
+
+    repo.commit(message)
+    assert repo.push.called
+
+
 def test_git_commit_list_has_expected_commit_list(mocker, mock_process):
     commit_list = [
         'another commit',

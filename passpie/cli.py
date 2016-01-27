@@ -50,14 +50,27 @@ def ensure_passphrase(passphrase, config):
         raise click.ClickException(click.style(message, fg='red'))
 
 
+def validate_remote(ctx, param, value):
+    if value:
+        try:
+            remote, branch = value.split('/')
+            return (remote, branch)
+        except ValueError:
+            raise click.BadParameter('remote need to be in format <remote>/<branch>')
+
+
 @click.group(invoke_without_command=True,
              cls=AliasedGroup if config.load()['short_commands'] else Group)
 @click.option('-D', '--database', help='Database path or url to remote repository',
-              type=click.Path(dir_okay=True, writable=True, resolve_path=True))
+              envvar="PASSPIE_DATABASE")
+@click.option('--autopull', help='Autopull changes from remote pository',
+              callback=validate_remote, envvar="PASSPIE_AUTOPULL")
+@click.option('--autopush', help='Autopush changes to remote pository',
+              callback=validate_remote, envvar="PASSPIE_AUTOPUSH")
 @click.option('-v', '--verbose', help='Activate verbose output', count=True)
 @click.version_option(version=__version__)
 @click.pass_context
-def cli(ctx, database, verbose):
+def cli(ctx, database, autopull, autopush, verbose):
     try:
         ensure_dependencies()
     except RuntimeError as e:
@@ -67,6 +80,10 @@ def cli(ctx, database, verbose):
     config_overrides = {}
     if database:
         config_overrides['path'] = clone(url=database) if is_repo_url(database) else database
+    if autopush:
+        config_overrides['autopush'] = autopush
+    if autopull:
+        config_overrides['autopull'] = autopull
 
     # Setup configuration
     configuration = config.load(**config_overrides)

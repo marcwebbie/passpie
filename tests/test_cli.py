@@ -68,6 +68,30 @@ def test_cli_create_database_with_configuration(mocker, mock_deps):
     mock_database.assert_called_once_with(mock_config.load())
 
 
+def test_cli_create_database_with_configuration_overriding_autopush(mocker, mock_deps):
+    mock_database = mocker.patch('passpie.cli.Database')
+    mock_config = mocker.patch('passpie.cli.config')
+    mocker.patch('passpie.cli.logging')
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ['--autopush', 'origin/master'])
+
+    assert mock_config.load.called
+    mock_config.load.assert_called_once_with(autopush=('origin', 'master'))
+
+
+def test_cli_create_database_with_configuration_overriding_autopull(mocker, mock_deps):
+    mock_database = mocker.patch('passpie.cli.Database')
+    mock_config = mocker.patch('passpie.cli.config')
+    mocker.patch('passpie.cli.logging')
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ['--autopull', 'origin/master'])
+
+    assert mock_config.load.called
+    mock_config.load.assert_called_once_with(autopull=('origin', 'master'))
+
+
 def test_cli_sets_logging_verbose_level_to_info_when_passing_one_v(mocker, mock_deps):
     mocker.patch('passpie.cli.Database')
     mocker.patch('passpie.cli.config')
