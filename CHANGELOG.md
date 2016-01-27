@@ -2,6 +2,11 @@
 
 ## Versions
 
+### 1.1.1
+
++ **√** Fix filtering by fullname without login
++ **√** Update colors on copy message
+
 ### 1.1.0
 
 + **√** Add volatile passpie repo using git url as path: `passpie -D https://foo@example.com/user/repo.git`.
