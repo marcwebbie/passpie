@@ -2,6 +2,13 @@
 
 ## Versions
 
+### 1.1.0
+
++ **√** Add volatile passpie repo using git url as path: `passpie -D https://foo@example.com/user/repo.git`.
++ **√** Add autopush git remote history.
++ **√** Set default config recipient to `null`.
++ **√** Fix error on passpie init raising exception when path exists. Closes #83
+
 ### 1.0.2
 
 + **√** Fix passpie update command values in wrong order
