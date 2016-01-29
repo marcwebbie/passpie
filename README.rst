@@ -48,35 +48,38 @@ Outputs:
 Features
 ========
 
-| ⁕ Add, update, remove credentials
-| ⁕ Manage multiple databases. Locally and remotely
-| ⁕ Copy passwords to clipboard or to stdout
-| ⁕ List credentials as a table with colored output
-| ⁕ Search credentials by name, login, comments or regulax expresions
-| ⁕ Group credentials by name
-| ⁕ `Configuration <#configuration>`_ with ~/.passpie or .config
-| ⁕ Version control passpie databases using git
-| ⁕ Change passphrase and re-encrypt database
-| ⁕ Export Passpie database to plain text file
-| ⁕ Import credentials
-| ⁕ Randomly generated credential passwords
-| ⁕ Generate database status report
-| ⁕ BASH/ZSH/FISH completion
-| ⁕ Undo/Redo changes to the database. (requires `git <https://git-scm.com/>`_)
-| ⁕ Set a personal gpg key recipient
-| ⁕ Per database keyring
+| ★ Add, update, remove credentials
+| ★ Manage multiple databases. Locally and remotely
+| ★ Copy passwords to clipboard or to stdout
+| ★ List credentials as a table with colored output
+| ★ Search credentials by name, login, comments or regulax expresions
+| ★ Group credentials by name
+| ★ `Configuration <#configuration>`_ with ~/.passpie or .config
+| ★ Version control passpie databases using git
+| ★ Change passphrase and re-encrypt database
+| ★ Export Passpie database to plain text file
+| ★ Import credentials
+| ★ Generate random passwords
+| ★ Generate database status report
+| ★ BASH/ZSH/FISH completion
+| ★ Undo/Redo changes to the database. (requires `git <https://git-scm.com/>`_)
+| ★ Set a personal gpg key recipient
+| ★ Per database keyring
 
 
 Tutorial
 ========
 
-Initializing a passpie database:
+Initializing a database:
 
 .. code:: bash
 
     passpie init
 
-Adding credentials
+    # Initializing a database using an existing GnuPG keyring recipient
+    passpie init --recipient marcwebbie@example.com
+
+Adding credentials:
 
 .. code:: bash
 
@@ -89,7 +92,7 @@ Adding credentials
     # Force re-adding a credential
     passpie add foo+commented@example.com --force
 
-Grouping credentials
+Grouping credentials:
 
 .. code:: bash
 
@@ -98,7 +101,7 @@ Grouping credentials
     passpie add foo@opensource/bitbucket.org --random
     passpie add foo@opensource/npm.org --random
 
-Randomizing passwords
+Randomizing passwords:
 
 .. code:: bash
 
@@ -111,7 +114,7 @@ Randomizing passwords
     # Adding credential with random password and copy generated password to clipboard
     passpie add john.doe@example.com --copy --random --pattern '[0-9]{5}[a-z]{5}'
 
-Using multiple databases
+Creating multiple databases each with a different password and keys:
 
 .. code:: bash
 
@@ -126,7 +129,7 @@ Using multiple databases
     passpie -D ~/credentials/work add john.doe@example.com --random
     passpie -D ~/credentials/junk add fake@example.com --random
 
-Updating and removing credentials
+Updating and removing credentials:
 
 .. code:: bash
 
@@ -142,7 +145,7 @@ Updating and removing credentials
     # Remove credential. Skip prompts
     passpie remove -y foo@example.com
 
-Searching credentials
+Searching credentials:
 
 .. code:: bash
 
@@ -152,7 +155,7 @@ Searching credentials
     # search credentials using regular expressions
     passpie search '[fF]oo|bar'
 
-Version control and sync databases
+Version control and sync databases:
 
 .. code:: bash
 
@@ -165,7 +168,7 @@ Version control and sync databases
     # Initialize git history on an existing database
     passpie log --init
 
-Reseting and purging a database
+Reseting and purging a database:
 
 .. code:: bash
 
@@ -175,7 +178,7 @@ Reseting and purging a database
     # Redefine passphrase and reencrypt all credentials from database
     passpie reset
 
-Playing with *volatile* remote databases.
+Playing with *volatile* remote databases:
 
 .. code:: bash
 
@@ -201,7 +204,7 @@ Playing with *volatile* remote databases.
     passpie add foo+nouveau@example.com --random --pattern "[0-9\#\$\%\w\ ]{32}"
 
 
-Debugging
+Debugging:
 
 .. code:: bash
 
@@ -218,8 +221,7 @@ Debugging
 Configuration
 =============
 
-
-Example configuration file
+Example configuration file:
 
 .. code-block:: yaml
 
