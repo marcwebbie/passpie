@@ -40,7 +40,7 @@ def test_git_init_creates_a_repository_on_path(mocker, mock_process):
     repo = Repository(path)
     repo.init()
 
-    mock_process.call.assert_called_once_with(cmd, cwd=repo.path)
+    mock_process.call.assert_called_once_with(cmd)
 
 
 def test_calls_pull_rebase_on_initialization_when_autopull_is_passed(mocker, mock_process):
