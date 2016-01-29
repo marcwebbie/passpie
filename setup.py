@@ -10,12 +10,7 @@ except ImportError:
 
 
 __version__ = "1.1.1"
-long_description = open('README.md').read() + "\n\n"
-
-
-if sys.argv[-1] == 'register':
-    import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst')
+long_description = open('README.rst').read() + "\n\n"
 
 
 if sys.argv[-1] == 'publish':
