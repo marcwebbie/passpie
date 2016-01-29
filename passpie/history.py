@@ -41,7 +41,7 @@ class Repository(object):
     @ensure_git()
     def init(self):
         cmd = ['git', 'init', self.path]
-        process.call(cmd, cwd=self.path)
+        process.call(cmd)
 
     @ensure_git()
     def pull_rebase(self, remote='origin', branch='master'):
