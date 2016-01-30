@@ -78,7 +78,7 @@ extensions: Contributions to Passpie are welcome! Here's how to get started:
 4. Send a pull request and bug the maintainer until it gets merged and
    published ☺
 
-Learn more on `contributing docs <http://passpie.readthedocs.org/en/latest/contributing.html>`
+Learn more on the `contributing documentation <http://passpie.readthedocs.org/en/latest/contributing.html>`_
 
 
 Licence |License|
