@@ -72,8 +72,7 @@ Features
 Documentation
 ================
 
-- `Usage <https://github.com/marcwebbie/passpie/blob/master/docs/documentation.rst#usage>`_
-- `Configuration <https://github.com/marcwebbie/passpie/blob/master/docs/documentation.rst#configuration>`_
+Check the documentation on `readthedocks<http://passpie.readthedocs.org>`
 
 
 Bugs & Questions

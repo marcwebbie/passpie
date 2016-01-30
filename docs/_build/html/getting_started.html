@@ -1,0 +1,416 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Getting Started &mdash; Passpie 1.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/passpie.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Passpie 1.1.1 documentation" href="index.html" />
+    <link rel="next" title="Configuration" href="configuration.html" />
+    <link rel="prev" title="Welcome to Passpie" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="fullnames-queries">
+<h2>Fullnames queries<a class="headerlink" href="#fullnames-queries" title="Permalink to this headline">¶</a></h2>
+<p>Passpie queried using <code class="docutils literal"><span class="pre">fullname</span></code> syntax. fullname syntax
+handles login and name for credentials in one go for faster adding and
+querying of credentials.</p>
+<div class="section" id="structure-of-a-fullname">
+<h3>Structure of a fullname<a class="headerlink" href="#structure-of-a-fullname" title="Permalink to this headline">¶</a></h3>
+<p>Fullnames are composed of <code class="docutils literal"><span class="pre">login</span></code>&#64;<code class="docutils literal"><span class="pre">name</span></code>. Login is optional. Fullnames have 3 possible formats:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">login&#64;name</span></code></li>
+<li><code class="docutils literal"><span class="pre">&#64;name</span></code></li>
+<li><code class="docutils literal"><span class="pre">name</span></code></li>
+</ul>
+<p>For example adding credentials using <code class="docutils literal"><span class="pre">&#64;name</span></code> syntax:</p>
+<div class="highlight-python"><div class="highlight"><pre>passpie add @banks/mybank --password 1234
+passpie add @banks/myotherbank --password 5678
+</pre></div>
+</div>
+<p>Listing credentials:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ passpie
+=================  =======  ==========  =========
+Name               Login    Password    Comment
+=================  =======  ==========  =========
+banks/mybank                *****
+banks/myotherbank           *****
+=================  =======  ==========  =========
+</pre></div>
+</div>
+<p>Since <code class="docutils literal"><span class="pre">login</span></code> is optional. You can query credentials using only name
+syntax, for example to update credential with name <code class="docutils literal"><span class="pre">banks/mybank</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre>passpie update @banks/mybank --random
+</pre></div>
+</div>
+<p>Or even better, without using the <code class="docutils literal"><span class="pre">&#64;</span></code> notation:</p>
+<div class="highlight-python"><div class="highlight"><pre>passpie update banks/mybank --random
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="random-passwords">
+<h2>Random Passwords<a class="headerlink" href="#random-passwords" title="Permalink to this headline">¶</a></h2>
+<p>Random password pattern can be set via <code class="docutils literal"><span class="pre">genpass_pattern</span></code> config.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c1"># Adding credential with random password using config pattern</span>
+passpie add john.doe@example.com
+
+<span class="c1"># Adding credential with random password overriding pattern</span>
+passpie add john.doe@example.com --pattern <span class="s1">&#39;[0-9]{5}[a-z]{5}&#39;</span>
+
+<span class="c1"># Updating credential with random password pattern</span>
+passpie update john.doe@example.com --pattern <span class="s2">&quot;[0-9\#\$\%\w\ ]{32}&quot;</span>
+
+<span class="c1"># Adding credential with random password and copy generated password to clipboard</span>
+passpie add john.doe@example.com --copy --pattern <span class="s1">&#39;[0-9]{5}[a-z]{5}&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="searching">
+<h2>Searching<a class="headerlink" href="#searching" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c1"># search credentials by string &quot;exam&quot;</span>
+passpie search exam
+
+<span class="c1"># search credentials using regular expressions</span>
+passpie search <span class="s1">&#39;[fF]oo|bar&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="clipboard">
+<h2>Clipboard<a class="headerlink" href="#clipboard" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="copying-passwords-to-clipboard">
+<h3>Copying passwords to clipboard<a class="headerlink" href="#copying-passwords-to-clipboard" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c1"># Copying password to clipboard using ``login@name``</span>
+passpie copy foo@example.com
+
+<span class="c1"># Copying password using only ``name``</span>
+<span class="c1"># only one credential with name ``example.com`` should exist</span>
+passpie copy example.com
+</pre></div>
+</div>
+</div>
+<div class="section" id="add-or-update-and-copy">
+<h3>Add or update and copy<a class="headerlink" href="#add-or-update-and-copy" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c1"># Adding credential with random password pattern</span>
+passpie add john.doe@example.com --random --pattern <span class="s1">&#39;[0-9]{5}[a-z]{5}&#39;</span>
+
+<span class="c1"># Updating credential with random password pattern</span>
+passpie update john.doe@example.com --random --pattern <span class="s2">&quot;[0-9\#\$\%\w\ ]{32}&quot;</span>
+
+<span class="c1"># Adding credential with random password and copy generated password to clipboard</span>
+passpie add john.doe@example.com --copy --random --pattern <span class="s1">&#39;[0-9]{5}[a-z]{5}&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="multiple-databases">
+<h2>Multiple Databases<a class="headerlink" href="#multiple-databases" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes it is useful to have multiple databases with different
+passphrases for higher security. This can be done using <code class="docutils literal"><span class="pre">-D</span></code> or
+<code class="docutils literal"><span class="pre">--database</span></code> option.</p>
+<div class="section" id="creating-databases">
+<h3>Creating databases<a class="headerlink" href="#creating-databases" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre>passpie -D ~/credentials/personal init
+passpie -D ~/credentials/work init
+passpie -D ~/credentials/junk init
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-passwords-to-specific-database">
+<h3>Adding passwords to specific database<a class="headerlink" href="#adding-passwords-to-specific-database" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre>passpie -D ~/credentials/personal add johnd@github.com --random
+passpie -D ~/credentials/work add john.doe@example.com --random
+passpie -D ~/credentials/junk add fake@example.com --random
+</pre></div>
+</div>
+</div>
+<div class="section" id="listing-passwords-from-specific-database">
+<h3>Listing passwords from specific database<a class="headerlink" href="#listing-passwords-from-specific-database" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre>passpie -D ~/databases/junk
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="version-control">
+<h2>Version Control<a class="headerlink" href="#version-control" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="initializing-a-database-with-git">
+<h3>Initializing a database with git<a class="headerlink" href="#initializing-a-database-with-git" title="Permalink to this headline">¶</a></h3>
+<p>By default all databases are initialized with a git repository if git is installed:</p>
+<div class="highlight-bash"><div class="highlight"><pre>passpie init
+</pre></div>
+</div>
+</div>
+<div class="section" id="avoiding-git-initialization">
+<h3>Avoiding git initialization<a class="headerlink" href="#avoiding-git-initialization" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre>passpie init --no-git
+</pre></div>
+</div>
+<p>Or using <a class="reference external" href="./docs/configuration">configuration</a></p>
+</div>
+<div class="section" id="logging">
+<h3>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h3>
+<p>To log changes to the database, use passpie command <code class="docutils literal"><span class="pre">log</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre>passpie log
+</pre></div>
+</div>
+<p>outputs:</p>
+<div class="code text highlight-python"><div class="highlight"><pre>[13] Updated foo@bar
+[12] Updated foo@bar
+[11] Reset database
+[10] Removed foozy@bar
+[9] Updated hello@world
+[8] Added hello@world
+[7] Added foozy@bar
+[6] Updated test@github
+[5] Added foozy@bazzy
+[4] Updated test@github
+[3] Added foo@bar
+[2] Added spam@egg
+[1] Added test@github
+[0] Initialized database
+</pre></div>
+</div>
+</div>
+<div class="section" id="resetting">
+<h3>Resetting<a class="headerlink" href="#resetting" title="Permalink to this headline">¶</a></h3>
+<p>If you want to go back to a previous version of the database history:
+<code class="docutils literal"><span class="pre">passpie</span> <span class="pre">--reset-to</span> <span class="pre">N</span></code> where N is the index of the change.</p>
+<div class="highlight-bash"><div class="highlight"><pre>passpie log --reset-to 5
+</pre></div>
+</div>
+<blockquote>
+<div><em>Attention</em>: this is an operation that destroys data. Use it with
+caution. It is equivalent to do <code class="docutils literal"><span class="pre">git</span> <span class="pre">reset</span> <span class="pre">--hard</span> <span class="pre">HEAD~N</span></code></div></blockquote>
+</div>
+<div class="section" id="remote-databases">
+<h3>Remote databases<a class="headerlink" href="#remote-databases" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c1"># Listing credentials from a remote database</span>
+passpie -D https://foo@example.com/user/repo.git
+
+<span class="c1"># Adding credentials to a remote database and autopushing changes</span>
+passpie -D https://foo@example.com/user/repo.git --autopush <span class="s2">&quot;origin/master&quot;</span> add foo+nouveau@example.com
+
+<span class="c1"># Exporting environment variables</span>
+<span class="nb">export</span> <span class="nv">PASSPIE_DATABASE</span><span class="o">=</span>https://foo@example.com/user/repo.git
+<span class="nb">export</span> <span class="nv">PASSPIE_AUTOPULL</span><span class="o">=</span>origin/master
+<span class="nb">export</span> <span class="nv">PASSPIE_AUTOPUSH</span><span class="o">=</span>origin/master
+
+<span class="c1"># List remote credentials</span>
+passpie
+
+<span class="c1"># Copy remote `foo@example.com` password</span>
+passpie copy foo@example.com
+
+<span class="c1"># Add credential with random password directly to remote</span>
+passpie add foo+nouveau@example.com --random --pattern <span class="s2">&quot;[0-9\#\$\%\w\ ]{32}&quot;</span>
+passpie add foo+nouveau@example.com --random --pattern <span class="s2">&quot;[0-9\#\$\%\w\ ]{32}&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="grouping-credentials">
+<h2>Grouping Credentials<a class="headerlink" href="#grouping-credentials" title="Permalink to this headline">¶</a></h2>
+<p>Passpie credentials handles multiple logins for each name which groups
+credentials by name:</p>
+<div class="highlight-python"><div class="highlight"><pre># add some credentials
+passpie add jonh@example.com --comment &quot;Jonh main mail&quot; --random
+passpie add doe@example.com --comment &quot;No comment&quot; --random
+</pre></div>
+</div>
+<p>Listing credentials:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ passpie
+</pre></div>
+</div>
+<div class="section" id="subgroups">
+<h3>Subgroups<a class="headerlink" href="#subgroups" title="Permalink to this headline">¶</a></h3>
+<p>Fullname syntax supports subgrouping of credentials by name</p>
+<div class="highlight-python"><div class="highlight"><pre>passpie add foo@opensource/github.com --random
+passpie add foo@opensource/python.org --random
+passpie add foo@opensource/bitbucket.org --random
+passpie add foo@opensource/npm.org --random
+</pre></div>
+</div>
+<p>Listing credentials:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ passpie
+========================  =======  ==========  =========
+Name                      Login    Password    Comment
+========================  =======  ==========  =========
+opensource/bitbucket.org  foo      *****
+opensource/github.com     foo      *****
+opensource/npm.org        foo      *****
+opensource/python.org     foo      *****
+========================  =======  ==========  =========
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="shell-completion">
+<h2>Shell Completion<a class="headerlink" href="#shell-completion" title="Permalink to this headline">¶</a></h2>
+<p>You can activate passpie completion for <code class="docutils literal"><span class="pre">bash</span></code>, <code class="docutils literal"><span class="pre">zsh</span></code> or <code class="docutils literal"><span class="pre">fish</span></code> shells</p>
+<p>&gt; Check the generated script with <code class="docutils literal"><span class="pre">passpie</span> <span class="pre">complete</span> <span class="pre">{shell_name}</span></code>.</p>
+<div class="section" id="bash">
+<h3><code class="docutils literal"><span class="pre">bash</span></code><a class="headerlink" href="#bash" title="Permalink to this headline">¶</a></h3>
+<p>Add this line to your <code class="docutils literal"><span class="pre">.bash_profile</span></code> or <code class="docutils literal"><span class="pre">.bashrc</span></code></p>
+<div class="highlight-python"><div class="highlight"><pre>if which passpie &gt; /dev/null; then eval &quot;$(passpie complete bash)&quot;; fi
+</pre></div>
+</div>
+</div>
+<div class="section" id="zsh">
+<h3><code class="docutils literal"><span class="pre">zsh</span></code><a class="headerlink" href="#zsh" title="Permalink to this headline">¶</a></h3>
+<p>Add this line to your <code class="docutils literal"><span class="pre">.zshrc</span></code> or <code class="docutils literal"><span class="pre">.zpreztorc</span></code></p>
+<div class="highlight-python"><div class="highlight"><pre>if which passpie &gt; /dev/null; then eval &quot;$(passpie complete zsh)&quot;; fi
+</pre></div>
+</div>
+</div>
+<div class="section" id="fish">
+<h3><code class="docutils literal"><span class="pre">fish</span></code><a class="headerlink" href="#fish" title="Permalink to this headline">¶</a></h3>
+<p>Add this line to your <code class="docutils literal"><span class="pre">~/.config/fish/config.fish</span></code></p>
+<div class="highlight-python"><div class="highlight"><pre>if which passpie &gt; /dev/null; then eval &quot;$(passpie complete zsh)&quot;; fi
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="importing-and-exporting">
+<h2>Importing and Exporting<a class="headerlink" href="#importing-and-exporting" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="exporting-a-passpie-database">
+<h3>Exporting a passpie database<a class="headerlink" href="#exporting-a-passpie-database" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>passpie export passpie.db
+</pre></div>
+</div>
+<blockquote>
+<div>❗ Passpie exports databases credentials in plain text</div></blockquote>
+</div>
+<div class="section" id="importing-a-passpie-database">
+<h3>Importing a passpie database<a class="headerlink" href="#importing-a-passpie-database" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>passpie import passpie.db
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="database-status">
+<h2>Database status<a class="headerlink" href="#database-status" title="Permalink to this headline">¶</a></h2>
+<p>To have a status report on the database run:</p>
+<div class="highlight-python"><div class="highlight"><pre>passpie status
+</pre></div>
+</div>
+<p>Available checkers are:</p>
+<ul class="simple">
+<li>repeated passwords</li>
+<li>old passwords</li>
+</ul>
+</div>
+<div class="section" id="gnupg-keys">
+<h2>GnuPG keys<a class="headerlink" href="#gnupg-keys" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="reseting-and-purging-databases">
+<h2>Reseting and Purging Databases<a class="headerlink" href="#reseting-and-purging-databases" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre># Delete all credentials from database
+passpie purge
+
+# Redefine passphrase and reencrypt all credentials from database
+passpie reset
+</pre></div>
+</div>
+</div>
+<div class="section" id="debugging">
+<h2>Debugging<a class="headerlink" href="#debugging" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c1"># get help on commands</span>
+<span class="n">passpie</span> <span class="o">--</span><span class="n">help</span>
+
+<span class="c1"># activating verbose output</span>
+<span class="n">passpie</span> <span class="o">-</span><span class="n">v</span>
+
+<span class="c1"># activating even more verbose output</span>
+<span class="n">passpie</span> <span class="o">-</span><span class="n">vv</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>About</h3>
+<p>
+  Passpie is a command-line password manager with a colorful interface.
+</p>
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="http://passpie.rtfd.org/">Passpie Website</a></li>
+  <li><a href="http://pypi.python.org/pypi/passpie">Passpie @ PyPI</a></li>
+  <li><a href="http://github.com/marcwebbie/passpie">Passpie @ github</a></li>
+  <li><a href="http://github.com/marcwebbie/passpie/issues">Issue Tracker</a></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/getting_started.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, marcwebbie.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/getting_started.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

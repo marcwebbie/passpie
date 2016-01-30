@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Configuration &mdash; Passpie 1.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/passpie.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Passpie 1.1.1 documentation" href="index.html" />
+    <link rel="next" title="Contributing to Passpie" href="contributing.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>Example configuration file:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="c1"># ~/.passpierc</span>
+<span class="l l-Scalar l-Scalar-Plain">path</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">~/.passpie</span>
+<span class="l l-Scalar l-Scalar-Plain">homedir</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">~/.gnupg</span>
+<span class="l l-Scalar l-Scalar-Plain">autopull</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="l l-Scalar l-Scalar-Plain">autopush</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="l l-Scalar l-Scalar-Plain">copy_timeout</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="l l-Scalar l-Scalar-Plain">extension</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">.pass</span>
+<span class="l l-Scalar l-Scalar-Plain">genpass_pattern</span><span class="p p-Indicator">:</span> <span class="s">&quot;[a-z]{5}</span><span class="nv"> </span><span class="s">[-_+=*&amp;%$#]{5}</span><span class="nv"> </span><span class="s">[A-Z]{5}&quot;</span>
+<span class="l l-Scalar l-Scalar-Plain">headers</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">login</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">password</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">comment</span>
+<span class="l l-Scalar l-Scalar-Plain">colors</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">login</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">green</span>
+  <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">yellow</span>
+<span class="l l-Scalar l-Scalar-Plain">key_length</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">4096</span>
+<span class="l l-Scalar l-Scalar-Plain">recipient</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">passpie@local</span>
+<span class="l l-Scalar l-Scalar-Plain">repo</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="l l-Scalar l-Scalar-Plain">short_commands</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="l l-Scalar l-Scalar-Plain">status_repeated_passwords_limit</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="l l-Scalar l-Scalar-Plain">table_format</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">fancy_grid</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">path</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">~/.passpie</span></code></div>
+<div class="line"><strong>Description:</strong> Path to default database.</div>
+<div class="line"><br /></div>
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">homedir</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">~/.gnupg</span></code></div>
+<div class="line"><strong>Description:</strong> Path to default gnupg homedir.</div>
+<div class="line"><br /></div>
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">autopull</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">null</span></code></div>
+<div class="line"><strong>Description:</strong> Automatically pull changes from remote git repository.</div>
+<div class="line"><br /></div>
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">autopush</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">null</span></code></div>
+<div class="line"><strong>Description:</strong> Automatically pull changes from remote git repository.</div>
+<div class="line"><br /></div>
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">recipient</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">null</span></code></div>
+<div class="line"><strong>Description:</strong> GnuPG defaul recipient. This can be a fingerprint/emai/name.</div>
+<div class="line"><br /></div>
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">extension</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">.pass</span></code></div>
+<div class="line"><strong>Description:</strong> Password files extension</div>
+<div class="line"><br /></div>
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">copy_timeout</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">0</span></code></div>
+<div class="line"><strong>Description:</strong> Automatically clear clipboard after n seconds</div>
+<div class="line"><br /></div>
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">genpass_pattern</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">&quot;[a-z]{5}</span> <span class="pre">[-_+=*&amp;%$#]{5}</span> <span class="pre">[A-Z]{5}&quot;</span></code></div>
+<div class="line"><strong>Description:</strong> Regex pattern for password random generation</div>
+<div class="line"><br /></div>
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">table_format</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">fancy_grid</span></code></div>
+<div class="line"><strong>Description:</strong></div>
+<div class="line"><br /></div>
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">headers</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">[name,</span> <span class="pre">login,</span> <span class="pre">password,</span> <span class="pre">comments]</span></code></div>
+<div class="line"><strong>Description:</strong></div>
+<div class="line"><br /></div>
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">colors</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">{login:</span> <span class="pre">green,</span> <span class="pre">name:</span> <span class="pre">yellow}</span></code></div>
+<div class="line"><strong>Description:</strong> Table column colors</div>
+<div class="line"><br /></div>
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">key_length</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">4096</span></code></div>
+<div class="line"><strong>Description:</strong> AES encryption key length</div>
+<div class="line"><br /></div>
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">repo</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">true</span></code></div>
+<div class="line"><strong>Description:</strong> Automatically create a git repository on initialization</div>
+<div class="line"><br /></div>
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">short_commands</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">false</span></code></div>
+<div class="line"><strong>Description:</strong></div>
+<div class="line"><br /></div>
+<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">status_repeated_passwords_limit</span></code>:</div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">5</span></code></div>
+<div class="line"><strong>Description:</strong></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>About</h3>
+<p>
+  Passpie is a command-line password manager with a colorful interface.
+</p>
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="http://passpie.rtfd.org/">Passpie Website</a></li>
+  <li><a href="http://pypi.python.org/pypi/passpie">Passpie @ PyPI</a></li>
+  <li><a href="http://github.com/marcwebbie/passpie">Passpie @ github</a></li>
+  <li><a href="http://github.com/marcwebbie/passpie/issues">Issue Tracker</a></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/configuration.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, marcwebbie.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/configuration.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,13 +1,10 @@
-Documentation
+Getting Started
 *******************************************************
 
-Usage
-=========
+Fullnames queries
+-----------------
 
-Fullname
----------
-
-Passpie credentials are referenced by ``fullname``. fullname syntax
+Passpie queried using ``fullname`` syntax. fullname syntax
 handles login and name for credentials in one go for faster adding and
 querying of credentials.
 
@@ -48,21 +45,27 @@ Or even better, without using the ``@`` notation::
 Random Passwords
 ----------------
 
-::
+Random password pattern can be set via ``genpass_pattern`` config.
 
-    # Adding credential with random password pattern
-    passpie add john.doe@example.com --random --pattern '[0-9]{5}[a-z]{5}'
+.. code-block:: bash
+
+    # Adding credential with random password using config pattern
+    passpie add john.doe@example.com
+
+    # Adding credential with random password overriding pattern
+    passpie add john.doe@example.com --pattern '[0-9]{5}[a-z]{5}'
 
     # Updating credential with random password pattern
-    passpie update john.doe@example.com --random --pattern "[0-9\#\$\%\w\ ]{32}"
+    passpie update john.doe@example.com --pattern "[0-9\#\$\%\w\ ]{32}"
 
     # Adding credential with random password and copy generated password to clipboard
-    passpie add john.doe@example.com --copy --random --pattern '[0-9]{5}[a-z]{5}'
+    passpie add john.doe@example.com --copy --pattern '[0-9]{5}[a-z]{5}'
+
 
 Searching
 ---------
 
-::
+.. code-block:: bash
 
     # search credentials by string "exam"
     passpie search exam
@@ -77,7 +80,7 @@ Clipboard
 Copying passwords to clipboard
 ++++++++++++++++++++++++++++++
 
-::
+.. code-block:: bash
 
     # Copying password to clipboard using ``login@name``
     passpie copy foo@example.com
@@ -90,7 +93,7 @@ Copying passwords to clipboard
 Add or update and copy
 +++++++++++++++++++++++++++
 
-::
+.. code-block:: bash
 
     # Adding credential with random password pattern
     passpie add john.doe@example.com --random --pattern '[0-9]{5}[a-z]{5}'
@@ -111,7 +114,7 @@ passphrases for higher security. This can be done using ``-D`` or
 Creating databases
 ++++++++++++++++++
 
-::
+.. code-block:: bash
 
     passpie -D ~/credentials/personal init
     passpie -D ~/credentials/work init
@@ -120,7 +123,7 @@ Creating databases
 Adding passwords to specific database
 +++++++++++++++++++++++++++++++++++++
 
-::
+.. code-block:: bash
 
     passpie -D ~/credentials/personal add johnd@github.com --random
     passpie -D ~/credentials/work add john.doe@example.com --random
@@ -129,14 +132,9 @@ Adding passwords to specific database
 Listing passwords from specific database
 ++++++++++++++++++++++++++++++++++++++++
 
-::
+.. code-block:: bash
 
-    $ passpie -D ~/databases/junk
-    ===========  =======  ==========  =========
-    Name         Login    Password    Comment
-    ===========  =======  ==========  =========
-    example.com  fake     *****
-    ===========  =======  ==========  =========
+    passpie -D ~/databases/junk
 
 Version Control
 ---------------
@@ -146,14 +144,14 @@ Initializing a database with git
 
 By default all databases are initialized with a git repository if git is installed:
 
-::
+.. code-block:: bash
 
     passpie init
 
 Avoiding git initialization
 +++++++++++++++++++++++++++
 
-::
+.. code-block:: bash
 
     passpie init --no-git
 
@@ -166,7 +164,7 @@ Logging
 
 To log changes to the database, use passpie command ``log``
 
-::
+.. code-block:: bash
 
     passpie log
 
@@ -195,7 +193,7 @@ Resetting
 If you want to go back to a previous version of the database history:
 ``passpie --reset-to N`` where N is the index of the change.
 
-::
+.. code-block:: bash
 
     passpie log --reset-to 5
 
@@ -208,7 +206,7 @@ If you want to go back to a previous version of the database history:
 Remote databases
 ++++++++++++++++
 
-::
+.. code-block:: bash
 
     # Listing credentials from a remote database
     passpie -D https://foo@example.com/user/repo.git
@@ -231,8 +229,8 @@ Remote databases
     passpie add foo+nouveau@example.com --random --pattern "[0-9\#\$\%\w\ ]{32}"
     passpie add foo+nouveau@example.com --random --pattern "[0-9\#\$\%\w\ ]{32}"
 
-Grouping
---------
+Grouping Credentials
+--------------------
 
 Passpie credentials handles multiple logins for each name which groups
 credentials by name:
@@ -248,12 +246,6 @@ Listing credentials:
 ::
 
     $ passpie
-    ===========  =======  ==========  ===============
-    name         login    password    comment
-    ===========  =======  ==========  ===============
-    example.com  doe      *****       No comment
-    example.com  jonh     *****       Jonh main email
-    ===========  =======  ==========  ===============
 
 Subgroups
 +++++++++
@@ -284,34 +276,34 @@ Listing credentials:
 Shell Completion
 ----------------
 
-You can activate passpie completion for `bash` or `zsh` shells
+You can activate passpie completion for ``bash``, ``zsh`` or ``fish`` shells
 
-> Check the generated script with `passpie complete {shell_name}`.
+> Check the generated script with ``passpie complete {shell_name}``.
 
-`bash`
-++++++
+``bash``
+++++++++
 
-Add this line to your `.bash_profile` or `.bashrc`
+Add this line to your ``.bash_profile`` or ``.bashrc``
 
 ::
 
    if which passpie > /dev/null; then eval "$(passpie complete bash)"; fi
 
-`zsh`
-+++++
+``zsh``
++++++++
 
-Add this line to your `.zshrc` or `.zpreztorc`
+Add this line to your ``.zshrc`` or ``.zpreztorc``
 
-.. code:: zsh
+::
 
    if which passpie > /dev/null; then eval "$(passpie complete zsh)"; fi
 
-`fish`
-++++++
+``fish``
+++++++++
 
-Add this line to your `~/.config/fish/config.fish`
+Add this line to your ``~/.config/fish/config.fish``
 
-.. code:: fish
+::
 
    if which passpie > /dev/null; then eval "$(passpie complete zsh)"; fi
 
@@ -344,6 +336,7 @@ Database status
 To have a status report on the database run:
 
 ::
+
     passpie status
 
 Available checkers are:
@@ -378,192 +371,3 @@ Debugging
 
     # activating even more verbose output
     passpie -vv
-
-
-Configuration
-=============
-
-Example configuration file:
-
-.. code-block:: yaml
-
-    # ~/.passpierc
-    path: ~/.passpie
-    homedir: ~/.gnupg
-    autopull: null
-    autopush: null
-    copy_timeout: 0
-    extension: .pass
-    genpass_pattern: "[a-z]{5} [-_+=*&%$#]{5} [A-Z]{5}"
-    headers:
-      - name
-      - login
-      - password
-      - comment
-    colors:
-      login: green
-      name: yellow
-    key_length: 4096
-    recipient: passpie@local
-    repo: true
-    short_commands: false
-    status_repeated_passwords_limit: 5
-    table_format: fancy_grid
-
-..
-
-| **Name:** ``path``:
-| **Default:** ``~/.passpie``
-| **Description:** Path to default database.
-|
-| **Name:** ``homedir``:
-| **Default:** ``~/.gnupg``
-| **Description:** Path to default gnupg homedir.
-|
-| **Name:** ``autopull``:
-| **Default:** ``null``
-| **Description:** Automatically pull changes from remote git repository.
-|
-| **Name:** ``autopush``:
-| **Default:** ``null``
-| **Description:** Automatically pull changes from remote git repository.
-|
-| **Name:** ``recipient``:
-| **Default:** ``null``
-| **Description:** GnuPG defaul recipient. This can be a fingerprint/emai/name.
-|
-| **Name:** ``extension``:
-| **Default:** ``.pass``
-| **Description:** Password files extension
-|
-| **Name:** ``copy_timeout``:
-| **Default:** ``0``
-| **Description:** Automatically clear clipboard after n seconds
-|
-| **Name:** ``genpass_pattern``:
-| **Default:** ``"[a-z]{5} [-_+=*&%$#]{5} [A-Z]{5}"``
-| **Description:** Regex pattern for password random generation
-|
-| **Name:** ``table_format``:
-| **Default:** ``fancy_grid``
-| **Description:**
-|
-| **Name:** ``headers``:
-| **Default:** ``[name, login, password, comments]``
-| **Description:**
-|
-| **Name:** ``colors``:
-| **Default:** ``{login: green, name: yellow}``
-| **Description:** Table column colors
-|
-| **Name:** ``key_length``:
-| **Default:** ``4096``
-| **Description:** AES encryption key length
-|
-| **Name:** ``repo``:
-| **Default:** ``true``
-| **Description:** Automatically create a git repository on initialization
-|
-| **Name:** ``short_commands``:
-| **Default:** ``false``
-| **Description:**
-|
-| **Name:** ``status_repeated_passwords_limit``:
-| **Default:** ``5``
-| **Description:**
-
-
-FAQ
-===
-
-What is a passpie database?
----------------------------
-
-Passpie database is structured in a directory hierachy. Every credential
-is a ``.pass`` file inside a directory named after a credential group.
-
-An empty database would look like this:
-
-.. code:: bash
-
-    passpie --database /tmp/passpie init
-
-    tree /tmp/passpie -la
-    # /tmp/passpie
-    # └── .keys
-
-After adding a new credential the database would look like this:
-
-.. code:: bash
-
-    passpie --database /tmp/passpie add octocat@github.com
-    # Password: **********
-
-    tree /tmp/passpie -la
-    # /tmp/passpie
-    # ├── .keys
-    # └── github.com
-    #     └── octocat.pass
-
-If we add more credentials to group github.com. Directory structure
-would be:
-
-.. code:: bash
-
-    passpie --database /tmp/passpie add octocat2@github.com
-    # Password: **********
-
-    tree /tmp/passpie -la
-    # /tmp/passpie
-    # ├── .keys
-    # └── github
-    #     └── octocat.pass
-    #     └── octocat2.pass
-
-What is a fullname?
--------------------
-
-``fullname`` is simply a way of referencing credentials on a passpie. `Learn more <#fullname>`_
-
-Is it possible to sync passpie using Dropbox?
--------------------------------------------
-
-Yes, it is possible to sync a passpie database using cloud services like Dropbox or Google Drive.
-
-Dropbox
-+++++++
-
-With default path ``~/.passpie`` and a Dropbox shared directory on path
-``~/Dropbox``
-
-::
-
-    mv ~/.passpie ~/Dropbox/passpie    # move passpie db to Dropbox
-    ln -s ~/Dropbox/passpie ~/.passpie # make a link to the db
-
-Google Drive
-++++++++++++
-
-With default path ``~/.passpie`` and a Google Drive shared directory on
-path ``~/GoogleDrive``
-
-::
-
-    mv ~/.passpie ~/GoogleDrive/passpie   # move passpie db to Google Drive
-    ln -s ~/GoogleDrive/passpie ~.passpie # make a link to the db
-
-
-Why is it taking so long to initialize a database?
---------------------------------------------------
-
-Sometimes it takes a long time because of entropy on the host machine. It was noticed a long time on an ubuntu server(even more if it is a virtual machine). You could try using `haveged` to generate enough entropy.
-
-On ubuntu:
-
-::
-
-   sudo apt-get install haveged
-
-..
-
-    You could also try this solution right here: http://serverfault.com/questions/214605/gpg-not-enough-entropy

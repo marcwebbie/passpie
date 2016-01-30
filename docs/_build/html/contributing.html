@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Contributing to Passpie &mdash; Passpie 1.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/passpie.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Passpie 1.1.1 documentation" href="index.html" />
+    <link rel="next" title="FAQ" href="faq.html" />
+    <link rel="prev" title="Configuration" href="configuration.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="contributing-to-passpie">
+<h1>Contributing to Passpie<a class="headerlink" href="#contributing-to-passpie" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="coding">
+<h2>Coding<a class="headerlink" href="#coding" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="quickstart">
+<h3>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>git clone https://github.com/marcwebbie/passpie.git
+cd passpie
+virtualenv .venv &amp;&amp; source .venv/bin/activate
+make develop
+make
+</pre></div>
+</div>
+</div>
+<div class="section" id="importers">
+<h3>Importers<a class="headerlink" href="#importers" title="Permalink to this headline">¶</a></h3>
+<p>Importers should be independent pluggable code. To add a new importer. Create python module into importers package. If you were writting an importer to a site called <code class="docutils literal"><span class="pre">superpassword</span></code>.</p>
+<div class="highlight-python"><div class="highlight"><pre>touch passpie/importers/superpassword.py
+</pre></div>
+</div>
+<p>This importer should inherit from <code class="docutils literal"><span class="pre">passpie.importers.BaseImporter</span></code> and override two methods:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">match</span></code>: This method should check file passed as filepath and see if it is parseable and can be read by importer</li>
+<li><code class="docutils literal"><span class="pre">handle</span></code>: Return parsed credentials from file. The return must be a list of credentials with plain text passwords</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">passpie.importers</span> <span class="kn">import</span> <span class="n">BaseImporter</span>
+
+
+<span class="k">class</span> <span class="nc">DefaultImporter</span><span class="p">(</span><span class="n">BaseImporter</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+        <span class="n">credentials</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">credentials</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>About</h3>
+<p>
+  Passpie is a command-line password manager with a colorful interface.
+</p>
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="http://passpie.rtfd.org/">Passpie Website</a></li>
+  <li><a href="http://pypi.python.org/pypi/passpie">Passpie @ PyPI</a></li>
+  <li><a href="http://github.com/marcwebbie/passpie">Passpie @ github</a></li>
+  <li><a href="http://github.com/marcwebbie/passpie/issues">Issue Tracker</a></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/contributing.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, marcwebbie.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/contributing.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

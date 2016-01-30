@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to Passpie &mdash; Passpie 1.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/passpie.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Passpie 1.1.1 documentation" href="#" />
+    <link rel="next" title="Getting Started" href="getting_started.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-passpie">
+<h1>Welcome to Passpie<a class="headerlink" href="#welcome-to-passpie" title="Permalink to this headline">¶</a></h1>
+<p>Passpie is a command line tool to  manage passwords from the terminal with a colorful and configurable interface. Use a master passphrase to decrypt login credentials, copy passwords to clipboard, syncronize with a git repository, check the state of your passwords, and more.</p>
+<p>Password files are encrypted using <a class="reference external" href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard)">GnuPG</a> and saved into yaml text files.</p>
+<p>What does it look like?  Here is an example of a simple Passpie usage:</p>
+<div class="highlight-bash"><div class="highlight"><pre>passpie init
+passpie add foo@example.com --random
+passpie add bar@example.com --pattern <span class="s2">&quot;[0-9]{5}[a-z]{5}&quot;</span>
+passpie update foo@example --comment <span class="s2">&quot;Hello&quot;</span>
+passpie
+</pre></div>
+</div>
+<p>And what it looks like when run:</p>
+<div class="highlight-python"><div class="highlight"><pre>╒═════════════╤═════════╤════════════╤═══════════╕
+│ Name        │ Login   │ Password   │ Comment   │
+╞═════════════╪═════════╪════════════╪═══════════╡
+│ example.com │ bar     │ *****      │           │
+├─────────────┼─────────┼────────────┼───────────┤
+│ example.com │ foo     │ *****      │ Hello     │
+╘═════════════╧═════════╧════════════╧═══════════╛
+</pre></div>
+</div>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">★ Add, update, remove credentials</div>
+<div class="line">★ Manage multiple databases. Locally and remotely</div>
+<div class="line">★ Copy passwords to clipboard or to stdout</div>
+<div class="line">★ List credentials as a table with colored output</div>
+<div class="line">★ Search credentials by name, login, comments or regulax expresions</div>
+<div class="line">★ Group credentials by name</div>
+<div class="line">★ <a class="reference external" href="https://github.com/marcwebbie/passpie/blob/master/docs/documentation.rst#configuration">Configuration</a> with <code class="docutils literal"><span class="pre">~/.passpie</span></code> or <code class="docutils literal"><span class="pre">.config</span></code></div>
+<div class="line">★ Version control passpie databases using git</div>
+<div class="line">★ Change passphrase and re-encrypt database</div>
+<div class="line">★ Export Passpie database to plain text file</div>
+<div class="line">★ Import credentials</div>
+<div class="line">★ Generate random passwords</div>
+<div class="line">★ Generate database status report</div>
+<div class="line">★ BASH/ZSH/FISH completion</div>
+<div class="line">★ Undo/Redo changes to the database. (requires <a class="reference external" href="https://git-scm.com/">git</a>)</div>
+<div class="line">★ Set a personal gpg key recipient</div>
+<div class="line">★ Per database keyring</div>
+</div>
+</div>
+<div class="section" id="documentation-contents">
+<h2>Documentation Contents<a class="headerlink" href="#documentation-contents" title="Permalink to this headline">¶</a></h2>
+<p>This part of the documentation guides you through all of the passpie usage patterns.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#fullnames-queries">Fullnames queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#random-passwords">Random Passwords</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#searching">Searching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#clipboard">Clipboard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#multiple-databases">Multiple Databases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#version-control">Version Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#grouping-credentials">Grouping Credentials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#shell-completion">Shell Completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#importing-and-exporting">Importing and Exporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#database-status">Database status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#gnupg-keys">GnuPG keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#reseting-and-purging-databases">Reseting and Purging Databases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#debugging">Debugging</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to Passpie</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#coding">Coding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#what-is-a-passpie-database">What is a passpie database?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#what-is-a-fullname">What is a fullname?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#is-it-possible-to-sync-passpie-using-dropbox">Is it possible to sync passpie using Dropbox?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#why-is-it-taking-so-long-to-initialize-a-database">Why is it taking so long to initialize a database?</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This repository is open source and is available on <a class="reference external" href="https://github.com/marcwebbie/passpie">GitHub</a>.
+We would love contributions.</p>
+</div>
+</div>
+<div class="section" id="miscellaneous-pages">
+<h2>Miscellaneous Pages<a class="headerlink" href="#miscellaneous-pages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-1-2">Version 1.1.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-1-1">Version 1.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-1-0">Version 1.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-0-2">Version 1.0.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-0-1">Version 1.0.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-0-0">Version 1.0.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-3-3">Version 0.3.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-3-2">Version 0.3.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-3-1">Version 0.3.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-3">Version 0.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-2-2">Version 0.2.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-2-1">Version 0.2.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-2">Version 0.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1-5">Version 0.1.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1-4">Version 0.1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1-3">Version 0.1.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1-2">Version 0.1.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1-1">Version 0.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1">Version 0.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1rc7">Version 0.1rc7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1rc6">Version 0.1rc6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1rc5">Version 0.1rc5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1rc4">Version 0.1rc4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1rc3">Version 0.1rc3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1rc2-1">Version 0.1rc2.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1rc2">Version 0.1rc2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1rc1">Version 0.1rc1</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="license.html#license-text">License Text</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>About</h3>
+<p>
+  Passpie is a command-line password manager with a colorful interface.
+</p>
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="http://passpie.rtfd.org/">Passpie Website</a></li>
+  <li><a href="http://pypi.python.org/pypi/passpie">Passpie @ PyPI</a></li>
+  <li><a href="http://github.com/marcwebbie/passpie">Passpie @ github</a></li>
+  <li><a href="http://github.com/marcwebbie/passpie/issues">Issue Tracker</a></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, marcwebbie.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/index.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
