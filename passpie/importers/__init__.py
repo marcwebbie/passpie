@@ -11,6 +11,10 @@ class BaseImporter(object):
     def log(self, message):
         logging.debug(message)
 
+    @property
+    def name(self):
+        return self.__class__.__name__.lower().replace('importer', '')
+
     def match(self, filepath):
         """Return True if file for filepath parseable by importer
         """
@@ -60,6 +64,10 @@ def get_all():
 def get_instances():
     """Get instances of all found detected importer classes"""
     return (wclass() for wclass in get_all())
+
+
+def get_names():
+    return [i.name for i in get_instances()]
 
 
 def find_importer(filepath):

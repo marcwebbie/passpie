@@ -375,14 +375,18 @@ def status(db, full, days, passphrase):
 
 @cli.command(name="import", help="Import credentials from path")
 @click.argument("filepath", type=click.Path())
+@click.option("-I", "--importer" "as_json", type=click.Choice(importers.get_names()),
+              help="Specify an importer")
 @logging_exception()
 @pass_db
-def import_database(db, filepath):
+def import_database(db, filepath, importer):
     importer = importers.find_importer(filepath)
     if importer:
         credentials = importer.handle(filepath)
         for cred in credentials:
-            encrypted = encrypt(cred['password'], recipient=db.config['recipient'], homedir=db.config['homedir'])
+            encrypted = encrypt(cred['password'],
+                                recipient=db.config['recipient'],
+                                homedir=db.config['homedir'])
             cred['password'] = encrypted
         db.insert_multiple(credentials)
 
