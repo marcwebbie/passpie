@@ -1,34 +1,50 @@
 Configuration
 =============
 
-Example configuration file:
+Passie configuration files are ``yaml`` files. Passpie supports local and global configuration files. To set a local database.
+
+global passpie configuration files lives in ``~/.passpierc`` while local configuration files lives in database directory as a ``.config`` file.
+
+Examples
+--------
+
+Full passpie configuration file
++++++++++++++++++++++++++++++++
 
 .. code-block:: yaml
 
-    # ~/.passpierc
-    path: ~/.passpie
-    homedir: ~/.gnupg
-    autopull: null
-    autopush: null
-    copy_timeout: 0
-    extension: .pass
-    genpass_pattern: "[a-z]{5} [-_+=*&%$#]{5} [A-Z]{5}"
-    headers:
-      - name
-      - login
-      - password
-      - comment
-    colors:
-      login: green
-      name: yellow
-    key_length: 4096
-    recipient: passpie@local
-    repo: true
-    short_commands: false
-    status_repeated_passwords_limit: 5
-    table_format: fancy_grid
+   path: ~/.passpie
+   homedir: ~/.gnupg
+   autopull: null
+   autopush: null
+   copy_timeout: 0
+   extension: .pass
+   genpass_pattern: "[a-z]{5} [-_+=*&%$#]{5} [A-Z]{5}"
+   headers:
+     - name
+     - login
+     - password
+     - comment
+   colors:
+     login: green
+     name: yellow
+   key_length: 4096
+   recipient: null
+   repo: true
+   short_commands: false
+   status_repeated_passwords_limit: 5
+   table_format: fancy_grid
 
-..
+Partial configuration file
+++++++++++++++++++++++++++
+
+.. code-block:: yaml
+
+   recipient: marcwebbie@example.com
+   copy_timeout: 10
+   extension: .gpg
+   table_format: rst
+
 
 
 ``path``
@@ -144,10 +160,11 @@ Values:
 
 .. warning::
 
-   Use a strong primary key.
-   Some people still have 1024-bit DSA keys. You really should transition to a stronger bit-length and hashing algo. In 2011, the US government instution NIST has deprecated DSA-1024, since 2013 it is even disallowed.
+   Use a strong primary key. Some people still have 1024-bit AES keys.
+   You really should transition to a stronger bit-length and hashing algo.
+   It is recommend to make a 2048 or 4096-bit key.
 
-   It is recommend to make a 4096bit RSA key, with the sha512 hashing algo, making a transition statement that is signed by both keys, and then letting people know. Also have a look at this good document that details exactly the steps that you need to create such a key, making sure that you are getting the right hashing algo (it can be slightly complicated if you are using GnuPG versions less than 1.4.10).
+   Also have a look at `GnuPG documentation <https://www.gnupg.org/gph/en/manual.html#AEN494>`_ on keys
 
 ``repo``
 -----------------------------------

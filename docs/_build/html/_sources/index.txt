@@ -3,7 +3,7 @@ Welcome to Passpie
 
 Passpie is a command line tool to  manage passwords from the terminal with a colorful and configurable interface. Use a master passphrase to decrypt login credentials, copy passwords to clipboard, syncronize with a git repository, check the state of your passwords, and more.
 
-Password files are encrypted using `GnuPG <http://en.wikipedia.org/wiki/GNU_Privacy_Guard)>`_ and saved into yaml text files. Passpie supports **Linux**, **OSX** and **Windows**.
+Password files are encrypted using `GnuPG <https://www.gnupg.org/>`_ and saved into yaml text files. Passpie supports **Linux**, **OSX** and **Windows**.
 
 What does it look like?  Here is an example of a simple Passpie usage:
 
@@ -30,7 +30,7 @@ Features
 | ★ List credentials as a table with colored output
 | ★ Search credentials by name, login, comments or regulax expresions
 | ★ Group credentials by name
-| ★ `Configuration <https://github.com/marcwebbie/passpie/blob/master/docs/documentation.rst#configuration>`_ with ``~/.passpie`` or ``.config``
+| ★ `Configuration <http://passpie.readthedocs.org/en/latest/configuration.html>`_ with ``~/.passpie`` or ``.config``
 | ★ Version control passpie databases using git
 | ★ Change passphrase and re-encrypt database
 | ★ Export Passpie database to plain text file
@@ -59,6 +59,7 @@ This part of the documentation guides you through all of the passpie usage patte
    getting_started
    configuration
    contributing
+   bugs_and_questions
    faq
 
 Miscellaneous Pages

@@ -40,9 +40,13 @@
             
   <div class="section" id="configuration">
 <h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
-<p>Example configuration file:</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span class="c1"># ~/.passpierc</span>
-<span class="l l-Scalar l-Scalar-Plain">path</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">~/.passpie</span>
+<p>Passie configuration files are <code class="docutils literal"><span class="pre">yaml</span></code> files. Passpie supports local and global configuration files. To set a local database.</p>
+<p>global passpie configuration files lives in <code class="docutils literal"><span class="pre">~/.passpierc</span></code> while local configuration files lives in database directory as a <code class="docutils literal"><span class="pre">.config</span></code> file.</p>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="full-passpie-configuration-file">
+<h3>Full passpie configuration file<a class="headerlink" href="#full-passpie-configuration-file" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l l-Scalar l-Scalar-Plain">path</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">~/.passpie</span>
 <span class="l l-Scalar l-Scalar-Plain">homedir</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">~/.gnupg</span>
 <span class="l l-Scalar l-Scalar-Plain">autopull</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
 <span class="l l-Scalar l-Scalar-Plain">autopush</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
@@ -58,12 +62,23 @@
   <span class="l l-Scalar l-Scalar-Plain">login</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">green</span>
   <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">yellow</span>
 <span class="l l-Scalar l-Scalar-Plain">key_length</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">4096</span>
-<span class="l l-Scalar l-Scalar-Plain">recipient</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">passpie@local</span>
+<span class="l l-Scalar l-Scalar-Plain">recipient</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
 <span class="l l-Scalar l-Scalar-Plain">repo</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="l l-Scalar l-Scalar-Plain">short_commands</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="l l-Scalar l-Scalar-Plain">status_repeated_passwords_limit</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
 <span class="l l-Scalar l-Scalar-Plain">table_format</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">fancy_grid</span>
 </pre></div>
+</div>
+</div>
+<div class="section" id="partial-configuration-file">
+<h3>Partial configuration file<a class="headerlink" href="#partial-configuration-file" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l l-Scalar l-Scalar-Plain">recipient</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">marcwebbie@example.com</span>
+<span class="l l-Scalar l-Scalar-Plain">copy_timeout</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
+<span class="l l-Scalar l-Scalar-Plain">extension</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">.gpg</span>
+<span class="l l-Scalar l-Scalar-Plain">table_format</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">rst</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="path">
 <h2><code class="docutils literal"><span class="pre">path</span></code><a class="headerlink" href="#path" title="Permalink to this headline">¶</a></h2>
@@ -189,9 +204,10 @@
 </div>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p>Use a strong primary key.
-Some people still have 1024-bit DSA keys. You really should transition to a stronger bit-length and hashing algo. In 2011, the US government instution NIST has deprecated DSA-1024, since 2013 it is even disallowed.</p>
-<p class="last">It is recommend to make a 4096bit RSA key, with the sha512 hashing algo, making a transition statement that is signed by both keys, and then letting people know. Also have a look at this good document that details exactly the steps that you need to create such a key, making sure that you are getting the right hashing algo (it can be slightly complicated if you are using GnuPG versions less than 1.4.10).</p>
+<p>Use a strong primary key. Some people still have 1024-bit AES keys.
+You really should transition to a stronger bit-length and hashing algo.
+It is recommend to make a 2048 or 4096-bit key.</p>
+<p class="last">Also have a look at <a class="reference external" href="https://www.gnupg.org/gph/en/manual.html#AEN494">GnuPG documentation</a> on keys</p>
 </div>
 </div>
 <div class="section" id="repo">

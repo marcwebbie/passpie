@@ -2,7 +2,8 @@
 *******************************************************
 
 .. image:: https://raw.githubusercontent.com/marcwebbie/passpie/master/images/passpie.png
-    :scale: 100%
+    :align: center
+    :width: 100%
 
 |Version| |Build Status| |Windows Build Status| |Coverage| |Requirements|
 
@@ -52,33 +53,7 @@ Documentation
 
 Read full documentation on http://passpie.readthedocs.org
 
-
-Bugs & Questions
-================
-
-You can file bugs in our github `issues tracker <https://github.com/marcwebbie/passpie/issues>`_, ask questions on our `mailing list <https://groups.google.com/d/forum/passpie>`_. Or check the `FAQ section <http://passpie.readthedocs.org/en/latest/faq.html>`_ on the documentation.
-
-| **Mailing list**: https://groups.google.com/d/forum/passpie
-| **Github issues**: https://github.com/marcwebbie/passpie/issues
-| **FAQ**: http://passpie.readthedocs.org/en/latest/faq.html
-
-
-Contributing
-============
-
-Whether reporting bugs, discussing improvements and new ideas or writing
-extensions: Contributions to Passpie are welcome! Here's how to get started:
-
-1. Check for open issues or open a fresh issue to start a discussion around
-   a feature idea or a bug
-2. Fork `the repository <https://github.com/marcwebbie/passpie/>`_
-   clone your fork and start making your changes
-3. Write a test which shows that the bug was fixed or that the feature works
-   as expected
-4. Send a pull request and bug the maintainer until it gets merged and
-   published ☺
-
-Learn more on the `contributing documentation <http://passpie.readthedocs.org/en/latest/contributing.html>`_
+And visit our chat on |Gitter|
 
 
 Licence |License|
@@ -97,6 +72,8 @@ Full license here: `LICENSE <https://github.com/marcwebbie/passpie/blob/master/L
    :target: https://coveralls.io/r/marcwebbie/passpie
 .. |Requirements| image:: http://img.shields.io/requires/github/marcwebbie/passpie.svg?style=flat-square
    :target: https://requires.io/github/marcwebbie/passpie/requirements/?branch=master
+.. |Gitter| image:: https://img.shields.io/gitter/room/marcwebbie/passpie.svg?style=flat-square
+   :target: https://gitter.im/marcwebbie/passpie
 .. |Version| image:: http://img.shields.io/pypi/v/passpie.svg?style=flat-square&label=latest%20version
    :target: https://pypi.python.org/pypi/passpie/
 .. |License| image:: http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
