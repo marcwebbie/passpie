@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 import errno
 import os
+import re
 import tempfile
 
 import rstr
@@ -14,7 +15,10 @@ import_module = __import__
 def genpass(pattern=r'[\w]{32}'):
     """generates a password with random chararcters
     """
-    return rstr.xeger(pattern)
+    try:
+        return rstr.xeger(pattern)
+    except re.error as e:
+        raise ValueError(str(e))
 
 
 @contextmanager

@@ -1,7 +1,9 @@
+from functools import wraps
 import json
 import logging
 import os
 import shutil
+import sys
 
 import click
 from click.decorators import Group
@@ -57,6 +59,23 @@ def validate_remote(ctx, param, value):
             return (remote, branch)
         except ValueError:
             raise click.BadParameter('remote need to be in format <remote>/<branch>')
+
+
+def logging_exception(exceptions=[Exception]):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except (click.ClickException, click.Abort):
+                raise
+            except tuple(exceptions) as e:
+                if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
+                    raise
+                logging.error(str(e))
+                sys.exit(1)
+        return wrapper
+    return decorator
 
 
 @click.group(invoke_without_command=True,
@@ -118,6 +137,7 @@ def cli(ctx, database, autopull, autopush, verbose):
 @cli.command(help='Generate completion scripts for shells')
 @click.argument('shell_name', type=click.Choice(completion.SHELLS),
                 default=None, required=False)
+@logging_exception()
 @pass_db
 @click.pass_context
 def complete(ctx, db, shell_name):
@@ -132,6 +152,7 @@ def complete(ctx, db, shell_name):
 @click.option('--no-git', is_flag=True, help="Don't create a git repository")
 @click.option('--recipient', help="Keyring default recipient")
 @click.option('--passphrase', help="Database passphrase")
+@logging_exception()
 @pass_db
 def init(db, force, no_git, recipient, passphrase):
     if force:
@@ -177,6 +198,7 @@ def init(db, force, no_git, recipient, passphrase):
 @click.option('-c', '--comment', default="", help="Credential comment")
 @click.option('-f', '--force', is_flag=True, help="Force overwriting")
 @click.option('-C', '--copy', is_flag=True, help="Copy password to clipboard")
+@logging_exception()
 @pass_db
 def add(db, fullname, password, random, pattern, comment, force, copy):
     if random or pattern:
@@ -209,6 +231,7 @@ def add(db, fullname, password, random, pattern, comment, force, copy):
               type=click.Choice(['stdout', 'clipboard']),
               help="Copy password destination")
 @click.option("--clear", default=0, help="Automatically clear password from clipboard")
+@logging_exception()
 @pass_db
 def copy(db, fullname, passphrase, to, clear):
     ensure_passphrase(passphrase, db.config)
@@ -239,6 +262,7 @@ def copy(db, fullname, passphrase, to, clear):
 @click.option("--password", help="Credential new password")
 @click.option('--random', is_flag=True, help="Credential new randomly generated password")
 @click.option('-P', '--pattern', help="Random password regex pattern")
+@logging_exception()
 @pass_db
 def update(db, fullname, name, login, password, random, pattern, comment):
     credential = db.credential(fullname)
@@ -279,6 +303,7 @@ def update(db, fullname, name, login, password, random, pattern, comment):
 @cli.command(help="Remove credential")
 @click.argument("fullname")
 @click.option("-y", "--yes", is_flag=True, help="Skip confirmation prompt")
+@logging_exception()
 @pass_db
 def remove(db, fullname, yes):
     credentials = db.credentials(fullname=fullname)
@@ -300,6 +325,7 @@ def remove(db, fullname, yes):
 
 @cli.command(help="Search credentials by regular expressions")
 @click.argument("regex")
+@logging_exception()
 @pass_db
 def search(db, regex):
     credentials = db.matches(regex)
@@ -317,6 +343,7 @@ def search(db, regex):
 @click.option("--full", is_flag=True, help="Show all entries")
 @click.option("--days", default=90, type=int, help="Elapsed days")
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
+@logging_exception()
 @pass_db
 def status(db, full, days, passphrase):
     ensure_passphrase(passphrase, db.config)
@@ -348,6 +375,7 @@ def status(db, full, days, passphrase):
 
 @cli.command(name="import", help="Import credentials from path")
 @click.argument("filepath", type=click.Path())
+@logging_exception()
 @pass_db
 def import_database(db, filepath):
     importer = importers.find_importer(filepath)
@@ -365,6 +393,7 @@ def import_database(db, filepath):
 @click.argument("filepath", type=click.File("w"))
 @click.option("--json", "as_json", is_flag=True, help="Export as JSON")
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
+@logging_exception()
 @pass_db
 def export_database(db, filepath, as_json, passphrase):
     ensure_passphrase(passphrase, db.config)
@@ -399,6 +428,7 @@ def export_database(db, filepath, as_json, passphrase):
 
 @cli.command(help='Renew passpie database and re-encrypt credentials')
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
+@logging_exception()
 @pass_db
 def reset(db, passphrase):
     ensure_passphrase(passphrase, db.config)
@@ -435,6 +465,7 @@ def reset(db, passphrase):
 
 @cli.command(help='Remove all credentials from database')
 @click.option("-y", "--yes", is_flag=True, help="Skip confirmation prompt")
+@logging_exception()
 @pass_db
 def purge(db, yes):
     if db.credentials():
@@ -449,6 +480,7 @@ def purge(db, yes):
 @cli.command(help='Shows passpie database changes history')
 @click.option("--init", is_flag=True, help="Enable history tracking")
 @click.option("--reset-to", default=-1, help="Undo changes in database")
+@logging_exception()
 @pass_db
 def log(db, reset_to, init):
     if reset_to >= 0:
