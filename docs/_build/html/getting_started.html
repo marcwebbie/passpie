@@ -40,6 +40,27 @@
             
   <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installing">
+<h2>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">GnuPG</span></code></li>
+<li><code class="docutils literal"><span class="pre">xclip</span></code> or <code class="docutils literal"><span class="pre">xsel</span></code> - [Linux] For copy to clipboard support</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre>pip install passpie
+</pre></div>
+</div>
+<p>Or if you are on a mac, install via <a class="reference external" href="http://brew.sh">Homebrew</a>:</p>
+<div class="highlight-python"><div class="highlight"><pre>brew install passpie
+</pre></div>
+</div>
+<p>Development version:</p>
+<div class="highlight-python"><div class="highlight"><pre>pip install -U https://github.com/marcwebbie/passpie/tarball/master
+</pre></div>
+</div>
+</div>
+</div>
 <div class="section" id="fullnames-queries">
 <h2>Fullnames queries<a class="headerlink" href="#fullnames-queries" title="Permalink to this headline">¶</a></h2>
 <p>Passpie queried using <code class="docutils literal"><span class="pre">fullname</span></code> syntax. fullname syntax
@@ -175,7 +196,7 @@ passpie -D ~/credentials/junk add fake@example.com --random
 <div class="highlight-bash"><div class="highlight"><pre>passpie init --no-git
 </pre></div>
 </div>
-<p>Or using <a class="reference external" href="./docs/configuration">configuration</a></p>
+<p>Or using <a class="reference external" href="#">configuration</a></p>
 </div>
 <div class="section" id="logging">
 <h3>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h3>
@@ -362,7 +383,7 @@ passpie reset
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><h3>About</h3>
+        <div class="sphinxsidebarwrapper"><h3>About Passpie</h3>
 <p>
   Passpie is a command-line password manager with a colorful interface.
 </p>

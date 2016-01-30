@@ -4,7 +4,7 @@
 .. image:: https://raw.githubusercontent.com/marcwebbie/passpie/master/images/passpie.png
     :scale: 100%
 
-|Version| |Build Status| |Windows Build Status| |Coverage|
+|Version| |Build Status| |Windows Build Status| |Coverage| |Requirements|
 
 Passpie is a command line tool to  manage passwords from the terminal with a colorful and configurable interface. Password files are encrypted using `GnuPG <http://en.wikipedia.org/wiki/GNU_Privacy_Guard)>`_ and saved into yaml text files. Use a master passphrase to decrypt login credentials, copy passwords to clipboard, syncronize with a git repository, check the state of your passwords, and more...
 
@@ -31,7 +31,7 @@ Quickstart
     passpie init
     passpie add foo@example.com --random --pattern "[0-9]{5}[a-z]{5}"
     passpie add bar@example.com --random --pattern "[0-9]{5}[a-z]{5}"
-    passpie update foo@example --comment "Hello"
+    passpie update foo@example.com --comment "Hello"
     passpie
 
 Outputs:
@@ -117,6 +117,8 @@ Full license here: `LICENSE <https://github.com/marcwebbie/passpie/blob/master/L
    :target: https://ci.appveyor.com/project/marcwebbie/passpie
 .. |Coverage| image:: http://img.shields.io/coveralls/marcwebbie/passpie.svg?style=flat-square
    :target: https://coveralls.io/r/marcwebbie/passpie
+.. |Requirements| image:: http://img.shields.io/requires/github/marcwebbie/passpie.svg?style=flat-square
+   :target: https://requires.io/github/marcwebbie/passpie/requirements/?branch=master
 .. |Version| image:: http://img.shields.io/pypi/v/passpie.svg?style=flat-square&label=latest%20version
    :target: https://pypi.python.org/pypi/passpie/
 .. |License| image:: http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square

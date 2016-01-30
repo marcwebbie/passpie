@@ -1,6 +1,27 @@
 Getting Started
 *******************************************************
 
+Installing
+----------
+
+Requirements
+++++++++++++
+
+- ``GnuPG``
+- ``xclip`` or ``xsel`` - [Linux] For copy to clipboard support
+
+::
+
+    pip install passpie
+
+Or if you are on a mac, install via `Homebrew <http://brew.sh>`_::
+
+    brew install passpie
+
+Development version::
+
+    pip install -U https://github.com/marcwebbie/passpie/tarball/master
+
 Fullnames queries
 -----------------
 
@@ -157,7 +178,7 @@ Avoiding git initialization
 
 ..
 
-Or using `configuration <./docs/configuration>`_
+Or using `configuration <#>`_
 
 Logging
 +++++++
