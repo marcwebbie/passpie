@@ -179,7 +179,7 @@ def init(db, force, no_git, recipient, passphrase):
 @click.option('-C', '--copy', is_flag=True, help="Copy password to clipboard")
 @pass_db
 def add(db, fullname, password, random, pattern, comment, force, copy):
-    if random:
+    if random or pattern:
         pattern = pattern if pattern else db.config['genpass_pattern']
         password = genpass(pattern=pattern)
     elif not password:
@@ -246,7 +246,7 @@ def update(db, fullname, name, login, password, random, pattern, comment):
         message = "Credential '{}' not found".format(fullname)
         raise click.ClickException(click.style(message, fg='red'))
 
-    if random:
+    if random or pattern:
         pattern = pattern if pattern else db.config['genpass_pattern']
         password = genpass(pattern=pattern)
 
