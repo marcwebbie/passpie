@@ -15,15 +15,11 @@ What does it look like?  Here is an example of a simple Passpie usage:
     passpie update foo@example --comment "Hello"
     passpie
 
-And what it looks like when run::
+And what it looks like when run
 
-    ╒═════════════╤═════════╤════════════╤═══════════╕
-    │ Name        │ Login   │ Password   │ Comment   │
-    ╞═════════════╪═════════╪════════════╪═══════════╡
-    │ example.com │ bar     │ *****      │           │
-    ├─────────────┼─────────┼────────────┼───────────┤
-    │ example.com │ foo     │ *****      │ Hello     │
-    ╘═════════════╧═════════╧════════════╧═══════════╛
+.. image:: ../images/tabulate.png
+    :align: center
+    :alt: alternate text
 
 Features
 --------

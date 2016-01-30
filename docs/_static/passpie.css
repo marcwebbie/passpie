@@ -1,6 +1,5 @@
 @import "alabaster.css";
 @import url(https://fonts.googleapis.com/css?family=Roboto);
-@import url(https://fonts.googleapis.com/css?family=Bitter);
 @import url(https://fonts.googleapis.com/css?family=Bree+Serif);
 
 div.body body, div.body input, div.body textarea {
@@ -14,4 +13,13 @@ div.body h1, div.body h2, div.body h3, div.body h4, div.body h5 {
 pre, tt, code {
     font-family: 'Monaco', 'Consolas', 'Menlo', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
     font-size: 0.9em;
+}
+
+div.sphinxsidebar h3 {
+    font-family: "Bree Serif";
+}
+
+div.sphinxsidebar h3.index-link {
+    font-size: 2.3em;
+    margin: 0px;
 }
