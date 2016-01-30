@@ -118,10 +118,12 @@ def cli(ctx, database, autopull, autopush, verbose):
 @cli.command(help='Generate completion scripts for shells')
 @click.argument('shell_name', type=click.Choice(completion.SHELLS),
                 default=None, required=False)
-@click.option('--commands', default=None)
-def complete(shell_name, commands):
-    commands = ['add', 'copy', 'remove', 'search', 'update']
-    script = completion.script(shell_name, config.path, commands)
+@pass_db
+@click.pass_context
+def complete(ctx, db, shell_name):
+    commands = [name for name, cmd in cli.commands.items()
+                if 'fullname' in [param.name for param in cmd.params]]
+    script = completion.script(shell_name, db.path, commands)
     click.echo(script)
 
 
