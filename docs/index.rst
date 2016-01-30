@@ -19,7 +19,7 @@ And what it looks like when run
 
 .. image:: ../images/tabulate.png
     :align: center
-    :alt: alternate text
+    :alt: Passpie table list result
 
 Features
 --------
