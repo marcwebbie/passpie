@@ -50,7 +50,7 @@ Outputs:
 Documentation
 ================
 
-Check the documentation on `readthedocks <http://passpie.readthedocs.org>`_
+Read full documentation on http://passpie.readthedocs.org
 
 
 Bugs & Questions
@@ -78,7 +78,7 @@ extensions: Contributions to Passpie are welcome! Here's how to get started:
 4. Send a pull request and bug the maintainer until it gets merged and
    published ☺
 
-Learn more on `CONTRIBUTING.md <https://github.com/marcwebbie/passpie/blob/master/CONTRIBUTING.md>`
+Learn more on `contributing docs <http://passpie.readthedocs.org/en/latest/contributing.html>`
 
 
 Licence |License|

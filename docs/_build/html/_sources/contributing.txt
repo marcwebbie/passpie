@@ -1,10 +1,22 @@
 Contributing to Passpie
 ***********************
 
+Whether reporting bugs, discussing improvements and new ideas or writing
+extensions: Contributions to Passpie are welcome! Here's how to get started:
+
+1. Check for open issues or open a fresh issue to start a discussion around
+   a feature idea or a bug
+2. Fork `the repository <https://github.com/marcwebbie/passpie/>`_
+   clone your fork and start making your changes
+3. Write a test which shows that the bug was fixed or that the feature works
+   as expected
+4. Send a pull request and bug the maintainer until it gets merged and
+   published ☺
+
 Documentation
 =============
 
-
+Passpie documentation is always open to improvements, to help passpie with better documentation. Passpie documentation is hosted on https://readthedocs.org and documentation files are written in `RestructuredText for Sphinx <http://www.sphinx-doc.org/en/stable/contents.html>`_
 
 Coding
 ======
