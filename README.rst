@@ -72,18 +72,18 @@ Features
 Documentation
 ================
 
-- `Usage <https://github.com/marcwebbie/passpie/blob/master/docs/documentation.md#usage>`_
-- `Configuration <https://github.com/marcwebbie/passpie/blob/master/docs/documentation.md#configuration>`_
+- `Usage <https://github.com/marcwebbie/passpie/blob/master/docs/documentation.rst#usage>`_
+- `Configuration <https://github.com/marcwebbie/passpie/blob/master/docs/documentation.rst#configuration>`_
 
 
 Bugs & Questions
 ================
 
-You can file bugs in our github `issues tracker <https://github.com/marcwebbie/passpie/issues>`_, ask questions on our `mailing list <https://groups.google.com/d/forum/passpie>`_. Or check the `FAQ section <https://github.com/marcwebbie/passpie/blob/master/docs/documentation.md#FAQ>`_ on the documentation.
+You can file bugs in our github `issues tracker <https://github.com/marcwebbie/passpie/issues>`_, ask questions on our `mailing list <https://groups.google.com/d/forum/passpie>`_. Or check the `FAQ section <https://github.com/marcwebbie/passpie/blob/master/docs/documentation.rst#faq>`_ on the documentation.
 
 | **Mailing list**: https://groups.google.com/d/forum/passpie
 | **Github issues**: https://github.com/marcwebbie/passpie/issues
-| **FAQ**: https://github.com/marcwebbie/passpie/blob/master/docs/documentation.md#FAQ
+| **FAQ**: https://github.com/marcwebbie/passpie/blob/master/docs/documentation.rst#FAQ
 
 
 Contributing
