@@ -56,7 +56,7 @@ Features
 | ★ List credentials as a table with colored output
 | ★ Search credentials by name, login, comments or regulax expresions
 | ★ Group credentials by name
-| ★ `Configuration <#configuration>`_ with ~/.passpie or .config
+| ★ `Configuration <https://github.com/marcwebbie/passpie/blob/master/docs/documentation.rst#configuration>`_ with ~/.passpie or .config
 | ★ Version control passpie databases using git
 | ★ Change passphrase and re-encrypt database
 | ★ Export Passpie database to plain text file
@@ -83,7 +83,7 @@ You can file bugs in our github `issues tracker <https://github.com/marcwebbie/p
 
 | **Mailing list**: https://groups.google.com/d/forum/passpie
 | **Github issues**: https://github.com/marcwebbie/passpie/issues
-| **FAQ**: https://github.com/marcwebbie/passpie/blob/master/docs/documentation.rst#FAQ
+| **FAQ**: https://github.com/marcwebbie/passpie/blob/master/docs/documentation.rst#faq
 
 
 Contributing
@@ -100,6 +100,8 @@ extensions: Contributions to Passpie are welcome! Here's how to get started:
    as expected
 4. Send a pull request and bug the maintainer until it gets merged and
    published ☺
+
+Learn more on `CONTRIBUTING.md <https://github.com/marcwebbie/passpie/blob/master/CONTRIBUTING.md>`
 
 
 Licence |License|
