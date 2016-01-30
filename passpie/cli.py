@@ -375,7 +375,7 @@ def status(db, full, days, passphrase):
 
 @cli.command(name="import", help="Import credentials from path")
 @click.argument("filepath", type=click.Path())
-@click.option("-I", "--importer" "as_json", type=click.Choice(importers.get_names()),
+@click.option("-I", "--importer", type=click.Choice(importers.get_names()),
               help="Specify an importer")
 @logging_exception()
 @pass_db
