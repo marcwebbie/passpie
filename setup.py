@@ -29,7 +29,7 @@ requirements = [
     'click==6.2',
     'PyYAML==3.11',
     'tabulate==0.7.5',
-    'tinydb==3.1.1',
+    'tinydb==3.1.2',
     'rstr==2.2.3',
 ]
 
