@@ -158,7 +158,7 @@ html_style = "passpie.css"
 #     'hello': 'links'
 # }
 html_sidebars = {
-    '**': ['sidebarlinks.html', 'sourcelink.html', 'searchbox.html'],
+    '**': ['sidebarlinks.html', 'searchbox.html'],
     # 'using/windows': ['windowssidebar.html', 'searchbox.html'],
 }
 

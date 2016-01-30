@@ -30,62 +30,141 @@ Example configuration file:
 
 ..
 
-| **Name:** ``path``:
+
+``path``
+-----------------------------------
+
 | **Default:** ``~/.passpie``
 | **Description:** Path to default database.
 |
-| **Name:** ``homedir``:
+
+``homedir``
+-----------------------------------
+
 | **Default:** ``~/.gnupg``
 | **Description:** Path to default gnupg homedir.
 |
-| **Name:** ``autopull``:
+
+``autopull``
+-----------------------------------
+
 | **Default:** ``null``
 | **Description:** Automatically pull changes from remote git repository.
 |
-| **Name:** ``autopush``:
+
+``autopush``
+-----------------------------------
+
 | **Default:** ``null``
 | **Description:** Automatically pull changes from remote git repository.
 |
-| **Name:** ``recipient``:
+
+``recipient``
+-----------------------------------
+
 | **Default:** ``null``
 | **Description:** GnuPG defaul recipient. This can be a fingerprint/emai/name.
 |
-| **Name:** ``extension``:
+
+``extension``
+-----------------------------------
+
 | **Default:** ``.pass``
 | **Description:** Password files extension
 |
-| **Name:** ``copy_timeout``:
+
+``copy_timeout``
+-----------------------------------
+
 | **Default:** ``0``
 | **Description:** Automatically clear clipboard after n seconds
 |
-| **Name:** ``genpass_pattern``:
+
+``genpass_pattern``
+-----------------------------------
+
 | **Default:** ``"[a-z]{5} [-_+=*&%$#]{5} [A-Z]{5}"``
 | **Description:** Regex pattern for password random generation
 |
-| **Name:** ``table_format``:
+
+``table_format``
+-----------------------------------
+
 | **Default:** ``fancy_grid``
-| **Description:**
+| **Description:** Render table format
 |
-| **Name:** ``headers``:
+
+Values:
+
+- plain
+- simple
+- grid
+- fancy_grid
+- pipe
+- orgtbl
+- jira
+- psql
+- rst
+- mediawiki
+- moinmoin
+- html
+- latex
+- latex_booktabs
+- textile
+
+``headers``
+-----------------------------------
+
 | **Default:** ``[name, login, password, comments]``
-| **Description:**
+| **Description:** Column names
 |
-| **Name:** ``colors``:
+
+``colors``
+-----------------------------------
+
 | **Default:** ``{login: green, name: yellow}``
 | **Description:** Table column colors
-|
-| **Name:** ``key_length``:
+
+Values:
+
+- green
+- yellow
+- blue
+- red
+- white
+- gray
+- magenta
+- cyan
+
+``key_length``
+-----------------------------------
+
 | **Default:** ``4096``
 | **Description:** AES encryption key length
-|
-| **Name:** ``repo``:
+
+.. warning::
+
+   Use a strong primary key.
+   Some people still have 1024-bit DSA keys. You really should transition to a stronger bit-length and hashing algo. In 2011, the US government instution NIST has deprecated DSA-1024, since 2013 it is even disallowed.
+
+   It is recommend to make a 4096bit RSA key, with the sha512 hashing algo, making a transition statement that is signed by both keys, and then letting people know. Also have a look at this good document that details exactly the steps that you need to create such a key, making sure that you are getting the right hashing algo (it can be slightly complicated if you are using GnuPG versions less than 1.4.10).
+
+``repo``
+-----------------------------------
+
 | **Default:** ``true``
-| **Description:** Automatically create a git repository on initialization
+| **Description:** Automatically create a git repository in database on initialization
 |
-| **Name:** ``short_commands``:
+
+``short_commands``
+-----------------------------------
+
 | **Default:** ``false``
-| **Description:**
+| **Description:** Use alias for passpie commands
 |
-| **Name:** ``status_repeated_passwords_limit``:
+
+``status_repeated_passwords_limit``
+-----------------------------------
+
 | **Default:** ``5``
-| **Description:**
+| **Description:** Number of credentials to show on the repeated column of status

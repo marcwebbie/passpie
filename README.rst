@@ -47,42 +47,20 @@ Outputs:
     ╘═════════════╧═════════╧════════════╧═══════════╛
 
 
-Features
-========
-
-| ★ Add, update, remove credentials
-| ★ Manage multiple databases. Locally and remotely
-| ★ Copy passwords to clipboard or to stdout
-| ★ List credentials as a table with colored output
-| ★ Search credentials by name, login, comments or regulax expresions
-| ★ Group credentials by name
-| ★ `Configuration <https://github.com/marcwebbie/passpie/blob/master/docs/documentation.rst#configuration>`_ with ~/.passpie or .config
-| ★ Version control passpie databases using git
-| ★ Change passphrase and re-encrypt database
-| ★ Export Passpie database to plain text file
-| ★ Import credentials
-| ★ Generate random passwords
-| ★ Generate database status report
-| ★ BASH/ZSH/FISH completion
-| ★ Undo/Redo changes to the database. (requires `git <https://git-scm.com/>`_)
-| ★ Set a personal gpg key recipient
-| ★ Per database keyring
-
-
 Documentation
 ================
 
-Check the documentation on `readthedocks<http://passpie.readthedocs.org>`
+Check the documentation on `readthedocks <http://passpie.readthedocs.org>`_
 
 
 Bugs & Questions
 ================
 
-You can file bugs in our github `issues tracker <https://github.com/marcwebbie/passpie/issues>`_, ask questions on our `mailing list <https://groups.google.com/d/forum/passpie>`_. Or check the `FAQ section <https://github.com/marcwebbie/passpie/blob/master/docs/documentation.rst#faq>`_ on the documentation.
+You can file bugs in our github `issues tracker <https://github.com/marcwebbie/passpie/issues>`_, ask questions on our `mailing list <https://groups.google.com/d/forum/passpie>`_. Or check the `FAQ section <http://passpie.readthedocs.org/en/latest/faq.html>`_ on the documentation.
 
 | **Mailing list**: https://groups.google.com/d/forum/passpie
 | **Github issues**: https://github.com/marcwebbie/passpie/issues
-| **FAQ**: https://github.com/marcwebbie/passpie/blob/master/docs/documentation.rst#faq
+| **FAQ**: http://passpie.readthedocs.org/en/latest/faq.html
 
 
 Contributing

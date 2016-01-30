@@ -1,11 +1,13 @@
 Contributing to Passpie
 ***********************
 
+Documentation
+=============
+
+
+
 Coding
 ======
-
-Quickstart
-----------
 
 ::
 
@@ -17,7 +19,7 @@ Quickstart
 
 
 Importers
----------
+=========
 
 Importers should be independent pluggable code. To add a new importer. Create python module into importers package. If you were writting an importer to a site called ``superpassword``.
 

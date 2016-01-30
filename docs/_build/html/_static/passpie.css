@@ -1,13 +1,14 @@
 @import "alabaster.css";
 @import url(https://fonts.googleapis.com/css?family=Roboto);
-@import url(https://fonts.googleapis.com/css?family=Graduate);
+@import url(https://fonts.googleapis.com/css?family=Bitter);
+@import url(https://fonts.googleapis.com/css?family=Bree+Serif);
 
 div.body body, div.body input, div.body textarea {
   font-family: "Roboto", Helvetica, Arial, sans-serif;
 }
 
 div.body h1, div.body h2, div.body h3, div.body h4, div.body h5 {
-  font-family: "Graduate";
+  font-family: "Bree Serif";
 }
 
 pre, tt, code {

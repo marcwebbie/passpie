@@ -178,7 +178,7 @@ Avoiding git initialization
 
 ..
 
-Or using `configuration <#>`_
+Or using `configuration <http://passpie.readthedocs.org/en/latest/configuration.html>`_
 
 Logging
 +++++++
@@ -339,9 +339,9 @@ Exporting a passpie database
 
     passpie export passpie.db
 
-..
+.. warning::
 
-    ❗ Passpie exports databases credentials in plain text
+   Passpie exports databases credentials in plain text
 
 
 Importing a passpie database

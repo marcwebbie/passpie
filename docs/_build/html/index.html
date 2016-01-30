@@ -40,7 +40,7 @@
   <div class="section" id="welcome-to-passpie">
 <h1>Welcome to Passpie<a class="headerlink" href="#welcome-to-passpie" title="Permalink to this headline">¶</a></h1>
 <p>Passpie is a command line tool to  manage passwords from the terminal with a colorful and configurable interface. Use a master passphrase to decrypt login credentials, copy passwords to clipboard, syncronize with a git repository, check the state of your passwords, and more.</p>
-<p>Password files are encrypted using <a class="reference external" href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard)">GnuPG</a> and saved into yaml text files.</p>
+<p>Password files are encrypted using <a class="reference external" href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard)">GnuPG</a> and saved into yaml text files. Passpie supports <strong>Linux</strong>, <strong>OSX</strong> and <strong>Windows</strong>.</p>
 <p>What does it look like?  Here is an example of a simple Passpie usage:</p>
 <div class="highlight-bash"><div class="highlight"><pre>passpie init
 passpie add foo@example.com --random
@@ -80,6 +80,11 @@ passpie
 <div class="line">★ Set a personal gpg key recipient</div>
 <div class="line">★ Per database keyring</div>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This repository is open source and is available on <a class="reference external" href="https://github.com/marcwebbie/passpie">GitHub</a>.
+We would love contributions.</p>
+</div>
 </div>
 <div class="section" id="documentation-contents">
 <h2>Documentation Contents<a class="headerlink" href="#documentation-contents" title="Permalink to this headline">¶</a></h2>
@@ -103,9 +108,28 @@ passpie
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#debugging">Debugging</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#path"><code class="docutils literal"><span class="pre">path</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#homedir"><code class="docutils literal"><span class="pre">homedir</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#autopull"><code class="docutils literal"><span class="pre">autopull</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#autopush"><code class="docutils literal"><span class="pre">autopush</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#recipient"><code class="docutils literal"><span class="pre">recipient</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#extension"><code class="docutils literal"><span class="pre">extension</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#copy-timeout"><code class="docutils literal"><span class="pre">copy_timeout</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#genpass-pattern"><code class="docutils literal"><span class="pre">genpass_pattern</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#table-format"><code class="docutils literal"><span class="pre">table_format</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#headers"><code class="docutils literal"><span class="pre">headers</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#colors"><code class="docutils literal"><span class="pre">colors</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#key-length"><code class="docutils literal"><span class="pre">key_length</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#repo"><code class="docutils literal"><span class="pre">repo</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#short-commands"><code class="docutils literal"><span class="pre">short_commands</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#status-repeated-passwords-limit"><code class="docutils literal"><span class="pre">status_repeated_passwords_limit</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to Passpie</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#documentation">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#coding">Coding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#importers">Importers</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a><ul>
@@ -116,11 +140,6 @@ passpie
 </ul>
 </li>
 </ul>
-</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This repository is open source and is available on <a class="reference external" href="https://github.com/marcwebbie/passpie">GitHub</a>.
-We would love contributions.</p>
 </div>
 </div>
 <div class="section" id="miscellaneous-pages">
@@ -171,9 +190,12 @@ We would love contributions.</p>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><h3>About Passpie</h3>
+        <div class="sphinxsidebarwrapper"><h3><a href="/">Passpie</a></h3>
 <p>
   Passpie is a command-line password manager with a colorful interface.
+</p>
+<p>
+  <iframe src="https://ghbtns.com/github-btn.html?user=marcwebbie&repo=passpie&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
 </p>
 <h3>Useful Links</h3>
 <ul>
@@ -181,14 +203,8 @@ We would love contributions.</p>
   <li><a href="http://pypi.python.org/pypi/passpie">Passpie @ PyPI</a></li>
   <li><a href="http://github.com/marcwebbie/passpie">Passpie @ github</a></li>
   <li><a href="http://github.com/marcwebbie/passpie/issues">Issue Tracker</a></li>
+  <li><a href="http://passpie.readthedocs.org/en/latest/faq.html">FAQ</a></li>
 </ul>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/index.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">

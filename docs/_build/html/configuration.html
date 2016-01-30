@@ -65,66 +65,157 @@
 <span class="l l-Scalar l-Scalar-Plain">table_format</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">fancy_grid</span>
 </pre></div>
 </div>
+<div class="section" id="path">
+<h2><code class="docutils literal"><span class="pre">path</span></code><a class="headerlink" href="#path" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">path</span></code>:</div>
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">~/.passpie</span></code></div>
 <div class="line"><strong>Description:</strong> Path to default database.</div>
 <div class="line"><br /></div>
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">homedir</span></code>:</div>
+</div>
+</div>
+<div class="section" id="homedir">
+<h2><code class="docutils literal"><span class="pre">homedir</span></code><a class="headerlink" href="#homedir" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">~/.gnupg</span></code></div>
 <div class="line"><strong>Description:</strong> Path to default gnupg homedir.</div>
 <div class="line"><br /></div>
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">autopull</span></code>:</div>
+</div>
+</div>
+<div class="section" id="autopull">
+<h2><code class="docutils literal"><span class="pre">autopull</span></code><a class="headerlink" href="#autopull" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">null</span></code></div>
 <div class="line"><strong>Description:</strong> Automatically pull changes from remote git repository.</div>
 <div class="line"><br /></div>
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">autopush</span></code>:</div>
+</div>
+</div>
+<div class="section" id="autopush">
+<h2><code class="docutils literal"><span class="pre">autopush</span></code><a class="headerlink" href="#autopush" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">null</span></code></div>
 <div class="line"><strong>Description:</strong> Automatically pull changes from remote git repository.</div>
 <div class="line"><br /></div>
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">recipient</span></code>:</div>
+</div>
+</div>
+<div class="section" id="recipient">
+<h2><code class="docutils literal"><span class="pre">recipient</span></code><a class="headerlink" href="#recipient" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">null</span></code></div>
 <div class="line"><strong>Description:</strong> GnuPG defaul recipient. This can be a fingerprint/emai/name.</div>
 <div class="line"><br /></div>
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">extension</span></code>:</div>
+</div>
+</div>
+<div class="section" id="extension">
+<h2><code class="docutils literal"><span class="pre">extension</span></code><a class="headerlink" href="#extension" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">.pass</span></code></div>
 <div class="line"><strong>Description:</strong> Password files extension</div>
 <div class="line"><br /></div>
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">copy_timeout</span></code>:</div>
+</div>
+</div>
+<div class="section" id="copy-timeout">
+<h2><code class="docutils literal"><span class="pre">copy_timeout</span></code><a class="headerlink" href="#copy-timeout" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">0</span></code></div>
 <div class="line"><strong>Description:</strong> Automatically clear clipboard after n seconds</div>
 <div class="line"><br /></div>
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">genpass_pattern</span></code>:</div>
+</div>
+</div>
+<div class="section" id="genpass-pattern">
+<h2><code class="docutils literal"><span class="pre">genpass_pattern</span></code><a class="headerlink" href="#genpass-pattern" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">&quot;[a-z]{5}</span> <span class="pre">[-_+=*&amp;%$#]{5}</span> <span class="pre">[A-Z]{5}&quot;</span></code></div>
 <div class="line"><strong>Description:</strong> Regex pattern for password random generation</div>
 <div class="line"><br /></div>
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">table_format</span></code>:</div>
+</div>
+</div>
+<div class="section" id="table-format">
+<h2><code class="docutils literal"><span class="pre">table_format</span></code><a class="headerlink" href="#table-format" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">fancy_grid</span></code></div>
-<div class="line"><strong>Description:</strong></div>
+<div class="line"><strong>Description:</strong> Render table format</div>
 <div class="line"><br /></div>
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">headers</span></code>:</div>
+</div>
+<p>Values:</p>
+<ul class="simple">
+<li>plain</li>
+<li>simple</li>
+<li>grid</li>
+<li>fancy_grid</li>
+<li>pipe</li>
+<li>orgtbl</li>
+<li>jira</li>
+<li>psql</li>
+<li>rst</li>
+<li>mediawiki</li>
+<li>moinmoin</li>
+<li>html</li>
+<li>latex</li>
+<li>latex_booktabs</li>
+<li>textile</li>
+</ul>
+</div>
+<div class="section" id="headers">
+<h2><code class="docutils literal"><span class="pre">headers</span></code><a class="headerlink" href="#headers" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">[name,</span> <span class="pre">login,</span> <span class="pre">password,</span> <span class="pre">comments]</span></code></div>
-<div class="line"><strong>Description:</strong></div>
+<div class="line"><strong>Description:</strong> Column names</div>
 <div class="line"><br /></div>
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">colors</span></code>:</div>
+</div>
+</div>
+<div class="section" id="colors">
+<h2><code class="docutils literal"><span class="pre">colors</span></code><a class="headerlink" href="#colors" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">{login:</span> <span class="pre">green,</span> <span class="pre">name:</span> <span class="pre">yellow}</span></code></div>
 <div class="line"><strong>Description:</strong> Table column colors</div>
-<div class="line"><br /></div>
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">key_length</span></code>:</div>
+</div>
+<p>Values:</p>
+<ul class="simple">
+<li>green</li>
+<li>yellow</li>
+<li>blue</li>
+<li>red</li>
+<li>white</li>
+<li>gray</li>
+<li>magenta</li>
+<li>cyan</li>
+</ul>
+</div>
+<div class="section" id="key-length">
+<h2><code class="docutils literal"><span class="pre">key_length</span></code><a class="headerlink" href="#key-length" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">4096</span></code></div>
 <div class="line"><strong>Description:</strong> AES encryption key length</div>
-<div class="line"><br /></div>
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">repo</span></code>:</div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Use a strong primary key.
+Some people still have 1024-bit DSA keys. You really should transition to a stronger bit-length and hashing algo. In 2011, the US government instution NIST has deprecated DSA-1024, since 2013 it is even disallowed.</p>
+<p class="last">It is recommend to make a 4096bit RSA key, with the sha512 hashing algo, making a transition statement that is signed by both keys, and then letting people know. Also have a look at this good document that details exactly the steps that you need to create such a key, making sure that you are getting the right hashing algo (it can be slightly complicated if you are using GnuPG versions less than 1.4.10).</p>
+</div>
+</div>
+<div class="section" id="repo">
+<h2><code class="docutils literal"><span class="pre">repo</span></code><a class="headerlink" href="#repo" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">true</span></code></div>
-<div class="line"><strong>Description:</strong> Automatically create a git repository on initialization</div>
+<div class="line"><strong>Description:</strong> Automatically create a git repository in database on initialization</div>
 <div class="line"><br /></div>
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">short_commands</span></code>:</div>
+</div>
+</div>
+<div class="section" id="short-commands">
+<h2><code class="docutils literal"><span class="pre">short_commands</span></code><a class="headerlink" href="#short-commands" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">false</span></code></div>
-<div class="line"><strong>Description:</strong></div>
+<div class="line"><strong>Description:</strong> Use alias for passpie commands</div>
 <div class="line"><br /></div>
-<div class="line"><strong>Name:</strong> <code class="docutils literal"><span class="pre">status_repeated_passwords_limit</span></code>:</div>
+</div>
+</div>
+<div class="section" id="status-repeated-passwords-limit">
+<h2><code class="docutils literal"><span class="pre">status_repeated_passwords_limit</span></code><a class="headerlink" href="#status-repeated-passwords-limit" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">5</span></code></div>
-<div class="line"><strong>Description:</strong></div>
+<div class="line"><strong>Description:</strong> Number of credentials to show on the repeated column of status</div>
+</div>
 </div>
 </div>
 
@@ -133,9 +224,12 @@
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><h3>About Passpie</h3>
+        <div class="sphinxsidebarwrapper"><h3><a href="/">Passpie</a></h3>
 <p>
   Passpie is a command-line password manager with a colorful interface.
+</p>
+<p>
+  <iframe src="https://ghbtns.com/github-btn.html?user=marcwebbie&repo=passpie&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
 </p>
 <h3>Useful Links</h3>
 <ul>
@@ -143,14 +237,8 @@
   <li><a href="http://pypi.python.org/pypi/passpie">Passpie @ PyPI</a></li>
   <li><a href="http://github.com/marcwebbie/passpie">Passpie @ github</a></li>
   <li><a href="http://github.com/marcwebbie/passpie/issues">Issue Tracker</a></li>
+  <li><a href="http://passpie.readthedocs.org/en/latest/faq.html">FAQ</a></li>
 </ul>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/configuration.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
