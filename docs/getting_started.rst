@@ -326,7 +326,7 @@ Add this line to your ``~/.config/fish/config.fish``
 
 ::
 
-   if which passpie > /dev/null; then eval "$(passpie complete zsh)"; fi
+   if which passpie > /dev/null; then eval "$(passpie complete fish)"; fi
 
 
 Importing and Exporting
@@ -403,8 +403,23 @@ Available checkers are:
 - repeated passwords
 - old passwords
 
+
 GnuPG keys
 ----------
+
+By default *Passpie* creates a GnuPG `keyring <https://en.wikipedia.org/wiki/Keyring_(cryptography)>`_ for each initialized database.
+This keyring will be used to encryt/decrypt credentials from database.
+
+To prevent this behavior, set the a recipient when initializing the database::
+
+  passpie init --recipient foo@example.com
+
+Or for an already initialized database, set the recipient to the config file:
+
+.. code-block:: yaml
+
+   recipient: foo@example.com
+
 
 Reseting and Purging Databases
 ------------------------------

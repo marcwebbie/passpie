@@ -316,7 +316,7 @@ opensource/python.org     foo      *****
 <div class="section" id="fish">
 <h3><code class="docutils literal"><span class="pre">fish</span></code><a class="headerlink" href="#fish" title="Permalink to this headline">¶</a></h3>
 <p>Add this line to your <code class="docutils literal"><span class="pre">~/.config/fish/config.fish</span></code></p>
-<div class="highlight-python"><div class="highlight"><pre>if which passpie &gt; /dev/null; then eval &quot;$(passpie complete zsh)&quot;; fi
+<div class="highlight-python"><div class="highlight"><pre>if which passpie &gt; /dev/null; then eval &quot;$(passpie complete fish)&quot;; fi
 </pre></div>
 </div>
 </div>
@@ -386,6 +386,16 @@ opensource/python.org     foo      *****
 </div>
 <div class="section" id="gnupg-keys">
 <h2>GnuPG keys<a class="headerlink" href="#gnupg-keys" title="Permalink to this headline">¶</a></h2>
+<p>By default <em>Passpie</em> creates a GnuPG <a class="reference external" href="https://en.wikipedia.org/wiki/Keyring_(cryptography)">keyring</a> for each initialized database.
+This keyring will be used to encryt/decrypt credentials from database.</p>
+<p>To prevent this behavior, set the a recipient when initializing the database:</p>
+<div class="highlight-python"><div class="highlight"><pre>passpie init --recipient foo@example.com
+</pre></div>
+</div>
+<p>Or for an already initialized database, set the recipient to the config file:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l l-Scalar l-Scalar-Plain">recipient</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">foo@example.com</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="reseting-and-purging-databases">
 <h2>Reseting and Purging Databases<a class="headerlink" href="#reseting-and-purging-databases" title="Permalink to this headline">¶</a></h2>
