@@ -10,15 +10,6 @@ Version 1.2.0
 + **√** Fix tests on creating repository for git init
 + **√** Fix error creating subdir in database in git init
 
-Version 1.1.2
--------------
-
-+ **√** Fix passpie complete commands for shells
-+ **√** Fix error creating subdir in database in git init
-
-+ **√** Fix passpie complete commands for shells
-+ **√** Fix error creating subdir in database in git init
-
 Version 1.1.1
 -------------
 
