@@ -1,5 +1,20 @@
+Version 1.2.0
+
++ **√** Add configurable master csv importer
++ **√** Fix cli `--importer` name on import command
++ **√** Add Keepass csv importer. fixes #32
++ **√** Add `--importers` option to import
++ **√** Fix genpass raising re.error on pattern error fixes #84
++ **√** Set `--pattern` option as standalone
++ **√** Fix passpie complete commands for shells
++ **√** Fix tests on creating repository for git init
++ **√** Fix error creating subdir in database in git init
+
 Version 1.1.2
 -------------
+
++ **√** Fix passpie complete commands for shells
++ **√** Fix error creating subdir in database in git init
 
 + **√** Fix passpie complete commands for shells
 + **√** Fix error creating subdir in database in git init
