@@ -1,4 +1,5 @@
 Version 1.2.0
+-------------
 
 + **√** Add configurable master csv importer
 + **√** Fix cli `--importer` name on import command
