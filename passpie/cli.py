@@ -17,7 +17,7 @@ from .utils import genpass, ensure_dependencies
 from .history import clone
 
 
-__version__ = "1.1.1"
+__version__ = "1.2.0"
 pass_db = click.make_pass_decorator(Database, ensure=False)
 
 

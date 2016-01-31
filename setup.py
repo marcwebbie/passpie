@@ -9,7 +9,7 @@ except ImportError:
     from distutils.core import setup, Command, find_packages
 
 
-__version__ = "1.1.1"
+__version__ = "1.2.0"
 long_description = open('README.rst').read() + "\n\n"
 
 
