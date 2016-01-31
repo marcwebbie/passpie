@@ -1,6 +1,10 @@
 :code:`passpie`: Comand-line password manager
 *******************************************************
 
+.. image:: https://badges.gitter.im/marcwebbie/passpie.svg
+   :alt: Join the chat at https://gitter.im/marcwebbie/passpie
+   :target: https://gitter.im/marcwebbie/passpie?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
 .. image:: https://raw.githubusercontent.com/marcwebbie/passpie/master/images/passpie.png
     :align: center
     :width: 100%
