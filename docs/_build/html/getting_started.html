@@ -323,9 +323,9 @@ opensource/python.org     foo      *****
 </div>
 <div class="section" id="importing-and-exporting">
 <h2>Importing and Exporting<a class="headerlink" href="#importing-and-exporting" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="exporting-a-passpie-database">
-<h3>Exporting a passpie database<a class="headerlink" href="#exporting-a-passpie-database" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-python"><div class="highlight"><pre>passpie export passpie.db
+<div class="section" id="exporting-credentials">
+<h3>Exporting credentials<a class="headerlink" href="#exporting-credentials" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>passpie export passwords.db
 </pre></div>
 </div>
 <div class="admonition warning">
@@ -333,21 +333,40 @@ opensource/python.org     foo      *****
 <p class="last">Passpie exports databases credentials in plain text</p>
 </div>
 </div>
-<div class="section" id="importing-a-passpie-database">
-<h3>Importing a passpie database<a class="headerlink" href="#importing-a-passpie-database" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-python"><div class="highlight"><pre>passpie import passpie.db
+<div class="section" id="importing-credentials">
+<h3>Importing credentials<a class="headerlink" href="#importing-credentials" title="Permalink to this headline">¶</a></h3>
+<p>Passpie importers use a list of importers to to try and handle the paswords file passed.</p>
+<p>Available importers:</p>
+<div class="line-block">
+<div class="line">★ Keepass (CSV)</div>
+<div class="line">★ Pysswords</div>
+<div class="line">★ Passpie</div>
+<div class="line">★ CSV configurable importer</div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>passpie import passwords.txt
 </pre></div>
 </div>
-<div class="section" id="csv-passwords-importer">
-<h4>CSV passwords importer<a class="headerlink" href="#csv-passwords-importer" title="Permalink to this headline">¶</a></h4>
-<p>Importing from a CSV file. Specify <code class="docutils literal"><span class="pre">--cols</span></code> option to map columns to credential attributes. For example for a CSV like this passwords.csv:</p>
+<div class="section" id="csv-configurable-importer">
+<h4>CSV configurable importer<a class="headerlink" href="#csv-configurable-importer" title="Permalink to this headline">¶</a></h4>
+<p>Importing from a CSV file. Specify <code class="docutils literal"><span class="pre">--cols</span></code> option to map columns to credential attributes.</p>
+<p><strong>Keepass</strong> exported credentials as <code class="docutils literal"><span class="pre">keepass.csv</span></code>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="s2">&quot;Group&quot;</span><span class="p">,</span><span class="s2">&quot;Title&quot;</span><span class="p">,</span><span class="s2">&quot;Username&quot;</span><span class="p">,</span><span class="s2">&quot;Password&quot;</span><span class="p">,</span><span class="s2">&quot;URL&quot;</span><span class="p">,</span><span class="s2">&quot;Notes&quot;</span>
 <span class="s2">&quot;Root&quot;</span><span class="p">,</span><span class="s2">&quot;Some Title&quot;</span><span class="p">,</span><span class="s2">&quot;john.doe&quot;</span><span class="p">,</span><span class="s2">&quot;secret&quot;</span><span class="p">,</span><span class="s2">&quot;example.com&quot;</span><span class="p">,</span><span class="s2">&quot;Some comments&quot;</span>
 <span class="s2">&quot;Root&quot;</span><span class="p">,</span><span class="s2">&quot;Another title&quot;</span><span class="p">,</span><span class="s2">&quot;foo.bar&quot;</span><span class="p">,</span><span class="s2">&quot;p4ssword&quot;</span><span class="p">,</span><span class="s2">&quot;example.org&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span>
 </pre></div>
 </div>
-<p>We can import those passwords with:</p>
-<div class="highlight-python"><div class="highlight"><pre>passpie import --cols &quot;,,login,password,name,comment&quot; passwords.csv
+<p>Import credentials with:</p>
+<div class="highlight-python"><div class="highlight"><pre>passpie import --cols &quot;,,login,password,name,comment&quot; keepass.csv
+</pre></div>
+</div>
+<p><strong>Lastpass</strong> exported credentials as <code class="docutils literal"><span class="pre">lastpass.csv</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s2">&quot;Group&quot;</span><span class="p">,</span><span class="s2">&quot;Title&quot;</span><span class="p">,</span><span class="s2">&quot;Username&quot;</span><span class="p">,</span><span class="s2">&quot;Password&quot;</span><span class="p">,</span><span class="s2">&quot;URL&quot;</span><span class="p">,</span><span class="s2">&quot;Notes&quot;</span>
+<span class="s2">&quot;Root&quot;</span><span class="p">,</span><span class="s2">&quot;Some Title&quot;</span><span class="p">,</span><span class="s2">&quot;john.doe&quot;</span><span class="p">,</span><span class="s2">&quot;secret&quot;</span><span class="p">,</span><span class="s2">&quot;example.com&quot;</span><span class="p">,</span><span class="s2">&quot;Some comments&quot;</span>
+<span class="s2">&quot;Root&quot;</span><span class="p">,</span><span class="s2">&quot;Another title&quot;</span><span class="p">,</span><span class="s2">&quot;foo.bar&quot;</span><span class="p">,</span><span class="s2">&quot;p4ssword&quot;</span><span class="p">,</span><span class="s2">&quot;example.org&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span>
+</pre></div>
+</div>
+<p>Import with:</p>
+<div class="highlight-python"><div class="highlight"><pre>passpie import --cols &quot;name,login,password,,comment&quot; lastpass.csv
 </pre></div>
 </div>
 </div>

@@ -42,15 +42,23 @@
 <p>Passpie is a command line tool to  manage passwords from the terminal with a colorful and configurable interface. Use a master passphrase to decrypt login credentials, copy passwords to clipboard, syncronize with a git repository, check the state of your passwords, and more.</p>
 <p>Password files are encrypted using <a class="reference external" href="https://www.gnupg.org/">GnuPG</a> and saved into yaml text files. Passpie supports <strong>Linux</strong>, <strong>OSX</strong> and <strong>Windows</strong>.</p>
 <p>What does it look like?  Here is an example of a simple Passpie usage:</p>
-<div class="highlight-bash"><div class="highlight"><pre>passpie init
+<div class="highlight-python"><div class="highlight"><pre>passpie init
 passpie add foo@example.com --random
-passpie add bar@example.com --pattern <span class="s2">&quot;[0-9]{5}[a-z]{5}&quot;</span>
-passpie update foo@example --comment <span class="s2">&quot;Hello&quot;</span>
+passpie add bar@example.com --pattern &quot;[0-9]{5}[a-z]{5}&quot;
+passpie update foo@example --comment &quot;Hello&quot;
 passpie
 </pre></div>
 </div>
-<p>And what it looks like when run</p>
-<img alt="Passpie table list result" class="align-center" src="_images/tabulate.png" />
+<p>Outputs:</p>
+<div class="highlight-python"><div class="highlight"><pre>╒═════════════╤═════════╤════════════╤═══════════╕
+│ Name        │ Login   │ Password   │ Comment   │
+╞═════════════╪═════════╪════════════╪═══════════╡
+│ example.com │ bar     │ *****      │           │
+├─────────────┼─────────┼────────────┼───────────┤
+│ example.com │ foo     │ *****      │ Hello     │
+╘═════════════╧═════════╧════════════╧═══════════╛
+</pre></div>
+</div>
 <div class="section" id="features">
 <h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
@@ -63,8 +71,8 @@ passpie
 <div class="line">★ <a class="reference external" href="http://passpie.readthedocs.org/en/latest/configuration.html">Configuration</a> with <code class="docutils literal"><span class="pre">~/.passpie</span></code> or <code class="docutils literal"><span class="pre">.config</span></code></div>
 <div class="line">★ Version control passpie databases using git</div>
 <div class="line">★ Change passphrase and re-encrypt database</div>
-<div class="line">★ Export Passpie database to plain text file</div>
-<div class="line">★ Import credentials</div>
+<div class="line">★ <a class="reference external" href="getting_started.html#exporting-credentials">Export credentials</a></div>
+<div class="line">★ <a class="reference external" href="getting_started.html#importing-credentials">Import credentials</a></div>
 <div class="line">★ Generate random passwords</div>
 <div class="line">★ Generate database status report</div>
 <div class="line">★ BASH/ZSH/FISH completion</div>
@@ -147,6 +155,7 @@ We would love contributions.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-2-0">Version 1.2.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-1-1">Version 1.1.1</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-1-0">Version 1.1.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-0-2">Version 1.0.2</a></li>

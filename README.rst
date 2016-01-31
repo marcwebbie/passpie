@@ -7,7 +7,27 @@
 
 |Version| |Build Status| |Windows Build Status| |Coverage| |Requirements|
 
-Passpie is a command line tool to  manage passwords from the terminal with a colorful and configurable interface. Password files are encrypted using `GnuPG <http://en.wikipedia.org/wiki/GNU_Privacy_Guard)>`_ and saved into yaml text files. Use a master passphrase to decrypt login credentials, copy passwords to clipboard, syncronize with a git repository, check the state of your passwords, and more...
+Passpie is a command line tool to  manage passwords from the terminal with a colorful and configurable interface. Use a master passphrase to decrypt login credentials, copy passwords to clipboard, syncronize with a git repository, check the state of your passwords, and more.
+
+Password files are encrypted using `GnuPG <https://www.gnupg.org/>`_ and saved into yaml text files. Passpie supports **Linux**, **OSX** and **Windows**.
+
+What does it look like?  Here is an example of a simple Passpie usage::
+
+    passpie init
+    passpie add foo@example.com --random
+    passpie add bar@example.com --pattern "[0-9]{5}[a-z]{5}"
+    passpie update foo@example --comment "Hello"
+    passpie
+
+Outputs::
+
+    ╒═════════════╤═════════╤════════════╤═══════════╕
+    │ Name        │ Login   │ Password   │ Comment   │
+    ╞═════════════╪═════════╪════════════╪═══════════╡
+    │ example.com │ bar     │ *****      │           │
+    ├─────────────┼─────────┼────────────┼───────────┤
+    │ example.com │ foo     │ *****      │ Hello     │
+    ╘═════════════╧═════════╧════════════╧═══════════╛
 
 
 Install
@@ -24,36 +44,12 @@ Or if you are on a mac, install via `Homebrew <http://brew.sh>`_:
     brew install passpie
 
 
-Quickstart
-==========
-
-.. code-block::
-
-    passpie init
-    passpie add foo@example.com --random --pattern "[0-9]{5}[a-z]{5}"
-    passpie add bar@example.com --random --pattern "[0-9]{5}[a-z]{5}"
-    passpie update foo@example.com --comment "Hello"
-    passpie
-
-Outputs:
-
-.. code-block::
-
-    ╒═════════════╤═════════╤════════════╤═══════════╕
-    │ Name        │ Login   │ Password   │ Comment   │
-    ╞═════════════╪═════════╪════════════╪═══════════╡
-    │ example.com │ bar     │ *****      │           │
-    ├─────────────┼─────────┼────────────┼───────────┤
-    │ example.com │ foo     │ *****      │ Hello     │
-    ╘═════════════╧═════════╧════════════╧═══════════╛
-
-
 Documentation
 ================
 
 Read full documentation on http://passpie.readthedocs.org
 
-And visit our chat on |Gitter|
+And visit our |Gitter|
 
 
 Licence |License|

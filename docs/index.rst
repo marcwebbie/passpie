@@ -5,9 +5,7 @@ Passpie is a command line tool to  manage passwords from the terminal with a col
 
 Password files are encrypted using `GnuPG <https://www.gnupg.org/>`_ and saved into yaml text files. Passpie supports **Linux**, **OSX** and **Windows**.
 
-What does it look like?  Here is an example of a simple Passpie usage:
-
-.. code-block:: bash
+What does it look like?  Here is an example of a simple Passpie usage::
 
     passpie init
     passpie add foo@example.com --random
@@ -15,11 +13,16 @@ What does it look like?  Here is an example of a simple Passpie usage:
     passpie update foo@example --comment "Hello"
     passpie
 
-And what it looks like when run
+Outputs::
 
-.. image:: ../images/tabulate.png
-    :align: center
-    :alt: Passpie table list result
+    ╒═════════════╤═════════╤════════════╤═══════════╕
+    │ Name        │ Login   │ Password   │ Comment   │
+    ╞═════════════╪═════════╪════════════╪═══════════╡
+    │ example.com │ bar     │ *****      │           │
+    ├─────────────┼─────────┼────────────┼───────────┤
+    │ example.com │ foo     │ *****      │ Hello     │
+    ╘═════════════╧═════════╧════════════╧═══════════╛
+
 
 Features
 --------
@@ -33,8 +36,8 @@ Features
 | ★ `Configuration <http://passpie.readthedocs.org/en/latest/configuration.html>`_ with ``~/.passpie`` or ``.config``
 | ★ Version control passpie databases using git
 | ★ Change passphrase and re-encrypt database
-| ★ Export Passpie database to plain text file
-| ★ Import credentials
+| ★ `Export credentials <getting_started.html#exporting-credentials>`_
+| ★ `Import credentials <getting_started.html#importing-credentials>`_
 | ★ Generate random passwords
 | ★ Generate database status report
 | ★ BASH/ZSH/FISH completion

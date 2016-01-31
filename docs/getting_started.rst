@@ -332,38 +332,61 @@ Add this line to your ``~/.config/fish/config.fish``
 Importing and Exporting
 -----------------------
 
-Exporting a passpie database
-++++++++++++++++++++++++++++
+Exporting credentials
++++++++++++++++++++++
 
 ::
 
-    passpie export passpie.db
+    passpie export passwords.db
 
 .. warning::
 
    Passpie exports databases credentials in plain text
 
 
-Importing a passpie database
-++++++++++++++++++++++++++++
+Importing credentials
++++++++++++++++++++++
+
+Passpie importers use a list of importers to to try and handle the paswords file passed.
+
+Available importers:
+
+| ★ Keepass (CSV)
+| ★ Pysswords
+| ★ Passpie
+| ★ CSV configurable importer
 
 ::
 
-    passpie import passpie.db
+    passpie import passwords.txt
 
 
-CSV passwords importer
-~~~~~~~~~~~~~~~~~~~~~~
+CSV configurable importer
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Importing from a CSV file. Specify ``--cols`` option to map columns to credential attributes. For example for a CSV like this passwords.csv::
+Importing from a CSV file. Specify ``--cols`` option to map columns to credential attributes.
+
+
+**Keepass** exported credentials as ``keepass.csv``::
 
   "Group","Title","Username","Password","URL","Notes"
   "Root","Some Title","john.doe","secret","example.com","Some comments"
   "Root","Another title","foo.bar","p4ssword","example.org",""
 
-We can import those passwords with::
+Import credentials with::
 
-  passpie import --cols ",,login,password,name,comment" passwords.csv
+  passpie import --cols ",,login,password,name,comment" keepass.csv
+
+
+**Lastpass** exported credentials as ``lastpass.csv``::
+
+  "Group","Title","Username","Password","URL","Notes"
+  "Root","Some Title","john.doe","secret","example.com","Some comments"
+  "Root","Another title","foo.bar","p4ssword","example.org",""
+
+Import with::
+
+  passpie import --cols "name,login,password,,comment" lastpass.csv
 
 
 Database status

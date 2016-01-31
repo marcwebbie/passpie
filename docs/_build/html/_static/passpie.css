@@ -11,7 +11,7 @@ div.body h1, div.body h2, div.body h3, div.body h4, div.body h5 {
 }
 
 pre, tt, code {
-    font-family: 'Monaco', 'Consolas', 'Menlo', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
+    font-family: 'DejaVu Sans Mono', 'Consolas', 'Menlo', 'Ubuntu Mono', 'Bitstream Vera Sans Mono', monospace;
     font-size: 0.9em;
 }
 
