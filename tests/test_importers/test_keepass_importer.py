@@ -1,15 +1,9 @@
+import pytest
+
 from passpie.importers.keepass_importer import KeepassImporter
 
 
-def mock_open():
-    try:
-        from mock import mock_open as mopen
-    except:
-        from unittest.mock import mock_open as mopen
-    return mopen()
-
-
-def test_keepass_importer_returns_false_when_csv_files_hasnt_expected_headers(mocker):
+def test_keepass_importer_returns_false_when_csv_files_hasnt_expected_headers(mocker, mock_open):
     headers = reversed(['Group', 'Title', 'Username', 'Password', 'URL', 'Notes'])
     mocker.patch('passpie.importers.keepass_importer.csv.reader',
                  return_value=iter([headers]))
@@ -19,7 +13,19 @@ def test_keepass_importer_returns_false_when_csv_files_hasnt_expected_headers(mo
     assert result is False
 
 
-def test_keepass_importer_returns_true_when_csv_files_has_expected_headers(mocker):
+def test_keepass_importer_with_empty_reader_raises_value_error(mck):
+    mck.patch('passpie.importers.keepass_importer.open', mck.mock_open(), create=True)
+    mck.patch('passpie.importers.keepass_importer.csv.reader', return_value=iter([]))
+    importer = KeepassImporter()
+
+    with pytest.raises(ValueError):
+        importer.match('filepath')
+
+    with pytest.raises(ValueError):
+        importer.handle('filepath')
+
+
+def test_keepass_importer_returns_true_when_csv_files_has_expected_headers(mocker, mock_open):
     headers = ['Group', 'Title', 'Username', 'Password', 'URL', 'Notes']
     mocker.patch('passpie.importers.keepass_importer.csv.reader',
                  return_value=iter([headers]))
@@ -29,7 +35,7 @@ def test_keepass_importer_returns_true_when_csv_files_has_expected_headers(mocke
     assert result is True
 
 
-def test_keepass_importer_returns_expected_credentials_for_row(mocker):
+def test_keepass_importer_returns_expected_credentials_for_row(mocker, mock_open):
     rows = [
         ['Group', 'Title', 'Username', 'Password', 'URL', 'Notes'],
         ['Root', 'Email', 'foo', 'password', 'example.org', ''],

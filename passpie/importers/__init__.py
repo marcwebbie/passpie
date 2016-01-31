@@ -70,6 +70,13 @@ def get_names():
     return [i.name for i in get_instances()]
 
 
+def get(name):
+    try:
+        return next(i for i in get_instances() if i.name == name)
+    except StopIteration:
+        return None
+
+
 def find_importer(filepath):
     for importer in get_instances():
         if importer.match(filepath):

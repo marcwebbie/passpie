@@ -8,7 +8,10 @@ class KeepassImporter(BaseImporter):
         expected_headers = ['Group', 'Title', 'Username', 'Password', 'URL', 'Notes']
         with open(filepath) as csv_file:
             reader = csv.reader(csv_file)
-            headers = next(reader)
+            try:
+                headers = next(reader)
+            except StopIteration:
+                raise ValueError('empty csv file: %s' % filepath)
             return headers == expected_headers
         return False
 
@@ -16,7 +19,10 @@ class KeepassImporter(BaseImporter):
         credentials = []
         with open(filepath) as csv_file:
             reader = csv.reader(csv_file)
-            next(reader)
+            try:
+                next(reader)
+            except StopIteration:
+                raise ValueError('empty csv file: %s' % filepath)
             for row in reader:
                 credential = {
                     'name': row[4],

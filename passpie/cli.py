@@ -18,7 +18,7 @@ from .history import clone
 
 
 __version__ = "1.1.1"
-pass_db = click.make_pass_decorator(Database)
+pass_db = click.make_pass_decorator(Database, ensure=False)
 
 
 class AliasedGroup(click.Group):
@@ -59,6 +59,19 @@ def validate_remote(ctx, param, value):
             return (remote, branch)
         except ValueError:
             raise click.BadParameter('remote need to be in format <remote>/<branch>')
+
+
+def validate_cols(ctx, param, value):
+    if value:
+        try:
+            validated = {c: index for index, c in enumerate(value.split(',')) if c}
+            for col in ('name', 'login', 'password'):
+                assert col in validated
+            return validated
+        except (AttributeError, ValueError):
+            raise click.BadParameter('cols need to be in format col1,col2,col3')
+        except AssertionError as e:
+            raise click.BadParameter('missing mandatory column: {}'.format(e))
 
 
 def logging_exception(exceptions=[Exception]):
@@ -374,22 +387,27 @@ def status(db, full, days, passphrase):
 
 
 @cli.command(name="import", help="Import credentials from path")
-@click.argument("filepath", type=click.Path())
+@click.argument("filepath", type=click.Path(readable=True, exists=True))
 @click.option("-I", "--importer", type=click.Choice(importers.get_names()),
               help="Specify an importer")
-@logging_exception()
+@click.option("--cols", help="CSV expected columns", callback=validate_cols)
 @pass_db
-def import_database(db, filepath, importer):
-    importer = importers.find_importer(filepath)
+def import_database(db, filepath, importer, cols):
+    if cols:
+        importer = importers.get(name='csv')
+        kwargs = {'cols': cols}
+    else:
+        importer = importers.find_importer(filepath)
+        kwargs = {}
+
     if importer:
-        credentials = importer.handle(filepath)
+        credentials = importer.handle(filepath, **kwargs)
         for cred in credentials:
             encrypted = encrypt(cred['password'],
                                 recipient=db.config['recipient'],
                                 homedir=db.config['homedir'])
             cred['password'] = encrypted
         db.insert_multiple(credentials)
-
         db.repo.commit(message='Imported credentials from {}'.format(filepath))
 
 
