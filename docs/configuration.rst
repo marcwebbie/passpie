@@ -110,7 +110,7 @@ Partial configuration file
 | **Description:** Render table format
 |
 
-Values:
+Supported table formats:
 
 - plain
 - simple
@@ -141,16 +141,17 @@ Values:
 | **Default:** ``{login: green, name: yellow}``
 | **Description:** Table column colors
 
-Values:
+Supported color names:
 
-- green
-- yellow
-- blue
+- black (might be a gray)
 - red
-- white
-- gray
+- green
+- yellow (might be an orange)
+- blue
 - magenta
 - cyan
+- white (might be light gray)
+- reset (reset the color code only)
 
 ``key_length``
 -----------------------------------

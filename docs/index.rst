@@ -1,6 +1,10 @@
 Welcome to Passpie
 ==================
 
+.. image:: ../images/passpie.png
+    :align: center
+    :width: 100%
+
 Passpie is a command line tool to  manage passwords from the terminal with a colorful and configurable interface. Use a master passphrase to decrypt login credentials, copy passwords to clipboard, syncronize with a git repository, check the state of your passwords, and more.
 
 Password files are encrypted using `GnuPG <https://www.gnupg.org/>`_ and saved into yaml text files. Passpie supports **Linux**, **OSX** and **Windows**.
