@@ -338,9 +338,18 @@ opensource/python.org     foo      *****
 <div class="highlight-python"><div class="highlight"><pre>passpie import passpie.db
 </pre></div>
 </div>
-<p>Importing from a CSV file. Specify <code class="docutils literal"><span class="pre">--cols</span></code> option to set csv importer to map column to credential attributes</p>
-<div class="highlight-python"><div class="highlight"><pre>passpie import --cols name,login,password password.csv
+<div class="section" id="csv-passwords-importer">
+<h4>CSV passwords importer<a class="headerlink" href="#csv-passwords-importer" title="Permalink to this headline">¶</a></h4>
+<p>Importing from a CSV file. Specify <code class="docutils literal"><span class="pre">--cols</span></code> option to map columns to credential attributes. For example for a CSV like this passwords.csv:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s2">&quot;Group&quot;</span><span class="p">,</span><span class="s2">&quot;Title&quot;</span><span class="p">,</span><span class="s2">&quot;Username&quot;</span><span class="p">,</span><span class="s2">&quot;Password&quot;</span><span class="p">,</span><span class="s2">&quot;URL&quot;</span><span class="p">,</span><span class="s2">&quot;Notes&quot;</span>
+<span class="s2">&quot;Root&quot;</span><span class="p">,</span><span class="s2">&quot;Some Title&quot;</span><span class="p">,</span><span class="s2">&quot;john.doe&quot;</span><span class="p">,</span><span class="s2">&quot;secret&quot;</span><span class="p">,</span><span class="s2">&quot;example.com&quot;</span><span class="p">,</span><span class="s2">&quot;Some comments&quot;</span>
+<span class="s2">&quot;Root&quot;</span><span class="p">,</span><span class="s2">&quot;Another title&quot;</span><span class="p">,</span><span class="s2">&quot;foo.bar&quot;</span><span class="p">,</span><span class="s2">&quot;p4ssword&quot;</span><span class="p">,</span><span class="s2">&quot;example.org&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span>
 </pre></div>
+</div>
+<p>We can import those passwords with:</p>
+<div class="highlight-python"><div class="highlight"><pre>passpie import --cols &quot;,,login,password,name,comment&quot; passwords.csv
+</pre></div>
+</div>
 </div>
 </div>
 </div>

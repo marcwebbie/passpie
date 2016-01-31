@@ -351,12 +351,19 @@ Importing a passpie database
 
     passpie import passpie.db
 
-Importing from a CSV file. Specify ``--cols`` option to set csv importer to map column to credential attributes
 
-::
+CSV passwords importer
+~~~~~~~~~~~~~~~~~~~~~~
 
-   passpie import --cols name,login,password password.csv
+Importing from a CSV file. Specify ``--cols`` option to map columns to credential attributes. For example for a CSV like this passwords.csv::
 
+  "Group","Title","Username","Password","URL","Notes"
+  "Root","Some Title","john.doe","secret","example.com","Some comments"
+  "Root","Another title","foo.bar","p4ssword","example.org",""
+
+We can import those passwords with::
+
+  passpie import --cols ",,login,password,name,comment" passwords.csv
 
 
 Database status
