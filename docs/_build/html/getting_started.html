@@ -40,14 +40,17 @@
             
   <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="installing">
-<h2>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="requirements">
 <h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">GnuPG</span></code></li>
-<li><code class="docutils literal"><span class="pre">xclip</span></code> or <code class="docutils literal"><span class="pre">xsel</span></code> - [Linux] For copy to clipboard support</li>
+<li><a class="reference external" href="https://www.gnupg.org/download/index.html">GnuPG</a>: The GNU Privacy Guard</li>
+<li>[Linux] <a class="reference external" href="http://sourceforge.net/projects/xclip/">xclip</a> or <a class="reference external" href="https://apps.ubuntu.com/cat/applications/xsel/">xsel</a>: For copy to clipboard support</li>
 </ul>
+</div>
+<div class="section" id="stable">
+<h3>Stable<a class="headerlink" href="#stable" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python"><div class="highlight"><pre>pip install passpie
 </pre></div>
 </div>
@@ -55,7 +58,9 @@
 <div class="highlight-python"><div class="highlight"><pre>brew install passpie
 </pre></div>
 </div>
-<p>Development version:</p>
+</div>
+<div class="section" id="development-versison">
+<h3>Development versison<a class="headerlink" href="#development-versison" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python"><div class="highlight"><pre>pip install -U https://github.com/marcwebbie/passpie/tarball/master
 </pre></div>
 </div>
@@ -81,12 +86,13 @@ passpie add @banks/myotherbank --password 5678
 </div>
 <p>Listing credentials:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ passpie
-=================  =======  ==========  =========
-Name               Login    Password    Comment
-=================  =======  ==========  =========
-banks/mybank                *****
-banks/myotherbank           *****
-=================  =======  ==========  =========
+╒═══════════════════╤═════════╤════════════╤═══════════╕
+│ Name              │ Login   │ Password   │ Comment   │
+╞═══════════════════╪═════════╪════════════╪═══════════╡
+│ banks/mybank      │         │ *****      │           │
+├───────────────────┼─────────┼────────────┼───────────┤
+│ banks/myotherbank │         │ *****      │           │
+╘═══════════════════╧═════════╧════════════╧═══════════╛
 </pre></div>
 </div>
 <p>Since <code class="docutils literal"><span class="pre">login</span></code> is optional. You can query credentials using only name
@@ -261,8 +267,7 @@ passpie add foo+nouveau@example.com --random --pattern <span class="s2">&quot;[0
 </div>
 <div class="section" id="grouping-credentials">
 <h2>Grouping Credentials<a class="headerlink" href="#grouping-credentials" title="Permalink to this headline">¶</a></h2>
-<p>Passpie credentials handles multiple logins for each name which groups
-credentials by name:</p>
+<p>Adding credentials with the same name, groups them accordingly:</p>
 <div class="highlight-python"><div class="highlight"><pre># add some credentials
 passpie add jonh@example.com --comment &quot;Jonh main mail&quot; --random
 passpie add doe@example.com --comment &quot;No comment&quot; --random
@@ -270,27 +275,57 @@ passpie add doe@example.com --comment &quot;No comment&quot; --random
 </div>
 <p>Listing credentials:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ passpie
+╒═════════════╤═════════╤════════════╤════════════════╕
+│ Name        │ Login   │ Password   │ Comment        │
+╞═════════════╪═════════╪════════════╪════════════════╡
+│ example.com │ doe     │ *****      │ No comment     │
+├─────────────┼─────────┼────────────┼────────────────┤
+│ example.com │ jonh    │ *****      │ Jonh main mail │
+╘═════════════╧═════════╧════════════╧════════════════╛
 </pre></div>
 </div>
 <div class="section" id="subgroups">
 <h3>Subgroups<a class="headerlink" href="#subgroups" title="Permalink to this headline">¶</a></h3>
-<p>Fullname syntax supports subgrouping of credentials by name</p>
+<p>Write names separated by slashes and passpie will form subgroups of credentials by name:</p>
 <div class="highlight-python"><div class="highlight"><pre>passpie add foo@opensource/github.com --random
 passpie add foo@opensource/python.org --random
 passpie add foo@opensource/bitbucket.org --random
 passpie add foo@opensource/npm.org --random
+
+# More nesting
+passpie add @cards/credit/mastercard --password &quot;1111 2222 3333 4444&quot;
+passpie add @cards/credit/mastercard/cvv --password &quot;123&quot;
+passpie add @cards/credit/visa --password &quot;1111 2222 3333 4444&quot;
+passpie add @cards/credit/visa/cvv --password &quot;456&quot;
+passpie add @cards/credit/amex --password &quot;1111 2222 3333 4444&quot;
+passpie add @cards/credit/amex/cvv --password &quot;789&quot;
 </pre></div>
 </div>
 <p>Listing credentials:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ passpie
-========================  =======  ==========  =========
-Name                      Login    Password    Comment
-========================  =======  ==========  =========
-opensource/bitbucket.org  foo      *****
-opensource/github.com     foo      *****
-opensource/npm.org        foo      *****
-opensource/python.org     foo      *****
-========================  =======  ==========  =========
+╒═════════════════════════════╤═════════╤════════════╤═══════════╕
+│ Name                        │ Login   │ Password   │ Comment   │
+╞═════════════════════════════╪═════════╪════════════╪═══════════╡
+│ cards/credit/amex           │         │ *****      │           │
+├─────────────────────────────┼─────────┼────────────┼───────────┤
+│ cards/credit/amex/cvv       │         │ *****      │           │
+├─────────────────────────────┼─────────┼────────────┼───────────┤
+│ cards/credit/mastercard     │         │ *****      │           │
+├─────────────────────────────┼─────────┼────────────┼───────────┤
+│ cards/credit/mastercard/cvv │         │ *****      │           │
+├─────────────────────────────┼─────────┼────────────┼───────────┤
+│ cards/credit/visa           │         │ *****      │           │
+├─────────────────────────────┼─────────┼────────────┼───────────┤
+│ cards/credit/visa/cvv       │         │ *****      │           │
+├─────────────────────────────┼─────────┼────────────┼───────────┤
+│ opensource/bitbucket.org    │ foo     │ *****      │           │
+├─────────────────────────────┼─────────┼────────────┼───────────┤
+│ opensource/github.com       │ foo     │ *****      │           │
+├─────────────────────────────┼─────────┼────────────┼───────────┤
+│ opensource/npm.org          │ foo     │ *****      │           │
+├─────────────────────────────┼─────────┼────────────┼───────────┤
+│ opensource/python.org       │ foo     │ *****      │           │
+╘═════════════════════════════╧═════════╧════════════╧═══════════╛
 </pre></div>
 </div>
 </div>
@@ -316,7 +351,7 @@ opensource/python.org     foo      *****
 <div class="section" id="fish">
 <h3><code class="docutils literal"><span class="pre">fish</span></code><a class="headerlink" href="#fish" title="Permalink to this headline">¶</a></h3>
 <p>Add this line to your <code class="docutils literal"><span class="pre">~/.config/fish/config.fish</span></code></p>
-<div class="highlight-python"><div class="highlight"><pre>if which passpie &gt; /dev/null; then eval &quot;$(passpie complete fish)&quot;; fi
+<div class="highlight-python"><div class="highlight"><pre>set passpie-complete passpie complete fish; if which passpie &gt; /dev/null; then eval &quot;$passpie-complete&quot;; fi
 </pre></div>
 </div>
 </div>

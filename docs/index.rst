@@ -1,7 +1,7 @@
 Welcome to Passpie
 ==================
 
-.. image:: ../images/passpie.png
+.. image:: ../images/passpie2.png
     :align: center
     :width: 100%
 

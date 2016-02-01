@@ -1,14 +1,17 @@
 Getting Started
 *******************************************************
 
-Installing
-----------
+Installation
+------------
 
 Requirements
 ++++++++++++
 
-- ``GnuPG``
-- ``xclip`` or ``xsel`` - [Linux] For copy to clipboard support
+- `GnuPG <https://www.gnupg.org/download/index.html>`_: The GNU Privacy Guard
+- [Linux] `xclip <http://sourceforge.net/projects/xclip/>`_ or `xsel <https://apps.ubuntu.com/cat/applications/xsel/>`_: For copy to clipboard support
+
+Stable
+++++++
 
 ::
 
@@ -18,9 +21,13 @@ Or if you are on a mac, install via `Homebrew <http://brew.sh>`_::
 
     brew install passpie
 
-Development version::
+Development versison
+++++++++++++++++++++
+
+::
 
     pip install -U https://github.com/marcwebbie/passpie/tarball/master
+
 
 Fullnames queries
 -----------------
@@ -46,12 +53,13 @@ For example adding credentials using ``@name`` syntax::
 Listing credentials::
 
     $ passpie
-    =================  =======  ==========  =========
-    Name               Login    Password    Comment
-    =================  =======  ==========  =========
-    banks/mybank                *****
-    banks/myotherbank           *****
-    =================  =======  ==========  =========
+    ╒═══════════════════╤═════════╤════════════╤═══════════╕
+    │ Name              │ Login   │ Password   │ Comment   │
+    ╞═══════════════════╪═════════╪════════════╪═══════════╡
+    │ banks/mybank      │         │ *****      │           │
+    ├───────────────────┼─────────┼────────────┼───────────┤
+    │ banks/myotherbank │         │ *****      │           │
+    ╘═══════════════════╧═════════╧════════════╧═══════════╛
 
 Since ``login`` is optional. You can query credentials using only name
 syntax, for example to update credential with name ``banks/mybank``::
@@ -253,46 +261,68 @@ Remote databases
 Grouping Credentials
 --------------------
 
-Passpie credentials handles multiple logins for each name which groups
-credentials by name:
-
-::
+Adding credentials with the same name, groups them accordingly::
 
     # add some credentials
     passpie add jonh@example.com --comment "Jonh main mail" --random
     passpie add doe@example.com --comment "No comment" --random
 
-Listing credentials:
-
-::
+Listing credentials::
 
     $ passpie
+    ╒═════════════╤═════════╤════════════╤════════════════╕
+    │ Name        │ Login   │ Password   │ Comment        │
+    ╞═════════════╪═════════╪════════════╪════════════════╡
+    │ example.com │ doe     │ *****      │ No comment     │
+    ├─────────────┼─────────┼────────────┼────────────────┤
+    │ example.com │ jonh    │ *****      │ Jonh main mail │
+    ╘═════════════╧═════════╧════════════╧════════════════╛
 
 Subgroups
 +++++++++
 
-Fullname syntax supports subgrouping of credentials by name
-
-::
+Write names separated by slashes and passpie will form subgroups of credentials by name::
 
     passpie add foo@opensource/github.com --random
     passpie add foo@opensource/python.org --random
     passpie add foo@opensource/bitbucket.org --random
     passpie add foo@opensource/npm.org --random
 
-Listing credentials:
+    # More nesting
+    passpie add @cards/credit/mastercard --password "1111 2222 3333 4444"
+    passpie add @cards/credit/mastercard/cvv --password "123"
+    passpie add @cards/credit/visa --password "1111 2222 3333 4444"
+    passpie add @cards/credit/visa/cvv --password "456"
+    passpie add @cards/credit/amex --password "1111 2222 3333 4444"
+    passpie add @cards/credit/amex/cvv --password "789"
 
-::
+Listing credentials::
 
     $ passpie
-    ========================  =======  ==========  =========
-    Name                      Login    Password    Comment
-    ========================  =======  ==========  =========
-    opensource/bitbucket.org  foo      *****
-    opensource/github.com     foo      *****
-    opensource/npm.org        foo      *****
-    opensource/python.org     foo      *****
-    ========================  =======  ==========  =========
+    ╒═════════════════════════════╤═════════╤════════════╤═══════════╕
+    │ Name                        │ Login   │ Password   │ Comment   │
+    ╞═════════════════════════════╪═════════╪════════════╪═══════════╡
+    │ cards/credit/amex           │         │ *****      │           │
+    ├─────────────────────────────┼─────────┼────────────┼───────────┤
+    │ cards/credit/amex/cvv       │         │ *****      │           │
+    ├─────────────────────────────┼─────────┼────────────┼───────────┤
+    │ cards/credit/mastercard     │         │ *****      │           │
+    ├─────────────────────────────┼─────────┼────────────┼───────────┤
+    │ cards/credit/mastercard/cvv │         │ *****      │           │
+    ├─────────────────────────────┼─────────┼────────────┼───────────┤
+    │ cards/credit/visa           │         │ *****      │           │
+    ├─────────────────────────────┼─────────┼────────────┼───────────┤
+    │ cards/credit/visa/cvv       │         │ *****      │           │
+    ├─────────────────────────────┼─────────┼────────────┼───────────┤
+    │ opensource/bitbucket.org    │ foo     │ *****      │           │
+    ├─────────────────────────────┼─────────┼────────────┼───────────┤
+    │ opensource/github.com       │ foo     │ *****      │           │
+    ├─────────────────────────────┼─────────┼────────────┼───────────┤
+    │ opensource/npm.org          │ foo     │ *****      │           │
+    ├─────────────────────────────┼─────────┼────────────┼───────────┤
+    │ opensource/python.org       │ foo     │ *****      │           │
+    ╘═════════════════════════════╧═════════╧════════════╧═══════════╛
+
 
 Shell Completion
 ----------------
@@ -326,7 +356,7 @@ Add this line to your ``~/.config/fish/config.fish``
 
 ::
 
-   if which passpie > /dev/null; then eval "$(passpie complete fish)"; fi
+   set passpie-complete passpie complete fish; if which passpie > /dev/null; then eval "$passpie-complete"; fi
 
 
 Importing and Exporting
