@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import io
 import os
 import sys
 
@@ -10,7 +11,9 @@ except ImportError:
 
 
 __version__ = "1.2.0"
-long_description = open('README.rst').read() + "\n\n"
+
+with io.open('README.rst', encoding='utf-8') as readme_file:
+    long_description = readme_file.read() + "\n\n"
 
 
 if sys.argv[-1] == 'publish':
