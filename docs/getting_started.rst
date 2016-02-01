@@ -356,7 +356,7 @@ Add this line to your ``~/.config/fish/config.fish``
 
 ::
 
-   set passpie-complete passpie complete fish; if which passpie > /dev/null; then eval "$passpie-complete"; fi
+   if which passpie > /dev/null; passpie complete fish | source ; end
 
 
 Importing and Exporting

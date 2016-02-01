@@ -351,7 +351,7 @@ passpie add @cards/credit/amex/cvv --password &quot;789&quot;
 <div class="section" id="fish">
 <h3><code class="docutils literal"><span class="pre">fish</span></code><a class="headerlink" href="#fish" title="Permalink to this headline">¶</a></h3>
 <p>Add this line to your <code class="docutils literal"><span class="pre">~/.config/fish/config.fish</span></code></p>
-<div class="highlight-python"><div class="highlight"><pre>set passpie-complete passpie complete fish; if which passpie &gt; /dev/null; then eval &quot;$passpie-complete&quot;; fi
+<div class="highlight-python"><div class="highlight"><pre>if which passpie &gt; /dev/null; passpie complete fish | source ; end
 </pre></div>
 </div>
 </div>
