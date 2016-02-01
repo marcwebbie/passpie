@@ -10,6 +10,8 @@ from passpie.database import Database
 
 @pytest.fixture
 def mock_deps(mocker):
+    from passpie.config import DEFAULT
+    mocker.patch('passpie.cli.config.load', return_value=DEFAULT)
     return mocker.patch('passpie.cli.ensure_dependencies')
 
 

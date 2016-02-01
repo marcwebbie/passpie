@@ -135,3 +135,13 @@ def test_config_create_adds_an_empty_dot_config_file_to_path_when_default_false(
     passpie.config.create('path', overrides)
 
     config_file.write.assert_called_once_with(mock_yaml_dump(overrides, default_flow_style=False))
+
+
+def path_is_repo_url(mocker):
+    assert is_repo_url('https://foo@example.com/user/repo.git')
+    assert is_repo_url('https://github.com/marcwebbie/passpie.git')
+    assert is_repo_url('git@github.com:marcwebbie/passpie.git')
+    assert not is_repo_url('http://example.com')
+    assert not is_repo_url(None)
+    assert not is_repo_url('')
+    assert not is_repo_url('++++++++++++++')

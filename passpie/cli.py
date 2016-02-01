@@ -6,12 +6,11 @@ import shutil
 import sys
 
 import click
-from click.decorators import Group
 import yaml
 
 from . import clipboard, completion, config, checkers, importers
 from .crypt import create_keys, encrypt, decrypt
-from .database import Database, is_repo_url
+from .database import Database
 from .table import Table
 from .utils import genpass, ensure_dependencies
 from .history import clone
@@ -19,21 +18,6 @@ from .history import clone
 
 __version__ = "1.2.0"
 pass_db = click.make_pass_decorator(Database, ensure=False)
-
-
-class AliasedGroup(click.Group):
-
-    def get_command(self, ctx, cmd_name):
-        rv = click.Group.get_command(self, ctx, cmd_name)
-        if rv is not None:
-            return rv
-        matches = [x for x in self.list_commands(ctx)
-                   if x.startswith(cmd_name)]
-        if not matches:
-            return None
-        elif len(matches) == 1:
-            return click.Group.get_command(self, ctx, matches[0])
-        ctx.fail('Too many matches: %s' % ', '.join(sorted(matches)))
 
 
 def ensure_passphrase(passphrase, config):
@@ -91,8 +75,7 @@ def logging_exception(exceptions=[Exception]):
     return decorator
 
 
-@click.group(invoke_without_command=True,
-             cls=AliasedGroup if config.load()['short_commands'] else Group)
+@click.group(invoke_without_command=True)
 @click.option('-D', '--database', help='Database path or url to remote repository',
               envvar="PASSPIE_DATABASE")
 @click.option('--autopull', help='Autopull changes from remote pository',
@@ -111,7 +94,7 @@ def cli(ctx, database, autopull, autopush, verbose):
     # Override configuration
     config_overrides = {}
     if database:
-        config_overrides['path'] = clone(url=database) if is_repo_url(database) else database
+        config_overrides['path'] = database
     if autopush:
         config_overrides['autopush'] = autopush
     if autopull:
@@ -119,6 +102,8 @@ def cli(ctx, database, autopull, autopush, verbose):
 
     # Setup configuration
     configuration = config.load(**config_overrides)
+    if config.is_repo_url(configuration['path']):
+        configuration['path'] = clone(configuration['path'])
 
     # Setup database
     db = Database(configuration)
@@ -154,8 +139,7 @@ def cli(ctx, database, autopull, autopush, verbose):
 @pass_db
 @click.pass_context
 def complete(ctx, db, shell_name):
-    commands = [name for name, cmd in cli.commands.items()
-                if 'fullname' in [param.name for param in cmd.params]]
+    commands = cli.commands.keys()
     script = completion.script(shell_name, db.path, commands)
     click.echo(script)
 

@@ -1,7 +1,6 @@
 from datetime import datetime
 import logging
 import os
-import re
 import shutil
 
 from tinydb import TinyDB, Storage, where, Query
@@ -10,14 +9,6 @@ import yaml
 from .utils import mkdir_open
 from .history import Repository
 from .credential import split_fullname, make_fullname
-
-
-def is_repo_url(path):
-    if path:
-        return re.match(
-            r'((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?',
-            path
-        )
 
 
 class PasspieStorage(Storage):

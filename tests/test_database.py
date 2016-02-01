@@ -1,7 +1,7 @@
 from tinydb import where, Query
 from tinydb.storages import MemoryStorage
 
-from passpie.database import Database, is_repo_url, PasspieStorage
+from passpie.database import Database, PasspieStorage
 from .helpers import MockerTestCase
 
 
@@ -66,16 +66,6 @@ class StorageTests(MockerTestCase):
                                           credentials[0]["login"])
         self.mock_shutil.rmtree.assert_called_once_with(
             self.mock_os.path.dirname(credpath))
-
-
-def test_database_initialization_creates_tempdir_and_clone_when_path_is_repo_url(mocker):
-    assert is_repo_url('https://foo@example.com/user/repo.git')
-    assert is_repo_url('https://github.com/marcwebbie/passpie.git')
-    assert is_repo_url('git@github.com:marcwebbie/passpie.git')
-    assert not is_repo_url('http://example.com')
-    assert not is_repo_url(None)
-    assert not is_repo_url('')
-    assert not is_repo_url('++++++++++++++')
 
 
 def test_database_has_keys_returns_true_when_file_dot_keys_found_in_db_path(mocker):

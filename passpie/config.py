@@ -1,6 +1,7 @@
 import copy
 import logging
 import os
+import re
 
 import yaml
 
@@ -27,6 +28,14 @@ DEFAULT = {
     'extension': '.pass',
     'recipient': None
 }
+
+
+def is_repo_url(path):
+    if path:
+        return re.match(
+            r'((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?',
+            path
+        )
 
 
 def read(path):

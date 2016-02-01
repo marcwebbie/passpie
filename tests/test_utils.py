@@ -1,3 +1,4 @@
+import re
 import pytest
 
 from passpie.utils import genpass, mkdir_open, ensure_dependencies, touch
@@ -14,6 +15,12 @@ def mock_open():
 def test_genpass_generates_a_password_with_length_32(mocker):
     password = genpass("\w{32}")
     assert len(password) == 32
+
+
+def test_genpass_raises_value_error_when_regex_pattern_error(mocker):
+    mocker.patch('passpie.utils.rstr.xeger', side_effect=re.error)
+    with pytest.raises(ValueError):
+        genpass("\w{32}")
 
 
 def test_mkdir_open_makedirs_on_path_dirname(mocker):
