@@ -1,0 +1,6 @@
+"Group","Title","Username","Password","URL","Notes"
+"Root","Some Title","john.doe","secret","example.com","Some comments"
+"Root","Another title","foo.bar","p4ssword","example.org",""
+"Root","Crazy title","oof","password","example.org",""
+"Root","Hard password credential","egg","+[-g9jTY%x.m-*3x,(;}]U5;aAU*BU2g","example.org",""
+"Root","Unicode credential","josé","™£¢∞§¶•ªºœ∑´®†¥¨ˆøß∂ƒ©˙∆˚¬Ω≈ç√∫~µ≤","example.org","Main mail"
