@@ -35,7 +35,7 @@ def is_repo_url(path):
         return re.match(
             r'((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?',
             path
-        )
+        ) is not None
 
 
 def read(path):

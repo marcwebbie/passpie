@@ -67,8 +67,10 @@ def test_cli_create_database_with_configuration(mocker, mock_deps):
     mocker.patch('passpie.cli.logging')
 
     runner = CliRunner()
-    result = runner.invoke(cli.cli)
+    result = runner.invoke(cli.cli, catch_exceptions=False)
 
+    output = result.output
+    exception = str(result.exception)
     assert mock_database.called
     mock_database.assert_called_once_with(mock_config.load())
 
@@ -99,7 +101,7 @@ def test_cli_create_database_with_configuration_overriding_autopull(mocker, mock
 
 def test_cli_sets_logging_verbose_level_to_info_when_passing_one_v(mocker, mock_deps):
     mocker.patch('passpie.cli.Database')
-    mocker.patch('passpie.cli.config')
+    mock_config = mocker.patch('passpie.cli.config')
     mock_logging = mocker.patch('passpie.cli.logging')
 
     runner = CliRunner()
@@ -138,32 +140,6 @@ def test_cli_sets_logging_verbose_level_to_critical_when_no_verbose_passed(mocke
     _, kwargs = mock_logging.basicConfig.call_args
     assert kwargs['level'] == mock_logging.CRITICAL
 
-
-def test_cli_import_uses_csv_importer_when_cols_option_is_passed_with_cols_as_kwargs(mocker, mock_deps):
-    mock_importer = mocker.patch('passpie.cli.importers.get')()
-    cols = {
-        'name': 0,
-        'login': 1,
-        'password': 2,
-        'comment': 3,
-    }
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        runner = CliRunner()
-        with open('passwords.csv', 'w') as f:
-            headers = ['Name', 'Login', 'Password', 'Comment']
-            rows = [
-                ['example.com', 'foo', 'password', 'comment'],
-                ['example.com', 'foo2', 'password', 'comment'],
-                ['example.com', 'foo3', 'password', 'comment'],
-            ]
-            csv_writer = csv.writer(f)
-            csv_writer.writerow(headers)
-            csv_writer.writerows(rows)
-            result = runner.invoke(cli.cli, ['import', '--cols', 'name,login,password,comment', 'passwords.csv'])
-            output = result.output
-            exception = str(result.exception)
-            mock_importer.handle.assert_called_once_with('passwords.csv', cols=cols)
 
 
 def test_validate_cols_returns_dict_with_col_position(mocker):
@@ -212,3 +188,30 @@ class CliAddTests(object):
 
     def test_add_credentials_with_random_password(self, mocker, irunner, config):
         pass
+
+
+# def test_cli_import_uses_csv_importer_when_cols_option_is_passed_with_cols_as_kwargs(mocker, mock_deps):
+#     mock_importer = mocker.patch('passpie.cli.importers.get')()
+#     cols = {
+#         'name': 0,
+#         'login': 1,
+#         'password': 2,
+#         'comment': 3,
+#     }
+#     runner = CliRunner()
+#     with runner.isolated_filesystem():
+#         runner = CliRunner()
+#         with open('passwords.csv', 'w') as f:
+#             headers = ['Name', 'Login', 'Password', 'Comment']
+#             rows = [
+#                 ['example.com', 'foo', 'password', 'comment'],
+#                 ['example.com', 'foo2', 'password', 'comment'],
+#                 ['example.com', 'foo3', 'password', 'comment'],
+#             ]
+#             csv_writer = csv.writer(f)
+#             csv_writer.writerow(headers)
+#             csv_writer.writerows(rows)
+#             result = runner.invoke(cli.cli, ['import', '--cols', 'name,login,password,comment', 'passwords.csv'])
+#             output = result.output
+#             exception = str(result.exception)
+#             mock_importer.handle.assert_called_once_with('passwords.csv', cols=cols)

@@ -102,7 +102,7 @@ def cli(ctx, database, autopull, autopush, verbose):
 
     # Setup configuration
     configuration = config.load(**config_overrides)
-    if config.is_repo_url(configuration['path']):
+    if config.is_repo_url(configuration['path']) is True:
         configuration['path'] = clone(configuration['path'], depth=1)
 
     # Setup database
@@ -145,13 +145,14 @@ def complete(ctx, db, shell_name):
 
 
 @cli.command(help="Initialize new passpie database")
-@click.option('--force', is_flag=True, help="Force overwrite database")
+@click.option('-f', '--force', is_flag=True, help="Force overwrite database")
+@click.option('-r', '--recipient', help="Keyring default recipient")
+@click.option('-c', '--clone', 'clone_repo', help="Clone a remote repository")
 @click.option('--no-git', is_flag=True, help="Don't create a git repository")
-@click.option('--recipient', help="Keyring default recipient")
 @click.option('--passphrase', help="Database passphrase")
 @logging_exception()
 @pass_db
-def init(db, force, no_git, recipient, passphrase):
+def init(db, force, clone_repo, recipient, no_git, passphrase):
     if force:
         if os.path.isdir(db.path):
             shutil.rmtree(db.path)
@@ -161,10 +162,17 @@ def init(db, force, no_git, recipient, passphrase):
             logging.info('removed file %s' % db.path)
 
     try:
-        os.makedirs(db.path)
+        if clone_repo and not config.is_repo_url(db.path):
+            if config.is_repo_url(clone_repo):
+                clone(clone_repo, db.path)
+            else:
+                message = "url is not a remote repo: {}".format(clone_repo)
+                raise click.ClickException(click.style(message, fg='red'))
+        else:
+            os.makedirs(db.path)
     except (SystemError, OSError):
         message = "Path exists '{}'. `--force` to overwrite".format(db.path)
-        raise click.ClickException(click.style(message, fg='yellow'))
+        raise click.ClickException(click.style(message, fg='red'))
 
     if recipient:
         logging.info('create .passpierc file at %s' % db.path)
