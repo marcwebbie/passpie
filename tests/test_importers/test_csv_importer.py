@@ -10,16 +10,16 @@ def test_csv_importer_match_always_returns_false():
     assert importer.match('~') is False
 
 
-def test_csv_importer_with_empty_reader_raises_value_error(mck):
-    mck.patch('passpie.importers.csv_importer.open', mck.mock_open(), create=True)
-    mck.patch('passpie.importers.csv_importer.csv.reader', return_value=iter([]))
+def test_csv_importer_with_empty_reader_raises_value_error(mocker, mock_open):
+    mocker.patch('passpie.importers.csv_importer.open', mock_open(), create=True)
+    mocker.patch('passpie.importers.csv_importer.csv.reader', return_value=iter([]))
     importer = CSVImporter()
 
     with pytest.raises(ValueError):
         importer.handle('filepath', cols=[])
 
 
-def test_csv_importer_returns_list_of_credentials(mck):
+def test_csv_importer_returns_list_of_credentials(mocker, mock_open):
     headers = ['Name', 'Login', 'Password', 'Comment']
     rows = [
         headers,
@@ -31,8 +31,8 @@ def test_csv_importer_returns_list_of_credentials(mck):
         {'name': 'example.com', 'login': 'bar', 'password': 'password', 'comment': ''},
     ]
     cols = {h.lower(): idx for idx, h in enumerate(headers)}
-    mck.patch('passpie.importers.csv_importer.open', mck.mock_open(), create=True)
-    mck.patch('passpie.importers.csv_importer.csv.reader', return_value=iter(rows))
+    mocker.patch('passpie.importers.csv_importer.open', mock_open(), create=True)
+    mocker.patch('passpie.importers.csv_importer.csv.reader', return_value=iter(rows))
     importer = CSVImporter()
 
     credentials = importer.handle('filepath', cols=cols)

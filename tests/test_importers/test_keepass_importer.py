@@ -13,9 +13,9 @@ def test_keepass_importer_returns_false_when_csv_files_hasnt_expected_headers(mo
     assert result is False
 
 
-def test_keepass_importer_with_empty_reader_raises_value_error(mck):
-    mck.patch('passpie.importers.keepass_importer.open', mck.mock_open(), create=True)
-    mck.patch('passpie.importers.keepass_importer.csv.reader', return_value=iter([]))
+def test_keepass_importer_with_empty_reader_raises_value_error(mocker, mock_open):
+    mocker.patch('passpie.importers.keepass_importer.open', mock_open(), create=True)
+    mocker.patch('passpie.importers.keepass_importer.csv.reader', return_value=iter([]))
     importer = KeepassImporter()
 
     with pytest.raises(ValueError):

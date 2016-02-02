@@ -160,10 +160,10 @@ def test_cli_import_uses_csv_importer_when_cols_option_is_passed_with_cols_as_kw
             csv_writer = csv.writer(f)
             csv_writer.writerow(headers)
             csv_writer.writerows(rows)
-        result = runner.invoke(cli.cli, ['import', '--cols', 'name,login,password,comment', 'passwords.csv'])
-    output = result.output
-    exception = str(result.exception)
-    mock_importer.handle.assert_called_once_with('passwords.csv', cols=cols)
+            result = runner.invoke(cli.cli, ['import', '--cols', 'name,login,password,comment', 'passwords.csv'])
+            output = result.output
+            exception = str(result.exception)
+            mock_importer.handle.assert_called_once_with('passwords.csv', cols=cols)
 
 
 def test_validate_cols_returns_dict_with_col_position(mocker):
@@ -192,3 +192,23 @@ def test_validate_cols_returns_none_when_missing_cols(mocker):
         cli.validate_cols(ctx='', param='', value=value_missing_password)
 
     assert cli.validate_cols(ctx='', param='', value=value_missing_comment) is not None
+
+
+class CliTests(object):
+
+    def test_cli_cli_list_credentials(self, mockie, faker, irunner, config, creds):
+        credentials = creds.make(5)
+
+        result = irunner.invoke(cli.cli, [])
+        output = result.output
+        assert result.exit_code == 0
+        for credential in credentials:
+            assert credential['name'] in output, output
+            assert credential['login'] in output
+            assert credential['comment'] in output
+
+
+class CliAddTests(object):
+
+    def test_add_credentials_with_random_password(self, mocker, irunner, config):
+        pass
