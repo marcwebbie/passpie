@@ -16,22 +16,8 @@ def test_ensure_git_logs_debug_for_git_not_installed(mocker, mock_process):
         pass
     result = func()
 
-    assert mock_logging.debug.called
+    assert mock_logging.error.called
     assert result is None
-
-
-def test_ensure_returns_specified_return_value_when_exception(mocker, mock_process):
-    mocker.patch('passpie.history.which', return_value='/usr/bin/gpg')
-    mock_logging = mocker.patch('passpie.history.logging')
-    return_value = 'return value'
-
-    @ensure_git(return_value=return_value)
-    def func():
-        raise ValueError()
-    result = func()
-
-    assert result == return_value
-    assert mock_logging.debug.called
 
 
 def test_git_init_creates_a_repository_on_path(mocker, mock_process):

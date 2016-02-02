@@ -3,6 +3,7 @@ import logging
 
 from . import process
 from .utils import which, tempdir
+from ._compat import *
 
 
 def ensure_git(return_value=None):
@@ -10,12 +11,9 @@ def ensure_git(return_value=None):
         @wraps(func)
         def wrapper(*args, **kwargs):
             if which('git'):
-                try:
-                    return func(*args, **kwargs)
-                except Exception as e:
-                    logging.debug(str(e))
+                return func(*args, **kwargs)
             else:
-                logging.debug('git is not installed')
+                logging.error('git is not installed')
             return return_value
         return wrapper
     return decorator
@@ -23,6 +21,8 @@ def ensure_git(return_value=None):
 
 @ensure_git()
 def clone(url, dest=None, depth=None):
+    if dest and os.path.exists(dest):
+        raise FileExistsError('Destination already exists: %s' % dest)
     dest = dest if dest else tempdir()
     cmd = ['git', 'clone', url, dest]
     if depth:
@@ -88,8 +88,7 @@ class Repository(object):
     def reset(self, to_index):
         try:
             sha = self.sha_list()[to_index]
+            cmd = ['git', 'reset', '--hard', sha]
+            process.call(cmd, cwd=self.path)
         except IndexError:
             logging.info('commit on index "{}" not found'.format(to_index))
-
-        cmd = ['git', 'reset', '--hard', sha]
-        process.call(cmd, cwd=self.path)
