@@ -22,9 +22,11 @@ def ensure_git(return_value=None):
 
 
 @ensure_git()
-def clone(url, dest=None):
+def clone(url, dest=None, depth=None):
     dest = dest if dest else tempdir()
     cmd = ['git', 'clone', url, dest]
+    if depth:
+        cmd += ['--depth', depth]
     process.call(cmd)
     return dest
 

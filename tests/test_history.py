@@ -89,6 +89,17 @@ def test_git_clone_calls_expected_command_with_repository_url_and_destination(mo
     mock_process.call.assert_called_once_with(cmd)
 
 
+def test_git_clone_calls_expected_command_with_repository_url_and_depth(mocker, mock_process):
+    mock_tempdir = mocker.patch('passpie.history.tempdir', return_value='tempdir')
+    url = 'https://foo@example.com/user/repo.git'
+    dest = "some/path"
+    cmd = ['git', 'clone', url, dest, "--depth", 1]
+    clone(url, dest, depth=1)
+
+    assert not mock_tempdir.called
+    mock_process.call.assert_called_once_with(cmd)
+
+
 def test_git_push_calls_expected_command(mocker, mock_process):
     cmd = ['git', 'push', 'origin', 'master']
     repo = Repository('path')
