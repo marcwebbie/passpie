@@ -6,7 +6,7 @@ all: clean develop check coverage check-release
 test:
 	python -W ignore setup.py -q test
 
-integration-test:
+integration-test: install
 	bash -x tests/examples.bash
 
 install:
