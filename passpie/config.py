@@ -7,6 +7,7 @@ import yaml
 
 from .utils import tempdir
 from .crypt import ensure_keys, import_keys, get_default_recipient
+from .history import clone
 
 
 DEFAULT_PATH = os.path.join(os.path.expanduser('~/.passpierc'))
@@ -83,6 +84,9 @@ def load(**overrides):
         configuration.update(read(local_config_path))
     if overrides:
         configuration.update(overrides)
+
+    if is_repo_url(configuration['path']) is True:
+        configuration['path'] = clone(configuration['path'], depth="1")
 
     configuration = setup_crypt(configuration)
     return configuration

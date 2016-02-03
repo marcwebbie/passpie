@@ -82,7 +82,7 @@ def import_keys(keys_path, homedir):
         '--homedir', homedir,
         '--import', keys_path
     ]
-    output, _ = process.call(command)
+    output, err = process.call(command)
     return homedir
 
 
