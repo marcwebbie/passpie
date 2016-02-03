@@ -6,6 +6,9 @@ all: clean develop check coverage check-release
 test:
 	python -W ignore setup.py -q test
 
+integration-test:
+	bash -x tests/examples.bash
+
 install:
 	pip install -U --editable .
 
