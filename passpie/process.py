@@ -21,7 +21,6 @@ class Proc(Popen):
 
     def __enter__(self, *args, **kwargs):
         if hasattr(super(Proc, self), '__enter__'):
-            print(super(Proc, self).__enter__(*args, **kwargs))
             return super(Proc, self).__enter__(*args, **kwargs)
         return self
 
