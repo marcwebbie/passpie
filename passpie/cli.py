@@ -144,6 +144,24 @@ def complete(ctx, db, shell_name):
     click.echo(script)
 
 
+@cli.command(name="config")
+@click.argument('level', type=click.Choice(['global', 'local', 'current']),
+                default='current', required=False)
+@logging_exception()
+@pass_db
+def check_config(db, level):
+    """Show current configuration for shell"""
+    if level == 'global':
+        configuration = config.read(config.DEFAULT_PATH)
+    elif level == 'local':
+        configuration = config.read(os.path.join(db.path, ".config"))
+    elif level == 'current':
+        configuration = db.config
+
+    if configuration:
+        click.echo(yaml.dump(configuration, default_flow_style=False))
+
+
 @cli.command(help="Initialize new passpie database")
 @click.option('-f', '--force', is_flag=True, help="Force overwrite database")
 @click.option('-r', '--recipient', help="Keyring default recipient")

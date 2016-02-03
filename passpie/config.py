@@ -42,7 +42,7 @@ def read(path):
     try:
         with open(path) as config_file:
             content = config_file.read()
-        config = yaml.load(content)
+        configuration = yaml.load(content)
     except IOError:
         logging.debug('config file "%s" not found' % path)
         return DEFAULT
@@ -50,7 +50,7 @@ def read(path):
         logging.error('Malformed user configuration file: {}'.format(path))
         return {}
 
-    return config
+    return configuration
 
 
 def read_global_config():

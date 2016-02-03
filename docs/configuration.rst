@@ -45,7 +45,38 @@ Partial configuration file
    extension: .gpg
    table_format: rst
 
+Debugging
+---------
 
+For debugging, it might be useful to check actual passpie configuration for your commands::
+
+  # Global configuration found on ~/.passpierc
+  passpie config global
+
+  # Local configuration found on $PASSPIE_DATABASE/.config
+  passpie config local
+
+Current config
+++++++++++++++
+
+Current configuration with all overriden variables::
+
+  passpie config current
+
+OR::
+
+  passpie config
+
+..
+
+.. note::
+
+   If you have pygments installed, to have colored output on the config::
+
+     passpie config | pygmentize -l YAML
+
+Options
+-------
 
 ``path``
 -----------------------------------
