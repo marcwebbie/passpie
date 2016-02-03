@@ -64,4 +64,4 @@ passpie config
 
 # remote databases
 passpie -D https://github.com/marcwebbie/passpiedb.git
-passpie -D https://github.com/marcwebbie/passpiedb.git copy banks/mutuel
+passpie -D https://github.com/marcwebbie/passpiedb.git copy banks/mutuel --passphrase s3cr3t
