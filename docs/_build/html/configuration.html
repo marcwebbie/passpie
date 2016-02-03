@@ -80,6 +80,38 @@
 </div>
 </div>
 </div>
+<div class="section" id="debugging">
+<h2>Debugging<a class="headerlink" href="#debugging" title="Permalink to this headline">¶</a></h2>
+<p>For debugging, it might be useful to check actual passpie configuration for your commands:</p>
+<div class="highlight-python"><div class="highlight"><pre># Global configuration found on ~/.passpierc
+passpie config global
+
+# Local configuration found on $PASSPIE_DATABASE/.config
+passpie config local
+</pre></div>
+</div>
+<div class="section" id="current-config">
+<h3>Current config<a class="headerlink" href="#current-config" title="Permalink to this headline">¶</a></h3>
+<p>Current configuration with all overriden variables:</p>
+<div class="highlight-python"><div class="highlight"><pre>passpie config current
+</pre></div>
+</div>
+<p>OR:</p>
+<div class="highlight-python"><div class="highlight"><pre>passpie config
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If you have pygments installed, to have colored output on the config:</p>
+<div class="last highlight-python"><div class="highlight"><pre>passpie config | pygmentize -l YAML
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="path">
 <h2><code class="docutils literal"><span class="pre">path</span></code><a class="headerlink" href="#path" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
