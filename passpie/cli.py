@@ -103,7 +103,7 @@ def cli(ctx, database, autopull, autopush, verbose):
     # Setup configuration
     configuration = config.load(**config_overrides)
     if config.is_repo_url(configuration['path']) is True:
-        configuration['path'] = clone(configuration['path'], depth=1)
+        configuration['path'] = clone(configuration['path'], depth="1")
 
     # Setup database
     db = Database(configuration)

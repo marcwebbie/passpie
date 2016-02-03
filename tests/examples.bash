@@ -61,3 +61,7 @@ passpie config global
 passpie config local
 passpie config current
 passpie config
+
+# remote databases
+passpie -D https://github.com/marcwebbie/passpiedb.git
+passpie -D https://github.com/marcwebbie/passpiedb.git copy banks/mutuel
