@@ -55,3 +55,9 @@ passpie log
 passpie complete bash
 passpie complete fish
 passpie complete zsh
+
+# config
+passpie config global
+passpie config local
+passpie config current
+passpie config
