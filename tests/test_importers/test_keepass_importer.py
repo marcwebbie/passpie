@@ -5,7 +5,7 @@ from passpie.importers.keepass_importer import KeepassImporter
 
 def test_keepass_importer_returns_false_when_csv_files_hasnt_expected_headers(mocker, mock_open):
     headers = reversed(['Group', 'Title', 'Username', 'Password', 'URL', 'Notes'])
-    mocker.patch('passpie.importers.keepass_importer.csv.reader',
+    mocker.patch('passpie.importers.keepass_importer.unicode_csv_reader',
                  return_value=iter([headers]))
     mocker.patch('passpie.importers.keepass_importer.open', mock_open(), create=True)
 
@@ -15,7 +15,8 @@ def test_keepass_importer_returns_false_when_csv_files_hasnt_expected_headers(mo
 
 def test_keepass_importer_with_empty_reader_raises_value_error(mocker, mock_open):
     mocker.patch('passpie.importers.keepass_importer.open', mock_open(), create=True)
-    mocker.patch('passpie.importers.keepass_importer.csv.reader', return_value=iter([]))
+    mocker.patch('passpie.importers.keepass_importer.unicode_csv_reader',
+                 return_value=iter([]))
     importer = KeepassImporter()
 
     with pytest.raises(ValueError):
@@ -27,7 +28,7 @@ def test_keepass_importer_with_empty_reader_raises_value_error(mocker, mock_open
 
 def test_keepass_importer_returns_true_when_csv_files_has_expected_headers(mocker, mock_open):
     headers = ['Group', 'Title', 'Username', 'Password', 'URL', 'Notes']
-    mocker.patch('passpie.importers.keepass_importer.csv.reader',
+    mocker.patch('passpie.importers.keepass_importer.unicode_csv_reader',
                  return_value=iter([headers]))
     mocker.patch('passpie.importers.keepass_importer.open', mock_open(), create=True)
 
@@ -53,7 +54,7 @@ def test_keepass_importer_returns_expected_credentials_for_row(mocker, mock_open
         'comment': 'Some comment',
         'password': 'password'
     }
-    mocker.patch('passpie.importers.keepass_importer.csv.reader',
+    mocker.patch('passpie.importers.keepass_importer.unicode_csv_reader',
                  return_value=iter(rows))
     mocker.patch('passpie.importers.keepass_importer.open', mock_open(), create=True)
 
