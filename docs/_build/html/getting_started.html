@@ -160,34 +160,6 @@ passpie add john.doe@example.com --copy --random --pattern <span class="s1">&#39
 </div>
 </div>
 </div>
-<div class="section" id="multiple-databases">
-<h2>Multiple Databases<a class="headerlink" href="#multiple-databases" title="Permalink to this headline">¶</a></h2>
-<p>Sometimes it is useful to have multiple databases with different
-passphrases for higher security. This can be done using <code class="docutils literal"><span class="pre">-D</span></code> or
-<code class="docutils literal"><span class="pre">--database</span></code> option.</p>
-<div class="section" id="creating-databases">
-<h3>Creating databases<a class="headerlink" href="#creating-databases" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-bash"><div class="highlight"><pre>passpie -D ~/credentials/personal init
-passpie -D ~/credentials/work init
-passpie -D ~/credentials/junk init
-</pre></div>
-</div>
-</div>
-<div class="section" id="adding-passwords-to-specific-database">
-<h3>Adding passwords to specific database<a class="headerlink" href="#adding-passwords-to-specific-database" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-bash"><div class="highlight"><pre>passpie -D ~/credentials/personal add johnd@github.com --random
-passpie -D ~/credentials/work add john.doe@example.com --random
-passpie -D ~/credentials/junk add fake@example.com --random
-</pre></div>
-</div>
-</div>
-<div class="section" id="listing-passwords-from-specific-database">
-<h3>Listing passwords from specific database<a class="headerlink" href="#listing-passwords-from-specific-database" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-bash"><div class="highlight"><pre>passpie -D ~/databases/junk
-</pre></div>
-</div>
-</div>
-</div>
 <div class="section" id="version-control">
 <h2>Version Control<a class="headerlink" href="#version-control" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="initializing-a-database-with-git">
@@ -239,8 +211,37 @@ passpie -D ~/credentials/junk add fake@example.com --random
 <div><em>Attention</em>: this is an operation that destroys data. Use it with
 caution. It is equivalent to do <code class="docutils literal"><span class="pre">git</span> <span class="pre">reset</span> <span class="pre">--hard</span> <span class="pre">HEAD~N</span></code></div></blockquote>
 </div>
-<div class="section" id="remote-databases">
-<h3>Remote databases<a class="headerlink" href="#remote-databases" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="multiple-databases">
+<h2>Multiple Databases<a class="headerlink" href="#multiple-databases" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes it is useful to have multiple databases with different
+passphrases for higher security. This can be done using <code class="docutils literal"><span class="pre">-D</span></code> or
+<code class="docutils literal"><span class="pre">--database</span></code> option.</p>
+<div class="section" id="creating-databases">
+<h3>Creating databases<a class="headerlink" href="#creating-databases" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre>passpie -D ~/credentials/personal init
+passpie -D ~/credentials/work init
+passpie -D ~/credentials/junk init
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-passwords-to-specific-database">
+<h3>Adding passwords to specific database<a class="headerlink" href="#adding-passwords-to-specific-database" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre>passpie -D ~/credentials/personal add johnd@github.com --random
+passpie -D ~/credentials/work add john.doe@example.com --random
+passpie -D ~/credentials/junk add fake@example.com --random
+</pre></div>
+</div>
+</div>
+<div class="section" id="listing-passwords-from-specific-database">
+<h3>Listing passwords from specific database<a class="headerlink" href="#listing-passwords-from-specific-database" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre>passpie -D ~/databases/junk
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="remote-databases-with-git">
+<h2>Remote databases with git<a class="headerlink" href="#remote-databases-with-git" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-bash"><div class="highlight"><pre><span class="c1"># Listing credentials from a remote database</span>
 passpie -D https://foo@example.com/user/repo.git
 
@@ -263,6 +264,9 @@ passpie add foo+nouveau@example.com --random --pattern <span class="s2">&quot;[0
 passpie add foo+nouveau@example.com --random --pattern <span class="s2">&quot;[0-9\#\$\%\w\ ]{32}&quot;</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There is an example database on: <a class="reference external" href="https://github.com/marcwebbie/passpiedb">https://github.com/marcwebbie/passpiedb</a></p>
 </div>
 </div>
 <div class="section" id="grouping-credentials">

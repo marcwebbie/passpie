@@ -133,38 +133,6 @@ Add or update and copy
     # Adding credential with random password and copy generated password to clipboard
     passpie add john.doe@example.com --copy --random --pattern '[0-9]{5}[a-z]{5}'
 
-Multiple Databases
-------------------
-
-Sometimes it is useful to have multiple databases with different
-passphrases for higher security. This can be done using ``-D`` or
-``--database`` option.
-
-Creating databases
-++++++++++++++++++
-
-.. code-block:: bash
-
-    passpie -D ~/credentials/personal init
-    passpie -D ~/credentials/work init
-    passpie -D ~/credentials/junk init
-
-Adding passwords to specific database
-+++++++++++++++++++++++++++++++++++++
-
-.. code-block:: bash
-
-    passpie -D ~/credentials/personal add johnd@github.com --random
-    passpie -D ~/credentials/work add john.doe@example.com --random
-    passpie -D ~/credentials/junk add fake@example.com --random
-
-Listing passwords from specific database
-++++++++++++++++++++++++++++++++++++++++
-
-.. code-block:: bash
-
-    passpie -D ~/databases/junk
-
 Version Control
 ---------------
 
@@ -232,8 +200,41 @@ If you want to go back to a previous version of the database history:
     caution. It is equivalent to do ``git reset --hard HEAD~N``
 
 
-Remote databases
-++++++++++++++++
+Multiple Databases
+------------------
+
+Sometimes it is useful to have multiple databases with different
+passphrases for higher security. This can be done using ``-D`` or
+``--database`` option.
+
+Creating databases
+++++++++++++++++++
+
+.. code-block:: bash
+
+    passpie -D ~/credentials/personal init
+    passpie -D ~/credentials/work init
+    passpie -D ~/credentials/junk init
+
+Adding passwords to specific database
++++++++++++++++++++++++++++++++++++++
+
+.. code-block:: bash
+
+    passpie -D ~/credentials/personal add johnd@github.com --random
+    passpie -D ~/credentials/work add john.doe@example.com --random
+    passpie -D ~/credentials/junk add fake@example.com --random
+
+Listing passwords from specific database
+++++++++++++++++++++++++++++++++++++++++
+
+.. code-block:: bash
+
+    passpie -D ~/databases/junk
+
+
+Remote databases with git
+-------------------------
 
 .. code-block:: bash
 
@@ -257,6 +258,12 @@ Remote databases
     # Add credential with random password directly to remote
     passpie add foo+nouveau@example.com --random --pattern "[0-9\#\$\%\w\ ]{32}"
     passpie add foo+nouveau@example.com --random --pattern "[0-9\#\$\%\w\ ]{32}"
+
+..
+
+.. note::
+
+   There is an example database on: https://github.com/marcwebbie/passpiedb
 
 Grouping Credentials
 --------------------

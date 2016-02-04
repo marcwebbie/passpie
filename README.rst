@@ -49,6 +49,8 @@ Documentation
 
 Read full documentation on http://passpie.readthedocs.org
 
+Check an example remote database: https://github.com/marcwebbie/passpiedb
+
 And visit our |Gitter|
 
 

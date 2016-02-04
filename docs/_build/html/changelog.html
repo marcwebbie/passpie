@@ -40,14 +40,23 @@
             
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="version-1-3-1">
+<h2>Version 1.3.1<a class="headerlink" href="#version-1-3-1" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><strong>√</strong> Fix cloning remote repository database</li>
+</ul>
+</div></blockquote>
+</div>
 <div class="section" id="version-1-3-0">
 <h2>Version 1.3.0<a class="headerlink" href="#version-1-3-0" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
+<li><strong>√</strong> Add config command: <code class="docutils literal"><span class="pre">passpie</span> <span class="pre">config</span></code></li>
 <li><strong>√</strong> Fix process.Proc printing objects on Python3. fixes #88</li>
 <li><strong>√</strong> Fix integration-test Makefile target</li>
 <li><strong>√</strong> Fix keepass importer csv errors</li>
 <li><strong>√</strong> Fix csv importing unicode chars</li>
-<li><strong>√</strong> Add <cite>&#8211;clone</cite> option to cli.init</li>
+<li><strong>√</strong> Add <code class="docutils literal"><span class="pre">--clone</span></code> option to cli.init</li>
 <li><strong>√</strong> Add depth arg to clone function from cli.init</li>
 <li><strong>√</strong> Fix python3 setup read README.rst</li>
 <li><strong>√</strong> Fix config path to remote repo. fixes #86</li>
@@ -57,11 +66,11 @@
 <h2>Version 1.2.0<a class="headerlink" href="#version-1-2-0" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><strong>√</strong> Add configurable master csv importer</li>
-<li><strong>√</strong> Fix cli <cite>&#8211;importer</cite> name on import command</li>
+<li><strong>√</strong> Fix cli <code class="docutils literal"><span class="pre">--importer</span></code> name on import command</li>
 <li><strong>√</strong> Add Keepass csv importer. fixes #32</li>
-<li><strong>√</strong> Add <cite>&#8211;importers</cite> option to import</li>
+<li><strong>√</strong> Add <code class="docutils literal"><span class="pre">--importers</span></code> option to import</li>
 <li><strong>√</strong> Fix genpass raising re.error on pattern error fixes #84</li>
-<li><strong>√</strong> Set <cite>&#8211;pattern</cite> option as standalone</li>
+<li><strong>√</strong> Set <code class="docutils literal"><span class="pre">--pattern</span></code> option as standalone</li>
 <li><strong>√</strong> Fix passpie complete commands for shells</li>
 <li><strong>√</strong> Fix tests on creating repository for git init</li>
 <li><strong>√</strong> Fix error creating subdir in database in git init</li>
@@ -77,9 +86,9 @@
 <div class="section" id="version-1-1-0">
 <h2>Version 1.1.0<a class="headerlink" href="#version-1-1-0" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>√</strong> Add volatile passpie repo using git url as path: <cite>passpie -D https://foo&#64;example.com/user/repo.git</cite>.</li>
+<li><strong>√</strong> Add volatile passpie repo using git url as path: <code class="docutils literal"><span class="pre">passpie</span> <span class="pre">-D</span> <span class="pre">https://foo&#64;example.com/user/repo.git</span></code>.</li>
 <li><strong>√</strong> Add autopush git remote history.</li>
-<li><strong>√</strong> Set default config recipient to <cite>null</cite>.</li>
+<li><strong>√</strong> Set default config recipient to <code class="docutils literal"><span class="pre">null</span></code>.</li>
 <li><strong>√</strong> Fix error on passpie init raising exception when path exists. Closes #83</li>
 </ul>
 </div>
@@ -92,17 +101,17 @@
 <div class="section" id="version-1-0-1">
 <h2>Version 1.0.1<a class="headerlink" href="#version-1-0-1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>√</strong> Fix missing <cite>&#8211;passphrase</cite> option to init</li>
+<li><strong>√</strong> Fix missing <code class="docutils literal"><span class="pre">--passphrase</span></code> option to init</li>
 </ul>
 </div>
 <div class="section" id="version-1-0-0">
 <h2>Version 1.0.0<a class="headerlink" href="#version-1-0-0" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><strong>√</strong> Fix runtime permission issues</li>
-<li><strong>√</strong> Add local database config files with <cite>.config</cite></li>
+<li><strong>√</strong> Add local database config files with <code class="docutils literal"><span class="pre">.config</span></code></li>
 <li><strong>√</strong> Add auto-pull git remote history. fixes #72</li>
-<li><strong>√</strong> Support default system keychain via config <cite>recipient</cite>. fixes #45</li>
-<li><strong>√</strong> Support filename extension <cite>.pass</cite> configurable. fixes #47</li>
+<li><strong>√</strong> Support default system keychain via config <code class="docutils literal"><span class="pre">recipient</span></code>. fixes #45</li>
+<li><strong>√</strong> Support filename extension <code class="docutils literal"><span class="pre">.pass</span></code> configurable. fixes #47</li>
 <li><strong>√</strong> Support regex pattern generated passwords. fixes #62</li>
 <li><strong>√</strong> Fix &#8211;random/&#8211;password error when passing from command. fixes #82</li>
 <li><strong>√</strong> Improve ensure passphrase function</li>
@@ -112,8 +121,8 @@
 <div class="section" id="version-0-3-3">
 <h2>Version 0.3.3<a class="headerlink" href="#version-0-3-3" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>√</strong> Fix issue on <cite>reset-to</cite> not reseting from <cite>passpie log</cite></li>
-<li><strong>√</strong> Fix issue on copy to clipboard on <cite>cygwin</cite> platform</li>
+<li><strong>√</strong> Fix issue on <code class="docutils literal"><span class="pre">reset-to</span></code> not reseting from <code class="docutils literal"><span class="pre">passpie</span> <span class="pre">log</span></code></li>
+<li><strong>√</strong> Fix issue on copy to clipboard on <code class="docutils literal"><span class="pre">cygwin</span></code> platform</li>
 </ul>
 </div>
 <div class="section" id="version-0-3-2">
@@ -138,7 +147,7 @@
 <div class="section" id="version-0-2-2">
 <h2>Version 0.2.2<a class="headerlink" href="#version-0-2-2" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>√</strong> Support <cite>gpg2</cite> binary</li>
+<li><strong>√</strong> Support <code class="docutils literal"><span class="pre">gpg2</span></code> binary</li>
 <li><strong>√</strong> Fix linux missing commands for copy to clipboard. thanks to &#64;jpiron</li>
 </ul>
 </div>
@@ -153,7 +162,7 @@
 <ul class="simple">
 <li><strong>√</strong> Change completion script to passpie complete {zsh, bash}</li>
 <li><strong>√</strong> Fix unicode passwords handling</li>
-<li><strong>√</strong> Add <cite>&#8211;to</cite> option on <cite>passpie copy</cite></li>
+<li><strong>√</strong> Add <code class="docutils literal"><span class="pre">--to</span></code> option on <code class="docutils literal"><span class="pre">passpie</span> <span class="pre">copy</span></code></li>
 </ul>
 </div>
 <div class="section" id="version-0-1-5">
@@ -178,8 +187,8 @@
 <div class="section" id="version-0-1-2">
 <h2>Version 0.1.2<a class="headerlink" href="#version-0-1-2" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>√</strong> Add <cite>&#8211;copy</cite> to clipboard option on <cite>add</cite> command: Thanks to [&#64;vitalk](<a class="reference external" href="https://github.com/vitalk">https://github.com/vitalk</a>)</li>
-<li><strong>√</strong> Add bumpversion for cleaner <cite>&#8211;version</cite> option.</li>
+<li><strong>√</strong> Add <code class="docutils literal"><span class="pre">--copy</span></code> to clipboard option on <code class="docutils literal"><span class="pre">add</span></code> command: Thanks to <a class="reference external" href="https://github.com/vitalk">&#64;vitalk</a></li>
+<li><strong>√</strong> Add bumpversion for cleaner <code class="docutils literal"><span class="pre">--version</span></code> option.</li>
 </ul>
 </div>
 <div class="section" id="version-0-1-1">
@@ -192,7 +201,7 @@
 <div class="section" id="version-0-1">
 <h2>Version 0.1<a class="headerlink" href="#version-0-1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>√</strong> Add <cite>&#8211;force</cite> option to overwrite when inserting credentials that exists</li>
+<li><strong>√</strong> Add <code class="docutils literal"><span class="pre">--force</span></code> option to overwrite when inserting credentials that exists</li>
 </ul>
 </div>
 <div class="section" id="version-0-1rc7">
@@ -234,13 +243,13 @@
 <div class="section" id="version-0-1rc2-1">
 <h2>Version 0.1rc2.1<a class="headerlink" href="#version-0-1rc2-1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>√</strong> Fix <cite>reset</cite> command not copying newly re-encrypted credentials</li>
+<li><strong>√</strong> Fix <code class="docutils literal"><span class="pre">reset</span></code> command not copying newly re-encrypted credentials</li>
 </ul>
 </div>
 <div class="section" id="version-0-1rc2">
 <h2>Version 0.1rc2<a class="headerlink" href="#version-0-1rc2" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>√</strong> Add <cite>reset</cite> command. Reset passphrase and re-encrypt all credentials</li>
+<li><strong>√</strong> Add <code class="docutils literal"><span class="pre">reset</span></code> command. Reset passphrase and re-encrypt all credentials</li>
 <li><strong>√</strong> Bug fixes</li>
 </ul>
 </div>
