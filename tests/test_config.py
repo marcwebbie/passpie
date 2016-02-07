@@ -2,41 +2,34 @@ import passpie.config
 import yaml
 
 
-def mock_open():
-    try:
-        from mock import mock_open as mopen
-    except:
-        from unittest.mock import mock_open as mopen
-    return mopen()
-
-
-def test_config_read_opens_path_and_load_yaml_content(mocker):
-    config_file = mocker.patch('passpie.config.open', mock_open(), create=True)()
+def test_config_read_opens_path_and_load_yaml_content(mocker, mock_open):
+    config_file = mocker.patch('passpie.config.open', mock_open(), create=True)
     mock_yaml = mocker.patch('passpie.config.yaml')
 
     passpie.config.read('path')
     assert mock_yaml.load.called
-    mock_yaml.load.assert_called_once_with(config_file.read())
+    mock_yaml.load.assert_called_once_with(config_file().__enter__().read())
 
 
-def test_config_read_logs_debug_when_config_file_not_found_and_returns_default(mocker):
+def test_config_read_logs_debug_when_config_file_not_found_and_returns_empty(mocker):
     mocker.patch('passpie.config.open', side_effect=IOError, create=True)
     mock_logging = mocker.patch('passpie.config.logging')
 
     result = passpie.config.read('path')
-    assert result == passpie.config.DEFAULT
+    assert result == {}
     assert mock_logging.debug.called
     mock_logging.debug.assert_called_once_with('config file "path" not found')
 
 
 def test_config_read_logs_error_when_config_file_malformed_found_and_returns_empty(mocker):
-    mocker.patch('passpie.config.open', side_effect=yaml.scanner.ScannerError, create=True)
+    mocker.patch('passpie.config.open', side_effect=yaml.scanner.ScannerError('message'),
+                 create=True)
     mock_logging = mocker.patch('passpie.config.logging')
 
     result = passpie.config.read('path')
     assert result == {}
     assert mock_logging.error.called
-    mock_logging.error.assert_called_once_with('Malformed user configuration file: path')
+    mock_logging.error.assert_called_once_with('Malformed user configuration file: message')
 
 
 def test_config_load_gets_settings_from_local_config_when_exists(mocker):
@@ -59,8 +52,7 @@ def test_config_load_overrides_global_config_with_local_config_vars(mocker):
         'genpass_pattern': "[\w]{32}"
     }
     mocker.patch('passpie.config.os.path.exists', return_value=True)
-    mocker.patch('passpie.config.read', return_value=local_config)
-    mocker.patch('passpie.config.read_global_config', return_value=global_config)
+    mocker.patch('passpie.config.read', side_effect=[global_config, local_config])
 
     configuration = passpie.config.load()
     assert configuration is not None
@@ -77,8 +69,7 @@ def test_config_load_has_default_config_loaded(mocker):
         'genpass_pattern': "[\w]{32}"
     }
     mocker.patch('passpie.config.os.path.exists', return_value=True)
-    mocker.patch('passpie.config.read', return_value=local_config)
-    mocker.patch('passpie.config.read_global_config', return_value=global_config)
+    mocker.patch('passpie.config.read', side_effect=[global_config, local_config])
 
     configuration = passpie.config.load()
     assert configuration is not None
@@ -97,7 +88,6 @@ def test_config_load_has_default_config_loaded(mocker):
     }
     mocker.patch('passpie.config.os.path.exists', return_value=True)
     mocker.patch('passpie.config.read', return_value=local_config)
-    mocker.patch('passpie.config.read_global_config', return_value=global_config)
 
     configuration = passpie.config.load()
     assert configuration is not None
@@ -119,7 +109,6 @@ def test_config_load_with_overrides_override_loaded_config(mocker):
     genpass_pattern=10
     mocker.patch('passpie.config.os.path.exists', return_value=True)
     mocker.patch('passpie.config.read', return_value=local_config)
-    mocker.patch('passpie.config.read_global_config', return_value=global_config)
 
     overrides = dict(short_commands=short_commands, genpass_pattern=genpass_pattern)
     configuration = passpie.config.load(**overrides)
@@ -128,13 +117,15 @@ def test_config_load_with_overrides_override_loaded_config(mocker):
     assert configuration['short_commands'] == short_commands
 
 
-def test_config_create_adds_an_empty_dot_config_file_to_path_when_default_false(mocker):
-    config_file = mocker.patch('passpie.config.open', mock_open(), create=True)()
+def test_config_create_adds_an_empty_dot_config_file_to_path_when_default_false(mocker, mock_open):
+    config_file = mocker.patch('passpie.config.open', mock_open(), create=True)
     mock_yaml_dump = mocker.patch('passpie.config.yaml.dump')
     overrides = {}
     passpie.config.create('path', overrides)
 
-    config_file.write.assert_called_once_with(mock_yaml_dump(overrides, default_flow_style=False))
+    config_file().__enter__().write.assert_called_once_with(
+        mock_yaml_dump(overrides, default_flow_style=False)
+    )
 
 
 def path_is_repo_url(mocker):

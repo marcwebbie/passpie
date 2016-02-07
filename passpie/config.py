@@ -10,9 +10,10 @@ from .crypt import ensure_keys, import_keys, get_default_recipient
 from .history import clone
 
 
-DEFAULT_PATH = os.path.join(os.path.expanduser('~/.passpierc'))
+HOMEDIR = os.path.expanduser("~")
+DEFAULT_CONFIG_PATH = os.path.join(os.path.join(HOMEDIR, '.passpierc'))
 DEFAULT = {
-    'path': os.path.join(os.path.expanduser('~/.passpie')),
+    'path': os.path.join(os.path.join(HOMEDIR, '.passpie')),
     'short_commands': False,
     'key_length': 4096,
     'genpass_pattern': r'[a-z]{10} [-_+=*&%$#]{10} [A-Z]{10}',
@@ -39,23 +40,18 @@ def is_repo_url(path):
         ) is not None
 
 
-def read(path):
+def read(path, filename='.config'):
     try:
-        with open(path) as config_file:
+        with open(os.path.join(path, '.config')) as config_file:
             content = config_file.read()
         configuration = yaml.load(content)
     except IOError:
         logging.debug('config file "%s" not found' % path)
-        return DEFAULT
-    except yaml.scanner.ScannerError:
-        logging.error('Malformed user configuration file: {}'.format(path))
         return {}
-
+    except yaml.scanner.ScannerError as e:
+        logging.error('Malformed user configuration file: {}'.format(e))
+        return {}
     return configuration
-
-
-def read_global_config():
-    return read(DEFAULT_PATH)
 
 
 def create(path, defaults={}, filename='.config'):
@@ -75,18 +71,17 @@ def setup_crypt(configuration):
 
 
 def load(**overrides):
-    database_path = overrides.get('path', DEFAULT['path'])
-    local_config_path = os.path.join(os.path.expanduser(database_path), '.config')
+    database_path = os.path.expanduser(overrides.get('path', DEFAULT['path']))
     configuration = copy.deepcopy(DEFAULT)
-    if os.path.exists(DEFAULT_PATH):
-        configuration.update(read_global_config())
-    if os.path.exists(local_config_path):
-        configuration.update(read(local_config_path))
-    if overrides:
-        configuration.update(overrides)
+
+    configuration.update(read(DEFAULT_CONFIG_PATH))   # 1. Global configuration
+    configuration.update(read(database_path))         # 2. Local configuration
+    configuration.update(overrides)                   # 3. Command line options
 
     if is_repo_url(configuration['path']) is True:
-        configuration['path'] = clone(configuration['path'], depth="1")
+        temporary_path = clone(configuration['path'], depth="1")
+        configuration.update(read(temporary_path))  # Read cloned config
+        configuration['path'] = temporary_path
 
     configuration = setup_crypt(configuration)
     return configuration

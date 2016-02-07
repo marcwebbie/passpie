@@ -150,7 +150,7 @@ def complete(ctx, db, shell_name):
 def check_config(db, level):
     """Show current configuration for shell"""
     if level == 'global':
-        configuration = config.read(config.DEFAULT_PATH)
+        configuration = config.read(config.DEFAULT_CONFIG_PATH)
     elif level == 'local':
         configuration = config.read(os.path.join(db.path, ".config"))
     elif level == 'current':
