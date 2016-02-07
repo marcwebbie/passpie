@@ -42,7 +42,7 @@ class PyTest(Command):
     user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
 
     def initialize_options(self):
-        self.pytest_args = ["-v"]
+        self.pytest_args = ["-v", "tests/"]
 
     def finalize_options(self):
         pass
@@ -57,10 +57,10 @@ class PyTestCoverage(PyTest):
 
     def initialize_options(self):
         self.pytest_args = [
-            "-v",
+            "-v", "tests",
             "--cov", 'passpie',
             "--cov-config", ".coveragerc",
-            "--cov-report", "term-missing"
+            "--cov-report", "term-missing",
         ]
 
 
