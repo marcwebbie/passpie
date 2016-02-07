@@ -1,4 +1,4 @@
-:code:`passpie`: Comand-line password manager
+:code:`passpie`: Command-line password manager
 *******************************************************
 
 .. image:: https://raw.githubusercontent.com/marcwebbie/passpie/master/images/passpie2.png

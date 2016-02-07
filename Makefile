@@ -1,6 +1,7 @@
 PACKAGE=passpie
 PACKAGE_TESTS=tests
 
+
 all: clean develop lint coverage preview
 
 test:
@@ -30,6 +31,11 @@ clean:
 
 coverage:
 	python setup.py coverage
+
+docs:
+	$(MAKE) -C docs/ clean
+	$(MAKE) -C docs/ html
+	cd docs/_build/html && python3 -m http.server
 
 dist:
 	pip install wheel
@@ -76,3 +82,5 @@ release-patch: lint test bump-patch register publish tag
 release-minor: lint test bump-minor register publish tag
 
 release-major: lint test bump-major register publish tag
+
+.PHONY: docs

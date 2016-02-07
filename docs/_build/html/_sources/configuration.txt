@@ -163,7 +163,23 @@ Supported table formats:
 -----------------------------------
 
 | **Default:** ``[name, login, password, comments]``
-| **Description:** Column names
+| **Description:** Column names to show on table
+|
+
+
+``hidden``
+-----------------------------------
+
+| **Default:** ``[password]``
+| **Description:** Column names to hide values when printing. Uses ``hidden_string`` as replaced text
+|
+
+
+``hidden_string``
+-----------------------------------
+
+| **Default:** ``********``
+| **Description:** Text to be used with ``hidden`` as replacement for hidden columns
 |
 
 ``colors``
