@@ -25,6 +25,7 @@ if sys.argv[-1] == 'publish':
 if sys.argv[-1] == 'tag':
     os.system("git tag -a v%s -m 'version v%s'" % (__version__, __version__))
     os.system("git push --tags")
+    os.system("git push")
     sys.exit()
 
 
@@ -41,7 +42,7 @@ class PyTest(Command):
     user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
 
     def initialize_options(self):
-        self.pytest_args = []
+        self.pytest_args = ["-v"]
 
     def finalize_options(self):
         pass
@@ -55,7 +56,12 @@ class PyTest(Command):
 class PyTestCoverage(PyTest):
 
     def initialize_options(self):
-        self.pytest_args = ['--cov', 'passpie']
+        self.pytest_args = [
+            "-v",
+            "--cov", 'passpie',
+            "--cov-config", ".coveragerc",
+            "--cov-report", "term-missing"
+        ]
 
 
 setup(
