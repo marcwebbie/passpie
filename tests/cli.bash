@@ -1,12 +1,16 @@
-sudo apt-get update --fix-missing
-sudo apt-get install gnupg xsel haveged
+if [ -n "$CI" ]; then
+    sudo apt-get update --fix-missing
+    sudo apt-get install gnupg xsel haveged
 
-sudo cp -a /dev/urandom /dev/random
+    sudo cp -a /dev/urandom /dev/random
 
-pip install -U setuptools
-pip install -e .
+    pip install -U setuptools
+else
+    export PASSPIE_DATABASE=$(mktemp -d /tmp/foo.XXXX)
+fi
 
 # initializing
+passpie config
 passpie init --force --passphrase s3cr3t
 
 # adding
