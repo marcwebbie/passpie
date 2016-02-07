@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import copy
 import logging
 import os
@@ -28,7 +29,9 @@ DEFAULT = {
     'status_repeated_passwords_limit': 5,
     'copy_timeout': 0,
     'extension': '.pass',
-    'recipient': None
+    'recipient': None,
+    'hidden': ['password'],
+    'hidden_string': u'********'
 }
 
 

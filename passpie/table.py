@@ -4,10 +4,16 @@ import click
 
 class Table(object):
 
-    def __init__(self, headers, table_format='rst', colors=None, hidden=None, missing=None):
+    def __init__(self, headers,
+                 table_format='rst',
+                 colors=None,
+                 hidden=None,
+                 missing=None,
+                 hidden_string="*****"):
         self.headers = headers
         self.colors = colors if colors else {}
         self.hidden = hidden if hidden else []
+        self.hidden_string = hidden_string
         self.table_format = table_format
         self.missing = missing
 
@@ -21,7 +27,7 @@ class Table(object):
             row = []
             for header in self.headers:
                 if header in self.hidden:
-                    entry[header] = '*****'
+                    entry[header] = self.hidden_string
                 elif header in self.colors:
                     text = entry[header]
                     entry[header] = self.colorize(header, text)

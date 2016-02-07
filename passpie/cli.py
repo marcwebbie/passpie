@@ -82,7 +82,8 @@ def logging_exception(exceptions=[Exception]):
               callback=validate_remote, envvar="PASSPIE_AUTOPULL")
 @click.option('--autopush', help='Autopush changes to remote pository',
               callback=validate_remote, envvar="PASSPIE_AUTOPUSH")
-@click.option('-v', '--verbose', help='Activate verbose output', count=True)
+@click.option('-v', '--verbose', help='Activate verbose output', count=True,
+              envvar="PASSPIE_VERBOSE")
 @click.version_option(version=__version__)
 @click.pass_context
 def cli(ctx, database, autopull, autopush, verbose):
@@ -125,7 +126,8 @@ def cli(ctx, database, autopull, autopush, verbose):
                 configuration['headers'],
                 table_format=configuration['table_format'],
                 colors=configuration['colors'],
-                hidden=['password']
+                hidden=configuration['hidden'],
+                hidden_string=configuration['hidden_string'],
             )
             click.echo(table.render(credentials))
 
