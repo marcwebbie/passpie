@@ -6,6 +6,7 @@ python:
 install:
   - make develop
 script:
+  - make lint
   - make coverage
 after_success:
   - pip install codecov

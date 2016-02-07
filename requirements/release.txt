@@ -1,0 +1,5 @@
+-r base.txt
+setuptools
+pip
+bumpversion
+homebrew-pypi-poet

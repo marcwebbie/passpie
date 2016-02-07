@@ -11,6 +11,6 @@ install:
   - ps: (new-object net.webclient).DownloadFile('https://bootstrap.pypa.io/get-pip.py', 'C:/get-pip.py')
   - "%PYTHON%/python.exe C:/get-pip.py"
   - "%PYTHON%/Scripts/pip.exe install setuptools"
-  - "%PYTHON%/Scripts/pip.exe install -r requirements_tests.txt"
+  - "%PYTHON%/Scripts/pip.exe install -r requirements/test.txt"
 test_script:
   - "%PYTHON%/python.exe setup.py test"
