@@ -1,6 +1,6 @@
 import csv
 from passpie.importers import BaseImporter
-from passpie._compat import is_python2
+from passpie._compat import is_python2, unicode
 
 
 def unicode_csv_reader(utf8_data, dialect=csv.excel, **kwargs):
