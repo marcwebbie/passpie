@@ -5,7 +5,7 @@
     :align: center
     :width: 100%
 
-|Version| |Build Status| |Windows Build Status| |Coverage| |Requirements|
+|Version| |Build Status| |Windows Build Status| |Coverage|
 
 Passpie is a command line tool to  manage passwords from the terminal with a colorful and configurable interface. Use a master passphrase to decrypt login credentials, copy passwords to clipboard, syncronize with a git repository, check the state of your passwords, and more.
 
@@ -70,8 +70,6 @@ Full license here: `LICENSE <https://github.com/marcwebbie/passpie/blob/master/L
    :target: https://ci.appveyor.com/project/marcwebbie/passpie
 .. |Coverage| image:: http://img.shields.io/coveralls/marcwebbie/passpie.svg?style=flat-square
    :target: https://coveralls.io/r/marcwebbie/passpie
-.. |Requirements| image:: http://img.shields.io/requires/github/marcwebbie/passpie.svg?style=flat-square
-   :target: https://requires.io/github/marcwebbie/passpie/requirements/?branch=master
 .. |Gitter| image:: https://img.shields.io/gitter/room/marcwebbie/passpie.svg?style=flat-square
    :target: https://gitter.im/marcwebbie/passpie
 .. |Version| image:: http://img.shields.io/pypi/v/passpie.svg?style=flat-square&label=latest%20version
