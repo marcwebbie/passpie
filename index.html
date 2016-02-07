@@ -20,176 +20,69 @@
 
     <section class="main-content">
       <h1>
-<a id="passpie-manage-login-credentials-from-terminal" class="anchor" href="#passpie-manage-login-credentials-from-terminal" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Passpie: Manage login credentials from terminal</h1>
+<a id="passpie-command-line-password-manager" class="anchor" href="#passpie-command-line-password-manager" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Passpie: Command-line password manager</h1>
 
-<h2>
-<a id="" class="anchor" href="#" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><img src="https://github.com/marcwebbie/passpie/raw/master/images/passpie.png" alt="Passpie console interface">
-</h2>
+<p><img src="https://raw.githubusercontent.com/marcwebbie/passpie/master/images/passpie2.png" alt="image"></p>
 
-<p><a href="https://marcwebbie.github.io/passpie">Passpie</a> helps you manage login credentials from the terminal with a colorful andconfigurable interface. Password files are saved into yaml text files with passwords encrypted using <a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard">GnuPG</a>. Use your master passphrase to decrypt login credentials, copy passwords to clipboard syncronize them to a git repository and more...</p>
+<p><a href="https://pypi.python.org/pypi/passpie/"><img src="http://img.shields.io/pypi/v/passpie.svg?style=flat-square&amp;label=latest%20version" alt="Version"></a> <a href="https://travis-ci.org/marcwebbie/passpie"><img src="http://img.shields.io/travis/marcwebbie/passpie.svg?style=flat-square" alt="Build Status"></a> <a href="https://ci.appveyor.com/project/marcwebbie/passpie"><img src="https://img.shields.io/appveyor/ci/marcwebbie/passpie.svg?style=flat-square&amp;label=windows%20build" alt="Windows Build Status"></a> <a href="https://coveralls.io/r/marcwebbie/passpie"><img src="http://img.shields.io/coveralls/marcwebbie/passpie.svg?style=flat-square" alt="Coverage"></a></p>
 
-<h2>
-<a id="---" class="anchor" href="#---" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://pypi.python.org/pypi/passpie"><img src="https://img.shields.io/pypi/v/passpie.svg?style=flat-square&amp;label=latest%20version" alt="pypi"></a> <a href="https://travis-ci.org/marcwebbie/passpie"><img src="https://img.shields.io/travis/marcwebbie/passpie/master.svg?style=flat-square&amp;label=unix%20build" alt="unix_build"></a> <a href="https://ci.appveyor.com/project/marcwebbie/passpie"><img src="https://img.shields.io/appveyor/ci/marcwebbie/passpie.svg?style=flat-square&amp;label=windows%20build" alt="windows_build"></a> <a href="https://codecov.io/github/marcwebbie/passpie"><img src="https://img.shields.io/codecov/c/github/marcwebbie/passpie.svg?style=flat-square&amp;label=coverage" alt="coverage"></a>
-</h2>
+<p>Passpie is a command line tool to manage passwords from the terminal with a colorful and configurable interface. Use a master passphrase to decrypt login credentials, copy passwords to clipboard, syncronize with a git repository, check the state of your passwords, and more.</p>
 
-<h2>
-<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h2>
+<p>Password files are encrypted using <a href="https://www.gnupg.org/">GnuPG</a> and saved into yaml text files. Passpie supports <strong>Linux</strong>, <strong>OSX</strong> and <strong>Windows</strong>.</p>
 
-<div class="highlight highlight-source-fish"><pre>pip install passpie</pre></div>
+<p>What does it look like? Here is an example of a simple Passpie usage:</p>
 
-<p>Or on a <em>mac</em>, with <a href="http://brew.sh">homebrew</a>:</p>
-
-<div class="highlight highlight-source-fish"><pre>brew install passpie</pre></div>
-
-<p>Or to install the <em>latest development</em> version:</p>
-
-<div class="highlight highlight-source-fish"><pre>pip install <span class="pl-s">-U</span> https://github.com/marcwebbie/passpie/tarball/master</pre></div>
-
-<h2>
-<a id="quickstart" class="anchor" href="#quickstart" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Quickstart</h2>
-
-<div class="highlight highlight-source-fish"><pre><span class="pl-c"># initialize a passpie database</span>
-passpie init
-
-<span class="pl-c"># add some credentials</span>
-passpie add foo@example.com
-passpie add bar@example.com
-
-<span class="pl-c"># add some credential with random passwords</span>
-passpie add bar@github.com <span class="pl-s">--random</span>
-passpie add spam@egg <span class="pl-s">--random</span>
-passpie add foo@github.com <span class="pl-s">--random</span>
-passpie add bar@github.com <span class="pl-s">--random</span>
-
-<span class="pl-c"># add spam@egg with random password and copy to clipboard</span>
-passpie add spam@egg.local <span class="pl-s">--random</span> <span class="pl-s">--copy</span>
-
-<span class="pl-c"># edit credential "foo@example.com"</span>
-passpie update foo@example.com
-
-<span class="pl-c"># copy password from credential "foo@example.com" to clipboard</span>
-passpie copy foo@example.com
-
-<span class="pl-c"># copy password to clipboard with clearing clipboard after 10 seconds</span>
-passpie copy foo@example.com <span class="pl-s">--clear</span> 10
-
-<span class="pl-c"># search credentials by string "exam"</span>
-passpie search exam
-
-<span class="pl-c"># search credentials using regular expressions</span>
-passpie search <span class="pl-s"><span class="pl-pds">'</span>foo|bar<span class="pl-pds">'</span></span>
-
-<span class="pl-c"># remove some credentials</span>
-passpie remove foo@example.com
-passpie remove foo@github.com
-
-<span class="pl-c"># see the database change history</span>
-passpie log
-
-<span class="pl-c"># reset to a previous version of the database</span>
-passpie <span class="pl-s">--reset-to</span> 5
-
-<span class="pl-c"># check database status</span>
-passpie <span class="pl-c1">status</span>
-
-<span class="pl-c"># print all credentials as a table with hidden passwords</span>
+<pre><code>passpie init
+passpie add foo@example.com --random
+passpie add bar@example.com --pattern "[0-9]{5}[a-z]{5}"
+passpie update foo@example --comment "Hello"
 passpie
+</code></pre>
 
-<span class="pl-c"># purge all credentials from database</span>
-passpie purge
+<p>Outputs:</p>
 
-<span class="pl-c"># shows help. Option `--help`</span>
-passpie <span class="pl-s">--help</span></pre></div>
-
-<h2>
-<a id="commands" class="anchor" href="#commands" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Commands</h2>
-
-<table>
-<thead>
-<tr>
-<th>Command</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong><code>add</code></strong></td>
-<td>Add new credential to database</td>
-</tr>
-<tr>
-<td><strong><code>complete</code></strong></td>
-<td>Generate completion scripts for shells</td>
-</tr>
-<tr>
-<td><strong><code>copy</code></strong></td>
-<td>Copy credential password to clipboard/stdout</td>
-</tr>
-<tr>
-<td><strong><code>export</code></strong></td>
-<td>Export credentials in plain text</td>
-</tr>
-<tr>
-<td><strong><code>import</code></strong></td>
-<td>Import credentials from file</td>
-</tr>
-<tr>
-<td><strong><code>init</code></strong></td>
-<td>Initialize new passpie database</td>
-</tr>
-<tr>
-<td><strong><code>log</code></strong></td>
-<td>Shows passpie database changes history</td>
-</tr>
-<tr>
-<td><strong><code>purge</code></strong></td>
-<td>Remove all credentials from database</td>
-</tr>
-<tr>
-<td><strong><code>remove</code></strong></td>
-<td>Remove credential</td>
-</tr>
-<tr>
-<td><strong><code>reset</code></strong></td>
-<td>Renew passpie database and re-encrypt all credentials</td>
-</tr>
-<tr>
-<td><strong><code>search</code></strong></td>
-<td>Search credentials by regular expressions</td>
-</tr>
-<tr>
-<td><strong><code>status</code></strong></td>
-<td>Diagnose database for improvements</td>
-</tr>
-<tr>
-<td><strong><code>update</code></strong></td>
-<td>Update credential</td>
-</tr>
-</tbody>
-</table>
-
-<h2>
-<a id="learn-more" class="anchor" href="#learn-more" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Learn more</h2>
-
-<ul>
-<li><a href="./docs/fullname.md">Diving into <em>fullname</em> syntax</a></li>
-<li><a href="./docs/configuration.md">Configuration</a></li>
-<li><a href="./docs/grouping.md">Grouping Credentials</a></li>
-<li><a href="./docs/multiple_databases.md">Multiple Databases</a></li>
-<li><a href="./docs/syncing.md">Syncing Credentials</a></li>
-<li><a href="./docs/syncing.md">Version Control With Git</a></li>
-<li><a href="#">Exporting Credentials</a></li>
-<li><a href="./docs/importing.md">Importing Credentials</a></li>
-</ul>
-
-<h2>
-<a id="licence-" class="anchor" href="#licence-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Licence <a href="./LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="license"></a>
-</h2>
-
-<p>Copyright (c) 2014-2016 Marcwebbie, <a href="http://github.com/marcwebbie">http://github.com/marcwebbie</a></p>
+<pre><code>╒═════════════╤═════════╤════════════╤═══════════╕
+│ Name        │ Login   │ Password   │ Comment   │
+╞═════════════╪═════════╪════════════╪═══════════╡
+│ example.com │ bar     │ *****      │           │
+├─────────────┼─────────┼────────────┼───────────┤
+│ example.com │ foo     │ *****      │ Hello     │
+╘═════════════╧═════════╧════════════╧═══════════╛
+</code></pre>
 
 <blockquote>
-<p>Full license here: <a href="./LICENSE">LICENSE</a></p>
+<p><strong>note</strong></p>
+
+<p>Check remote passpie database &lt;<a href="https://github.com/passpiedb">https://github.com/passpiedb</a>&gt;.</p>
 </blockquote>
+
+<h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install</h2>
+
+<pre lang="sourceCode"><code>pip install passpie
+</code></pre>
+
+<p>Or if you are on a mac, install via <a href="http://brew.sh">Homebrew</a>:</p>
+
+<pre lang="sourceCode"><code>brew install passpie
+</code></pre>
+
+<h2>
+<a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Documentation</h2>
+
+<p>Read full documentation on <a href="http://passpie.readthedocs.org">http://passpie.readthedocs.org</a></p>
+
+<p>Check an example remote database: <a href="https://github.com/marcwebbie/passpiedb">https://github.com/marcwebbie/passpiedb</a></p>
+
+<p>And visit our <a href="https://gitter.im/marcwebbie/passpie"><img src="https://img.shields.io/gitter/room/marcwebbie/passpie.svg?style=flat-square" alt="Gitter"></a></p>
+
+<h2>
+<a id="licence-" class="anchor" href="#licence-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Licence <img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License">
+</h2>
+
+<p>Copyright (c) 2014-2016 Marcwebbie, &lt;<a href="http://github.com/marcwebbie">http://github.com/marcwebbie</a>&gt;</p>
+
+<p>Full license here: <a href="https://github.com/marcwebbie/passpie/blob/master/LICENSE">LICENSE</a></p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/marcwebbie/passpie">Passpie</a> is maintained by <a href="https://github.com/marcwebbie">marcwebbie</a>.</span>
