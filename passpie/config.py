@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import copy
 import logging
 import os
 import re
@@ -8,14 +7,12 @@ import yaml
 
 from .utils import tempdir
 from .crypt import ensure_keys, import_keys, get_default_recipient
-from .history import clone
 
 
 HOMEDIR = os.path.expanduser("~")
 DEFAULT_CONFIG_PATH = os.path.join(os.path.join(HOMEDIR, '.passpierc'))
 DEFAULT = {
     'path': os.path.join(os.path.join(HOMEDIR, '.passpie')),
-    'short_commands': False,
     'key_length': 4096,
     'genpass_pattern': r'[a-z]{10} [-_+=*&%$#]{10} [A-Z]{10}',
     'homedir': os.path.join(os.path.expanduser('~/.gnupg')),

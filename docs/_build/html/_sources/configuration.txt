@@ -31,7 +31,6 @@ Full passpie configuration file
    key_length: 4096
    recipient: null
    repo: true
-   short_commands: false
    status_repeated_passwords_limit: 5
    table_format: fancy_grid
 
@@ -219,13 +218,6 @@ Supported color names:
 
 | **Default:** ``true``
 | **Description:** Automatically create a git repository in database on initialization
-|
-
-``short_commands``
------------------------------------
-
-| **Default:** ``false``
-| **Description:** Use alias for passpie commands
 |
 
 ``status_repeated_passwords_limit``
