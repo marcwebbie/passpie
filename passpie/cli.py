@@ -54,7 +54,20 @@ def logging_exception(exceptions=[Exception]):
     return decorator
 
 
-@click.group(invoke_without_command=True)
+class AliasGroup(click.Group):
+
+    def get_command(self, ctx, name):
+        cmd = super(AliasGroup, self).get_command(ctx, name)
+        aliases = ctx.params.get('configuration', {}).get('aliases')
+        if cmd:
+            return cmd
+        elif name in aliases:
+            aliased_name = aliases[name]
+            cmd = super(AliasGroup, self).get_command(ctx, aliased_name)
+            return cmd
+
+
+@click.group(cls=AliasGroup, invoke_without_command=True)
 @click.option('-D', '--database', 'path', help='Database path or url to remote repository',
               envvar="PASSPIE_DATABASE")
 @click.option('--autopull', help='Autopull changes from remote pository',
@@ -88,7 +101,6 @@ def cli(ctx, path, autopull, autopush, configuration, verbose):
     logging.basicConfig(format="%(levelname)s:passpie.%(module)s:%(message)s",
                         level=logging_level)
 
-    # List credentials
     if ctx.invoked_subcommand is None:
         ctx.invoke(cli.commands['list'])
 
@@ -109,7 +121,7 @@ def complete(ctx, db, shell_name):
 @logging_exception()
 @pass_db
 def list_database(db):
-    """Print credential as table"""
+    """Print credential as a table"""
     credentials = db.credentials()
     if credentials:
         table = Table(
@@ -120,7 +132,6 @@ def list_database(db):
             hidden_string=db.config['hidden_string'],
         )
         click.echo(table.render(credentials))
-    pass
 
 
 @cli.command(name="config")
