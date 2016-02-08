@@ -45,7 +45,9 @@ def is_repo_url(path):
 
 def read(path, filename='.config'):
     try:
-        with open(os.path.join(path, '.config')) as config_file:
+        if os.path.isdir(path):
+            path = os.path.join(path, '.config')
+        with open(path) as config_file:
             content = config_file.read()
         configuration = yaml.load(content)
     except IOError:

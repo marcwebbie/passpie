@@ -14,6 +14,7 @@ from .database import Database
 from .table import Table
 from .utils import genpass, ensure_dependencies
 from .history import clone
+from .validators import validate_config
 
 
 __version__ = "1.3.1"
@@ -76,33 +77,24 @@ def logging_exception(exceptions=[Exception]):
 
 
 @click.group(invoke_without_command=True)
-@click.option('-D', '--database', help='Database path or url to remote repository',
+@click.option('-D', '--database', 'path', help='Database path or url to remote repository',
               envvar="PASSPIE_DATABASE")
 @click.option('--autopull', help='Autopull changes from remote pository',
               callback=validate_remote, envvar="PASSPIE_AUTOPULL")
 @click.option('--autopush', help='Autopush changes to remote pository',
               callback=validate_remote, envvar="PASSPIE_AUTOPUSH")
+@click.option('--config', 'configuration', help='Path to configuration file',
+              callback=validate_config, type=click.Path(readable=True, exists=True),
+              envvar="PASSPIE_CONFIG")
 @click.option('-v', '--verbose', help='Activate verbose output', count=True,
               envvar="PASSPIE_VERBOSE")
 @click.version_option(version=__version__)
 @click.pass_context
-def cli(ctx, database, autopull, autopush, verbose):
+def cli(ctx, path, autopull, autopush, configuration, verbose):
     try:
         ensure_dependencies()
     except RuntimeError as e:
         raise click.ClickException(click.style(str(e), fg='red'))
-
-    # Override configuration
-    config_overrides = {}
-    if database:
-        config_overrides['path'] = database
-    if autopush:
-        config_overrides['autopush'] = autopush
-    if autopull:
-        config_overrides['autopull'] = autopull
-
-    # Setup configuration
-    configuration = config.load(**config_overrides)
 
     # Setup database
     db = Database(configuration)
