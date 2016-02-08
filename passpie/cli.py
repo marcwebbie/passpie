@@ -144,9 +144,9 @@ def complete(ctx, db, shell_name):
 def check_config(db, level):
     """Show current configuration for shell"""
     if level == 'global':
-        configuration = config.read(config.DEFAULT_CONFIG_PATH)
+        configuration = config.read(config.HOMEDIR, '.passpierc')
     elif level == 'local':
-        configuration = config.read(os.path.join(db.path, ".config"))
+        configuration = config.read(os.path.join(db.path))
     elif level == 'current':
         configuration = db.config
 
