@@ -1,6 +1,10 @@
 from copy import deepcopy
+import tempfile
+
 import pytest
 
+from passpie.crypt import get_default_recipient, import_keys
+from passpie import config
 from . import helpers
 
 
@@ -20,11 +24,39 @@ def mockie(mocker, mock_open):
 
 
 @pytest.fixture
-def config(mockie):
-    import passpie.config
-    config = mockie.patch('passpie.cli.config')
-    config.load.return_value = passpie.config.DEFAULT
-    return config
+def mock_config(mocker):
+    class Config(object):
+        def __init__(self, overrides={}):
+            self.overrides = overrides
+            self.values = config.DEFAULT.copy()
+            self.values['path'] = tempfile.NamedTemporaryFile().name
+            self.values.update(overrides)
+            mocker.patch.dict('passpie.validators.config.DEFAULT',
+                              self.values, clear=True)
+            mocker.patch('passpie.config.read', self.read)
+            mocker.patch('passpie.config.setup_crypt', self.setup_crypt)
+
+        def __enter__(self, *args, **kwargs):
+            return self
+
+        def __exit__(self, *args, **kwargs):
+            pass
+
+        def read(self, *args, **kwargs):
+            return self.overrides
+
+        def setup_crypt(self, *args, **kwargs):
+            keysfile = tempfile.NamedTemporaryFile()
+            with open(keysfile.name, "w") as tfile:
+                tfile.write(helpers.KEYS)
+            # configuration = {k: v for k, v in self.read().items()}
+            configuration = self.values
+            configuration['homedir'] = tempfile.mkdtemp()
+            import_keys(keysfile.name, configuration['homedir'])
+            configuration['recipient'] = get_default_recipient(configuration['homedir'])
+            return configuration
+
+    return Config
 
 
 @pytest.fixture
@@ -57,6 +89,7 @@ def runner(request, mocker):
     """
     from click.testing import CliRunner
     mocker.patch('passpie.cli.create_keys', helpers.create_keys)
+    mocker.patch('passpie.cli.ensure_dependencies')
     init_kwargs = {}
     marker = request.node.get_marker('runner_setup')
     if marker:
@@ -65,15 +98,9 @@ def runner(request, mocker):
 
 
 @pytest.yield_fixture
-def irunner(runner):
+def irunner(mocker, runner):
     """
     Instance of `click.testing.CliRunner` with automagically `isolated_filesystem()` called.
     """
     with runner.isolated_filesystem():
         yield runner
-
-
-def pytest_configure(config):
-    config.addinivalue_line(
-        'markers', 'runner_setup(**kwargs): Pass kwargs to `click.testing.CliRunner` initialization.'
-    )

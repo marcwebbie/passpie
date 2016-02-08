@@ -8,13 +8,6 @@ from passpie import cli
 from passpie.database import Database
 
 
-@pytest.fixture
-def mock_deps(mocker):
-    from passpie.config import DEFAULT
-    mocker.patch('passpie.cli.config.load', return_value=DEFAULT)
-    return mocker.patch('passpie.cli.ensure_dependencies')
-
-
 def test_ensure_passphrase_calls_decrypt_with_encrypted_data(mocker):
     mock_logging = mocker.patch('passpie.cli.logging')
     mock_encrypt = mocker.patch('passpie.cli.encrypt')
@@ -33,7 +26,7 @@ def test_ensure_passphrase_calls_decrypt_with_encrypted_data(mocker):
                                          homedir=config['homedir'])
 
 
-def test_ensure_passphrase_logs_error_when_decrypt_result_not_ok(mocker, mock_deps):
+def test_ensure_passphrase_logs_error_when_decrypt_result_not_ok(mocker):
     mock_logging = mocker.patch('passpie.cli.logging')
     mock_encrypt = mocker.patch('passpie.cli.encrypt')
     mock_decrypt = mocker.patch('passpie.cli.decrypt', return_value='NOT OK')
@@ -52,7 +45,6 @@ def test_ensure_passphrase_logs_error_when_decrypt_result_not_ok(mocker, mock_de
 
 def test_call_to_cli_exit_with_error_when_missing_dependencies(mocker):
     mocker.patch('passpie.cli.Database')
-    mocker.patch('passpie.cli.config')
     mocker.patch('passpie.cli.ensure_dependencies', side_effect=RuntimeError)
     mocker.patch('passpie.cli.logging')
 
@@ -61,51 +53,31 @@ def test_call_to_cli_exit_with_error_when_missing_dependencies(mocker):
     assert result.exit_code != 0
 
 
-def test_cli_create_database_with_configuration(mocker, mock_deps):
+def test_cli_instantiate_database_with_configuration(mocker, mock_config, irunner):
     mock_database = mocker.patch('passpie.cli.Database')
-    mock_config = mocker.patch('passpie.cli.config')
     mocker.patch('passpie.cli.logging')
 
-    runner = CliRunner()
-    result = runner.invoke(cli.cli, catch_exceptions=False)
+    with mock_config() as configuration:
+        result = irunner.invoke(cli.cli)
 
     output = result.output
-    exception = str(result.exception)
     assert mock_database.called
-    mock_database.assert_called_once_with(mock_config.load())
+    mock_database.assert_called_once_with(configuration.values)
 
 
-def test_cli_create_database_with_configuration_overriding_autopush(mocker, mock_deps):
-    mock_database = mocker.patch('passpie.cli.Database')
-    mock_config = mocker.patch('passpie.cli.config')
-    mocker.patch('passpie.cli.logging')
-
-    runner = CliRunner()
-    result = runner.invoke(cli.cli, ['--autopush', 'origin/master'])
-
-    assert mock_config.load.called
-    mock_config.load.assert_called_once_with(autopush=('origin', 'master'))
-
-
-def test_cli_create_database_with_configuration_overriding_autopull(mocker, mock_deps):
-    mock_database = mocker.patch('passpie.cli.Database')
-    mock_config = mocker.patch('passpie.cli.config')
-    mocker.patch('passpie.cli.logging')
-
-    runner = CliRunner()
-    result = runner.invoke(cli.cli, ['--autopull', 'origin/master'])
-
-    assert mock_config.load.called
-    mock_config.load.assert_called_once_with(autopull=('origin', 'master'))
-
-
-def test_cli_sets_logging_verbose_level_to_info_when_passing_one_v(mocker, mock_deps):
-    mocker.patch('passpie.cli.Database')
-    mock_config = mocker.patch('passpie.cli.config')
+def test_cli_sets_logging_verbose_level_to_info_when_passing_one_v(mocker, mock_config, irunner):
     mock_logging = mocker.patch('passpie.cli.logging')
+    configuration = {
+        'path': 'mocked',
+        'headers': ['name', 'login'],
+        'colors': {},
+        'table_format': 'plain',
+        'hidden': [],
+        'hidden_string': '*******',
+    }
 
-    runner = CliRunner()
-    result = runner.invoke(cli.cli, ['-v'])
+    with mock_config(configuration):
+        result = irunner.invoke(cli.cli, ['-v'])
 
     assert mock_logging.basicConfig.called
     _, kwargs = mock_logging.basicConfig.call_args
@@ -113,13 +85,12 @@ def test_cli_sets_logging_verbose_level_to_info_when_passing_one_v(mocker, mock_
     assert result.exit_code == 0
 
 
-def test_cli_sets_logging_verbose_level_to_debug_when_passing_two_v(mocker, mock_deps):
-    mocker.patch('passpie.cli.Database')
-    mocker.patch('passpie.cli.config')
+def test_cli_sets_logging_verbose_level_to_debug_when_passing_two_v(mocker, mock_config):
     mock_logging = mocker.patch('passpie.cli.logging')
 
-    runner = CliRunner()
-    result = runner.invoke(cli.cli, ['-vv'])
+    with mock_config():
+        runner = CliRunner()
+        result = runner.invoke(cli.cli, ['-vv'], catch_exceptions=False)
 
     assert result.exit_code == 0
     assert mock_logging.basicConfig.called
@@ -127,13 +98,12 @@ def test_cli_sets_logging_verbose_level_to_debug_when_passing_two_v(mocker, mock
     assert kwargs['level'] == mock_logging.DEBUG
 
 
-def test_cli_sets_logging_verbose_level_to_critical_when_no_verbose_passed(mocker, mock_deps):
-    mocker.patch('passpie.cli.Database')
-    mocker.patch('passpie.cli.config')
+def test_cli_sets_logging_verbose_level_to_critical_when_no_verbose_passed(mocker, mock_config):
     mock_logging = mocker.patch('passpie.cli.logging')
 
-    runner = CliRunner()
-    result = runner.invoke(cli.cli)
+    with mock_config():
+        runner = CliRunner()
+        result = runner.invoke(cli.cli, [], catch_exceptions=False)
 
     assert result.exit_code == 0
     assert mock_logging.basicConfig.called
@@ -172,7 +142,7 @@ def test_validate_cols_returns_none_when_missing_cols(mocker):
 
 class CliTests(object):
 
-    def test_cli_cli_list_credentials(self, mockie, faker, irunner, config, creds):
+    def test_cli_cli_list_credentials(self, mockie, faker, mock_config, creds, irunner):
         credentials = creds.make(5)
 
         result = irunner.invoke(cli.cli, [])
@@ -186,7 +156,7 @@ class CliTests(object):
 
 class CliAddTests(object):
 
-    def test_add_credentials_with_random_password(self, mocker, irunner, config):
+    def test_add_credentials_with_random_password(self, mocker, mock_config, irunner):
         pass
 
 
