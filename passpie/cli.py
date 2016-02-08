@@ -90,16 +90,7 @@ def cli(ctx, path, autopull, autopush, configuration, verbose):
 
     # List credentials
     if ctx.invoked_subcommand is None:
-        credentials = db.credentials()
-        if credentials:
-            table = Table(
-                configuration['headers'],
-                table_format=configuration['table_format'],
-                colors=configuration['colors'],
-                hidden=configuration['hidden'],
-                hidden_string=configuration['hidden_string'],
-            )
-            click.echo(table.render(credentials))
+        ctx.invoke(cli.commands['list'])
 
 
 @cli.command(help='Generate completion scripts for shells')
@@ -112,6 +103,24 @@ def complete(ctx, db, shell_name):
     commands = cli.commands.keys()
     script = completion.script(shell_name, db.path, commands)
     click.echo(script)
+
+
+@cli.command(name='list')
+@logging_exception()
+@pass_db
+def list_database(db):
+    """Print credential as table"""
+    credentials = db.credentials()
+    if credentials:
+        table = Table(
+            db.config['headers'],
+            table_format=db.config['table_format'],
+            colors=db.config['colors'],
+            hidden=db.config['hidden'],
+            hidden_string=db.config['hidden_string'],
+        )
+        click.echo(table.render(credentials))
+    pass
 
 
 @cli.command(name="config")
