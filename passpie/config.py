@@ -73,20 +73,3 @@ def setup_crypt(configuration):
     if not configuration['recipient']:
         configuration['recipient'] = get_default_recipient(configuration['homedir'])
     return configuration
-
-
-def load(**overrides):
-    database_path = os.path.expanduser(overrides.get('path', DEFAULT['path']))
-    configuration = copy.deepcopy(DEFAULT)
-
-    configuration.update(read(DEFAULT_CONFIG_PATH))   # 1. Global configuration
-    configuration.update(read(database_path))         # 2. Local configuration
-    configuration.update(overrides)                   # 3. Command line options
-
-    if is_repo_url(configuration['path']) is True:
-        temporary_path = clone(configuration['path'], depth="1")
-        configuration.update(read(temporary_path))  # Read cloned config
-        configuration['path'] = temporary_path
-
-    configuration = setup_crypt(configuration)
-    return configuration
