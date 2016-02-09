@@ -219,7 +219,11 @@ def add(db, fullname, password, random, pattern, interactive, comment, force, co
         pattern = pattern if pattern else db.config['genpass_pattern']
         password = genpass(pattern=pattern)
     elif not password:
-        password = click.prompt('Password', hide_input=True, confirmation_prompt=True)
+        password = click.prompt('Password [empty]',
+                                hide_input=True,
+                                confirmation_prompt=True,
+                                show_default=False,
+                                default="")
 
     found = db.credential(fullname=fullname)
     if found and not force:
