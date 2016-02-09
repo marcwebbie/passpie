@@ -2,7 +2,7 @@ PACKAGE=passpie
 PACKAGE_TESTS=tests
 
 
-all: clean develop lint coverage preview
+all: clean develop lint coverage news
 
 test:
 	python -W ignore setup.py -q test
@@ -13,9 +13,11 @@ integration-test: install
 install:
 	pip install -U --editable .
 
-develop:
-	pip install -U -r requirements/test.txt
+release:
 	pip install -U -r requirements/release.txt
+
+develop: release install
+	pip install -U -r requirements/test.txt
 
 clean:
 	find $(PACKAGE) -name \*.pyc -delete
@@ -65,6 +67,9 @@ publish:
 tag:
 	python setup.py tag
 
+formula:
+	poet -f passpie > passpie.rb
+
 bump-patch:
 	bumpversion patch setup.py passpie/cli.py
 
@@ -74,15 +79,16 @@ bump-minor:
 bump-major:
 	bumpversion major setup.py passpie/cli.py
 
-preview:
+news:
+	@echo "################################################"
 	@echo "Commits not included in last version"
-	@echo "======================"
-	git log `git describe --tags --abbrev=0`..HEAD --oneline
+	@echo "################################################"
+	@git log `git describe --tags --abbrev=0`..HEAD --pretty=format:"**:heavy_check_mark:** %s"
 
-release-patch: lint test bump-patch register publish tag
+release-patch: lint test bump-patch register publish tag formula
 
-release-minor: lint test bump-minor register publish tag
+release-minor: lint test bump-minor register publish tag formula
 
-release-major: lint test bump-major register publish tag
+release-major: lint test bump-major register publish tag formula
 
-.PHONY: docs
+.PHONY: docs news
