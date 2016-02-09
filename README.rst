@@ -29,8 +29,9 @@ Outputs::
     │ example.com │ foo     │ *****      │ Hello     │
     ╘═════════════╧═════════╧════════════╧═══════════╛
 
-.. note::
-   Check `remote passpie database <https://github.com/passpiedb>`.
+..
+
+    Check remote `passpie database <https://github.com/passpiedb>`_.
 
 Install
 ========
