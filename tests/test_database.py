@@ -295,5 +295,5 @@ def test_database_filename_returns_expected_filename_of_credential(mocker):
         'extension': '.pass',
     }
     db = Database(config)
-    assert db.filename("login@name") == "path/name/login.pass"
-    assert db.filename("@name") == "path/name/.pass"
+    assert db.filename("login@name") == os.path.normpath("path/name/login.pass")
+    assert db.filename("@name") == os.path.normpath("path/name/.pass")
