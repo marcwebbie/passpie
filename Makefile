@@ -83,12 +83,21 @@ news:
 	@echo "################################################"
 	@echo "Commits not included in last version"
 	@echo "################################################"
-	@git log `git describe --tags --abbrev=0`..HEAD --pretty=format:"**:heavy_check_mark:** %s"
+	@git log `git describe --tags --abbrev=0`..HEAD --pretty=format:"+ **:✔:** %s"
 
-release-patch: lint test bump-patch register publish tag formula
+ensure-news-patch:
+	grep 'Version $(shell bumpversion --allow-dirty --dry-run --list patch | grep new_version | sed s,"^.*=",,)' NEWS.rst
 
-release-minor: lint test bump-minor register publish tag formula
+ensure-news-minor:
+	grep 'Version $(shell bumpversion --allow-dirty --dry-run --list minor | grep new_version | sed s,"^.*=",,)' NEWS.rst
 
-release-major: lint test bump-major register publish tag formula
+ensure-news-major:
+	grep 'Version $(shell bumpversion --allow-dirty --dry-run --list major | grep new_version | sed s,"^.*=",,)' NEWS.rst
+
+release-patch: ensure-news-patch lint test bump-patch register publish tag formula
+
+release-minor: ensure-news-minor lint test bump-minor register publish tag formula
+
+release-major: ensure-news-major lint test bump-major register publish tag formula
 
 .PHONY: docs news
