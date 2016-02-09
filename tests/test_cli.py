@@ -173,8 +173,8 @@ class CliAddTests(object):
         fullname = credentials[0]['fullname']
         mock_genpass = mocker.patch('passpie.cli.genpass', return_value='random')
         mock_db_add = mocker.patch('passpie.cli.Database.add')
-        mock_db_add = mocker.patch('passpie.cli.Database.credential',
-                                   return_value=credentials[0])
+        mocker.patch('passpie.cli.Database.credential',
+                     return_value=credentials[0])
 
         with mock_config() as cfg:
             pattern = cfg['genpass_pattern']
@@ -203,6 +203,25 @@ class CliAddTests(object):
         with mock_config() as cfg:
             pattern = cfg['genpass_pattern']
             result = irunner.invoke(cli.cli, ['add', "fullname@name", '--random', '--interactive'])
+
+            assert result.exit_code == 0
+            assert mock_click_edit.called is True
+            mock_click_edit.assert_called_once_with(filename=filename)
+
+class CliUpdateTests(object):
+
+    def test_update_credentials_with_interactive_open_cred_in_editor(self, mocker, creds, mock_config, irunner):
+        credentials = creds.make(2)
+        fullname = credentials[0]['fullname']
+        filename = 'path/to/credential.pass'
+        mocker.patch('passpie.cli.Database.credential', return_value=credentials[0])
+        mocker.patch('passpie.cli.Database.filename', return_value=filename)
+        mock_genpass = mocker.patch('passpie.cli.genpass', return_value='random')
+        mock_click_edit = mocker.patch('passpie.cli.click.edit')
+
+        with mock_config() as cfg:
+            pattern = cfg['genpass_pattern']
+            result = irunner.invoke(cli.cli, ['update', fullname, '--random', '--interactive'])
 
             assert result.exit_code == 0
             assert mock_click_edit.called is True

@@ -278,10 +278,11 @@ def copy(db, fullname, passphrase, to, clear):
 @click.option("--comment", help="Credential new comment")
 @click.option("--password", help="Credential new password")
 @click.option('--random', is_flag=True, help="Credential new randomly generated password")
+@click.option('-i', '--interactive', is_flag=True, help="Interactively edit credential")
 @click.option('-P', '--pattern', help="Random password regex pattern")
 @logging_exception()
 @pass_db
-def update(db, fullname, name, login, password, random, pattern, comment):
+def update(db, fullname, name, login, password, random, interactive, pattern, comment):
     credential = db.credential(fullname)
     if not credential:
         message = "Credential '{}' not found".format(fullname)
@@ -314,6 +315,8 @@ def update(db, fullname, name, login, password, random, pattern, comment):
             encrypted = encrypt(password, recipient=db.config['recipient'], homedir=db.config['homedir'])
             values['password'] = encrypted
         db.update(fullname=fullname, values=values)
+        if interactive:
+            click.edit(filename=db.filename(fullname))
         db.repo.commit('Updated {}'.format(credential['fullname']))
 
 
