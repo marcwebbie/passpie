@@ -142,7 +142,7 @@ def test_validate_cols_returns_none_when_missing_cols(mocker):
 
 class CliTests(object):
 
-    def test_cli_cli_list_credentials(self, mockie, faker, mock_config, creds, irunner):
+    def test_cli_cli_list_credentials(self, mockie, mock_config, creds, irunner):
         credentials = creds.make(5)
 
         result = irunner.invoke(cli.cli, [])
@@ -157,31 +157,39 @@ class CliTests(object):
 class CliAddTests(object):
 
     def test_add_credentials_with_random_password(self, mocker, mock_config, irunner):
-        pass
+        fullname = "foo@example.com"
+        mock_genpass = mocker.patch('passpie.cli.genpass', return_value='random')
 
+        with mock_config() as cfg:
+            pattern = cfg['genpass_pattern']
+            result = irunner.invoke(cli.cli, ['add', fullname, '--random'])
 
-# def test_cli_import_uses_csv_importer_when_cols_option_is_passed_with_cols_as_kwargs(mocker, mock_deps):
-#     mock_importer = mocker.patch('passpie.cli.importers.get')()
-#     cols = {
-#         'name': 0,
-#         'login': 1,
-#         'password': 2,
-#         'comment': 3,
-#     }
-#     runner = CliRunner()
-#     with runner.isolated_filesystem():
-#         runner = CliRunner()
-#         with open('passwords.csv', 'w') as f:
-#             headers = ['Name', 'Login', 'Password', 'Comment']
-#             rows = [
-#                 ['example.com', 'foo', 'password', 'comment'],
-#                 ['example.com', 'foo2', 'password', 'comment'],
-#                 ['example.com', 'foo3', 'password', 'comment'],
-#             ]
-#             csv_writer = csv.writer(f)
-#             csv_writer.writerow(headers)
-#             csv_writer.writerows(rows)
-#             result = runner.invoke(cli.cli, ['import', '--cols', 'name,login,password,comment', 'passwords.csv'])
-#             output = result.output
-#             exception = str(result.exception)
-#             mock_importer.handle.assert_called_once_with('passwords.csv', cols=cols)
+            assert result.exit_code == 0
+            assert mock_genpass.called is True
+            mock_genpass.assert_called_once_with(pattern=pattern)
+
+    def test_add_credentials_with_force_rewrites_credential(self, mocker, creds, mock_config, irunner):
+        credentials = creds.make(2)
+        fullname = credentials[0]['fullname']
+        mock_genpass = mocker.patch('passpie.cli.genpass', return_value='random')
+        mock_db_add = mocker.patch('passpie.cli.Database.add')
+        mock_db_add = mocker.patch('passpie.cli.Database.credential',
+                                   return_value=credentials[0])
+
+        with mock_config() as cfg:
+            pattern = cfg['genpass_pattern']
+            result = irunner.invoke(cli.cli, ['add', fullname, '--random', '--force'])
+
+            assert result.exit_code == 0
+            assert mock_db_add.called is True
+
+    def test_add_credentials_with_copy_copy_to_clipboard(self, mocker, mock_config, irunner):
+        mock_genpass = mocker.patch('passpie.cli.genpass', return_value='random')
+        mock_copy = mocker.patch('passpie.cli.clipboard.copy')
+
+        with mock_config() as cfg:
+            pattern = cfg['genpass_pattern']
+            result = irunner.invoke(cli.cli, ['add', "fullname@name", '--random', '--copy'])
+
+            assert result.exit_code == 0
+            assert mock_copy.called is True

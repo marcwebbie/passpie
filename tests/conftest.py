@@ -1,3 +1,4 @@
+from functools import partial
 from copy import deepcopy
 import tempfile
 
@@ -42,14 +43,15 @@ def mock_config(mocker):
         def __exit__(self, *args, **kwargs):
             pass
 
+        def __getitem__(self, name):
+            return self.values[name]
+
         def read(self, *args, **kwargs):
             return self.overrides
 
         def setup_crypt(self, *args, **kwargs):
-            keysfile = tempfile.NamedTemporaryFile()
-            with open(keysfile.name, "w") as tfile:
-                tfile.write(helpers.KEYS)
-            # configuration = {k: v for k, v in self.read().items()}
+            keysfile = tempfile.NamedTemporaryFile(mode="w")
+            keysfile.write(helpers.KEYS)
             configuration = self.values
             configuration['homedir'] = tempfile.mkdtemp()
             import_keys(keysfile.name, configuration['homedir'])
@@ -72,6 +74,8 @@ def creds(mocker, faker):
                     'password': faker.md5(),
                     'comment': faker.word(),
                 }
+                credential['fullname'] =  "{}@{}".format(
+                    credential['login'], credential['name'])
                 credentials.append(credential)
             mocker.patch('passpie.cli.Database.credentials',
                          return_value=deepcopy(credentials))
@@ -90,6 +94,7 @@ def runner(request, mocker):
     from click.testing import CliRunner
     mocker.patch('passpie.cli.create_keys', helpers.create_keys)
     mocker.patch('passpie.cli.ensure_dependencies')
+    mocker.patch('passpie.database.Repository')
     init_kwargs = {}
     marker = request.node.get_marker('runner_setup')
     if marker:
@@ -103,4 +108,5 @@ def irunner(mocker, runner):
     Instance of `click.testing.CliRunner` with automagically `isolated_filesystem()` called.
     """
     with runner.isolated_filesystem():
+        runner.invoke = partial(runner.invoke, catch_exceptions=False)
         yield runner
