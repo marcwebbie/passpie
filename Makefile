@@ -35,6 +35,8 @@ coverage:
 docs:
 	$(MAKE) -C docs/ clean
 	$(MAKE) -C docs/ html
+
+serve: docs
 	cd docs/_build/html && python3 -m http.server
 
 dist:
