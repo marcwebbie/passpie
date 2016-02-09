@@ -58,6 +58,10 @@
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">login</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">password</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">comment</span>
+<span class="l l-Scalar l-Scalar-Plain">aliases</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">st</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">status</span>
+  <span class="l l-Scalar l-Scalar-Plain">rm</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">remove</span>
+  <span class="l l-Scalar l-Scalar-Plain">ls</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">list</span>
 <span class="l l-Scalar l-Scalar-Plain">colors</span><span class="p p-Indicator">:</span>
   <span class="l l-Scalar l-Scalar-Plain">login</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">green</span>
   <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">yellow</span>
@@ -243,6 +247,26 @@ passpie config local
 <li>white (might be light gray)</li>
 <li>reset (reset the color code only)</li>
 </ul>
+</div>
+<div class="section" id="aliases">
+<h2><code class="docutils literal"><span class="pre">aliases</span></code><a class="headerlink" href="#aliases" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">{}</span></code></div>
+<div class="line"><strong>Description:</strong> Aliases to commands.</div>
+</div>
+<p>Example configuration:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l l-Scalar l-Scalar-Plain">aliases</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">st</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">status</span>
+  <span class="l l-Scalar l-Scalar-Plain">rm</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">remove</span>
+  <span class="l l-Scalar l-Scalar-Plain">a</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">add</span>
+  <span class="l l-Scalar l-Scalar-Plain">u</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">update</span>
+  <span class="l l-Scalar l-Scalar-Plain">l</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">log</span>
+</pre></div>
+</div>
+<p>We can then run our configuration with the short commands:</p>
+<div class="highlight-python"><div class="highlight"><pre>passpie rm foo@bar
+</pre></div>
+</div>
 </div>
 <div class="section" id="key-length">
 <h2><code class="docutils literal"><span class="pre">key_length</span></code><a class="headerlink" href="#key-length" title="Permalink to this headline">¶</a></h2>

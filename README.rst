@@ -31,7 +31,7 @@ Outputs::
 
 ..
 
-    Check remote `passpie database <https://github.com/passpiedb>`_.
+    Check example remote passpie database: https://github.com/passpiedb.
 
 Install
 ========
@@ -47,14 +47,13 @@ Or if you are on a mac, install via `Homebrew <http://brew.sh>`_:
     brew install passpie
 
 
-Documentation
+Learn more
 ================
 
-Read full documentation on http://passpie.readthedocs.org
-
-Check an example remote database: https://github.com/marcwebbie/passpiedb
-
-And visit our |Gitter|
+Documentation: http://passpie.readthedocs.org
+Mailing list: https://groups.google.com/d/forum/passpie
+Gitter chat: https://gitter.im/marcwebbie/passpie
+FAQ: http://passpie.readthedocs.org/en/latest/faq.html
 
 
 Licence |License|

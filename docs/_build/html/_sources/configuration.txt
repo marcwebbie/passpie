@@ -25,6 +25,10 @@ Full passpie configuration file
      - login
      - password
      - comment
+   aliases:
+     st: status
+     rm: remove
+     ls: list
    colors:
      login: green
      name: yellow
@@ -198,6 +202,31 @@ Supported color names:
 - cyan
 - white (might be light gray)
 - reset (reset the color code only)
+
+
+
+``aliases``
+-----------------------------------
+
+| **Default:** ``{}``
+| **Description:** Aliases to commands.
+
+
+Example configuration:
+
+.. code-block:: yaml
+
+    aliases:
+      st: status
+      rm: remove
+      a: add
+      u: update
+      l: log
+
+We can then run our configuration with the short commands::
+
+    passpie rm foo@bar
+
 
 ``key_length``
 -----------------------------------
