@@ -210,10 +210,11 @@ def init(db, force, clone_repo, recipient, no_git, passphrase):
 @click.option('-P', '--pattern', help="Random password regex pattern")
 @click.option('-c', '--comment', default="", help="Credential comment")
 @click.option('-f', '--force', is_flag=True, help="Force overwriting")
+@click.option('-i', '--interactive', is_flag=True, help="Interactively edit credential")
 @click.option('-C', '--copy', is_flag=True, help="Copy password to clipboard")
 @logging_exception()
 @pass_db
-def add(db, fullname, password, random, pattern, comment, force, copy):
+def add(db, fullname, password, random, pattern, interactive, comment, force, copy):
     if random or pattern:
         pattern = pattern if pattern else db.config['genpass_pattern']
         password = genpass(pattern=pattern)
@@ -228,6 +229,9 @@ def add(db, fullname, password, random, pattern, comment, force, copy):
 
     encrypted = encrypt(password, recipient=db.config['recipient'], homedir=db.config['homedir'])
     db.add(fullname=fullname, password=encrypted, comment=comment)
+
+    if interactive:
+        click.edit(filename=db.filename(fullname))
 
     if copy:
         clipboard.copy(password)

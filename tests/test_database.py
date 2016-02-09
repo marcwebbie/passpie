@@ -288,3 +288,12 @@ def test_database_matches_uses_table_remove_credential_from_database(mocker):
         Credential.login.matches(regex) |
         Credential.comment.matches(regex)
     )
+
+def test_database_filename_returns_expected_filename_of_credential(mocker):
+    config = {
+        'path': 'path',
+        'extension': '.pass',
+    }
+    db = Database(config)
+    assert db.filename("login@name") == "path/name/login.pass"
+    assert db.filename("@name") == "path/name/.pass"

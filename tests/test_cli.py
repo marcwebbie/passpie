@@ -193,3 +193,17 @@ class CliAddTests(object):
 
             assert result.exit_code == 0
             assert mock_copy.called is True
+
+    def test_add_credentials_with_interactive_open_cred_in_editor(self, mocker, mock_config, irunner):
+        filename = 'path/to/credential.pass'
+        mocker.patch('passpie.cli.Database.filename', return_value=filename)
+        mock_genpass = mocker.patch('passpie.cli.genpass', return_value='random')
+        mock_click_edit = mocker.patch('passpie.cli.click.edit')
+
+        with mock_config() as cfg:
+            pattern = cfg['genpass_pattern']
+            result = irunner.invoke(cli.cli, ['add', "fullname@name", '--random', '--interactive'])
+
+            assert result.exit_code == 0
+            assert mock_click_edit.called is True
+            mock_click_edit.assert_called_once_with(filename=filename)

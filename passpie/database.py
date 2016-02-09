@@ -18,10 +18,14 @@ class PasspieStorage(Storage):
         super(PasspieStorage, self).__init__()
         self.path = path
 
+    def make_credpath(self, name, login):
+        dirname, filename = name, login + self.extension
+        credpath = os.path.join(self.path, dirname, filename)
+        return credpath
+
     def delete(self, credentials):
         for cred in credentials:
-            dirname, filename = cred["name"], cred["login"] + self.extension
-            credpath = os.path.join(self.path, dirname, filename)
+            credpath = self.make_credpath(cred["name"], cred["login"])
             os.remove(credpath)
             if not os.listdir(os.path.dirname(credpath)):
                 shutil.rmtree(os.path.dirname(credpath))
@@ -44,8 +48,7 @@ class PasspieStorage(Storage):
         self.delete(deleted)
 
         for eid, cred in data["_default"].items():
-            dirname, filename = cred["name"], cred["login"] + self.extension
-            credpath = os.path.join(self.path, dirname, filename)
+            credpath = self.make_credpath(cred["name"], cred["login"])
             with mkdir_open(credpath, "w") as f:
                 f.write(yaml.dump(dict(cred), default_flow_style=False))
 
@@ -63,6 +66,10 @@ class Database(TinyDB):
 
     def has_keys(self):
         return os.path.exists(os.path.join(self.path, '.keys'))
+
+    def filename(self, fullname):
+        login, name = split_fullname(fullname)
+        return self._storage.make_credpath(name=name, login=login)
 
     def credential(self, fullname):
         login, name = split_fullname(fullname)
