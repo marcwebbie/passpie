@@ -1,18 +1,18 @@
 Version 1.4.0
 -------------
 
-**:heavy_check_mark:** Add support for empty passwords when adding credentials. closes #91
-**:heavy_check_mark:** Add interactive edit with editor on cli.update. closes #87
-**:heavy_check_mark:** Add interactive option to cli.add
-**:heavy_check_mark:** Remove short_commands config. closes #93
-**:heavy_check_mark:** Add command aliases support. closes #92
-**:heavy_check_mark:** Add list credentials command: ``passpie list``
-**:heavy_check_mark:** Refactor validators into validators module
-**:heavy_check_mark:** Fix not loading global config on ``passpie config``
-**:heavy_check_mark:** Add option config: ``passpie --config path/to/config``
-**:heavy_check_mark:** Add hidden field configuration. closes #90
-**:heavy_check_mark:** Fix import unicode on csv_importer
-**:heavy_check_mark:** Fix not loading config from remote db. closes #89
++ **:heavy_check_mark:** Add support for empty passwords when adding credentials. closes #91
++ **:heavy_check_mark:** Add interactive edit with editor on cli.update. closes #87
++ **:heavy_check_mark:** Add interactive option to cli.add
++ **:heavy_check_mark:** Remove short_commands config. closes #93
++ **:heavy_check_mark:** Add command aliases support. closes #92
++ **:heavy_check_mark:** Add list credentials command: ``passpie list``
++ **:heavy_check_mark:** Refactor validators into validators module
++ **:heavy_check_mark:** Fix not loading global config on ``passpie config``
++ **:heavy_check_mark:** Add option config: ``passpie --config path/to/config``
++ **:heavy_check_mark:** Add hidden field configuration. closes #90
++ **:heavy_check_mark:** Fix import unicode on csv_importer
++ **:heavy_check_mark:** Fix not loading config from remote db. closes #89
 
 
 Version 1.3.1
