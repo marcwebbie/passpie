@@ -83,7 +83,7 @@ news:
 	@echo "################################################"
 	@echo "Commits not included in last version"
 	@echo "################################################"
-	@git log `git describe --tags --abbrev=0`..HEAD --pretty=format:"+ **:✔:** %s"
+	@git log `git describe --tags --abbrev=0`..HEAD --pretty=format:"+ **✔** %s"
 
 ensure-news-patch:
 	grep 'Version $(shell bumpversion --allow-dirty --dry-run --list patch | grep new_version | sed s,"^.*=",,)' NEWS.rst
