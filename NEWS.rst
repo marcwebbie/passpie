@@ -1,3 +1,8 @@
+Version 1.4.1
+-------------
+
++ **✔** Fix string literals unicode tests
+
 Version 1.4.0
 -------------
 
