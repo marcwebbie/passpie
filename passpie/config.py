@@ -48,10 +48,10 @@ def read(path, filename='.config'):
             content = config_file.read()
         configuration = yaml.load(content)
     except IOError:
-        logging.debug('config file "%s" not found' % path)
+        logging.debug(u'config file "{}" not found'.format(path))
         return {}
     except yaml.scanner.ScannerError as e:
-        logging.error('Malformed user configuration file: {}'.format(e))
+        logging.error(u'Malformed user configuration file: {}'.format(e))
         return {}
     return configuration
 

@@ -74,7 +74,7 @@ def creds(mocker, faker):
                     'password': faker.md5(),
                     'comment': faker.word(),
                 }
-                credential['fullname'] =  "{}@{}".format(
+                credential['fullname'] =  u"{}@{}".format(
                     credential['login'], credential['name'])
                 credentials.append(credential)
             mocker.patch('passpie.cli.Database.credentials',

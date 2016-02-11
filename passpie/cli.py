@@ -29,7 +29,7 @@ def ensure_passphrase(passphrase, config):
                         homedir=config['homedir'])
     if not decrypted == 'OK':
         message = "Wrong passphrase"
-        message_full = "Wrong passphrase for recipient: {} in homedir: {}".format(
+        message_full = u"Wrong passphrase for recipient: {} in homedir: {}".format(
             config['recipient'],
             config['homedir'],
         )
@@ -174,12 +174,12 @@ def init(db, force, clone_repo, recipient, no_git, passphrase):
             if config.is_repo_url(clone_repo):
                 clone(clone_repo, db.path)
             else:
-                message = "url is not a remote repo: {}".format(clone_repo)
+                message = u"url is not a remote repo: {}".format(clone_repo)
                 raise click.ClickException(click.style(message, fg='red'))
         else:
             os.makedirs(db.path)
     except (SystemError, OSError):
-        message = "Path exists '{}'. `--force` to overwrite".format(db.path)
+        message = u"Path exists '{}'. `--force` to overwrite".format(db.path)
         raise click.ClickException(click.style(message, fg='red'))
 
     if recipient:
@@ -227,7 +227,7 @@ def add(db, fullname, password, random, pattern, interactive, comment, force, co
 
     found = db.credential(fullname=fullname)
     if found and not force:
-        message = "Credential {} already exists. --force to overwrite".format(
+        message = u"Credential {} already exists. --force to overwrite".format(
             fullname)
         raise click.ClickException(click.style(message, fg='yellow'))
 
@@ -241,7 +241,7 @@ def add(db, fullname, password, random, pattern, interactive, comment, force, co
         clipboard.copy(password)
         click.secho('Password copied to clipboard', fg='yellow')
 
-    message = 'Added {}{}'.format(fullname, ' [--force]' if force else '')
+    message = u'Added {}{}'.format(fullname, ' [--force]' if force else '')
     db.repo.commit(message=message)
 
 
@@ -259,7 +259,7 @@ def copy(db, fullname, passphrase, to, clear):
     clear = clear if clear else db.config['copy_timeout']
     credential = db.credential(fullname)
     if not credential:
-        message = "Credential '{}' not found".format(fullname)
+        message = u"Credential '{}' not found".format(fullname)
         raise click.ClickException(click.style(message, fg='red'))
 
     encrypted = credential["password"]
@@ -289,7 +289,7 @@ def copy(db, fullname, passphrase, to, clear):
 def update(db, fullname, name, login, password, random, interactive, pattern, comment):
     credential = db.credential(fullname)
     if not credential:
-        message = "Credential '{}' not found".format(fullname)
+        message = u"Credential '{}' not found".format(fullname)
         raise click.ClickException(click.style(message, fg='red'))
 
     if random or pattern:
@@ -321,7 +321,7 @@ def update(db, fullname, name, login, password, random, interactive, pattern, co
         db.update(fullname=fullname, values=values)
         if interactive:
             click.edit(filename=db.filename(fullname))
-        db.repo.commit('Updated {}'.format(credential['fullname']))
+        db.repo.commit(u'Updated {}'.format(credential['fullname']))
 
 
 @cli.command(help="Remove credential")
@@ -336,7 +336,7 @@ def remove(db, fullname, yes):
         if not yes:
             creds = ', '.join([c['fullname'] for c in credentials])
             click.confirm(
-                'Remove credentials: ({})'.format(
+                u'Remove credentials: ({})'.format(
                     click.style(creds, 'yellow')),
                 abort=True
             )
@@ -344,7 +344,7 @@ def remove(db, fullname, yes):
             db.remove(credential['fullname'])
 
         fullnames = ', '.join(c['fullname'] for c in credentials)
-        db.repo.commit('Removed {}'.format(fullnames))
+        db.repo.commit(u'Removed {}'.format(fullnames))
 
 
 @cli.command(help="Search credentials by regular expressions")
@@ -419,7 +419,7 @@ def import_database(db, filepath, importer, cols):
                                 homedir=db.config['homedir'])
             cred['password'] = encrypted
         db.insert_multiple(credentials)
-        db.repo.commit(message='Imported credentials from {}'.format(filepath))
+        db.repo.commit(message=u'Imported credentials from {}'.format(filepath))
 
 
 @cli.command(name="export", help="Export credentials in plain text")
@@ -503,7 +503,7 @@ def reset(db, passphrase):
 def purge(db, yes):
     if db.credentials():
         if not yes:
-            alert = "Purge '{}' credentials".format(len(db.credentials()))
+            alert = u"Purge '{}' credentials".format(len(db.credentials()))
             yes = click.confirm(click.style(alert, 'yellow'), abort=True)
         if yes:
             db.purge()
@@ -527,7 +527,7 @@ def log(db, reset_to, init):
         for number, message in enumerate(db.repo.commit_list()):
             number = click.style(str(number), fg='magenta')
             message = message.strip()
-            commits.append("[{}] {}".format(number, message))
+            commits.append(u"[{}] {}".format(number, message))
 
         for commit in reversed(commits):
             print(commit)

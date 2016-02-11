@@ -22,5 +22,5 @@ def split_fullname(fullname):
 
 
 def make_fullname(login, name):
-    fullname = "{}@{}".format("" if login is None else login, name)
+    fullname = u"{}@{}".format("" if login is None else login, name)
     return fullname
