@@ -31,7 +31,7 @@ Outputs::
 
 ..
 
-    Check example remote passpie database: https://github.com/passpiedb.
+    Check example remote passpie database: https://github.com/marcwebbie/passpiedb.
 
 Install
 ========
