@@ -95,9 +95,15 @@ class Database(TinyDB):
         return credential
 
     def update(self, fullname, values):
+        login, name = split_fullname(fullname)
         values['fullname'] = make_fullname(values["login"], values["name"])
         values['modified'] = datetime.now()
-        self.table().update(values, (where("fullname") == fullname))
+        Credential = Query()
+        if login is None:
+            query = (Credential.name == name)
+        else:
+            query = ((Credential.login == login) & (Credential.name == name))
+        self.table().update(values, query)
 
     def credentials(self, fullname=None):
         if fullname:

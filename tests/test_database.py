@@ -181,9 +181,10 @@ def test_database_update_uses_table_update_credential_to_database(mocker):
     }
 
     db.update(fullname='login@name', values=values)
+    query = (Query().login == 'login') & (Query().name == 'name')
 
     assert db.table().update.called
-    db.table().update.assert_called_once_with(values, (where('fullname') == 'login@name'))
+    db.table().update.assert_called_once_with(values, query)
 
 
 def test_database_remove_uses_table_remove_credential_from_database(mocker):
