@@ -153,6 +153,12 @@ class CliTests(object):
             assert credential['login'] in output
             assert credential['comment'] in output
 
+    def test_cli_show_error_no_such_command(self, mocker, mock_config, irunner):
+        with mock_config():
+            result = irunner.invoke(cli.cli, ['nocommand'])
+            assert result.exit_code == 2
+            assert 'Error: No such command "nocommand"' in result.output
+
 
 class CliAddTests(object):
 
