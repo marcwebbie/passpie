@@ -1,3 +1,8 @@
+Version 1.4.2
+-------------
+
++ **✔** Fix passpie update using only fullname query by name
+
 Version 1.4.1
 -------------
 
