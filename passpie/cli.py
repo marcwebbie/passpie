@@ -58,7 +58,7 @@ class AliasGroup(click.Group):
 
     def get_command(self, ctx, name):
         cmd = super(AliasGroup, self).get_command(ctx, name)
-        aliases = ctx.params.get('configuration', {}).get('aliases')
+        aliases = ctx.params.get('configuration', {}).get('aliases', {})
         if cmd:
             return cmd
         elif name in aliases:
