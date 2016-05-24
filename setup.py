@@ -10,7 +10,7 @@ except ImportError:
     from distutils.core import setup, Command, find_packages
 
 
-__version__ = "1.4.1"
+__version__ = "2.0"
 
 with io.open('README.rst', encoding='utf-8') as readme_file:
     long_description = readme_file.read() + "\n\n"
@@ -30,10 +30,10 @@ if sys.argv[-1] == 'tag':
 
 
 requirements = [
-    'click==6.2',
+    'click==6.6',
     'PyYAML==3.11',
     'tabulate==0.7.5',
-    'tinydb==3.1.2',
+    'tinydb==3.2.0',
     'rstr==2.2.3',
 ]
 

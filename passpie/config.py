@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
+from copy import deepcopy
 import logging
 import os
-import re
 
 import yaml
 
 from .utils import tempdir
 from .crypt import ensure_keys, import_keys, get_default_recipient
+from ._compat import *
 
 
 HOMEDIR = os.path.expanduser("~")
@@ -28,41 +29,49 @@ DEFAULT = {
     'extension': '.pass',
     'recipient': None,
     'hidden': ['password'],
-    'hidden_string': u'********'
+    'encrypted': ['password'],
+    'hidden_string': u'********',
+    'aliases': {"rm": "remove"},
 }
 
 
-def is_repo_url(path):
-    if path:
-        return re.match(
-            r'((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?',
-            path
-        ) is not None
+def default():
+    return deepcopy(DEFAULT)
 
 
 def read(path, filename='.config'):
     try:
-        if os.path.isdir(path):
+        if path and os.path.isdir(path) and ".config" in os.listdir(path):
             path = os.path.join(path, '.config')
         with open(path) as config_file:
             content = config_file.read()
-        configuration = yaml.load(content)
-    except IOError:
+        return yaml.load(content)
+    except (IOError, TypeError):
         logging.debug(u'config file "{}" not found'.format(path))
-        return {}
     except yaml.scanner.ScannerError as e:
         logging.error(u'Malformed user configuration file: {}'.format(e))
-        return {}
-    return configuration
+
+    return {}
 
 
-def create(path, defaults={}, filename='.config'):
-    config_path = os.path.join(os.path.expanduser(path), filename)
+def create(config_path, overrides):
+    values = {}
+    values.update(overrides)
     with open(config_path, 'w') as config_file:
-        config_file.write(yaml.dump(defaults, default_flow_style=False))
+        config_file.write(yaml.dump(values, default_flow_style=False))
+
+
+def from_path(config_path, overrides=None):
+    overrides = overrides if overrides else {}
+    cfg = deepcopy(DEFAULT)
+    cfg.update(read(DEFAULT_CONFIG_PATH))
+    cfg.update(read(config_path))
+    cfg.update(overrides)
+    return cfg
 
 
 def setup_crypt(configuration):
+    configuration = deepcopy(configuration)
     keys_filepath = ensure_keys(configuration['path'])
     if keys_filepath:
         configuration['homedir'] = tempdir()

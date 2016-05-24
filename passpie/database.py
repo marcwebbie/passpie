@@ -1,124 +1,159 @@
+from copy import deepcopy
 from datetime import datetime
-import logging
 import os
+import re
 import shutil
-
-from tinydb import TinyDB, Storage, where, Query
 import yaml
 
-from .utils import mkdir_open
-from .history import Repository
-from .credential import split_fullname, make_fullname
+from tinydb import TinyDB, Storage, Query
+from tinydb.database import Table
+from tinydb.middlewares import Middleware
+
+from .utils import is_repo_url, mkdir_open
+from .history import clone, Repository
 
 
-class PasspieStorage(Storage):
+def split_fullname(fullname):
+    regex = re.compile(r'(?:(?P<login>.+?(?:\@.+?)?)@(?P<name>.+?$))')
+    regex_name_only = re.compile(r'(?P<at>@)?(?P<name>.+?$)')
+
+    if regex.match(fullname):
+        mobj = regex.match(fullname)
+    elif regex_name_only.match(fullname):
+        mobj = regex_name_only.match(fullname)
+    else:
+        raise ValueError("Not a valid name")
+
+    if mobj.groupdict().get('at'):
+        login = ""
+    else:
+        login = mobj.groupdict().get('login')
+    name = mobj.groupdict().get("name")
+
+    return login, name
+
+
+def make_fullname(login, name):
+    fullname = "{}@{}".format("" if login is None else login, name)
+    return fullname
+
+
+class CredentialStorage(Storage):
     extension = ".pass"
 
-    def __init__(self, path):
-        super(PasspieStorage, self).__init__()
-        self.path = path
+    def __init__(self, path, extension):
+        self.path = os.path.expanduser(path)
+        self.extension = extension
 
-    def make_credpath(self, name, login):
-        dirname, filename = name, login + self.extension
-        credpath = os.path.join(self.path, dirname, filename)
-        return credpath
-
-    def delete(self, credentials):
-        for cred in credentials:
-            credpath = self.make_credpath(cred["name"], cred["login"])
-            os.remove(credpath)
-            if not os.listdir(os.path.dirname(credpath)):
-                shutil.rmtree(os.path.dirname(credpath))
+    def make_path(self, element):
+        return os.path.join(self.path,
+                            element['name'],
+                            element['login'] + self.extension)
 
     def read(self):
         elements = []
         for rootdir, dirs, files in os.walk(self.path):
-            filenames = [f for f in files if f.endswith(self.extension)]
-            for filename in filenames:
-                docpath = os.path.join(rootdir, filename)
-                with open(docpath) as f:
-                    elements.append(yaml.load(f.read()))
-
-        return {"_default":
-                {idx: elem for idx, elem in enumerate(elements, start=1)}}
+            for fpath in [f for f in files if f.endswith(self.extension)]:
+                with open(os.path.join(rootdir, fpath)) as f:
+                    credential = yaml.load(f.read())
+                credential['name'] = os.path.relpath(rootdir, self.path)
+                login, extension = os.path.splitext(fpath)
+                if not extension:
+                    login = ''
+                credential['login'] = login
+                credential['fullname'] = make_fullname(
+                    login=credential['login'], name=credential['name'])
+                elements.append(credential)
+        return {"_default": {i: e for i, e in enumerate(elements)}}
 
     def write(self, data):
-        deleted = [c for c in self.read()["_default"].values()
-                   if c not in data["_default"].values()]
-        self.delete(deleted)
+        elements = data['_default'].values()
+        for element in [e for e in elements if e.get('_deleted')]:
+            self.delete_credential(element)
+        for element in [e for e in elements if e.get('_updated')]:
+            element = deepcopy(element)
+            self.delete_credential(element)
+            element.update(element["_updated"])
+            self.write_credential(element)
+        for element in [e for e in elements if e.get('_created')]:
+            self.write_credential(element)
 
-        for eid, cred in data["_default"].items():
-            credpath = self.make_credpath(cred["name"], cred["login"])
-            with mkdir_open(credpath, "w") as f:
-                f.write(yaml.dump(dict(cred), default_flow_style=False))
+    def delete_credential(self, element):
+        filepath = self.make_path(element)
+        dirpath = os.path.dirname(filepath)
+        os.remove(filepath)
+        if not os.listdir(dirpath):
+            shutil.rmtree(os.path.dirname(filepath))
+
+    def write_credential(self, element):
+        filepath = self.make_path(element)
+        element['modified'] = datetime.now()
+        with mkdir_open(filepath, "w") as f:
+            element.pop("name", None)
+            element.pop("login", None)
+            element.pop("_created", None)
+            element.pop("_deleted", None)
+            element.pop("_updated", None)
+            f.write(yaml.dump(element, default_flow_style=False))
 
 
-class Database(TinyDB):
+class CredentialTable(Table):
 
-    def __init__(self, config, storage=PasspieStorage):
-        self.config = config
-        self.path = config['path']
-        self.repo = Repository(self.path,
-                               autopull=config.get('autopull'),
-                               autopush=config.get('autopush'))
-        PasspieStorage.extension = config['extension']
-        super(Database, self).__init__(self.path, storage=storage)
-
-    def has_keys(self):
-        return os.path.exists(os.path.join(self.path, '.keys'))
-
-    def filename(self, fullname):
-        login, name = split_fullname(fullname)
-        return self._storage.make_credpath(name=name, login=login)
-
-    def credential(self, fullname):
-        login, name = split_fullname(fullname)
+    def cond(self, fullname):
         Credential = Query()
-        if login is None:
-            creds = self.get(Credential.name == name)
-        else:
-            creds = self.get((Credential.login == login) & (Credential.name == name))
-        return creds
-
-    def add(self, fullname, password, comment):
         login, name = split_fullname(fullname)
-        if login is None:
-            logging.error('Cannot add credential with empty login. use "@<name>" syntax')
-            return None
-        credential = dict(fullname=fullname,
-                          name=name,
-                          login=login,
-                          password=password,
-                          comment=comment,
-                          modified=datetime.now())
-        self.insert(credential)
-        return credential
-
-    def update(self, fullname, values):
-        values['fullname'] = make_fullname(values["login"], values["name"])
-        values['modified'] = datetime.now()
-        self.table().update(values, (where("fullname") == fullname))
-
-    def credentials(self, fullname=None):
-        if fullname:
-            login, name = split_fullname(fullname)
-            Credential = Query()
-            if login is None:
-                creds = self.search(Credential.name == name)
-            else:
-                creds = self.search((Credential.login == login) & (Credential.name == name))
+        if login:
+            return (Credential.name == name) & (Credential.login == login)
         else:
-            creds = self.all()
-        return sorted(creds, key=lambda x: x["name"] + x["login"])
+            return (Credential.name == name)
+
+    def insert(self, element):
+        element['_created'] = True
+        element['modified'] = datetime.now()
+        return super(CredentialTable, self).insert(element)
+
+    def update(self, fields, fullname):
+        def _update(data, eid):
+            fields["modified"] = datetime.now()
+            data[eid]['_updated'] = fields
+        return self.process_elements(_update, self.cond(fullname))
 
     def remove(self, fullname):
-        self.table().remove(where('fullname') == fullname)
+        def _remove(data, eid):
+            data[eid]['_deleted'] = True
+        return self.process_elements(_remove, self.cond(fullname))
+
+    def credential(self, fullname):
+        Credential = Query()
+        login, name = split_fullname(fullname)
+        if login:
+            return self.get((Credential.name == name) & (Credential.login == login))
+        else:
+            return self.get((Credential.name == name))
 
     def matches(self, regex):
         Credential = Query()
-        credentials = self.search(
+        return self.search(
             Credential.name.matches(regex) |
             Credential.login.matches(regex) |
             Credential.comment.matches(regex)
         )
-        return sorted(credentials, key=lambda x: x["name"] + x["login"])
+
+    def purge(self):
+        self.process_elements(self._delete, cond=all)
+
+
+class Database(TinyDB):
+
+    def __init__(self, path, autopush=None, autopull=None, extension='.pass'):
+        self.path = path
+        if is_repo_url(self.path):
+            self.path = clone(self.path)
+        self.repo = Repository(self.path, autopull=autopull, autopush=autopush)
+
+        self.table_class = CredentialTable
+        super(Database, self).__init__(
+            self.path,
+            extension=extension,
+            storage=CredentialStorage
+        )

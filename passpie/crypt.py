@@ -141,3 +141,31 @@ def decrypt(data, recipient, passphrase, homedir):
     ]
     output, _ = process.call(command, input=data)
     return output
+
+
+class GPG(object):
+
+    def __init__(self, homedir, recipient):
+        self.homedir = homedir
+        self.recipient = recipient
+
+    @classmethod
+    def from_keys(cls, path):
+        homedir = tempdir()
+        import_keys(path, homedir)
+        recipient = get_default_recipient(homedir)
+        return GPG(homedir, recipient)
+
+    @classmethod
+    def build(cls, path, fallback_recipient, fallback_homedir):
+        keys_file = ensure_keys(path)
+        if keys_file:
+            return GPG.from_keys(keys_file)
+        else:
+            return GPG(recipient, homedir)
+
+    def encrypt(self, data):
+        return encrypt(data, self.recipient, self.homedir)
+
+    def decrypt(self, data, passphrase):
+        return decrypt(data, self.recipient, passphrase, self.homedir)

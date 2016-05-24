@@ -92,9 +92,9 @@ def runner(request, mocker):
         ...
     """
     from click.testing import CliRunner
-    mocker.patch('passpie.cli.create_keys', helpers.create_keys)
-    mocker.patch('passpie.cli.ensure_dependencies')
-    mocker.patch('passpie.database.Repository')
+    # mocker.patch('passpie.cli.create_keys', helpers.create_keys)
+    # mocker.patch('passpie.cli.ensure_dependencies')
+    # mocker.patch('passpie.database.Repository')
     init_kwargs = {}
     marker = request.node.get_marker('runner_setup')
     if marker:

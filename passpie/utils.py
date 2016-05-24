@@ -21,6 +21,14 @@ def genpass(pattern=r'[\w]{32}'):
         raise ValueError(str(e))
 
 
+def is_repo_url(path):
+    if path:
+        return re.match(
+            r'((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?',
+            path
+        ) is not None
+
+
 @contextmanager
 def mkdir_open(path, mode="r"):
     try:

@@ -8,33 +8,19 @@ import sys
 import click
 import yaml
 
-from . import clipboard, completion, config, checkers, importers
-from .crypt import create_keys, encrypt, decrypt
-from .database import Database
-from .table import Table
-from .utils import genpass, ensure_dependencies
-from .history import clone
-from .validators import validate_config, validate_cols, validate_remote
-
+from passpie import config, database, table, clipboard, completion, importers
+from .callbacks import validate_remote
+from .utils import genpass
+from .crypt import GPG, create_keys, ensure_keys
+from .database import split_fullname
+from .termui import (
+    pass_context_object,
+    password_prompt,
+    ensure_passphrase,
+    validate_cols,
+)
 
 __version__ = "1.4.1"
-pass_db = click.make_pass_decorator(Database, ensure=False)
-
-
-def ensure_passphrase(passphrase, config):
-    encrypted = encrypt('OK', recipient=config['recipient'], homedir=config['homedir'])
-    decrypted = decrypt(encrypted,
-                        recipient=config['recipient'],
-                        passphrase=passphrase,
-                        homedir=config['homedir'])
-    if not decrypted == 'OK':
-        message = "Wrong passphrase"
-        message_full = u"Wrong passphrase for recipient: {} in homedir: {}".format(
-            config['recipient'],
-            config['homedir'],
-        )
-        logging.error(message_full)
-        raise click.ClickException(click.style(message, fg='red'))
 
 
 def logging_exception(exceptions=[Exception]):
@@ -54,100 +40,78 @@ def logging_exception(exceptions=[Exception]):
     return decorator
 
 
-class AliasGroup(click.Group):
-
-    def get_command(self, ctx, name):
-        cmd = super(AliasGroup, self).get_command(ctx, name)
-        aliases = ctx.params.get('configuration', {}).get('aliases')
-        if cmd:
-            return cmd
-        elif name in aliases:
-            aliased_name = aliases[name]
-            cmd = super(AliasGroup, self).get_command(ctx, aliased_name)
-            return cmd
-
-
-@click.group(cls=AliasGroup, invoke_without_command=True)
-@click.option('-D', '--database', 'path', help='Database path or url to remote repository',
+@click.group(invoke_without_command=True)
+@click.option('-D', '--database', 'db_path',
+              help='Database path or url to remote repository',
               envvar="PASSPIE_DATABASE")
+@click.option('--passphrase', "-P", help='Global database passphrase',
+              envvar="PASSPIE_PASSPHRASE")
 @click.option('--autopull', help='Autopull changes from remote pository',
               callback=validate_remote, envvar="PASSPIE_AUTOPULL")
 @click.option('--autopush', help='Autopush changes to remote pository',
               callback=validate_remote, envvar="PASSPIE_AUTOPUSH")
-@click.option('--config', 'configuration', help='Path to configuration file',
-              callback=validate_config, type=click.Path(readable=True, exists=True),
+@click.option('--config', 'config_path', help='Path to configuration file',
+              type=click.Path(readable=True, exists=True),
               envvar="PASSPIE_CONFIG")
 @click.option('-v', '--verbose', help='Activate verbose output', count=True,
               envvar="PASSPIE_VERBOSE")
 @click.version_option(version=__version__)
 @click.pass_context
-def cli(ctx, path, autopull, autopush, configuration, verbose):
-    try:
-        ensure_dependencies()
-    except RuntimeError as e:
-        raise click.ClickException(click.style(str(e), fg='red'))
+def cli(ctx, db_path, passphrase, autopull, autopush, config_path, verbose):
+    overrides = {}
+    if db_path:
+        config_path = db_path
+        overrides = {"path": db_path}
 
-    # Setup database
-    db = Database(configuration)
-    ctx.obj = db
-
-    # Verbose
-    if verbose == 1:
-        logging_level = logging.INFO
-    elif verbose > 1:
-        logging_level = logging.DEBUG
-    else:
-        logging_level = logging.CRITICAL
-    logging.basicConfig(format="%(levelname)s:passpie.%(module)s:%(message)s",
-                        level=logging_level)
+    ctx.config = config.from_path(config_path, overrides=overrides)
+    ctx.database = database.Database(ctx.config['path'])
+    ctx.database.passphrase = passphrase
+    ctx.gpg = GPG.build(
+        ctx.database.path,
+        fallback_recipient=ctx.config['recipient'],
+        fallback_homedir=ctx.config['recipient'],
+    )
 
     if ctx.invoked_subcommand is None:
-        ctx.invoke(cli.commands['list'])
+        ctx.invoke(list_database)
+
+
+@cli.command(name="list")
+@pass_context_object('config', 'cfg')
+@pass_context_object('database', 'db')
+def list_database(db, cfg):
+    credentials = sorted(db.all(), key=lambda e: (e['name'], e['login']))
+    cred_table = table.Table(
+        headers=cfg['headers'],
+        table_format=cfg['table_format'],
+        colors=cfg['colors'],
+        hidden=cfg['hidden'],
+        hidden_string=cfg['hidden_string'],
+    )
+    click.echo(cred_table.render(data=credentials))
 
 
 @cli.command(help='Generate completion scripts for shells')
 @click.argument('shell_name', type=click.Choice(completion.SHELLS),
                 default=None, required=False)
-@logging_exception()
-@pass_db
-@click.pass_context
-def complete(ctx, db, shell_name):
+@pass_context_object('database', 'db')
+def complete(db, shell_name):
     commands = cli.commands.keys()
     script = completion.script(shell_name, db.path, commands)
     click.echo(script)
 
 
-@cli.command(name='list')
-@logging_exception()
-@pass_db
-def list_database(db):
-    """Print credential as a table"""
-    credentials = db.credentials()
-    if credentials:
-        table = Table(
-            db.config['headers'],
-            table_format=db.config['table_format'],
-            colors=db.config['colors'],
-            hidden=db.config['hidden'],
-            hidden_string=db.config['hidden_string'],
-        )
-        click.echo(table.render(credentials))
-
-
 @cli.command(name="config")
 @click.argument('level', type=click.Choice(['global', 'local', 'current']),
                 default='current', required=False)
-@logging_exception()
-@pass_db
-def check_config(db, level):
+@pass_context_object('database', 'db')
+@pass_context_object('config', 'configuration')
+def check_config(configuration, db, level):
     """Show current configuration for shell"""
     if level == 'global':
-        configuration = config.read(config.HOMEDIR, '.passpierc')
+        configuration = config.from_path(config.DEFAULT_CONFIG_PATH)
     elif level == 'local':
-        configuration = config.read(os.path.join(db.path))
-    elif level == 'current':
-        configuration = db.config
-
+        configuration = config.from_path(os.path.join(db.path))
     if configuration:
         click.echo(yaml.dump(configuration, default_flow_style=False))
 
@@ -158,8 +122,7 @@ def check_config(db, level):
 @click.option('-c', '--clone', 'clone_repo', help="Clone a remote repository")
 @click.option('--no-git', is_flag=True, help="Don't create a git repository")
 @click.option('--passphrase', help="Database passphrase")
-@logging_exception()
-@pass_db
+@pass_context_object('database', 'db')
 def init(db, force, clone_repo, recipient, no_git, passphrase):
     if force:
         if os.path.isdir(db.path):
@@ -212,27 +175,30 @@ def init(db, force, clone_repo, recipient, no_git, passphrase):
 @click.option('-f', '--force', is_flag=True, help="Force overwriting")
 @click.option('-i', '--interactive', is_flag=True, help="Interactively edit credential")
 @click.option('-C', '--copy', is_flag=True, help="Copy password to clipboard")
-@logging_exception()
-@pass_db
-def add(db, fullname, password, random, pattern, interactive, comment, force, copy):
+@pass_context_object('config', 'cfg')
+@pass_context_object('database', 'db')
+@pass_context_object('gpg', 'gpg')
+@click.pass_context
+def add(ctx, cfg, db, gpg, fullname, password, random, pattern, interactive, comment, force, copy):
+    """Add new credential"""
     if random or pattern:
-        pattern = pattern if pattern else db.config['genpass_pattern']
-        password = genpass(pattern=pattern)
+        pattern = pattern if pattern else cfg['genpass_pattern']
+        password = genpass(pattern)
     elif not password:
-        password = click.prompt('Password [empty]',
-                                hide_input=True,
-                                confirmation_prompt=True,
-                                show_default=False,
-                                default="")
+        password = password_prompt()
 
-    found = db.credential(fullname=fullname)
-    if found and not force:
-        message = u"Credential {} already exists. --force to overwrite".format(
-            fullname)
-        raise click.ClickException(click.style(message, fg='yellow'))
+    login, name = split_fullname(fullname)
+    credential = {"name": name, "login": login, "password": password, "comment": comment}
 
-    encrypted = encrypt(password, recipient=db.config['recipient'], homedir=db.config['homedir'])
-    db.add(fullname=fullname, password=encrypted, comment=comment)
+    for field in (f for f in cfg['encrypted'] if f in credential):
+        credential[field] = gpg.encrypt(credential[field])
+
+    db.insert(credential)
+
+    if copy:
+        ctx.invoke(cli.commands.get('copy'), fullname=fullname)
+    if interactive:
+        ctx.invoke(cli.commands.get('edit'), fullname=fullname)
 
     if interactive:
         click.edit(filename=db.filename(fullname))
@@ -247,26 +213,31 @@ def add(db, fullname, password, random, pattern, interactive, comment, force, co
 
 @cli.command(help="Copy credential password to clipboard/stdout")
 @click.argument("fullname")
-@click.option("--passphrase", prompt="Passphrase", hide_input=True)
+@click.option("--passphrase", "-P", help="Database passphrase")
 @click.option("--to", default='clipboard',
               type=click.Choice(['stdout', 'clipboard']),
               help="Copy password destination")
 @click.option("--clear", default=0, help="Automatically clear password from clipboard")
 @logging_exception()
-@pass_db
-def copy(db, fullname, passphrase, to, clear):
-    ensure_passphrase(passphrase, db.config)
-    clear = clear if clear else db.config['copy_timeout']
+@pass_context_object('config', 'cfg')
+@pass_context_object('database', 'db')
+@pass_context_object('gpg', 'gpg')
+def copy(gpg, db, cfg, fullname, passphrase, to, clear):
     credential = db.credential(fullname)
     if not credential:
         message = u"Credential '{}' not found".format(fullname)
         raise click.ClickException(click.style(message, fg='red'))
 
-    encrypted = credential["password"]
-    decrypted = decrypt(encrypted,
-                        recipient=db.config['recipient'],
-                        passphrase=passphrase,
-                        homedir=db.config['homedir'])
+    if db.passphrase:
+        passphrase = db.passphrase
+    elif passphrase is None:
+        passphrase = click.prompt("Passphrase", hide_input=True)
+    ensure_passphrase(passphrase, gpg, cfg)
+
+    clear = clear if clear else cfg['copy_timeout']
+
+    encrypted_password = credential["password"]
+    decrypted = gpg.decrypt(encrypted_password, passphrase=passphrase)
     if to == 'clipboard':
         clipboard.copy(decrypted, clear)
         if not clear:
@@ -275,7 +246,7 @@ def copy(db, fullname, passphrase, to, clear):
         click.echo(decrypted)
 
 
-@cli.command(help="Update credential")
+@cli.command()
 @click.argument("fullname")
 @click.option("--name", help="Credential new name")
 @click.option("--login", help="Credential new login")
@@ -284,10 +255,11 @@ def copy(db, fullname, passphrase, to, clear):
 @click.option('--random', is_flag=True, help="Credential new randomly generated password")
 @click.option('-i', '--interactive', is_flag=True, help="Interactively edit credential")
 @click.option('-P', '--pattern', help="Random password regex pattern")
-@logging_exception()
-@pass_db
-def update(db, fullname, name, login, password, random, interactive, pattern, comment):
-    credential = db.credential(fullname)
+@pass_context_object('database', 'db')
+@pass_context_object('gpg', 'gpg')
+def update(gpg, db, fullname, name, login, password, random, interactive, pattern, comment):
+    """Update credential"""
+    credential = db.credential(fullname=fullname)
     if not credential:
         message = u"Credential '{}' not found".format(fullname)
         raise click.ClickException(click.style(message, fg='red'))
@@ -316,9 +288,9 @@ def update(db, fullname, name, login, password, random, interactive, pattern, co
 
     if values != credential:
         if values["password"] != credential["password"]:
-            encrypted = encrypt(password, recipient=db.config['recipient'], homedir=db.config['homedir'])
+            encrypted = gpg.encrypt(password)
             values['password'] = encrypted
-        db.update(fullname=fullname, values=values)
+        db.update(fields=values, fullname=fullname)
         if interactive:
             click.edit(filename=db.filename(fullname))
         db.repo.commit(u'Updated {}'.format(credential['fullname']))
@@ -328,39 +300,38 @@ def update(db, fullname, name, login, password, random, interactive, pattern, co
 @click.argument("fullname")
 @click.option("-y", "--yes", is_flag=True, help="Skip confirmation prompt")
 @logging_exception()
-@pass_db
+@pass_context_object('database', 'db')
 def remove(db, fullname, yes):
-    credentials = db.credentials(fullname=fullname)
+    credential = db.credential(fullname)
+    if not credential:
+        message = u"Credential '{}' not found".format(fullname)
+        raise click.ClickException(click.style(message, fg='red'))
 
-    if credentials:
-        if not yes:
-            creds = ', '.join([c['fullname'] for c in credentials])
-            click.confirm(
-                u'Remove credentials: ({})'.format(
-                    click.style(creds, 'yellow')),
-                abort=True
-            )
-        for credential in credentials:
-            db.remove(credential['fullname'])
-
-        fullnames = ', '.join(c['fullname'] for c in credentials)
-        db.repo.commit(u'Removed {}'.format(fullnames))
+    removed_credentials = db.search(db.cond(fullname))
+    fullnames = ', '.join(c['fullname'] for c in removed_credentials)
+    if not yes:
+        click.confirm(
+            u'Remove credentials: ({})'.format(click.style(fullnames, 'yellow')),
+            abort=True
+        )
+    db.remove(fullname=fullname)
+    db.repo.commit(u'Removed {}'.format(fullnames))
 
 
 @cli.command(help="Search credentials by regular expressions")
 @click.argument("regex")
-@logging_exception()
-@pass_db
-def search(db, regex):
-    credentials = db.matches(regex)
-    if credentials:
-        table = Table(
-            db.config['headers'],
-            table_format=db.config['table_format'],
-            colors=db.config['colors'],
-            hidden=['password']
-        )
-        click.echo(table.render(credentials))
+@pass_context_object('config', 'cfg')
+@pass_context_object('database', 'db')
+def search(db, cfg, regex):
+    credentials = sorted(db.matches(regex), key=lambda e: (e['name'], e['login']))
+    cred_table = table.Table(
+        headers=cfg['headers'],
+        table_format=cfg['table_format'],
+        colors=cfg['colors'],
+        hidden=cfg['hidden'],
+        hidden_string=cfg['hidden_string'],
+    )
+    click.echo(cred_table.render(data=credentials))
 
 
 @cli.command(help="Diagnose database for improvements")
@@ -368,7 +339,7 @@ def search(db, regex):
 @click.option("--days", default=90, type=int, help="Elapsed days")
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
 @logging_exception()
-@pass_db
+@pass_context_object('database', 'db')
 def status(db, full, days, passphrase):
     ensure_passphrase(passphrase, db.config)
     credentials = db.credentials()
@@ -402,7 +373,7 @@ def status(db, full, days, passphrase):
 @click.option("-I", "--importer", type=click.Choice(importers.get_names()),
               help="Specify an importer")
 @click.option("--cols", help="CSV expected columns", callback=validate_cols)
-@pass_db
+@pass_context_object('database', 'db')
 def import_database(db, filepath, importer, cols):
     if cols:
         importer = importers.get(name='csv')
@@ -427,7 +398,7 @@ def import_database(db, filepath, importer, cols):
 @click.option("--json", "as_json", is_flag=True, help="Export as JSON")
 @click.option("--passphrase", prompt="Passphrase", hide_input=True)
 @logging_exception()
-@pass_db
+@pass_context_object('database', 'db')
 def export_database(db, filepath, as_json, passphrase):
     ensure_passphrase(passphrase, db.config)
     credentials = db.all()
@@ -460,33 +431,36 @@ def export_database(db, filepath, as_json, passphrase):
 
 
 @cli.command(help='Renew passpie database and re-encrypt credentials')
-@click.option("--passphrase", prompt="Passphrase", hide_input=True)
-@logging_exception()
-@pass_db
-def reset(db, passphrase):
-    ensure_passphrase(passphrase, db.config)
-    credentials = db.credentials()
+@click.option("--passphrase", "-P", help="Database passphrase")
+@click.option("--new-passphrase", "-N", help="New database passphrase")
+@pass_context_object('config', 'cfg')
+@pass_context_object('gpg', 'gpg')
+@pass_context_object('database', 'db')
+def reset(db, gpg, cfg, passphrase, new_passphrase):
+    if db.passphrase:
+        passphrase = db.passphrase
+    elif passphrase is None:
+        passphrase = click.prompt("Passphrase", hide_input=True)
+    ensure_passphrase(passphrase, gpg, cfg)
+
+    credentials = db.all()
     if credentials:
         # decrypt all credentials
         for cred in credentials:
-            decrypted = decrypt(cred['password'],
-                                recipient=db.config['recipient'],
-                                passphrase=passphrase,
-                                homedir=db.config['homedir'])
+            decrypted = gpg.decrypt(cred['password'], passphrase=passphrase)
             cred["password"] = decrypted
 
         # recreate keys if exists
-        if db.has_keys():
-            new_passphrase = click.prompt('New passphrase',
-                                          hide_input=True,
-                                          confirmation_prompt=True)
-            create_keys(new_passphrase)
+        if ensure_keys(db.path):
+            if new_passphrase is None:
+                new_passphrase = click.prompt(
+                    'New passphrase', hide_input=True, confirmation_prompt=True
+                )
+            create_keys(new_passphrase, ensure_keys(db.path), cfg['key_length'])
 
         # encrypt passwords
         for cred in credentials:
-            cred['password'] = encrypt(cred['password'],
-                                       recipient=db.config['recipient'],
-                                       homedir=db.config['homedir'])
+            cred['password'] = gpg.encrypt(cred['password'])
 
         # remove old and insert re-encrypted credentials
         db.purge()
@@ -499,7 +473,7 @@ def reset(db, passphrase):
 @cli.command(help='Remove all credentials from database')
 @click.option("-y", "--yes", is_flag=True, help="Skip confirmation prompt")
 @logging_exception()
-@pass_db
+@pass_context_object('database', 'db')
 def purge(db, yes):
     if db.credentials():
         if not yes:
@@ -514,7 +488,7 @@ def purge(db, yes):
 @click.option("--init", is_flag=True, help="Enable history tracking")
 @click.option("--reset-to", default=-1, help="Undo changes in database")
 @logging_exception()
-@pass_db
+@pass_context_object('database', 'db')
 def log(db, reset_to, init):
     if reset_to >= 0:
         logging.info('reset database to index %s', reset_to)
