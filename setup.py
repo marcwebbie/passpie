@@ -34,7 +34,7 @@ requirements = [
     'PyYAML==3.11',
     'tabulate==0.7.5',
     'tinydb==3.2.0',
-    'rstr==2.2.3',
+    'rstr==2.2.4',
 ]
 
 
