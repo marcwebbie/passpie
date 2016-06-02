@@ -1,7 +1,8 @@
 set -e
 
 source ~/.virtualenvs/passpie/bin/activate
-PASSPIE_TEMPDIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
+PASSPIE_TEMPDIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'passpietmp')
+PASSPIE_EXPORT_TEMPDIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'passpieexporttmp')
 cp -R tests/database/ $PASSPIE_TEMPDIR
 tree -a -I .git $PASSPIE_TEMPDIR
 export PASSPIE_DATABASE=$PASSPIE_TEMPDIR
@@ -55,16 +56,58 @@ passpie copy fooz+test6@barz
 passpie copy fooz+test6@barz --to=clipboard
 passpie copy fooz+test6@barz --to=stdout
 
-# remove
+# # remove
 passpie remove foo+test5@bar --yes
 passpie remove barz --yes
 
-# search
+# # search
 passpie search f
 passpie search fo
 passpie search foo
 passpie search bar
 
 # reset
-passpie --passphrase=k reset --new-passphrase=kk
-passpie --passphrase=kk copy foo@bar --to=stdout
+unset PASSPIE_PASSPHRASE
+passpie --passphrase=k reset --new-passphrase=s3cr3t
+passpie --passphrase=s3cr3t copy foo+test4@bar --to=stdout
+passpie list
+
+# # log
+passpie log
+
+# export
+passpie --passphrase s3cr3t export $PASSPIE_EXPORT_TEMPDIR/passpie.db
+
+# import
+passpie --passphrase s3cr3t import $PASSPIE_EXPORT_TEMPDIR/passpie.db
+passpie list
+
+# status
+passpie  --passphrase s3cr3t status
+
+# purge
+passpie purge --yes
+
+# import keepass
+passpie import --cols ",,login,password,name,comment" examples/keepass.csv
+passpie list
+
+# import lastpass
+passpie import --cols "name,login,password,,comment"  examples/lastpass.csv
+passpie list
+
+# logging
+passpie log
+
+# remote databases
+passpie -D https://github.com/marcwebbie/passpiedb.git
+passpie --passphrase s3cr3t -D https://github.com/marcwebbie/passpiedb.git copy banks/mutuel
+
+# init
+rm -rf /tmp/passpiedb
+passpie --database /tmp/passpiedb --passphrase k init
+passpie --database /tmp/passpiedb --passphrase k init --force
+passpie --database /tmp/passpiedb --passphrase k init --force --no-git
+passpie add foo@bar --random
+passpie list
+passpie --database /tmp/passpiedb --passphrase k init --force --recipient john.doe@example.com

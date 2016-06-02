@@ -8,7 +8,7 @@ test:
 	python -W ignore setup.py -q test
 
 integration-test: install
-	bash -x tests/cli.bash
+	bash -x tests/integration.bash
 
 install:
 	pip install -U --editable .
