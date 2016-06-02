@@ -99,6 +99,8 @@ class CredentialStorage(Storage):
 
 class CredentialTable(Table):
 
+    private_fields = ["password"]
+
     def cond(self, fullname):
         Credential = Query()
         login, name = split_fullname(fullname)
