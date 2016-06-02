@@ -145,27 +145,33 @@ def decrypt(data, recipient, passphrase, homedir):
 
 class GPG(object):
 
-    def __init__(self, homedir, recipient):
+    def __init__(self, homedir, recipient, passphrase=None):
         self.homedir = homedir
         self.recipient = recipient
+        self.passphrase = passphrase
+
+    def create_keys(self, path, key_length):
+        keyspath = os.path.join(path, '.keys')
+        create_keys(self.passphrase, keyspath, key_length)
+        return keyspath
 
     @classmethod
-    def from_keys(cls, path):
+    def from_keys(cls, path, passphrase=None):
         homedir = tempdir()
         import_keys(path, homedir)
         recipient = get_default_recipient(homedir)
-        return GPG(homedir, recipient)
+        return GPG(homedir, recipient, passphrase=passphrase)
 
     @classmethod
-    def build(cls, path, fallback_recipient, fallback_homedir):
+    def build(cls, path, passphrase, fallback_recipient, fallback_homedir):
         keys_file = ensure_keys(path)
         if keys_file:
-            return GPG.from_keys(keys_file)
+            return GPG.from_keys(keys_file, passphrase=passphrase)
         else:
-            return GPG(recipient, homedir)
+            return GPG(fallback_homedir, fallback_recipient, passphrase=passphrase)
 
     def encrypt(self, data):
         return encrypt(data, self.recipient, self.homedir)
 
-    def decrypt(self, data, passphrase):
-        return decrypt(data, self.recipient, passphrase, self.homedir)
+    def decrypt(self, data):
+        return decrypt(data, self.recipient, self.passphrase, self.homedir)
