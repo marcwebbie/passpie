@@ -49,9 +49,9 @@ def password_prompt(text="Password", default=""):
         click.echo('Error: the two entered values do not match', err=False)
 
 
-def ensure_passphrase(passphrase, gpg, cfg):
+def ensure_passphrase(gpg, cfg, abort=True):
     encrypted = gpg.encrypt('OK')
-    decrypted = gpg.decrypt(encrypted, passphrase=passphrase)
+    decrypted = gpg.decrypt(encrypted)
     if not decrypted == 'OK':
         message = "Wrong passphrase"
         message_full = u"Wrong passphrase for recipient: {} in homedir: {}".format(
@@ -59,7 +59,9 @@ def ensure_passphrase(passphrase, gpg, cfg):
             cfg['homedir'],
         )
         logging.error(message_full)
-        raise click.ClickException(click.style(message, fg='red'))
+        if abort is True:
+            raise click.ClickException(click.style(message, fg='red'))
+    return decrypted
 
 
 def validate_cols(ctx, param, value):
@@ -73,3 +75,8 @@ def validate_cols(ctx, param, value):
             raise click.BadParameter('cols need to be in format col1,col2,col3')
         except AssertionError as e:
             raise click.BadParameter('missing mandatory column: {}'.format(e))
+
+
+def passphrase_required(ctx):
+    protected_commands = ("copy", "reset", "export", "status")
+    return ctx.invoked_subcommand in protected_commands
