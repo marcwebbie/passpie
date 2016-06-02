@@ -152,7 +152,10 @@ class CredentialTable(Table):
         )
 
     def purge(self):
-        self.process_elements(self._delete, cond=all)
+        self.process_elements(self._remove, cond=all)
+
+    def _remove(self, data, eid):
+        data[eid]['_deleted'] = True
 
 
 class Database(TinyDB):
