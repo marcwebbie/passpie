@@ -148,7 +148,7 @@ def init(db, cfg, gpg, force, recipient, no_git):
 
 
 @cli.command(help='Add new credential to database')
-@click.argument("fullname")
+@click.argument("fullnames", nargs=-1)
 @click.option('-p', '--password', help="Credential password")
 @click.option('-r', '--random', is_flag=True, help="Randonly generate password")
 @click.option('-P', '--pattern', help="Random password regex pattern")
@@ -160,35 +160,32 @@ def init(db, cfg, gpg, force, recipient, no_git):
 @pass_context_object('database', 'db')
 @pass_context_object('gpg', 'gpg')
 @click.pass_context
-def add(ctx, cfg, db, gpg, fullname, password, random, pattern, interactive, comment, force, copy):
-    """Add new credential"""
-    if random or pattern:
-        pattern = pattern if pattern else cfg['genpass_pattern']
-        password = genpass(pattern)
-    elif not password:
-        password = password_prompt()
+def add(ctx, cfg, db, gpg, fullnames, password, random, pattern, interactive, comment, force, copy):
+    for fullname in fullnames:
+        if random or pattern:
+            pattern = pattern if pattern else cfg['genpass_pattern']
+            password = genpass(pattern)
+        elif not password:
+            password = password_prompt()
 
-    login, name = split_fullname(fullname)
-    credential = {"name": name, "login": login, "password": password, "comment": comment}
+        login, name = split_fullname(fullname)
+        credential = {"name": name,
+                      "login": login,
+                      "password": password,
+                      "comment": comment}
 
-    for field in (f for f in cfg['encrypted'] if f in credential):
-        credential[field] = gpg.encrypt(credential[field])
+        for field in (f for f in cfg['encrypted'] if f in credential):
+            credential[field] = gpg.encrypt(credential[field])
 
-    db.insert(credential)
+        db.insert(credential)
 
     if copy:
         ctx.invoke(cli.commands.get('copy'), fullname=fullname)
-    if interactive:
-        ctx.invoke(cli.commands.get('edit'), fullname=fullname)
 
     if interactive:
         click.edit(filename=db.filename(fullname))
 
-    if copy:
-        clipboard.copy(password)
-        click.secho('Password copied to clipboard', fg='yellow')
-
-    message = u'Added {}{}'.format(fullname, ' [--force]' if force else '')
+    message = u'Added {}{}'.format(fullnames, ' [--force]' if force else '')
     db.repo.commit(message=message)
 
 

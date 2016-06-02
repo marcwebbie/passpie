@@ -4,7 +4,6 @@ source ~/.virtualenvs/passpie/bin/activate
 PASSPIE_TEMPDIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'passpietmp')
 PASSPIE_EXPORT_TEMPDIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'passpieexporttmp')
 cp -R tests/database/ $PASSPIE_TEMPDIR
-tree -a -I .git $PASSPIE_TEMPDIR
 export PASSPIE_DATABASE=$PASSPIE_TEMPDIR
 export PASSPIE_VERBOSE=3
 
@@ -38,6 +37,8 @@ passpie list
 passpie add foo+test6@bar --random
 passpie list
 passpie add foo+test6@bar --force --random
+passpie list
+passpie add --random spam1@bar spam2@bar spam3@bar
 passpie list
 
 # update
