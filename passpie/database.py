@@ -131,6 +131,18 @@ class CredentialTable(Table):
         else:
             return self.get((Credential.name == name))
 
+    def all(self, decryptor=None):
+        if decryptor:
+            data = []
+            for elem in super(CredentialTable, self).all():
+                for key in elem.keys():
+                    if key in self.private_fields:
+                        elem[key] = decryptor(elem[key])
+                data.append(elem)
+            return data
+        else:
+            return super(CredentialTable, self).all()
+
     def matches(self, regex):
         Credential = Query()
         return self.search(
