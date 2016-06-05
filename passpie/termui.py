@@ -78,5 +78,18 @@ def validate_cols(ctx, param, value):
 
 
 def passphrase_required(ctx):
-    protected_commands = ("copy", "reset", "export", "status")
-    return ctx.invoked_subcommand in protected_commands
+    protected_commands = ("copy", "reset", "export", "status", "init")
+    cmd = ctx.invoked_subcommand
+    if (ctx.config["private"] is True) or (cmd and (cmd in protected_commands)):
+        return True
+    else:
+        return False
+
+
+def passphrase_confirm_required(ctx):
+    protected_commands = ("init")
+    cmd = ctx.invoked_subcommand
+    if cmd and (cmd in protected_commands):
+        return True
+    else:
+        return False
