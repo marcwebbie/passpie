@@ -17,6 +17,7 @@ from .termui import (
     ensure_passphrase,
     validate_cols,
     passphrase_required,
+    passphrase_confirm_required,
 )
 
 __version__ = "2.0"
@@ -161,11 +162,17 @@ def init(db, cfg, gpg, force, recipient, no_git):
 @pass_context_object('gpg', 'gpg')
 @click.pass_context
 def add(ctx, cfg, db, gpg, fullnames, password, random, pattern, interactive, comment, force, copy):
-    if copy:
+    if copy and getattr(gpg, "passphrase", None) is None:
         gpg.passphrase = click.prompt('Passphrase', hide_input=True)
         ensure_passphrase(ctx.gpg, ctx.config, abort=True)
 
+    credentials_inserted = False
     for fullname in fullnames:
+        if db.credential(fullname, decryptor=None) and not force:
+            msg = "Credential {} exists `--force` to override".format(fullname)
+            click.secho(msg, fg="yellow")
+            continue
+
         if random or pattern:
             pattern = pattern if pattern else cfg['genpass_pattern']
             password = genpass(pattern)
@@ -186,7 +193,7 @@ def add(ctx, cfg, db, gpg, fullnames, password, random, pattern, interactive, co
         for field in (f for f in encrypted_fields if f in credential):
             credential[field] = gpg.encrypt(credential[field])
 
-        db.insert(credential)
+        credentials_inserted = db.insert(credential)
 
     if copy:
         ctx.invoke(cli.commands.get('copy'), fullname=fullname, passphrase=gpg.passphrase)
@@ -194,8 +201,9 @@ def add(ctx, cfg, db, gpg, fullnames, password, random, pattern, interactive, co
     if interactive:
         click.edit(filename=db.filename(fullname))
 
-    message = u'Added {}{}'.format(fullnames, ' [--force]' if force else '')
-    db.repo.commit(message=message)
+    if credentials_inserted:
+        message = u'Added {}{}'.format(fullnames, ' [--force]' if force else '')
+        db.repo.commit(message=message)
 
 
 @cli.command(help="Copy credential password to clipboard/stdout")
