@@ -161,6 +161,10 @@ def init(db, cfg, gpg, force, recipient, no_git):
 @pass_context_object('gpg', 'gpg')
 @click.pass_context
 def add(ctx, cfg, db, gpg, fullnames, password, random, pattern, interactive, comment, force, copy):
+    if copy:
+        gpg.passphrase = click.prompt('Passphrase', hide_input=True)
+        ensure_passphrase(ctx.gpg, ctx.config, abort=True)
+
     for fullname in fullnames:
         if random or pattern:
             pattern = pattern if pattern else cfg['genpass_pattern']
@@ -174,13 +178,18 @@ def add(ctx, cfg, db, gpg, fullnames, password, random, pattern, interactive, co
                       "password": password,
                       "comment": comment}
 
-        for field in (f for f in cfg['encrypted'] if f in credential):
+        if cfg["private"] is True:
+            encrypted_fields = db.private_fields
+        else:
+            encrypted_fields = ["password"]
+
+        for field in (f for f in encrypted_fields if f in credential):
             credential[field] = gpg.encrypt(credential[field])
 
         db.insert(credential)
 
     if copy:
-        ctx.invoke(cli.commands.get('copy'), fullname=fullname)
+        ctx.invoke(cli.commands.get('copy'), fullname=fullname, passphrase=gpg.passphrase)
 
     if interactive:
         click.edit(filename=db.filename(fullname))
@@ -191,7 +200,6 @@ def add(ctx, cfg, db, gpg, fullnames, password, random, pattern, interactive, co
 
 @cli.command(help="Copy credential password to clipboard/stdout")
 @click.argument("fullname")
-@click.option("--passphrase", "-P", help="Database passphrase")
 @click.option("--to", default='clipboard',
               type=click.Choice(['stdout', 'clipboard']),
               help="Copy password destination")
@@ -199,8 +207,10 @@ def add(ctx, cfg, db, gpg, fullnames, password, random, pattern, interactive, co
 @pass_context_object('config', 'cfg')
 @pass_context_object('database', 'db')
 @pass_context_object('gpg', 'gpg')
-def copy(gpg, db, cfg, fullname, passphrase, to, clear):
-    credential = db.credential(fullname)
+def copy(gpg, db, cfg, fullname, to, clear, passphrase=None):
+    if passphrase is not None:
+        gpg.passphrase = passphrase
+    credential = db.credential(fullname, decryptor=gpg.decrypt)
     if not credential:
         message = u"Credential '{}' not found".format(fullname)
         raise click.ClickException(click.style(message, fg='red'))
