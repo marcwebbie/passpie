@@ -44,13 +44,27 @@ def cli(ctx, db_path, passphrase, autopull, autopush, config_path, verbose):
     overrides = {}
     if db_path:
         config_path = db_path
-        overrides = {"path": db_path}
+        overrides["path"] = db_path
+
+    if autopush:
+        overrides["autopush"] = autopush
+
+    if autopull:
+        overrides["autopull"] = autopull
 
     # Setting context
     ctx.config = config.from_path(config_path, overrides=overrides)
-    ctx.database = database.Database(ctx.config['path'])
+    ctx.database = database.Database(
+        path=ctx.config['path'],
+        autopush=ctx.config['autopush'],
+        autopull=ctx.config['autopull'],
+        extension=ctx.config['extension'],
+        private=ctx.config['private'],
+    )
     if passphrase_required(ctx) and passphrase is None:
-        passphrase = click.prompt('Passphrase', hide_input=True)
+        confirm = passphrase_confirm_required(ctx)
+        passphrase = click.prompt(
+            'Passphrase', hide_input=True, confirmation_prompt=confirm)
     ctx.gpg = GPG.build(
         ctx.database.path,
         passphrase=passphrase,
