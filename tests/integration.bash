@@ -8,6 +8,15 @@ export PASSPIE_DATABASE=$PASSPIE_TEMPDIR
 export PASSPIE_VERBOSE=3
 
 
+export PASSPIE_PASSPHRASE=k
+export PASSPIE_DATABASE=git@bitbucket.org:marcwebbie/passpiejson.git
+passpie init -f
+passpie add --random foo@bar spam@egg
+passpie list
+passpie copy foo@bar
+exit
+
+
 # list
 passpie
 passpie list

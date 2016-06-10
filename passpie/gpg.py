@@ -1,11 +1,10 @@
 import os
 import re
+from tempfile import NamedTemporaryFile, mkdtemp
 
 from . import process
-from .utils import tempdir
+from .utils import which, mkdir
 from ._compat import *
-
-from passpie.utils import which
 
 
 GPG_HOMEDIR = os.path.expanduser('~/.gnupg')
@@ -35,13 +34,13 @@ def make_key_input(passphrase, key_length):
     return key_input
 
 
-def export_keys(homedir, secret=False):
+def export_keys(homedir, private=False):
     command = [
         which('gpg2') or which('gpg'),
         '--no-version',
         '--batch',
         '--homedir', homedir,
-        '--export-secret-keys' if secret else '--export',
+        '--export-secret-keys' if private else '--export',
         '--armor',
         '-o', '-'
     ]
@@ -49,8 +48,8 @@ def export_keys(homedir, secret=False):
     return output
 
 
-def create_keys(passphrase, path=None, key_length=4096):
-    homedir = tempdir()
+def create_keys(passphrase, key_length=4096):
+    homedir = mkdtemp()
     command = [
         which('gpg2') or which('gpg'),
         '--batch',
@@ -63,12 +62,7 @@ def create_keys(passphrase, path=None, key_length=4096):
     ]
     key_input = make_key_input(passphrase, key_length)
     output, error = process.call(command, input=key_input)
-    if path:
-        with open(path, 'w') as keysfile:
-            keysfile.write(export_keys(homedir))
-            keysfile.write(export_keys(homedir, secret=True))
-    else:
-        return output
+    return export_keys(homedir), export_keys(homedir, private=True)
 
 
 def import_keys(keys_path, homedir):
@@ -110,7 +104,6 @@ def get_default_recipient(homedir, secret=False):
 
 
 def encrypt(data, recipient, homedir):
-    recipient = recipient if recipient else get_default_recipient(homedir)
     command = [
         which('gpg2') or which('gpg'),
         '--batch',
@@ -126,7 +119,6 @@ def encrypt(data, recipient, homedir):
 
 
 def decrypt(data, recipient, passphrase, homedir):
-    recipient = recipient if recipient else get_default_recipient(homedir)
     command = [
         which('gpg2') or which('gpg'),
         '--batch',
@@ -150,28 +142,22 @@ class GPG(object):
         self.recipient = recipient
         self.passphrase = passphrase
 
-    def create_keys(self, path, key_length):
-        keyspath = os.path.join(path, '.keys')
-        create_keys(self.passphrase, keyspath, key_length)
-        return keyspath
-
     @classmethod
-    def from_keys(cls, path, passphrase=None):
-        homedir = tempdir()
-        import_keys(path, homedir)
+    def from_keys(cls, public, private, passphrase):
+        homedir = mkdtemp()
+        keysfile = NamedTemporaryFile()
+        with open(keysfile.name, "w") as f:
+            f.write(public)
+            f.write(private)
+        import_keys(keysfile.name, homedir)
         recipient = get_default_recipient(homedir)
-        return GPG(homedir, recipient, passphrase=passphrase)
-
-    @classmethod
-    def build(cls, path, passphrase, fallback_recipient, fallback_homedir):
-        keys_file = ensure_keys(path)
-        if keys_file:
-            return GPG.from_keys(keys_file, passphrase=passphrase)
-        else:
-            return GPG(fallback_homedir, fallback_recipient, passphrase=passphrase)
+        return GPG(homedir, recipient, passphrase)
 
     def encrypt(self, data):
         return encrypt(data, self.recipient, self.homedir)
 
     def decrypt(self, data):
         return decrypt(data, self.recipient, self.passphrase, self.homedir)
+
+    def __str__(self):
+        return "GPG<{0}@{1}>".format(self.recipient, self.homedir)

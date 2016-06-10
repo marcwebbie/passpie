@@ -80,7 +80,7 @@ def validate_cols(ctx, param, value):
 def passphrase_required(ctx):
     protected_commands = ("copy", "reset", "export", "status", "init")
     cmd = ctx.invoked_subcommand
-    if (ctx.config["private"] is True) or (cmd and (cmd in protected_commands)):
+    if (ctx.cfg["private"] is True) or (cmd and (cmd in protected_commands)):
         return True
     else:
         return False
@@ -93,3 +93,11 @@ def passphrase_confirm_required(ctx):
         return True
     else:
         return False
+
+
+def ensure_credential(credential, fullname):
+    if not credential:
+        message = u"Credential '{}' not found".format(fullname)
+        raise click.ClickException(click.style(message, fg='red'))
+    else:
+        return credential

@@ -1,0 +1,29 @@
+DATABASE:
+  PATH: os.path.join(os.path.join(HOMEDIR, '.passpie'))
+  URL: null
+  GIT: true
+  AUTOPUSH: "origin/master"
+  ENCRYPTED_FIELDS: ['password']
+
+GPG:
+  KEY_LENGTH: 4096
+  PASSPHRASE: null
+  HOMEDIR: os.path.join(os.path.expanduser('~/.gnupg'))
+  RECIPIENT: null
+
+TABLE:
+  FORMAT: 'fancy_grid'
+  FIELDS:
+    - name
+    - login
+    - password
+    - comment
+  FIELD_COLORS:
+    name: yellow
+    login: green
+  HIDDEN_STRING: "********"
+  HIDDEN_FIELDS:
+
+CREDENTIALS:
+  COPY_TIMEOUT: 0
+  GENPASS_PATTERN: r'[a-z]{10} [-_+=*&%$#]{10} [A-Z]{10}'

@@ -14,6 +14,9 @@ import_module = __import__
 
 def genpass(pattern=r'[\w]{32}'):
     """generates a password with random chararcters
+    examples:
+      cat /dev/urandom | strings
+
     """
     try:
         return rstr.xeger(pattern)
@@ -27,6 +30,16 @@ def is_repo_url(path):
             r'((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?',
             path
         ) is not None
+
+
+def mkdir(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
 
 
 @contextmanager

@@ -33,8 +33,9 @@ def clone(url, dest=None, depth=None):
 
 class Repository(object):
 
-    def __init__(self, path, autopull=None, autopush=None):
+    def __init__(self, path, url, autopull=None, autopush=None):
         self.path = path
+        self.url = url
         self.autopush = autopush
         self.autopull = autopull
         if autopull:

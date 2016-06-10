@@ -15,13 +15,12 @@ class DefaultImporter(BaseImporter):
             return False
 
         try:
-            dict_content = yaml.load(file_content)
+            credentials = yaml.load(file_content)
         except (ReaderError, ScannerError):
             return False
 
         try:
-            assert dict_content.get('handler') == 'passpie'
-            assert isinstance(dict_content.get('version'), float)
+            assert isinstance(credentials, list)
         except AssertionError:
             return False
 
@@ -30,6 +29,5 @@ class DefaultImporter(BaseImporter):
     def handle(self, filepath):
         with open(filepath) as fp:
             file_content = fp.read()
-        dict_content = yaml.load(file_content)
-        credentials = dict_content.get('credentials')
+        credentials = yaml.load(file_content)
         return credentials
