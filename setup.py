@@ -35,6 +35,7 @@ requirements = [
     'tabulate==0.7.5',
     'tinydb==3.2.0',
     'rstr==2.2.4',
+    "pyperclip==1.5.27",
 ]
 
 
