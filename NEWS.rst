@@ -1,3 +1,8 @@
+Version 1.4.3
+-------------
++ **✔** Fix update credential password encrypts empty string
++ **✔** Default to an empty dict instead of None
+
 Version 1.4.2
 -------------
 
