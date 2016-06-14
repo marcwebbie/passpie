@@ -316,7 +316,9 @@ def update(db, fullname, name, login, password, random, interactive, pattern, co
 
     if values != credential:
         if values["password"] != credential["password"]:
-            encrypted = encrypt(password, recipient=db.config['recipient'], homedir=db.config['homedir'])
+            encrypted = encrypt(values["password"],
+                                recipient=db.config['recipient'],
+                                homedir=db.config['homedir'])
             values['password'] = encrypted
         db.update(fullname=fullname, values=values)
         if interactive:

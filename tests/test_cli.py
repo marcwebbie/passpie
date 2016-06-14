@@ -214,21 +214,36 @@ class CliAddTests(object):
             assert mock_click_edit.called is True
             mock_click_edit.assert_called_once_with(filename=filename)
 
-class CliUpdateTests(object):
 
-    def test_update_credentials_with_interactive_open_cred_in_editor(self, mocker, creds, mock_config, irunner):
-        credentials = creds.make(2)
-        fullname = credentials[0]['fullname']
-        filename = 'path/to/credential.pass'
-        mocker.patch('passpie.cli.Database.credential', return_value=credentials[0])
-        mocker.patch('passpie.cli.Database.filename', return_value=filename)
-        mock_genpass = mocker.patch('passpie.cli.genpass', return_value='random')
-        mock_click_edit = mocker.patch('passpie.cli.click.edit')
+def test_update_credentials_with_interactive_open_cred_in_editor(mocker, creds, mock_config, irunner):
+    credentials = creds.make(2)
+    fullname = credentials[0]['fullname']
+    filename = 'path/to/credential.pass'
+    mocker.patch('passpie.cli.Database.credential', return_value=credentials[0])
+    mocker.patch('passpie.cli.Database.filename', return_value=filename)
+    mock_genpass = mocker.patch('passpie.cli.genpass', return_value='random')
+    mock_click_edit = mocker.patch('passpie.cli.click.edit')
 
-        with mock_config() as cfg:
-            pattern = cfg['genpass_pattern']
-            result = irunner.invoke(cli.cli, ['update', fullname, '--random', '--interactive'])
+    with mock_config() as cfg:
+        pattern = cfg['genpass_pattern']
+        result = irunner.invoke(cli.cli, ['update', fullname, '--random', '--interactive'])
 
-            assert result.exit_code == 0
-            assert mock_click_edit.called is True
-            mock_click_edit.assert_called_once_with(filename=filename)
+        assert result.exit_code == 0
+        assert mock_click_edit.called is True
+        mock_click_edit.assert_called_once_with(filename=filename)
+
+def test_update_credentials_encrypt_password(mocker, creds, mock_config, irunner):
+    credentials = creds.make(2)
+    fullname = credentials[0]['fullname']
+    filename = 'path/to/credential.pass'
+    mocker.patch('passpie.cli.Database.credential', return_value=credentials[0])
+    mocker.patch('passpie.cli.Database.filename', return_value=filename)
+    mock_encrypt = mocker.patch('passpie.cli.encrypt')
+
+    password  = "s3cr3t"
+    with mock_config() as cfg:
+        result = irunner.invoke(cli.cli, ['update', fullname, '--password', password])
+        assert result.exit_code == 0
+        assert mock_encrypt.called is True
+        args, _ = mock_encrypt.call_args
+        assert args[0] == password
