@@ -476,18 +476,18 @@ class Repo(object):
 # cli
 #############################
 
-def pass_db(ensure_passphrase=False):
+def pass_db(ensure_passphrase=False, confirm_passphrase=False):
     def decorator(func):
         def ensure_passphrase_wrapper(f):
             @functools.wraps(f)
             def new_func(db, *args, **kwargs):
                 if ensure_passphrase:
-                    passphrase = db.config["PASSPHRASE"] or sys.stdin.read().strip()
+                    passphrase = db.config["PASSPHRASE"]
                     if not passphrase:
                         passphrase = click.prompt(
                             "Passphrase",
                             hide_input=True,
-                            confirmation_prompt=True,
+                            confirmation_prompt=confirm_passphrase,
                         )
                     db.config["PASSPHRASE"] = passphrase
                     try:
@@ -540,7 +540,7 @@ def cli(ctx, database, passphrase, autopush):
     if ctx.invoked_subcommand == "init":
         ctx.obj = config
     else:
-        db = Database(config=config_load(config_overrides))
+        db = Database(config=config)
         ctx.obj = db
 
 
@@ -551,7 +551,7 @@ def cli(ctx, database, passphrase, autopush):
 def init(ctx, force, recipient):
     """Initialize database"""
     config = ctx.obj
-    passphrase = config["PASSPHRASE"] or sys.stdin.read().strip()
+    passphrase = config["PASSPHRASE"]
     if not passphrase:
         passphrase = click.prompt(
             "Passphrase",
