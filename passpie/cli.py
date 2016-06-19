@@ -696,3 +696,12 @@ def import_database(db, filepath, importer, cols):
             cred['password'] = encrypted
         db.insert_multiple(credentials)
         db.repo.commit(message=u'Imported credentials from {}'.format(filepath))
+
+
+@cli.command(context_settings={"ignore_unknown_options": True})
+@click.argument("command", nargs=-1)
+@pass_db()
+def git(db, command):
+    """Git commands"""
+    cmd = ["git"] + list(command)
+    run(cmd, cwd=db.config["PATH"], nopipe=True)
