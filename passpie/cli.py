@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 from subprocess import Popen, PIPE
 from tempfile import mkdtemp, NamedTemporaryFile
 import errno
 import functools
+import json
 import logging
 import os
 import re
@@ -48,13 +49,13 @@ class Proc(Popen):
 
 def run(*args, **kwargs):
     Response = namedtuple("Response", "cmd std_out std_err returncode")
-    nopipe = kwargs.pop('nopipe', None)
     data = kwargs.pop('data', None)
     kwargs.setdefault('shell', False)
-    if not nopipe:
+    kwargs.setdefault('pipe', True)
+    kwargs.setdefault('stdin', PIPE)
+    if kwargs.pop("pipe") is True:
         kwargs.setdefault('stderr', PIPE)
         kwargs.setdefault('stdout', PIPE)
-        kwargs.setdefault('stdin', PIPE)
 
     with Proc(*args, **kwargs) as proc:
         std_out, std_err = proc.communicate(input=data)
@@ -401,6 +402,7 @@ class Database(TinyDB):
             safe_join(self.config["PATH"], "credentials.json"),
             default_table="credentials")
         self._setup_keyring()
+        self.repo = Repo(self.config["PATH"], autopush=self.config["AUTOPUSH"])
 
     def _setup_keyring(self):
         public_key = self.table("keys").get(Query().name == "public")
@@ -452,7 +454,7 @@ class Repo(object):
 
     def __init__(self, path, autopush=None):
         self.path = path
-        self.autopush = autopush
+        self.autopush = parse_remote(autopush) if autopush else ["origin", "master"]
 
     def init(self):
         run(["git", "init"], cwd=self.path)
@@ -465,6 +467,8 @@ class Repo(object):
     def commit(self, message):
         run(["git", "add", "."], cwd=self.path)
         run(["git", "commit", "-m", message], cwd=self.path)
+        if self.autopush:
+            self.push()
         return self
 
 
@@ -477,11 +481,14 @@ def pass_db(ensure_passphrase=False):
         def ensure_passphrase_wrapper(f):
             @functools.wraps(f)
             def new_func(db, *args, **kwargs):
-                if db.config["PASSPHRASE"] is None and ensure_passphrase:
-                    passphrase = click.prompt(
-                        "Passphrase",
-                        hide_input=True,
-                    )
+                if ensure_passphrase:
+                    passphrase = db.config["PASSPHRASE"] or sys.stdin.read().strip()
+                    if not passphrase:
+                        passphrase = click.prompt(
+                            "Passphrase",
+                            hide_input=True,
+                            confirmation_prompt=True,
+                        )
                     db.config["PASSPHRASE"] = passphrase
                     try:
                         db.ensure_passphrase()
@@ -507,16 +514,27 @@ def validate_cols(ctx, param, value):
             raise click.BadParameter('missing mandatory column: {}'.format(e))
 
 
+def parse_remote(value):
+    try:
+        remote, branch = value.split('/')
+        return [remote, branch]
+    except ValueError:
+        raise []
+
+
 @click.group()
 @click.option("-D", "--database", help="Database path", envvar="PASSPIE_DATABASE")
 @click.option("-P", "--passphrase", help="Database passphrase", envvar="PASSPIE_PASSPHRASE")
+@click.option("-A", "--autopush", help="Autopush git [origin/master]", envvar="PASSPIE_AUTOPUSH")
 @click.pass_context
-def cli(ctx, database, passphrase):
+def cli(ctx, database, passphrase, autopush):
     config_overrides = {}
     if database:
         config_overrides["PATH"] = database
     if passphrase:
         config_overrides["PASSPHRASE"] = passphrase
+    if autopush:
+        config_overrides["AUTOPUSH"] = autopush
     config = config_load(config_overrides)
 
     if ctx.invoked_subcommand == "init":
@@ -533,8 +551,8 @@ def cli(ctx, database, passphrase):
 def init(ctx, force, recipient):
     """Initialize database"""
     config = ctx.obj
-    passphrase = config["PASSPHRASE"]
-    if passphrase is None:
+    passphrase = config["PASSPHRASE"] or sys.stdin.read().strip()
+    if not passphrase:
         passphrase = click.prompt(
             "Passphrase",
             hide_input=True,
@@ -552,13 +570,13 @@ def init(ctx, force, recipient):
     if recipient:
         config_values["recipient"] = recipient
     else:
-        public_key, private_key = create_keys(config["PASSPHRASE"])
+        public_key, private_key = create_keys(passphrase)
         db.table("keys").insert({"name": "public", "content": public_key})
         db.table("keys").insert({"name": "private", "content": private_key})
 
     config_path = os.path.join(db.config["PATH"], ".passpieconfig")
     config_create(config_path, values=config_values)
-    Repo(config["PATH"]).init().commit("Initialized database")
+    db.repo.init().commit("Initialize database")
 
 
 @cli.command(name="ls")
@@ -597,6 +615,8 @@ def add(db, fullnames, random, comment, password, force):
                 db.update(credential, db.query(fullname))
         else:
             db.insert(db.encrypt(credential))
+    else:
+        db.repo.commit("Add credentials '{}'".format((", ").join(fullnames)))
 
 
 @cli.command(name="rm")
@@ -605,9 +625,14 @@ def add(db, fullnames, random, comment, password, force):
 @pass_db()
 def remove(db, fullnames, force):
     """Remove credential"""
+    removed = False
     for fullname in [f for f in fullnames if db.contains(db.query(f))]:
         if force or click.confirm("Remove {}".format(fullname)):
             db.remove(db.query(fullname))
+            removed = True
+
+    if removed is True:
+        db.repo.commit("Remove credentials '{}'".format((", ").join(fullnames)))
 
 
 @cli.command()
@@ -630,6 +655,7 @@ def update(db, fullnames, random, comment, password, name, login, force):
                             default=value,
                             show_default=False)
 
+    updated = False
     for fullname in [f for f in fullnames if db.contains(db.query(f))]:
         if force is False and not click.confirm("Update {}".format(fullname)):
             continue
@@ -647,10 +673,10 @@ def update(db, fullnames, random, comment, password, name, login, force):
             "comment": comment,
         }
         db.update(values, db.query(fullname))
-    else:
-        return
+        updated = True
 
-    raise click.ClickException("{} not found".format(fullname))
+    if updated:
+        db.repo.commit("Remove credentials '{}'".format((", ").join(fullnames)))
 
 
 @cli.command()
@@ -677,8 +703,9 @@ def copy(db, fullname, dest, timeout):
 @click.option("-I", "--importer", type=click.Choice(importers.get_names()),
               help="Specify an importer")
 @click.option("--cols", help="CSV expected columns", callback=validate_cols)
+@click.option("-f", "--force", is_flag=True, help="Force importing credentials")
 @pass_db()
-def import_database(db, filepath, importer, cols):
+def import_database(db, filepath, importer, cols, force):
     """Import credentials from path"""
     if cols:
         importer = importers.get(name='csv')
@@ -687,15 +714,43 @@ def import_database(db, filepath, importer, cols):
         importer = importers.find_importer(filepath)
         kwargs = {}
 
+    imported = False
     if importer:
-        credentials = importer.handle(filepath, **kwargs)
-        for cred in credentials:
-            encrypted = encrypt(cred['password'],
-                                recipient=db.config['recipient'],
-                                homedir=db.config['homedir'])
-            cred['password'] = encrypted
-        db.insert_multiple(credentials)
+        credentials = [db.encrypt(c) for c in importer.handle(filepath, **kwargs)]
+        for credential in credentials:
+            fullname = make_fullname(credential["login"], credential["name"])
+            if db.contains(db.query(fullname)):
+                if force is False and not click.confirm("Update {}".format(fullname)):
+                    continue
+                else:
+                    db.update(credential, db.query(fullname))
+                    imported = True
+            else:
+                db.insert(credential)
+                imported = True
+
+    if imported is True:
         db.repo.commit(message=u'Imported credentials from {}'.format(filepath))
+
+
+@cli.command(name="export", help="Export credentials in plain text")
+@click.argument("filepath", type=click.File("w"))
+@click.option("--json", "as_json", is_flag=True, help="Export as JSON")
+@pass_db(ensure_passphrase=True)
+def export_database(db, filepath, as_json):
+    credentials = (db.decrypt(c) for c in db.all())
+    dict_content = OrderedDict()
+    dict_content["handler"] = "passpie"
+    dict_content["version"] = 1.0
+    dict_content["credentials"] = [dict(x) for x in credentials]
+
+    if as_json:
+        content = json.dumps(dict_content, indent=2)
+    else:
+        dict_content = dict(dict_content)
+        content = yaml.safe_dump(dict_content, default_flow_style=False)
+
+    filepath.write(content)
 
 
 @cli.command(context_settings={"ignore_unknown_options": True})
@@ -704,4 +759,4 @@ def import_database(db, filepath, importer, cols):
 def git(db, command):
     """Git commands"""
     cmd = ["git"] + list(command)
-    run(cmd, cwd=db.config["PATH"], nopipe=True)
+    run(cmd, cwd=db.config["PATH"], pipe=False)
