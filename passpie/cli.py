@@ -48,17 +48,13 @@ class Proc(Popen):
 
 def run(*args, **kwargs):
     Response = namedtuple("Response", "cmd std_out std_err returncode")
-
-    if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
-        stderr = PIPE
-    else:
-        stderr = DEVNULL
-
-    kwargs.setdefault('stderr', stderr)
-    kwargs.setdefault('stdout', PIPE)
-    kwargs.setdefault('stdin', PIPE)
-    kwargs.setdefault('shell', False)
+    nopipe = kwargs.pop('nopipe', None)
     data = kwargs.pop('data', None)
+    kwargs.setdefault('shell', False)
+    if not nopipe:
+        kwargs.setdefault('stderr', PIPE)
+        kwargs.setdefault('stdout', PIPE)
+        kwargs.setdefault('stdin', PIPE)
 
     with Proc(*args, **kwargs) as proc:
         std_out, std_err = proc.communicate(input=data)
@@ -450,6 +446,29 @@ class Database(TinyDB):
 
 
 #############################
+# git
+#############################
+class Repo(object):
+
+    def __init__(self, path, autopush=None):
+        self.path = path
+        self.autopush = autopush
+
+    def init(self):
+        run(["git", "init"], cwd=self.path)
+        return self
+
+    def push(self):
+        run(["git", "push"] + list(self.autopush), cwd=self.path)
+        return self
+
+    def commit(self, message):
+        run(["git", "add", "."], cwd=self.path)
+        run(["git", "commit", "-m", message], cwd=self.path)
+        return self
+
+
+#############################
 # cli
 #############################
 
@@ -473,6 +492,19 @@ def pass_db(ensure_passphrase=False):
         return click.make_pass_decorator(Database, ensure=True)(
             ensure_passphrase_wrapper(func))
     return decorator
+
+
+def validate_cols(ctx, param, value):
+    if value:
+        try:
+            validated = {c: index for index, c in enumerate(value.split(',')) if c}
+            for col in ('name', 'login', 'password'):
+                assert col in validated
+            return validated
+        except (AttributeError, ValueError):
+            raise click.BadParameter('cols need to be in format col1,col2,col3')
+        except AssertionError as e:
+            raise click.BadParameter('missing mandatory column: {}'.format(e))
 
 
 @click.group()
@@ -499,7 +531,15 @@ def cli(ctx, database, passphrase):
 @click.option("-r", "--recipient", help="Keyring recipient")
 @click.pass_context
 def init(ctx, force, recipient):
+    """Initialize database"""
     config = ctx.obj
+    passphrase = config["PASSPHRASE"]
+    if passphrase is None:
+        passphrase = click.prompt(
+            "Passphrase",
+            hide_input=True,
+        )
+
     if os.path.isdir(config["PATH"]) and not force:
         msg = "Path '{}' exists [--force] to overwrite".format(config["PATH"])
         raise click.ClickException(msg)
@@ -518,11 +558,13 @@ def init(ctx, force, recipient):
 
     config_path = os.path.join(db.config["PATH"], ".passpieconfig")
     config_create(config_path, values=config_values)
+    Repo(config["PATH"]).init().commit("Initialized database")
 
 
-@cli.command(name="list")
+@cli.command(name="ls")
 @pass_db()
 def listdb(db):
+    """List credentials as table"""
     table = Table(db.config)
     click.echo(table.render(db.all()))
 
@@ -535,6 +577,7 @@ def listdb(db):
 @click.option("-f", "--force", is_flag=True, help="Force overwrite existing credential")
 @pass_db()
 def add(db, fullnames, random, comment, password, force):
+    """Insert credential"""
     for fullname in fullnames:
         if random or db.config["RANDOM"]:
             password = genpass(db.config["PATTERN"])
@@ -561,6 +604,7 @@ def add(db, fullnames, random, comment, password, force):
 @click.option("-f", "--force", is_flag=True, help="Force removing credentials")
 @pass_db()
 def remove(db, fullnames, force):
+    """Remove credential"""
     for fullname in [f for f in fullnames if db.contains(db.query(f))]:
         if force or click.confirm("Remove {}".format(fullname)):
             db.remove(db.query(fullname))
@@ -576,6 +620,7 @@ def remove(db, fullnames, force):
 @click.option("-n", "--name", help="Credentials name")
 @pass_db(ensure_passphrase=True)
 def update(db, fullnames, random, comment, password, name, login, force):
+    """Update credential"""
     def prompt_update(credential, field, hidden=False):
         value = credential[field]
         prompt = "{} [{}]".format(field.title(), "*****" if hidden else value)
@@ -614,6 +659,7 @@ def update(db, fullnames, random, comment, password, name, login, force):
 @click.option("-t", "--timeout", type=int, default=0, help="Timeout to clear clipboard")
 @pass_db(ensure_passphrase=True)
 def copy(db, fullname, dest, timeout):
+    """Copy credential password"""
     credential = db.get(db.query(fullname))
     if credential:
         credential = db.decrypt(credential)
