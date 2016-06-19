@@ -19,6 +19,8 @@ import pyperclip
 import rstr
 import yaml
 
+from . import importers
+
 
 #############################
 # process
@@ -622,3 +624,29 @@ def copy(db, fullname, dest, timeout):
             copy_to_clipboard(password, timeout)
     else:
         raise click.ClickException("{} not found".format(fullname))
+
+
+@cli.command(name="import")
+@click.argument("filepath", type=click.Path(readable=True, exists=True))
+@click.option("-I", "--importer", type=click.Choice(importers.get_names()),
+              help="Specify an importer")
+@click.option("--cols", help="CSV expected columns", callback=validate_cols)
+@pass_db()
+def import_database(db, filepath, importer, cols):
+    """Import credentials from path"""
+    if cols:
+        importer = importers.get(name='csv')
+        kwargs = {'cols': cols}
+    else:
+        importer = importers.find_importer(filepath)
+        kwargs = {}
+
+    if importer:
+        credentials = importer.handle(filepath, **kwargs)
+        for cred in credentials:
+            encrypted = encrypt(cred['password'],
+                                recipient=db.config['recipient'],
+                                homedir=db.config['homedir'])
+            cred['password'] = encrypted
+        db.insert_multiple(credentials)
+        db.repo.commit(message=u'Imported credentials from {}'.format(filepath))
