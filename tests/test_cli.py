@@ -39,8 +39,8 @@ def test_ensure_passphrase_logs_error_when_decrypt_result_not_ok(mocker):
     with pytest.raises(click.ClickException):
         cli.ensure_passphrase('passphrase', config=config)
 
-    assert mock_logging.error.called
-    mock_logging.error.assert_called_once_with(message_full)
+    assert mock_logging.debug.called
+    mock_logging.debug.assert_called_once_with(message_full)
 
 
 def test_call_to_cli_exit_with_error_when_missing_dependencies(mocker):
