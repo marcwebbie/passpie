@@ -30,11 +30,11 @@ if sys.argv[-1] == 'tag':
 
 
 requirements = [
-    'click==6.2',
+    'click==6.6',
     'PyYAML==3.11',
     'tabulate==0.7.5',
-    'tinydb==3.1.2',
-    'rstr==2.2.3',
+    'tinydb==3.2.1',
+    'rstr==2.2.4',
 ]
 
 
