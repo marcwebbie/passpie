@@ -133,7 +133,7 @@ def mkdir(path):
 #############################
 
 HOMEDIR = os.path.expanduser("~")
-HOMEDIR_CONFIG_PATH = safe_join(HOMEDIR, ".passpieconfig")
+HOMEDIR_CONFIG_PATH = safe_join(HOMEDIR, ".passpierc")
 DEFAULT_CONFIG = {
     # Database
     'PATH': safe_join(HOMEDIR, ".passpie"),
@@ -143,7 +143,6 @@ DEFAULT_CONFIG = {
 
     # GPG
     'KEY_LENGTH': 4096,
-    'PASSPHRASE': None,
     'HOMEDIR': os.path.join(os.path.expanduser('~/.gnupg')),
     'RECIPIENT': None,
 
@@ -396,13 +395,18 @@ def make_fullname(login, name):
 
 class Database(TinyDB):
 
-    def __init__(self, config):
-        self.config = config
+    def __init__(self, config, passphrase=None):
+        self.passphrase = passphrase
         super(Database, self).__init__(
-            safe_join(self.config["PATH"], "credentials.json"),
+            safe_join(config["PATH"], "passpiedb.json"),
             default_table="credentials")
+        self.table("config").insert(config)
         self._setup_keyring()
         self.repo = Repo(self.config["PATH"], autopush=self.config["AUTOPUSH"])
+
+    @property
+    def config(self):
+        return self.table("config").all()[0]
 
     def _setup_keyring(self):
         public_key = self.table("keys").get(Query().name == "public")
@@ -411,8 +415,8 @@ class Database(TinyDB):
             homedir = setup_homedir(
                 public_key["content"],
                 private_key["content"])
-            self.config["HOMEDIR"] = homedir
-            self.config["RECIPIENT"] = get_default_recipient(homedir)
+            self.table("config").update({"HOMEDIR": homedir}, eids=[1])
+            self.table("config").update({"RECIPIENT": get_default_recipient(homedir)}, eids=[1])
 
     def ensure_passphrase(self):
         encrypted_dict = self.encrypt({"password": "OK"})
@@ -442,7 +446,7 @@ class Database(TinyDB):
             credential["password"],
             self.config["RECIPIENT"] or get_default_recipient(),
             self.config["HOMEDIR"],
-            self.config["PASSPHRASE"]
+            self.passphrase
         )
         return credential
 
@@ -482,14 +486,14 @@ def pass_db(ensure_passphrase=False, confirm_passphrase=False):
             @functools.wraps(f)
             def new_func(db, *args, **kwargs):
                 if ensure_passphrase:
-                    passphrase = db.config["PASSPHRASE"]
+                    passphrase = db.passphrase
                     if not passphrase:
                         passphrase = click.prompt(
                             "Passphrase",
                             hide_input=True,
                             confirmation_prompt=confirm_passphrase,
                         )
-                    db.config["PASSPHRASE"] = passphrase
+                    db.passphrase = passphrase
                     try:
                         db.ensure_passphrase()
                     except ValueError as e:
@@ -531,16 +535,14 @@ def cli(ctx, database, passphrase, autopush):
     config_overrides = {}
     if database:
         config_overrides["PATH"] = database
-    if passphrase:
-        config_overrides["PASSPHRASE"] = passphrase
     if autopush:
         config_overrides["AUTOPUSH"] = autopush
     config = config_load(config_overrides)
 
     if ctx.invoked_subcommand == "init":
-        ctx.obj = config
+        ctx.obj = {"config": config, "passphrase": passphrase}
     else:
-        db = Database(config=config)
+        db = Database(config=config, passphrase=passphrase)
         ctx.obj = db
 
 
@@ -550,8 +552,8 @@ def cli(ctx, database, passphrase, autopush):
 @click.pass_context
 def init(ctx, force, recipient):
     """Initialize database"""
-    config = ctx.obj
-    passphrase = config["PASSPHRASE"]
+    config = ctx.obj["config"]
+    passphrase = ctx.obj["passphrase"]
     if not passphrase:
         passphrase = click.prompt(
             "Passphrase",
@@ -574,12 +576,10 @@ def init(ctx, force, recipient):
         db.table("keys").insert({"name": "public", "content": public_key})
         db.table("keys").insert({"name": "private", "content": private_key})
 
-    config_path = os.path.join(db.config["PATH"], ".passpieconfig")
-    config_create(config_path, values=config_values)
     db.repo.init().commit("Initialize database")
 
 
-@cli.command(name="ls")
+@cli.command(name="list")
 @pass_db()
 def listdb(db):
     """List credentials as table"""
@@ -619,7 +619,7 @@ def add(db, fullnames, random, comment, password, force):
         db.repo.commit("Add credentials '{}'".format((", ").join(fullnames)))
 
 
-@cli.command(name="rm")
+@cli.command()
 @click.argument("fullnames", nargs=-1, callback=lambda ctx, param, val: list(val))
 @click.option("-f", "--force", is_flag=True, help="Force removing credentials")
 @pass_db()
