@@ -5,12 +5,11 @@ import ctypes
 import logging
 import platform
 import time
+import sys
 
 from . import process
-from ._compat import *
+from ._compat import unicode, is_python2, which
 
-
-text_type = unicode if is_python2() else str
 
 LINUX_COMMANDS = {
     'xsel': ['xsel', '-ibps'],
@@ -44,7 +43,7 @@ def _copy_windows(text, clear=0):
     GMEM_DDESHARE = 0x2000
     CF_UNICODETEXT = 13
     d = ctypes.windll  # cdll expects 4 more bytes in user32.OpenClipboard(0)
-    if not isinstance(text, text_type):
+    if not isinstance(text, unicode):
         text = text.decode('mbcs')
 
     d.user32.OpenClipboard(0 if is_python2() else None)
@@ -62,7 +61,7 @@ def _copy_cygwin(text, clear=0):
     GMEM_DDESHARE = 0x2000
     CF_UNICODETEXT = 13
     d = ctypes.cdll
-    if not isinstance(text, text_type):
+    if not isinstance(text, unicode):
         text = text.decode('mbcs')
     d.user32.OpenClipboard(0)
     d.user32.EmptyClipboard()

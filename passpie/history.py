@@ -1,9 +1,10 @@
 from functools import wraps
 import logging
+import os
 
 from . import process
 from .utils import which, tempdir
-from ._compat import *
+from ._compat import FileExistsError
 
 
 def ensure_git(return_value=None):

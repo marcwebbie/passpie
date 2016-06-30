@@ -3,7 +3,7 @@ import re
 
 from . import process
 from .utils import tempdir
-from ._compat import *
+from ._compat import unicode
 
 from passpie.utils import which
 

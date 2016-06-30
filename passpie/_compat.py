@@ -6,7 +6,7 @@ except ImportError:
     from distutils.spawn import find_executable as _which
 
 try:
-    basestring
+    basestring = basestring
 except NameError:
     basestring = str
 
