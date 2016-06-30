@@ -50,7 +50,7 @@ class PasspieStorage(Storage):
         for eid, cred in data["_default"].items():
             credpath = self.make_credpath(cred["name"], cred["login"])
             with mkdir_open(credpath, "w") as f:
-                f.write(yaml.dump(dict(cred), default_flow_style=False))
+                f.write(yaml.safe_dump(dict(cred), default_flow_style=False))
 
 
 class Database(TinyDB):
