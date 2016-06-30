@@ -33,7 +33,7 @@ def ensure_passphrase(passphrase, config):
             config['recipient'],
             config['homedir'],
         )
-        logging.error(message_full)
+        logging.debug(message_full)
         raise click.ClickException(click.style(message, fg='red'))
 
 
@@ -46,9 +46,13 @@ def logging_exception(exceptions=[Exception]):
             except (click.ClickException, click.Abort):
                 raise
             except tuple(exceptions) as e:
-                if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
+                logging_level = logging.getLogger().getEffectiveLevel()
+                if logging_level == logging.DEBUG:
                     raise
-                logging.error(str(e))
+                elif logging_level == logging.CRITICAL:
+                    pass
+                else:
+                    logging.error(str(e))
                 sys.exit(1)
         return wrapper
     return decorator
