@@ -64,9 +64,9 @@ Copyright (c) 2014-2016 Marcwebbie, <http://github.com/marcwebbie>
 Full license here: `LICENSE <https://github.com/marcwebbie/passpie/blob/master/LICENSE>`_
 
 
-.. |Build Status| image:: http://img.shields.io/travis/marcwebbie/passpie.svg?style=flat-square
+.. |Build Status| image:: http://img.shields.io/travis/marcwebbie/passpie/master.svg?style=flat-square
    :target: https://travis-ci.org/marcwebbie/passpie
-.. |Windows Build Status| image:: https://img.shields.io/appveyor/ci/marcwebbie/passpie.svg?style=flat-square&label=windows%20build
+.. |Windows Build Status| image:: https://img.shields.io/appveyor/ci/marcwebbie/passpie/master.svg?style=flat-square&label=windows%20build
    :target: https://ci.appveyor.com/project/marcwebbie/passpie
 .. |Coverage| image:: http://img.shields.io/coveralls/marcwebbie/passpie.svg?style=flat-square
    :target: https://coveralls.io/r/marcwebbie/passpie
