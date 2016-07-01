@@ -53,7 +53,7 @@ def read(path, filename='.config'):
     except yaml.scanner.ScannerError as e:
         logging.error(u'Malformed user configuration file: {}'.format(e))
         return {}
-    return configuration
+    return configuration or {}
 
 
 def create(path, defaults={}, filename='.config'):
