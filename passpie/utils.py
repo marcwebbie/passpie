@@ -49,3 +49,13 @@ def tempdir():
 def touch(path):
     with open(path, "w"):
         pass
+
+
+def setup_gpg_confs(path):
+    gpg_conf = os.path.join(path, 'gpg.conf')
+    agent_conf = os.path.join(path, 'gpg-agent.conf')
+
+    with open(gpg_conf, "w") as f:
+        f.write("pinentry-mode loopback\n")
+    with open(agent_conf, "w") as f:
+        f.write("allow-loopback-pinentry\n")

@@ -5,7 +5,7 @@ import re
 
 import yaml
 
-from .utils import tempdir
+from .utils import tempdir, setup_gpg_confs, which
 from .crypt import ensure_keys, import_keys, get_default_recipient
 
 
@@ -66,6 +66,8 @@ def setup_crypt(configuration):
     keys_filepath = ensure_keys(configuration['path'])
     if keys_filepath:
         configuration['homedir'] = tempdir()
+        if which('gpg2'):
+            setup_gpg_confs(configuration['homedir'])
         import_keys(keys_filepath, configuration['homedir'])
     if not configuration['recipient']:
         configuration['recipient'] = get_default_recipient(configuration['homedir'])
