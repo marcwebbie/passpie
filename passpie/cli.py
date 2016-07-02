@@ -545,6 +545,16 @@ def parse_remote(value):
         raise []
 
 
+def prompt_update(credential, field, hidden=False):
+    value = credential[field]
+    prompt = "{} [{}]".format(field.title(), "*****" if hidden else value)
+    return click.prompt(prompt,
+                        hide_input=hidden,
+                        confirmation_prompt=hidden,
+                        default=value,
+                        show_default=False)
+
+
 @click.group()
 @click.option("-D", "--database", help="Database path", envvar="PASSPIE_DATABASE")
 @click.option("-P", "--passphrase", help="Database passphrase", envvar="PASSPIE_PASSPHRASE")
@@ -665,45 +675,46 @@ def remove(db, fullnames, force):
 @cli.command()
 @click.argument("fullnames", nargs=-1, callback=lambda ctx, param, val: list(val))
 @click.option("-r", "--random", is_flag=True, help="Random password generation")
-@click.option("-f", "--force", is_flag=True, help="Force updating credentials")
+@click.option("-P", "--pattern", help="Random password pattern")
+@click.option("-C", "--copy", is_flag=True, help="Copy passwor to clipboard")
+@click.option("-y", "--yes", is_flag=True, help="Skip confirmation prompt")
 @click.option("-c", "--comment", help="Credentials comment")
 @click.option("-p", "--password", help="Credentials password")
 @click.option("-l", "--login", help="Credentials login")
 @click.option("-n", "--name", help="Credentials name")
 @pass_db(ensure_passphrase=True)
-def update(db, fullnames, random, comment, password, name, login, force):
+def update(db, fullnames, random, pattern, copy, comment, password, name, login, yes):
     """Update credential"""
-    def prompt_update(credential, field, hidden=False):
-        value = credential[field]
-        prompt = "{} [{}]".format(field.title(), "*****" if hidden else value)
-        return click.prompt(prompt,
-                            hide_input=hidden,
-                            confirmation_prompt=hidden,
-                            default=value,
-                            show_default=False)
-
-    updated = False
+    updated = []
     for fullname in [f for f in fullnames if db.contains(db.query(f))]:
-        if force is False and not click.confirm("Update {}".format(fullname)):
-            continue
+        if yes is True or click.confirm("Update {}".format(fullname)):
+            cred = db.get(db.query(fullname))
+            values = {}
+            if login:
+                values["login"] = login
+            if name:
+                values["name"] = name
+            if password:
+                values["password"] = password
+            if comment:
+                values["comment"] = comment
+            if random:
+                values["password"] = genpass(pattern or db.config["PATTERN"])
 
-        cred = db.get(db.query(fullname))
-        login = login if login is not None else prompt_update(cred, "login")
-        name = name if name is not None else prompt_update(cred, "name")
-        password = password if password is not None else prompt_update(cred, "password", hidden=True)
-        comment = comment if comment is not None else prompt_update(cred, "comment")
+            if not values:
+                values["login"] = prompt_update(cred, "login")
+                values["name"] = prompt_update(cred, "name")
+                values["password"] = prompt_update(cred, "password", hidden=True)
+                values["comment"] = prompt_update(cred, "comment")
 
-        values = {
-            "login": login,
-            "name": name,
-            "password": password,
-            "comment": comment,
-        }
-        db.update(values, db.query(fullname))
-        updated = True
+            db.update(values, db.query(fullname))
+            updated.append(fullname)
 
     if updated:
-        db.repo.commit("Remove credentials '{}'".format((", ").join(fullnames)))
+        db.repo.commit("Update credentials '{}'".format((", ").join(fullnames)))
+
+        if copy:
+            copy_to_clipboard(cred["password"], db.config["COPY_TIMEOUT"])
 
 
 @cli.command()
