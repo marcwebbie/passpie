@@ -687,6 +687,7 @@ def update(db, fullnames, random, comment, password, name, login, force):
 def copy(db, fullname, dest, timeout):
     """Copy credential password"""
     credential = db.get(db.query(fullname))
+    timeout = timeout or db.config["COPY_TIMEOUT"]
     if credential:
         credential = db.decrypt(credential)
         password = credential["password"]
