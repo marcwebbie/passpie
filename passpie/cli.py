@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from contextlib import contextmanager
 from copy import deepcopy
 from collections import namedtuple, OrderedDict
 from subprocess import Popen, PIPE
@@ -81,6 +82,10 @@ def safe_join(*paths):
     return os.path.join(*[os.path.expanduser(p) for p in paths])
 
 
+def yaml_dump(data):
+    return yaml.safe_dump(data, default_flow_style=False)
+
+
 def genpass(pattern):
     """generates a password with random chararcters
     examples:
@@ -128,6 +133,13 @@ def mkdir(path):
             raise
 
 
+@contextmanager
+def mkdir_open(path, mode):
+    mkdir(os.path.dirname(path))
+    with open(path, mode) as fd:
+        yield fd
+
+
 #############################
 # configuration
 #############################
@@ -145,27 +157,39 @@ DEFAULT_CONFIG = {
     'KEY_LENGTH': 4096,
     'HOMEDIR': os.path.join(os.path.expanduser('~/.gnupg')),
     'RECIPIENT': None,
+    'KEYS': {
+        'PUBLIC': "",
+        'PRIVATE': "",
+    },
 
     # Table
-    'TABLE_FORMAT': 'simple',
+    'TABLE_FORMAT': 'fancy_grid',
     'TABLE_SHOW_PASSWORD': False,
     'TABLE_HIDDEN_STRING': u'********',
-    'TABLE_FIELDS': ['name', 'login', 'password', 'comment'],
-    'TABLE_STYLE': {'login': {"fg": 'green'}, 'name': {"fg": 'yellow'}},
+    'TABLE_FIELDS': ('name', 'login', 'password', 'comment'),
+    'TABLE_STYLE': {
+        'login': {"fg": 'green'},
+        'name': {"fg": 'yellow'}
+    },
 
     # Credentials
     'COPY_TIMEOUT': 0,
     'PATTERN': "[a-zA-Z0-9=+_*!?&%$# ]{32}",
-    'RANDOM': True,
+    'RANDOM': False,
 }
 
 
 def config_from_file(path):
-    cfg = {}
-    if os.path.isfile(path):
+    try:
         with open(path) as f:
             cfg = yaml.safe_load(f.read())
-    return cfg
+    except IOError:
+        logging.debug(u'config file "{}" not found'.format(path))
+        return {}
+    except yaml.scanner.ScannerError as e:
+        logging.error(u'Malformed user configuration file: {}'.format(e))
+        return {}
+    return cfg or {}
 
 
 def config_create(path, values={}):
@@ -175,9 +199,9 @@ def config_create(path, values={}):
 
 def config_load(overrides):
     cfg = deepcopy(DEFAULT_CONFIG)
-    cfg.update(config_from_file(safe_join(HOMEDIR, ".passpieconfig")))
+    cfg.update(config_from_file(safe_join(HOMEDIR, ".config")))
     cfg.update(overrides)
-    cfg.update(config_from_file(safe_join(cfg["PATH"], ".passpieconfig")))
+    cfg.update(config_from_file(safe_join(cfg["PATH"], ".config")))
     return cfg
 
 
@@ -398,25 +422,20 @@ class Database(TinyDB):
     def __init__(self, config, passphrase=None):
         self.passphrase = passphrase
         super(Database, self).__init__(
-            safe_join(config["PATH"], "passpiedb.json"),
+            safe_join(config["PATH"], "credentials.json"),
             default_table="credentials")
-        self.table("config").insert(config)
+        self.config = config
         self._setup_keyring()
         self.repo = Repo(self.config["PATH"], autopush=self.config["AUTOPUSH"])
 
-    @property
-    def config(self):
-        return self.table("config").all()[0]
-
     def _setup_keyring(self):
-        public_key = self.table("keys").get(Query().name == "public")
-        private_key = self.table("keys").get(Query().name == "private")
+        public_key = self.config["KEYS"]["PUBLIC"]
+        private_key = self.config["KEYS"]["PRIVATE"]
         if public_key and private_key:
-            homedir = setup_homedir(
-                public_key["content"],
-                private_key["content"])
-            self.table("config").update({"HOMEDIR": homedir}, eids=[1])
-            self.table("config").update({"RECIPIENT": get_default_recipient(homedir)}, eids=[1])
+            homedir = setup_homedir(public_key, private_key)
+            recipient = get_default_recipient(homedir)
+            self.config["HOMEDIR"] = homedir
+            self.config["RECIPIENT"] = recipient
 
     def ensure_passphrase(self):
         encrypted_dict = self.encrypt({"password": "OK"})
@@ -558,23 +577,31 @@ def init(ctx, force, recipient):
         passphrase = click.prompt(
             "Passphrase",
             hide_input=True,
+            confirmation_prompt=True,
         )
 
-    if os.path.isdir(config["PATH"]) and not force:
-        msg = "Path '{}' exists [--force] to overwrite".format(config["PATH"])
-        raise click.ClickException(msg)
-    elif os.path.isdir(config["PATH"]):
-        shutil.rmtree(config["PATH"])
+    db_path = config["PATH"]
 
-    mkdir(config["PATH"])
+    if os.path.isdir(db_path) and not force:
+        msg = "Path '{}' exists [--force] to overwrite".format(db_path)
+        raise click.ClickException(msg)
+    elif os.path.isdir(db_path):
+        shutil.rmtree(db_path)
+
+    mkdir(db_path)
     db = Database(config)
+
     config_values = {}
     if recipient:
         config_values["recipient"] = recipient
     else:
         public_key, private_key = create_keys(passphrase)
-        db.table("keys").insert({"name": "public", "content": public_key})
-        db.table("keys").insert({"name": "private", "content": private_key})
+        config_values["KEYS"] = {}
+        config_values["KEYS"]["PUBLIC"] = public_key
+        config_values["KEYS"]["PRIVATE"] = private_key
+
+    with open(safe_join(db_path, ".config"), "w") as f:
+        f.write(yaml_dump(config_values))
 
     db.repo.init().commit("Initialize database")
 
