@@ -733,11 +733,12 @@ def import_database(db, filepath, importer, cols, force):
         db.repo.commit(message=u'Imported credentials from {}'.format(filepath))
 
 
-@cli.command(name="export", help="Export credentials in plain text")
+@cli.command(name="export")
 @click.argument("filepath", type=click.File("w"))
 @click.option("--json", "as_json", is_flag=True, help="Export as JSON")
 @pass_db(ensure_passphrase=True)
 def export_database(db, filepath, as_json):
+    """Export credentials in plain text"""
     credentials = (db.decrypt(c) for c in db.all())
     dict_content = OrderedDict()
     dict_content["handler"] = "passpie"
