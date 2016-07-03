@@ -12,7 +12,10 @@ import os
 import re
 import shutil
 import sys
+import tarfile
 import time
+import zipfile
+
 
 from tabulate import tabulate
 from tinydb import TinyDB, Query
@@ -86,6 +89,22 @@ def yaml_dump(data):
     return yaml.safe_dump(data, default_flow_style=False)
 
 
+def yaml_load(path, ensure=False):
+    yaml_content = {}
+    try:
+        with open(path) as f:
+            yaml_content = yaml.safe_load(f.read())
+    except IOError:
+        logging.debug(u'YAML file "{}" not found'.format(path))
+    except yaml.scanner.ScannerError as e:
+        raise click.ClickException(u'Malformed YAML file: {}'.format(e))
+
+    if not yaml_content and ensure is True:
+        raise RuntimeError("yaml content is empty and ensure is True")
+    else:
+        return yaml_content
+
+
 def genpass(pattern):
     """generates a password with random chararcters
     examples:
@@ -144,11 +163,11 @@ def mkdir_open(path, mode):
 # configuration
 #############################
 
-HOMEDIR = os.path.expanduser("~")
-HOMEDIR_CONFIG_PATH = safe_join(HOMEDIR, ".passpierc")
+HOME = os.path.expanduser("~")
+HOME_CONFIG_PATH = safe_join(HOME, ".passpierc")
 DEFAULT_CONFIG = {
     # Database
-    'PATH': safe_join(HOMEDIR, ".passpie"),
+    'PATH': "passpie.db",  # safe_join(HOMEDIR, ".passpie"),
     'GIT': True,
     'AUTOPUSH': 'origin/master',
     'ENCRYPTED_FIELDS': ['password'],
@@ -179,19 +198,6 @@ DEFAULT_CONFIG = {
 }
 
 
-def config_from_file(path):
-    try:
-        with open(path) as f:
-            cfg = yaml.safe_load(f.read())
-    except IOError:
-        logging.debug(u'config file "{}" not found'.format(path))
-        return {}
-    except yaml.scanner.ScannerError as e:
-        logging.error(u'Malformed user configuration file: {}'.format(e))
-        return {}
-    return cfg or {}
-
-
 def config_create(path, values={}):
     with open(path, "w") as f:
         f.write(yaml.safe_dump(values, default_flow_style=False))
@@ -199,9 +205,8 @@ def config_create(path, values={}):
 
 def config_load(overrides):
     cfg = deepcopy(DEFAULT_CONFIG)
-    cfg.update(config_from_file(safe_join(HOMEDIR, ".config")))
+    cfg.update(yaml_load(HOME_CONFIG_PATH))
     cfg.update(overrides)
-    cfg.update(config_from_file(safe_join(cfg["PATH"], ".config")))
     return cfg
 
 
@@ -378,7 +383,7 @@ def decrypt(data, recipient, homedir, passphrase):
     return response.std_out
 
 
-def setup_homedir(public_key, private_key):
+def create_homedir(public_key, private_key):
     homedir = mkdtemp()
     keysfile = NamedTemporaryFile("w")
     with open(keysfile.name, "w") as f:
@@ -417,25 +422,98 @@ def make_fullname(login, name):
     return fullname
 
 
+def find_database_root(path):
+    for root, dirs, files in os.walk(path):
+        if "credentials.json" or ".passpie" in files:
+            return root
+
+
+def archive(src, dest, format):
+    tfile = NamedTemporaryFile()
+    tpath = shutil.make_archive(tfile.name, format, src)
+    shutil.move(tpath, dest)
+
+
+def compression_type(filename):
+    magic_dict = {
+        "\x1f\x8b\x08": "gztar",
+        "\x42\x5a\x68": "bztar",
+        "\x50\x4b\x03\x04": "zip"
+    }
+
+    max_len = max(len(x) for x in magic_dict)
+
+    with open(filename) as f:
+        file_start = f.read(max_len)
+    for magic, filetype in magic_dict.items():
+        if file_start.startswith(magic):
+            return filetype
+
+
+def setup_path(path):
+    """Setup database path, extracting to temp dir if needed
+    1. `path` is a dir, set dbpath as dir and dbformat to "dir"
+    2. `path` is a tar, extract to a tempdir, set dbpath as tempdir
+       and dbformat to "tar"
+    2. `path` is a zip, extract to a tempdir, set dbpath as tempdir
+       and dbformat to "zip"
+    """
+    if os.path.isdir(path):
+        dbpath = path
+        dbformat = "dir"
+    elif os.path.isfile(path) and tarfile.is_tarfile(path):
+        dir_path = mkdtemp()
+        with tarfile.open(path) as tf:
+            tf.extractall(dir_path)
+            dbpath = find_database_root(dir_path)
+        dbformat = compression_type(path) or "tar"
+    elif os.path.isfile(path) and zipfile.is_zipfile(path):
+        dir_path = mkdtemp()
+        with zipfile.ZipFile(path) as zf:
+            zf.extractall(dir_path)
+            dbpath = find_database_root(dir_path)
+        dbformat = "zip"
+    else:
+        raise RuntimeError(
+            "Unrecognized database format in path: {}".format(path))
+    return dbpath, dbformat
+
+
+def setup_keyring(path, fallback_homedir):
+    keys = yaml_load(safe_join(path, "keys.yaml"))
+    if keys.get("PUBLIC") and keys.get("PRIVATE"):
+        homedir = mkdtemp()
+        keysfile = NamedTemporaryFile("w")
+        with open(keysfile.name, "w") as f:
+            f.write(keys["PUBLIC"])
+            f.write(keys["PRIVATE"])
+        import_keys(keysfile.name, homedir)
+    else:
+        homedir = fallback_homedir
+    return homedir
+
+
 class Database(TinyDB):
 
     def __init__(self, config, passphrase=None):
         self.passphrase = passphrase
-        super(Database, self).__init__(
-            safe_join(config["PATH"], "credentials.json"),
-            default_table="credentials")
         self.config = config
-        self._setup_keyring()
-        self.repo = Repo(self.config["PATH"], autopush=self.config["AUTOPUSH"])
+        self.src = config["PATH"]
+        self.path, self.format = setup_path(self.src)
+        super(Database, self).__init__(
+            safe_join(self.path, "credentials.json"),
+            default_table="credentials")
+        self.homedir = setup_keyring(self.path)
+        self.recipient = (
+            config["RECIPIENT"] or get_default_recipient(self.homedir))
+        self.repo = Repo(self.path, autopush=self.config["AUTOPUSH"])
 
-    def _setup_keyring(self):
-        public_key = self.config["KEYS"]["PUBLIC"]
-        private_key = self.config["KEYS"]["PRIVATE"]
-        if public_key and private_key:
-            homedir = setup_homedir(public_key, private_key)
-            recipient = get_default_recipient(homedir)
-            self.config["HOMEDIR"] = homedir
-            self.config["RECIPIENT"] = recipient
+    def archive(self, dest=None, format=None):
+        format = format or self.format or "gztar"
+        dest = dest or self.src or "passpie.db"
+        tfile = NamedTemporaryFile()
+        tpath = shutil.make_archive(tfile.name, format, self.path)
+        shutil.move(tpath, dest)
 
     def ensure_passphrase(self):
         encrypted_dict = self.encrypt({"password": "OK"})
@@ -454,8 +532,8 @@ class Database(TinyDB):
         credential = deepcopy(credential)
         credential["password"] = encrypt(
             credential["password"],
-            self.config["RECIPIENT"] or get_default_recipient(),
-            self.config["HOMEDIR"]
+            self.recipient,
+            self.homedir
         )
         return credential
 
@@ -463,8 +541,8 @@ class Database(TinyDB):
         credential = deepcopy(credential)
         credential["password"] = decrypt(
             credential["password"],
-            self.config["RECIPIENT"] or get_default_recipient(),
-            self.config["HOMEDIR"],
+            self.recipient,
+            self.homedir,
             self.passphrase
         )
         return credential
@@ -569,20 +647,30 @@ def cli(ctx, database, passphrase, autopush):
     config = config_load(config_overrides)
 
     if ctx.invoked_subcommand == "init":
-        ctx.obj = {"config": config, "passphrase": passphrase}
+        ctx.meta["config"] = config
+        ctx.meta["passphrase"] = passphrase
     else:
         db = Database(config=config, passphrase=passphrase)
         ctx.obj = db
 
+    @ctx.call_on_close
+    def close_database():
+        context = click.get_current_context()
+        if isinstance(context.obj, Database):
+            db = context.obj
+            db.archive()
+
 
 @cli.command()
+@click.argument("path", default="passpie.db")
 @click.option("-f", "--force", is_flag=True, help="Force initialization")
 @click.option("-r", "--recipient", help="Keyring recipient")
+@click.option("-ng", "--no-git", is_flag=True, help="Don't initialize a git repo")
 @click.pass_context
-def init(ctx, force, recipient):
+def init(ctx, path, force, recipient, no_git):
     """Initialize database"""
-    config = ctx.obj["config"]
-    passphrase = ctx.obj["passphrase"]
+    config = ctx.meta["config"]
+    passphrase = ctx.meta["passphrase"]
     if not passphrase:
         passphrase = click.prompt(
             "Passphrase",
@@ -590,30 +678,42 @@ def init(ctx, force, recipient):
             confirmation_prompt=True,
         )
 
-    db_path = config["PATH"]
+    if os.path.exists(path):
+        if force and os.path.isdir(path):
+            shutil.rmtree(config["PATH"])
+        if force and os.path.isfile(path):
+            os.remove(path)
+        else:
+            msg = "Path '{}' exists [--force] to overwrite".format(path)
+            raise click.ClickException(msg)
 
-    if os.path.isdir(db_path) and not force:
-        msg = "Path '{}' exists [--force] to overwrite".format(db_path)
-        raise click.ClickException(msg)
-    elif os.path.isdir(db_path):
-        shutil.rmtree(db_path)
-
-    mkdir(db_path)
-    db = Database(config)
-
+    tempdir = mkdtemp()
     config_values = {}
+    keyring_values = {}
     if recipient:
         config_values["recipient"] = recipient
+        keyring_values["PUBLIC"] = None
+        keyring_values["PRIVATE"] = None
     else:
         public_key, private_key = create_keys(passphrase)
-        config_values["KEYS"] = {}
-        config_values["KEYS"]["PUBLIC"] = public_key
-        config_values["KEYS"]["PRIVATE"] = private_key
+        keyring_values["PUBLIC"] = public_key
+        keyring_values["PRIVATE"] = private_key
 
-    with open(safe_join(db_path, ".config"), "w") as f:
+    # Create files: keys.yml, config.yml, .passpie
+    with open(safe_join(tempdir, "keys.yml"), "w") as f:
+        f.write(yaml_dump(keyring_values))
+    with open(safe_join(tempdir, "config.yml"), "w") as f:
         f.write(yaml_dump(config_values))
+    with open(safe_join(tempdir, ".passpie"), "w"):
+        pass
 
-    db.repo.init().commit("Initialize database")
+    if no_git or config["GIT"] is False:
+        # Don't create a git repo
+        pass
+    else:
+        repo = Repo(tempdir)
+        repo.init().commit("Initialize database")
+    archive(src=tempdir, dest=path, format="tar")
 
 
 @cli.command(name="list")
