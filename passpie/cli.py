@@ -790,7 +790,7 @@ def init(ctx, path, force, recipient, no_git):
 def listdb(db):
     """List credentials as table"""
     table = Table(db.config)
-    if db.contains():
+    if len(db):
         click.echo(table.render(db.all()))
 
 
