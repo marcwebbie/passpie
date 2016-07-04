@@ -26,6 +26,7 @@ import rstr
 import yaml
 
 from . import importers
+from ._compat import FileExistsError
 
 
 #############################
@@ -33,6 +34,8 @@ from . import importers
 #############################
 
 DEVNULL = open(os.devnull, 'w')
+
+Response = namedtuple("Response", "cmd std_out std_err returncode")
 
 
 class Proc(Popen):
@@ -53,7 +56,6 @@ class Proc(Popen):
 
 
 def run(*args, **kwargs):
-    Response = namedtuple("Response", "cmd std_out std_err returncode")
     data = kwargs.pop('data', None)
     kwargs.setdefault('shell', False)
     kwargs.setdefault('pipe', True)

@@ -1,3 +1,5 @@
+import random
+
 import pytest
 from passpie.cli import Repo, clone, parse_remote
 

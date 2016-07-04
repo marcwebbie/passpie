@@ -182,3 +182,17 @@ def irunner_with_db(irunner):
     irunner.invoke(cli, ["--passphrase", "p", "init"])
     irunner.credentials = credentials
     yield irunner
+
+
+@pytest.fixture
+def mock_run(mocker):
+    return mocker.patch('passpie.cli.run')
+
+
+@pytest.fixture
+def mock_open():
+    try:
+        from mock import mock_open as mopen
+    except:
+        from unittest.mock import mock_open as mopen
+    return mopen()
