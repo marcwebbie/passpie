@@ -8,7 +8,6 @@ import yaml
 
 from passpie.importers import find_importer, BaseImporter, get_instances
 from passpie.importers.default_importer import DefaultImporter
-from passpie.importers.pysswords_importer import PysswordsImporter
 
 
 def mock_open():
