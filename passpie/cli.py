@@ -595,19 +595,35 @@ class Database(TinyDB):
 #############################
 # git
 #############################
+def ensure_git(f):
+    @functools.wraps(f)
+    def wrapper(self, *args, **kwargs):
+        if not which("git"):
+            logging.debug("git not found. -- mocking call --")
+        elif not os.path.exists(safe_join(self.path, ".git")):
+            logging.debug("git repository not found. -- mocking call --")
+        else:
+            return f(self, *args, **kwargs)
+        return self
+    return wrapper
+
+
 class Repo(object):
 
     def __init__(self, path):
         self.path = path
 
+    @ensure_git
     def init(self):
         run(["git", "init"], cwd=self.path)
         return self
 
+    @ensure_git
     def push(self, remote="origin", branch="master"):
         run(["git", "push", remote, branch], cwd=self.path)
         return self
 
+    @ensure_git
     def commit(self, message):
         run(["git", "add", "."], cwd=self.path)
         run(["git", "commit", "-m", message], cwd=self.path)
