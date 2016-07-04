@@ -218,3 +218,25 @@ def test_cli_add_credential_with_no_option_prompts_password(irunner_with_db, moc
     assert result.exit_code == 0
     assert mock_prompt.called
     mock_prompt.assert_called_once_with("Password", confirmation_prompt=True, hide_input=True)
+
+
+def test_cli_config_without_arguments_prints_config(irunner_with_db, mocker):
+    result = irunner_with_db.invoke(cli, ["config"])
+    assert result.exit_code == 0
+    assert irunner_with_db.db.config["PATH"] in result.output
+    assert irunner_with_db.db.config["TABLE_FORMAT"] in result.output
+
+
+def test_cli_config_with_name_and_value_arguments_sets_config(irunner_with_db, mocker):
+    set_result = irunner_with_db.invoke(cli, ["config", "TABLE_FORMAT", "new_table_format"])
+    result = irunner_with_db.invoke(cli, ["config"])
+    assert set_result.exit_code == 0
+    assert result.exit_code == 0
+    assert "TABLE_FORMAT: new_table_format" in result.output
+
+
+def test_cli_config_with_name_and_value_arguments_prints(irunner_with_db, mocker):
+    irunner_with_db.invoke(cli, ["config", "TABLE_FORMAT", "new_table_format"])
+    result = irunner_with_db.invoke(cli, ["config", "TABLE_FORMAT"])
+    assert result.exit_code == 0
+    assert "TABLE_FORMAT: new_table_format\n" == result.output

@@ -560,9 +560,15 @@ class Database(TinyDB):
     def archive(self, dest=None, format=None):
         format = format or find_source_format(self.src) or "gztar"
         dest = dest or self.src or "passpie.db"
+        config_values = {k: v for k, v in self.config.items()
+                         if k not in ["homedir"] and DEFAULT_CONFIG[k] != v}
+        config_create(safe_join(self.path, "config.yml"), config_values)
         tfile = NamedTemporaryFile()
         tpath = shutil.make_archive(tfile.name, format, self.path)
         shutil.move(tpath, dest)
+
+    def config_set(self, name, value):
+        self.config[name] = value
 
     def ensure_passphrase(self):
         if self.passphrase is None:
@@ -802,10 +808,20 @@ def listdb(db):
 
 
 @cli.command(name="config")
+@click.argument("name", required=False)
+@click.argument("value", required=False)
 @pass_db()
-def configdb(db):
+def configdb(db, name, value):
     """Configuration settings"""
-    pass
+    if name and db.config.get(name):
+        if value:
+            db.config_set(name, value)
+            db.archive()
+            return
+        click.echo("{}: {}".format(name, db.config[name]))
+        return
+
+    click.echo(yaml_dump(db.config))
 
 
 @cli.command()

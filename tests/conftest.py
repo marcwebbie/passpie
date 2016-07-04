@@ -6,7 +6,7 @@ from click.testing import CliRunner
 import pytest
 import yaml
 
-from passpie.cli import cli
+from passpie.cli import cli, Database, config_load
 
 
 MOCK_PUBLIC_KEY = """-----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -180,6 +180,7 @@ def irunner_with_db(irunner):
             return content["credentials"].values()
 
     irunner.invoke(cli, ["--passphrase", "p", "init"])
+    irunner.db = Database(config=config_load({}), passphrase="p")
     irunner.credentials = credentials
     yield irunner
 
