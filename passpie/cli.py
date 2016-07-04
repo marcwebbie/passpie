@@ -968,4 +968,4 @@ def export_database(db, filepath, as_json):
 def git(db, command):
     """Git commands"""
     cmd = ["git"] + list(command)
-    run(cmd, cwd=db.config["PATH"], pipe=False)
+    run(cmd, cwd=db.path, pipe=False)
