@@ -206,7 +206,7 @@ DEFAULT_CONFIG = {
 
 def config_create(path, values={}):
     with open(path, "w") as f:
-        f.write(yaml.safe_dump(values, default_flow_style=False))
+        f.write(yaml_dump(values))
 
 
 def config_load(overrides):
