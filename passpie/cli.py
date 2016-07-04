@@ -595,24 +595,37 @@ class Database(TinyDB):
 #############################
 class Repo(object):
 
-    def __init__(self, path, autopush=None):
+    def __init__(self, path):
         self.path = path
-        self.autopush = parse_remote(autopush) if autopush else ["origin", "master"]
 
     def init(self):
         run(["git", "init"], cwd=self.path)
         return self
 
-    def push(self):
-        run(["git", "push"] + list(self.autopush), cwd=self.path)
+    def push(self, remote="origin", branch="master"):
+        run(["git", "push", remote, branch], cwd=self.path)
         return self
 
     def commit(self, message):
         run(["git", "add", "."], cwd=self.path)
         run(["git", "commit", "-m", message], cwd=self.path)
-        if self.autopush:
-            self.push()
         return self
+
+
+def parse_remote(arg):
+    origin, branch = arg.split("/")
+    return origin, branch
+
+
+def clone(url, dest=None, depth=None):
+    if dest and os.path.exists(dest):
+        raise FileExistsError('Destination already exists: %s' % dest)
+    dest = dest if dest else mkdtemp()
+    cmd = ['git', 'clone', url, dest]
+    if depth:
+        cmd += ['--depth', depth]
+    run(cmd)
+    return dest
 
 
 #############################
@@ -657,14 +670,6 @@ def validate_cols(ctx, param, value):
             raise click.BadParameter('cols need to be in format col1,col2,col3')
         except AssertionError as e:
             raise click.BadParameter('missing mandatory column: {}'.format(e))
-
-
-def parse_remote(value):
-    try:
-        remote, branch = value.split('/')
-        return [remote, branch]
-    except ValueError:
-        raise []
 
 
 def prompt_update(credential, field, hidden=False):
