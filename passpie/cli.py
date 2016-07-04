@@ -652,8 +652,9 @@ def pass_db(ensure_passphrase=False, confirm_passphrase=False, ensure_exists=Tru
                         db.ensure_passphrase()
                     except ValueError as e:
                         raise click.ClickException("{}".format(e))
-                if ensure_exists and db.src is None:
-                    raise click.ClickException("Database not found at path")
+                if ensure_exists and db.path is None:
+                    raise click.ClickException(
+                        "Database not found at path: {}".format(db.src))
                 return f(db, *args, **kwargs)
             return new_func
         return click.make_pass_decorator(Database, ensure=True)(
