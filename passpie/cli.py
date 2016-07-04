@@ -19,6 +19,7 @@ import zipfile
 
 from tabulate import tabulate
 from tinydb import TinyDB, Query
+from tinydb.storages import MemoryStorage
 import click
 import pyperclip
 import rstr
@@ -458,16 +459,19 @@ def setup_path(path):
     2. `path` is a zip, extract to a tempdir, set dbpath as tempdir
        and dbformat to "zip"
     """
-    if os.path.isdir(path):
+    if not os.path.isfile(path):
+        dbpath = None
+        dbformat = None
+    elif os.path.isdir(path):
         dbpath = path
         dbformat = "dir"
-    elif os.path.isfile(path) and tarfile.is_tarfile(path):
+    elif tarfile.is_tarfile(path):
         dir_path = mkdtemp()
         with tarfile.open(path) as tf:
             tf.extractall(dir_path)
             dbpath = find_database_root(dir_path)
         dbformat = compression_type(path) or "tar"
-    elif os.path.isfile(path) and zipfile.is_zipfile(path):
+    elif zipfile.is_zipfile(path):
         dir_path = mkdtemp()
         with zipfile.ZipFile(path) as zf:
             zf.extractall(dir_path)
@@ -500,13 +504,19 @@ class Database(TinyDB):
         self.config = config
         self.src = config["PATH"]
         self.path, self.format = setup_path(self.src)
-        super(Database, self).__init__(
-            safe_join(self.path, "credentials.json"),
-            default_table="credentials")
-        self.homedir = setup_keyring(self.path)
-        self.recipient = (
-            config["RECIPIENT"] or get_default_recipient(self.homedir))
-        self.repo = Repo(self.path, autopush=self.config["AUTOPUSH"])
+        if self.path and self.format:
+            super(Database, self).__init__(
+                safe_join(self.path, "credentials.json"),
+                default_table="credentials")
+            self.homedir = setup_keyring(self.path, self.config["HOMEDIR"])
+            self.recipient = (
+                config["RECIPIENT"] or get_default_recipient(self.homedir))
+            self.repo = Repo(self.path, autopush=self.config["AUTOPUSH"])
+        else:
+            super(Database, self).__init__(
+                default_table="credentials",
+                storage=MemoryStorage
+            )
 
     def archive(self, dest=None, format=None):
         format = format or self.format or "gztar"
@@ -577,7 +587,7 @@ class Repo(object):
 # cli
 #############################
 
-def pass_db(ensure_passphrase=False, confirm_passphrase=False):
+def pass_db(ensure_passphrase=False, confirm_passphrase=False, ensure_exists=True):
     def decorator(func):
         def ensure_passphrase_wrapper(f):
             @functools.wraps(f)
@@ -595,6 +605,8 @@ def pass_db(ensure_passphrase=False, confirm_passphrase=False):
                         db.ensure_passphrase()
                     except ValueError as e:
                         raise click.ClickException("{}".format(e))
+                if ensure_exists and db.src is None:
+                    raise click.ClickException("Database not found at path")
                 return f(db, *args, **kwargs)
             return new_func
         return click.make_pass_decorator(Database, ensure=True)(
@@ -656,7 +668,8 @@ def cli(ctx, database, passphrase, autopush):
     @ctx.call_on_close
     def close_database():
         context = click.get_current_context()
-        if isinstance(context.obj, Database):
+        db = context.obj
+        if isinstance(db, Database) and db.path is not None:
             db = context.obj
             db.archive()
 
