@@ -504,20 +504,27 @@ def setup_path(path):
         raise RuntimeError("Database is missing required files".format(path))
 
 
-def setup_homedir(path):
-    try:
+def setup_homedir(path, default=None):
+    if path and os.path.exists(path):
         keys = yaml_load(safe_join(path, "keys.yml"))
-    except AttributeError:
-        return
 
-    if keys.get("PUBLIC") and keys.get("PRIVATE"):
-        homedir = mkdtemp()
-        keysfile = NamedTemporaryFile("w")
-        with open(keysfile.name, "w") as f:
-            f.write(keys["PUBLIC"])
-            f.write(keys["PRIVATE"])
-            import_keys(keysfile.name, homedir)
-        return homedir
+        if keys.get("PUBLIC") and keys.get("PRIVATE"):
+            homedir = mkdtemp()
+            keysfile = NamedTemporaryFile("w")
+            with open(keysfile.name, "w") as f:
+                f.write(keys["PUBLIC"])
+                f.write(keys["PRIVATE"])
+                import_keys(keysfile.name, homedir)
+            return homedir
+    return default
+
+
+def setup_config(path, default=None):
+    if path and os.path.exists(path):
+        config = deepcopy(default)
+        config.update(yaml_load(safe_join(path, "config.yml")))
+        return config
+    return default
 
 
 class Database(TinyDB):
@@ -535,12 +542,12 @@ class Database(TinyDB):
     REQUIRED_FILES = ("config.yml", ".passpie",)
 
     def __init__(self, config, passphrase=None):
-        self.config = config
         self.passphrase = passphrase
-        self.src = self.config["PATH"]
+        self.src = config["PATH"]
         self.path = setup_path(self.src)
-        self.repo = Repo(self.path) if self.path else None
-        self.homedir = setup_homedir(self.path) or self.config["HOMEDIR"]
+        self.config = setup_config(self.path, config)
+        self.repo = Repo(self.path)
+        self.homedir = setup_homedir(self.path, self.config["HOMEDIR"])
         self.recipient = (
             config["RECIPIENT"] or
             get_default_recipient(self.homedir) if self.homedir else None)
@@ -702,14 +709,14 @@ def prompt_update(credential, field, hidden=False):
 
 
 @click.group()
-@click.option("-D", "--database", help="Database path", envvar="PASSPIE_DATABASE")
+@click.option("-D", "--database", "dbsrc", help="Database path", envvar="PASSPIE_DATABASE")
 @click.option("-P", "--passphrase", help="Database passphrase", envvar="PASSPIE_PASSPHRASE")
 @click.option("-A", "--autopush", help="Autopush git [origin/master]", envvar="PASSPIE_AUTOPUSH")
 @click.pass_context
-def cli(ctx, database, passphrase, autopush):
+def cli(ctx, dbsrc, passphrase, autopush):
     config_overrides = {}
-    if database:
-        config_overrides["PATH"] = database
+    if dbsrc:
+        config_overrides["PATH"] = dbsrc
     if autopush:
         config_overrides["AUTOPUSH"] = autopush
     config = config_load(config_overrides)
@@ -792,6 +799,13 @@ def listdb(db):
     table = Table(db.config)
     if len(db):
         click.echo(table.render(db.all()))
+
+
+@cli.command(name="config")
+@pass_db()
+def configdb(db):
+    """Configuration settings"""
+    pass
 
 
 @cli.command()
