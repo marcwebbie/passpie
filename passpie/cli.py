@@ -435,7 +435,7 @@ def archive(src, dest, format):
     shutil.move(tpath, dest)
 
 
-def compression_type(filename):
+def find_compression_type(filename):
     magic_dict = {
         "\x1f\x8b\x08": "gztar",
         "\x42\x5a\x68": "bztar",
@@ -451,6 +451,21 @@ def compression_type(filename):
             return filetype
 
 
+def find_source_format(path):
+    if not os.path.isfile(path):
+        return None
+    elif os.path.isdir(path):
+        return "dir"
+    elif tarfile.is_tarfile(path):
+        return find_compression_type(path) or "tar"
+    elif zipfile.is_zipfile(path):
+        return "zip"
+
+
+def has_required_database_files(path):
+    return all(f in os.listdir(path) for f in Database.REQUIRED_FILES)
+
+
 def setup_path(path):
     """Setup database path, extracting to temp dir if needed
     1. `path` is a dir, set dbpath as dir and dbformat to "dir"
@@ -459,73 +474,87 @@ def setup_path(path):
     2. `path` is a zip, extract to a tempdir, set dbpath as tempdir
        and dbformat to "zip"
     """
-    if not os.path.isfile(path):
-        dbpath = None
-        dbformat = None
-    elif os.path.isdir(path):
-        dbpath = path
-        dbformat = "dir"
-    elif tarfile.is_tarfile(path):
+    source_format = find_source_format(path)
+    if source_format is None:
+        return None
+
+    if source_format == "dir":
+        dir_path = path
+    elif source_format in ("tar", "gztar", "bztar"):
         dir_path = mkdtemp()
         with tarfile.open(path) as tf:
             tf.extractall(dir_path)
-            dbpath = find_database_root(dir_path)
-        dbformat = compression_type(path) or "tar"
-    elif zipfile.is_zipfile(path):
+    elif source_format == "zip":
         dir_path = mkdtemp()
         with zipfile.ZipFile(path) as zf:
             zf.extractall(dir_path)
-            dbpath = find_database_root(dir_path)
-        dbformat = "zip"
     else:
-        raise RuntimeError(
-            "Unrecognized database format in path: {}".format(path))
-    return dbpath, dbformat
+        path = os.path.abspath(path)
+        raise RuntimeError("Unrecognized database format in path: {}".format(path))
+
+    dir_path = find_database_root(dir_path)
+    if dir_path is not None and has_required_database_files(dir_path):
+        return dir_path
+    else:
+        raise RuntimeError("Database is missing required files".format(path))
 
 
-def setup_keyring(path, fallback_homedir):
-    keys = yaml_load(safe_join(path, "keys.yaml"))
+def setup_homedir(path):
+    try:
+        keys = yaml_load(safe_join(path, "keys.yml"))
+    except AttributeError:
+        return
+
     if keys.get("PUBLIC") and keys.get("PRIVATE"):
         homedir = mkdtemp()
         keysfile = NamedTemporaryFile("w")
         with open(keysfile.name, "w") as f:
             f.write(keys["PUBLIC"])
             f.write(keys["PRIVATE"])
-        import_keys(keysfile.name, homedir)
-    else:
-        homedir = fallback_homedir
-    return homedir
+            import_keys(keysfile.name, homedir)
+        return homedir
 
 
 class Database(TinyDB):
+    """ Database
+    self.config: Database passphrase
+    self.passphrase: Database passphrase
+    self.path: Path to temp extracted/copied database
+    self.src: Path to database source: passpie.db, ~/.passpiedir
+    self.recipient: Recipient name or fingerprint
+    self.repo: Repo object at self.path
+    self.homedir: Path to homedir: either created from imported
+                  keys.yml or config["HOMEDIR"]
+    """
+
+    REQUIRED_FILES = ("config.yml", ".passpie",)
 
     def __init__(self, config, passphrase=None):
-        self.passphrase = passphrase
         self.config = config
-        self.src = config["PATH"]
-        self.path, self.format = setup_path(self.src)
-        if self.path and self.format:
-            super(Database, self).__init__(
-                safe_join(self.path, "credentials.json"),
-                default_table="credentials")
-            self.homedir = setup_keyring(self.path, self.config["HOMEDIR"])
-            self.recipient = (
-                config["RECIPIENT"] or get_default_recipient(self.homedir))
-            self.repo = Repo(self.path, autopush=self.config["AUTOPUSH"])
+        self.passphrase = passphrase
+        self.src = self.config["PATH"]
+        self.path = setup_path(self.src)
+        self.repo = Repo(self.path) if self.path else None
+        self.homedir = setup_homedir(self.path) or self.config["HOMEDIR"]
+        self.recipient = (
+            config["RECIPIENT"] or
+            get_default_recipient(self.homedir) if self.homedir else None)
+        if self.path:
+            dbfile_path = safe_join(self.path, "credentials.json")
+            super(Database, self).__init__(dbfile_path, default_table="credentials")
         else:
-            super(Database, self).__init__(
-                default_table="credentials",
-                storage=MemoryStorage
-            )
+            super(Database, self).__init__(default_table="credentials", storage=MemoryStorage)
 
     def archive(self, dest=None, format=None):
-        format = format or self.format or "gztar"
+        format = format or find_source_format(self.src) or "gztar"
         dest = dest or self.src or "passpie.db"
         tfile = NamedTemporaryFile()
         tpath = shutil.make_archive(tfile.name, format, self.path)
         shutil.move(tpath, dest)
 
     def ensure_passphrase(self):
+        if self.passphrase is None:
+            raise ValueError("Passphrase not set")
         encrypted_dict = self.encrypt({"password": "OK"})
         decrypted_dict = self.decrypt(encrypted_dict)
         if decrypted_dict["password"] != "OK":
@@ -750,9 +779,8 @@ def add(db, fullnames, random, comment, password, force):
         if random or db.config["RANDOM"]:
             password = genpass(db.config["PATTERN"])
         elif password is None:
-            prompt = "Password for {}".format(password)
-            password = click.prompt(prompt, hide_input=True,
-                                    confirmation_prompt=True)
+            password = click.prompt(
+                "Password", hide_input=True, confirmation_prompt=True)
         login, name = split_fullname(fullname)
         credential = {
             "name": name,
@@ -760,9 +788,9 @@ def add(db, fullnames, random, comment, password, force):
             "password": password,
             "comment": comment,
         }
-        if db.contains(db.query(fullname)):
-            if force or click.confirm("Overwrite {}".format(fullname)):
-                db.update(credential, db.query(fullname))
+        if db.contains(db.query(fullname)) and not force:
+            msg = "Credential {} exists. `--force` to overwrite".format(fullname)
+            raise click.ClickException(msg)
         else:
             db.insert(db.encrypt(credential))
     else:

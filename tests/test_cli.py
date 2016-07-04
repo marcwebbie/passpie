@@ -19,6 +19,7 @@ import tarfile
 import tempfile
 
 import click
+import pytest
 import yaml
 
 from passpie.cli import cli
@@ -121,3 +122,99 @@ def test_cli_init_create_git_repo_when_config_git_is_true(irunner, mocker):
         assert result.exit_code == 0, result.output
         with tarfile.open("passpie.db") as tf:
             assert "./.git" in tf.getnames()
+
+
+def test_cli_add_credential_with_random_password(irunner_with_db, mocker):
+    """passpie --passphrase p add foo@bar --random
+    """
+    mocker.patch("passpie.cli.genpass", return_value="randompassword")
+    mock_encrypt = mocker.patch("passpie.cli.encrypt", return_value="encryptedrandompassword")
+    result = irunner_with_db.invoke(cli, ["add", "foo@bar",  "--random"])
+    credentials = irunner_with_db.credentials()
+    args, _ = mock_encrypt.call_args
+
+    assert result.exit_code == 0
+    assert args[0] == "randompassword"
+    assert any(
+        (e["login"] == "foo" and e["name"] == "bar" and e["password"] == "encryptedrandompassword")
+        for e in credentials
+    ), credentials
+
+
+def test_cli_add_credential_with_password_option(irunner_with_db, mocker):
+    """passpie --passphrase p add foo@bar --password password
+    """
+    mock_encrypt = mocker.patch("passpie.cli.encrypt", return_value="encryptedrandompassword")
+    result = irunner_with_db.invoke(cli, ["add", "foo@bar",  "--password", "password"])
+    credentials = irunner_with_db.credentials()
+    args, _ = mock_encrypt.call_args
+
+    assert result.exit_code == 0
+    assert args[0] == "password"
+    assert any(
+        (e["login"] == "foo" and e["name"] == "bar" and e["password"] == "encryptedrandompassword")
+        for e in credentials
+    ), credentials
+
+
+def test_cli_add_credential_with_comment_option(irunner_with_db, mocker):
+    """passpie --passphrase p add foo@bar --random --comment comment
+    """
+    mock_encrypt = mocker.patch("passpie.cli.encrypt", return_value="GPG pwd")
+    result = irunner_with_db.invoke(cli, ["add", "foo@bar",  "--random", "--comment", "comment"])
+    credentials = irunner_with_db.credentials()
+
+    assert result.exit_code == 0
+    assert any(
+        (e["login"] == "foo" and e["name"] == "bar" and e["comment"] == "comment")
+        for e in credentials
+    ), credentials
+
+
+def test_cli_add_multiple_credentials_with_random_passwords(irunner_with_db, mocker):
+    """passpie --passphrase p add foo@bar --random --comment comment
+    """
+    mock_encrypt = mocker.patch("passpie.cli.encrypt", return_value="GPG pwd")
+    result = irunner_with_db.invoke(cli, ["add", "foo@bar", "spam@egg", "foozy@bar", "--random"])
+    credentials = irunner_with_db.credentials()
+
+    assert result.exit_code == 0
+    assert {"login": "foo", "name": "bar", "password": "GPG pwd", "comment": ""} in credentials
+    assert {"login": "spam", "name": "egg", "password": "GPG pwd", "comment": ""} in credentials
+    assert {"login": "foozy", "name": "bar", "password": "GPG pwd", "comment": ""} in credentials
+
+
+def test_cli_add_multiple_credentials_with_random_passwords(irunner_with_db, mocker):
+    """passpie --passphrase p add foo@bar --random --comment comment
+    """
+    mock_encrypt = mocker.patch("passpie.cli.encrypt", return_value="GPG pwd")
+    result = irunner_with_db.invoke(cli, ["add", "foo@bar", "spam@egg", "foozy@bar", "--random"])
+    credentials = irunner_with_db.credentials()
+
+    assert result.exit_code == 0
+    assert {"login": "foo", "name": "bar", "password": "GPG pwd", "comment": ""} in credentials
+    assert {"login": "spam", "name": "egg", "password": "GPG pwd", "comment": ""} in credentials
+    assert {"login": "foozy", "name": "bar", "password": "GPG pwd", "comment": ""} in credentials
+
+
+def test_cli_add_existing_credential_errors_asking_for_force_option(irunner_with_db, mocker):
+    """passpie --passphrase p add foo@bar && passpie --passphrase p  add foo@bar
+    """
+    mock_encrypt = mocker.patch("passpie.cli.encrypt", return_value="GPG pwd")
+    irunner_with_db.invoke(cli, ["add", "foo@bar", "--random"])
+    result = irunner_with_db.invoke(cli, ["add", "foo@bar", "--random"])
+
+    assert result.exit_code != 0
+    assert result.output == "Error: Credential foo@bar exists. `--force` to overwrite\n"
+
+
+def test_cli_add_credential_with_no_option_prompts_password(irunner_with_db, mocker):
+    """passpie --passphrase p add foo@bar && passpie --passphrase p  add foo@bar
+    """
+    mock_prompt = mocker.patch("passpie.cli.click.prompt", return_value="pwd")
+    mock_encrypt = mocker.patch("passpie.cli.encrypt", return_value="GPG pwd")
+    result = irunner_with_db.invoke(cli, ["add", "foo@bar"], input="password\n")
+
+    assert result.exit_code == 0
+    assert mock_prompt.called
+    mock_prompt.assert_called_once_with("Password", confirmation_prompt=True, hide_input=True)

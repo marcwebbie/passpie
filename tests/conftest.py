@@ -1,7 +1,13 @@
 from functools import partial
+import os
+import tarfile
 
-import pytest
 from click.testing import CliRunner
+import pytest
+import yaml
+
+from passpie.cli import cli
+
 
 MOCK_PUBLIC_KEY = """-----BEGIN PGP PUBLIC KEY BLOCK-----
 
@@ -162,3 +168,17 @@ def irunner(mocker):
     with runner.isolated_filesystem():
         runner.invoke = partial(runner.invoke, catch_exceptions=False)
         yield runner
+
+
+@pytest.yield_fixture
+def irunner_with_db(irunner):
+    def credentials():
+        with tarfile.open("passpie.db") as tf:
+            member = tf.getmember("./credentials.json")
+            credentials_file = tf.extractfile(member)
+            content = yaml.load(credentials_file.read())
+            return content["credentials"].values()
+
+    irunner.invoke(cli, ["--passphrase", "p", "init"])
+    irunner.credentials = credentials
+    yield irunner
