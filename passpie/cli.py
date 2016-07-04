@@ -196,6 +196,9 @@ DEFAULT_CONFIG = {
     'COPY_TIMEOUT': 0,
     'PATTERN': "[a-zA-Z0-9=+_*!?&%$# ]{32}",
     'RANDOM': False,
+
+    # Cli
+    'VERBOSE': False,
 }
 
 
