@@ -11,6 +11,24 @@ Passpie is a command line tool to  manage passwords from the terminal with a col
 
 Password files are encrypted using `GnuPG <https://www.gnupg.org/>`_ and saved into yaml text files. Passpie supports **Linux**, **OSX** and **Windows**.
 
+
+Install
+========
+
+.. code-block::
+
+    pip install passpie
+
+Or if you are on a mac, install via `Homebrew <http://brew.sh>`_:
+
+.. code-block::
+
+    brew install passpie
+
+
+Quickstart
+==========
+
 What does it look like?  Here is an example of a simple Passpie usage::
 
     passpie init
@@ -33,25 +51,10 @@ Outputs::
 
     Check example remote passpie database: https://github.com/passpiedb.
 
-Install
-========
-
-.. code-block::
-
-    pip install passpie
-
-Or if you are on a mac, install via `Homebrew <http://brew.sh>`_:
-
-.. code-block::
-
-    brew install passpie
-
-
 Learn more
 ================
 
 Documentation: http://passpie.readthedocs.org
-Mailing list: https://groups.google.com/d/forum/passpie
 Gitter chat: https://gitter.im/marcwebbie/passpie
 FAQ: http://passpie.readthedocs.org/en/latest/faq.html
 
