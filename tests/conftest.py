@@ -1,4 +1,5 @@
 from functools import partial
+from tempfile import mkdtemp
 import os
 import tarfile
 
@@ -6,7 +7,7 @@ from click.testing import CliRunner
 import pytest
 import yaml
 
-from passpie.cli import cli, Database, config_load
+from passpie.cli import cli, Database, config_load, mkdir, safe_join
 
 
 MOCK_PUBLIC_KEY = """-----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -197,3 +198,13 @@ def mock_open():
     except:
         from unittest.mock import mock_open as mopen
     return mopen()
+
+
+@pytest.fixture
+def tempdir():
+    return mkdtemp()
+
+@pytest.fixture
+def tempdir_with_git(tempdir):
+    mkdir(safe_join(tempdir, ".git"))
+    return tempdir

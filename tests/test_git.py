@@ -1,7 +1,8 @@
+from functools import partial
 import random
 
 import pytest
-from passpie.cli import Repo, clone, parse_remote
+from passpie.cli import Repo, clone, parse_remote, ensure_git, mkdir, safe_join
 
 
 def test_git_init_creates_a_repository_on_path(mocker, mock_run):
@@ -46,30 +47,30 @@ def test_git_clone_calls_expected_command_with_repository_url_and_depth(mocker, 
     mock_run.assert_called_once_with(cmd)
 
 
-def test_git_push_calls_expected_command(mocker, mock_run):
+def test_git_push_calls_expected_command(mocker, mock_run, tempdir_with_git):
     cmd = ['git', 'push', 'origin', 'master']
-    repo = Repo('path')
+    repo = Repo(tempdir_with_git)
     repo.push()
 
     mock_run.assert_called_once_with(cmd, cwd=repo.path)
 
 
-def test_git_push_calls_expected_command_when_remote_branch_is_passed(mocker, mock_run):
+def test_git_push_calls_expected_command_when_remote_branch_is_passed(mocker, mock_run, tempdir_with_git):
     cmd = ['git', 'push', 'another_origin', 'another_branch']
-    repo = Repo('path')
+    repo = Repo(tempdir_with_git)
     repo.push(remote='another_origin', branch='another_branch')
 
     mock_run.assert_called_once_with(cmd, cwd=repo.path)
 
 
-def test_git_commit_creates_commit_with_message(mocker, mock_run):
+def test_git_commit_creates_commit_with_message(mocker, mock_run, tempdir_with_git):
     message = 'Initial commit'
     cmd = ['git', 'commit', '-m', message]
-    repo = Repo('path')
+    repo = Repo(tempdir_with_git)
     repo.commit(message)
 
-    call_to_add = ((['git', 'add', '.'],), {'cwd': 'path'})
-    call_to_commit = ((['git', 'commit', '-m', message],), {'cwd': 'path'})
+    call_to_add = ((['git', 'add', '.'],), {'cwd': tempdir_with_git})
+    call_to_commit = ((['git', 'commit', '-m', message],), {'cwd': tempdir_with_git})
     assert mock_run.call_args_list[0] == call_to_add
     assert mock_run.call_args_list[1] == call_to_commit
 
