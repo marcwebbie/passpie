@@ -39,13 +39,12 @@ What does it look like?  Here is an example of a simple Passpie usage::
 
 Outputs::
 
-    ╒═════════════╤═════════╤════════════╤═══════════╕
-    │ Name        │ Login   │ Password   │ Comment   │
-    ╞═════════════╪═════════╪════════════╪═══════════╡
-    │ example.com │ bar     │ *****      │           │
-    ├─────────────┼─────────┼────────────┼───────────┤
-    │ example.com │ foo     │ *****      │ Hello     │
-    ╘═════════════╧═════════╧════════════╧═══════════╛
+    ===========  =======  ==========  =========
+    Name         Login    Password    Comment
+    ===========  =======  ==========  =========
+    example.com  bar      ********
+    example.com  foo      ********    Hello
+    ===========  =======  ==========  =========
 
 ..
 
