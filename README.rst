@@ -53,9 +53,9 @@ Outputs::
 Learn more
 ================
 
-Documentation: http://passpie.readthedocs.org
-Gitter chat: https://gitter.im/marcwebbie/passpie
-FAQ: http://passpie.readthedocs.org/en/latest/faq.html
++ Documentation: http://passpie.readthedocs.org
++ Gitter chat: https://gitter.im/marcwebbie/passpie
++ FAQ: http://passpie.readthedocs.org/en/latest/faq.html
 
 
 Licence |License|
