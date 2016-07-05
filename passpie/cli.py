@@ -806,17 +806,17 @@ def listdb(db):
 
 
 @cli.command(name="config")
-@click.argument("name", required=False)
+@click.argument("name", required=False, callback=lambda c, p, val: val.upper())
 @click.argument("value", required=False)
 @pass_db()
 def configdb(db, name, value):
     """Configuration settings"""
-    if name and db.config.get(name):
+    if name and name in db.config:
         if value:
-            db.config_set(name, value)
+            db.config_set(name.upper(), value)
             db.archive()
             return
-        click.echo("{}: {}".format(name, db.config[name]))
+        click.echo("{}: {}".format(name.upper(), db.config[name]))
         return
 
     click.echo(yaml_dump(db.config))
