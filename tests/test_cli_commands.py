@@ -229,14 +229,14 @@ def test_cli_config_without_arguments_prints_config(irunner_with_db, mocker):
 
 def test_cli_config_with_name_and_value_arguments_sets_config(irunner_with_db, mocker):
     set_result = irunner_with_db.invoke(cli, ["config", "TABLE_FORMAT", "new_table_format"])
-    result = irunner_with_db.invoke(cli, ["config"])
+    result = irunner_with_db.invoke(cli, ["config","TABLE_FORMAT"])
     assert set_result.exit_code == 0
     assert result.exit_code == 0
-    assert "TABLE_FORMAT: new_table_format" in result.output
+    assert "TABLE_FORMAT: new_table_format\n" == result.output
 
 
-def test_cli_config_with_name_and_value_arguments_prints(irunner_with_db, mocker):
+def test_cli_config_with_name_lower_case_findsargument_prints_value(irunner_with_db, mocker):
     irunner_with_db.invoke(cli, ["config", "TABLE_FORMAT", "new_table_format"])
-    result = irunner_with_db.invoke(cli, ["config", "TABLE_FORMAT"])
+    result = irunner_with_db.invoke(cli, ["config", "table_format"])
     assert result.exit_code == 0
     assert "TABLE_FORMAT: new_table_format\n" == result.output
