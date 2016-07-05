@@ -456,15 +456,26 @@ def find_compression_type(filename):
             return filetype
 
 
+def is_git_url(path):
+    regex = re.compile(
+        r'((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?'
+    )
+    if path and regex.match(path):
+        return True
+    else:
+        return False
+
+
 def find_source_format(path):
-    if not os.path.isfile(path):
+    try:
+        if os.path.isdir(path):
+            return "dir"
+        elif tarfile.is_tarfile(path):
+            return find_compression_type(path) or "tar"
+        elif zipfile.is_zipfile(path):
+            return "zip"
+    except IOError:
         return None
-    elif os.path.isdir(path):
-        return "dir"
-    elif tarfile.is_tarfile(path):
-        return find_compression_type(path) or "tar"
-    elif zipfile.is_zipfile(path):
-        return "zip"
 
 
 def has_required_database_files(path):
@@ -472,36 +483,31 @@ def has_required_database_files(path):
 
 
 def setup_path(path):
-    """Setup database path, extracting to temp dir if needed
-    1. `path` is a dir, set dbpath as dir and dbformat to "dir"
-    2. `path` is a tar, extract to a tempdir, set dbpath as tempdir
-       and dbformat to "tar"
-    2. `path` is a zip, extract to a tempdir, set dbpath as tempdir
-       and dbformat to "zip"
-    """
     source_format = find_source_format(path)
+
     if source_format is None:
         return None
-
-    if source_format == "dir":
+    elif source_format == "dir":
         dir_path = path
+    elif source_format == "git":
+        dir_path = clone(path)
     elif source_format in ("tar", "gztar", "bztar"):
         dir_path = mkdtemp()
         with tarfile.open(path) as tf:
             tf.extractall(dir_path)
     elif source_format == "zip":
         dir_path = mkdtemp()
-        with zipfile.ZipFile(path) as zf:
+        with zipfile.open(path) as zf:
             zf.extractall(dir_path)
     else:
-        path = os.path.abspath(path)
-        raise RuntimeError("Unrecognized database format in path: {}".format(path))
+        raise RuntimeError("Unrecognized database format: {}".format(path))
 
+    # Find database root
     dir_path = find_database_root(dir_path)
     if dir_path is not None and has_required_database_files(dir_path):
         return dir_path
     else:
-        raise RuntimeError("Database is missing required files".format(path))
+        raise RuntimeError("Database is missing required files: {}".format(path))
 
 
 def setup_homedir(path, default=None):
@@ -528,17 +534,6 @@ def setup_config(path, default=None):
 
 
 class Database(TinyDB):
-    """ Database
-    self.config: Database passphrase
-    self.passphrase: Database passphrase
-    self.path: Path to temp extracted/copied database
-    self.src: Path to database source: passpie.db, ~/.passpiedir
-    self.recipient: Recipient name or fingerprint
-    self.repo: Repo object at self.path
-    self.homedir: Path to homedir: either created from imported
-                  keys.yml or config["HOMEDIR"]
-    """
-
     REQUIRED_FILES = ("config.yml", ".passpie",)
 
     def __init__(self, config, passphrase=None):
