@@ -17,7 +17,7 @@ from .history import clone
 from .validators import validate_config, validate_cols, validate_remote
 
 
-__version__ = "1.4.3"
+__version__ = "1.5.0"
 pass_db = click.make_pass_decorator(Database, ensure=False)
 
 
