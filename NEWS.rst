@@ -1,3 +1,12 @@
+Version 1.5.0
+-------------
++ **✔** Fix an issue with gpg2 (v2.1) where it does not respect --passphrase
++ **✔** Fix empty config file error
++ **✔** Fix tests on logging passphrase exception
++ **✔** Fix logging minor exceptions to level error
++ **✔** Upgrade dependencies
++ **✔** Update encrypted credential dump to cleaner yaml.safe_dump
+
 Version 1.4.3
 -------------
 + **✔** Fix update credential password encrypts empty string
