@@ -71,10 +71,44 @@ Or even better, without using the ``@`` notation::
     passpie update banks/mybank --random
 
 
+Configuration
+-------------
+
+For debugging, it might be useful to check actual passpie configuration for your commands::
+
+  passpie config
+
+Printing specific config::
+
+  passpie config RANDOM_PASSWORD
+
+Setting a new value in local config::
+
+  passpie config RANDOM_PASSWORD true
+
+Setting a new value in global config::
+
+  passpie config --global RANDOM_PASSWORD true
+
+ Configuration can also be overriden by environment_variables::
+
+   export PASSPIE_PUSH=origin/master
+   export PASSPIE_RANDOM_PASSWORD=true
+   export PASSPIE_RECIPIENT=jonh.doe@example.com
+
+..
+
+.. note::
+
+   If you have pygments installed, to have colored output on the config::
+
+     passpie config | pygmentize -l YAML
+
+
 Random Passwords
 ----------------
 
-Random password pattern can be set via ``genpass_pattern`` config.
+Random password pattern can be set via ``PASSWORD_PATTERN`` config.
 
 .. code-block:: bash
 
@@ -118,6 +152,16 @@ Copying passwords to clipboard
     # only one credential with name ``example.com`` should exist
     passpie copy example.com
 
+Copying passwords to clipboard with clear timeout
++++++++++++++++++++++++++++++++++++++++++++++++++
+
+To clear the clipboard automatically after a few seconds run copy with ``timeout`` option
+
+.. code-block:: bash
+
+    # Clear the clipbard after 5 seconds
+    passpie copy -t 5 foo@example.com
+
 
 Add or update and copy
 +++++++++++++++++++++++++++
@@ -152,53 +196,7 @@ Avoiding git initialization
 
     passpie init --no-git
 
-..
-
-Or using `configuration <http://passpie.readthedocs.org/en/latest/configuration.html>`_
-
-Logging
-+++++++
-
-To log changes to the database, use passpie command ``log``
-
-.. code-block:: bash
-
-    passpie log
-
-outputs:
-
-.. code:: text
-
-    [13] Updated foo@bar
-    [12] Updated foo@bar
-    [11] Reset database
-    [10] Removed foozy@bar
-    [9] Updated hello@world
-    [8] Added hello@world
-    [7] Added foozy@bar
-    [6] Updated test@github
-    [5] Added foozy@bazzy
-    [4] Updated test@github
-    [3] Added foo@bar
-    [2] Added spam@egg
-    [1] Added test@github
-    [0] Initialized database
-
-Resetting
-+++++++++
-
-If you want to go back to a previous version of the database history:
-``passpie --reset-to N`` where N is the index of the change.
-
-.. code-block:: bash
-
-    passpie log --reset-to 5
-
-..
-
-    *Attention*: this is an operation that destroys data. Use it with
-    caution. It is equivalent to do ``git reset --hard HEAD~N``
-
+or set ``GIT`` to ``false`` in the config
 
 Multiple Databases
 ------------------
@@ -246,8 +244,7 @@ Remote databases with git
 
     # Exporting environment variables
     export PASSPIE_DATABASE=https://foo@example.com/user/repo.git
-    export PASSPIE_AUTOPULL=origin/master
-    export PASSPIE_AUTOPUSH=origin/master
+    export PASSPIE_PUSH=origin/master
 
     # List remote credentials
     passpie
@@ -388,21 +385,19 @@ Passpie importers use a list of importers to to try and handle the paswords file
 
 Available importers:
 
+| ★ Passpie (default)
 | ★ Keepass (CSV)
-| ★ Pysswords
-| ★ Passpie
-| ★ CSV configurable importer
+| ★ CSV general importer
 
-::
+Importing default credentials exported using passpie::
 
-    passpie import passwords.txt
+  passpie import passwords.txt
 
 
 CSV configurable importer
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Importing from a CSV file. Specify ``--cols`` option to map columns to credential attributes.
-
 
 **Keepass** exported credentials as ``keepass.csv``::
 
@@ -424,21 +419,6 @@ Import credentials with::
 Import with::
 
   passpie import --cols "name,login,password,,comment" lastpass.csv
-
-
-Database status
----------------
-
-To have a status report on the database run:
-
-::
-
-    passpie status
-
-Available checkers are:
-
-- repeated passwords
-- old passwords
 
 
 GnuPG keys
@@ -464,7 +444,7 @@ Reseting and Purging Databases
 ::
 
     # Delete all credentials from database
-    passpie purge
+    passpie remove --all
 
     # Redefine passphrase and reencrypt all credentials from database
     passpie reset

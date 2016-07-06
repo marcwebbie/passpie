@@ -45,7 +45,7 @@
 <p>Passpie database is structured in a directory hierachy. Every credential
 is a <code class="docutils literal"><span class="pre">.pass</span></code> file inside a directory named after a credential group.</p>
 <p>An empty database would look like this:</p>
-<div class="code bash highlight-python"><div class="highlight"><pre>passpie --database /tmp/passpie init
+<div class="code bash highlight-python"><div class="highlight"><pre><span></span>passpie --database /tmp/passpie init
 
 tree /tmp/passpie -la
 # /tmp/passpie
@@ -53,7 +53,7 @@ tree /tmp/passpie -la
 </pre></div>
 </div>
 <p>After adding a new credential the database would look like this:</p>
-<div class="code bash highlight-python"><div class="highlight"><pre>passpie --database /tmp/passpie add octocat@github.com
+<div class="code bash highlight-python"><div class="highlight"><pre><span></span>passpie --database /tmp/passpie add octocat@github.com
 # Password: **********
 
 tree /tmp/passpie -la
@@ -65,7 +65,7 @@ tree /tmp/passpie -la
 </div>
 <p>If we add more credentials to group github.com. Directory structure
 would be:</p>
-<div class="code bash highlight-python"><div class="highlight"><pre>passpie --database /tmp/passpie add octocat2@github.com
+<div class="code bash highlight-python"><div class="highlight"><pre><span></span>passpie --database /tmp/passpie add octocat2@github.com
 # Password: **********
 
 tree /tmp/passpie -la
@@ -88,7 +88,7 @@ tree /tmp/passpie -la
 <h3>Dropbox<a class="headerlink" href="#dropbox" title="Permalink to this headline">¶</a></h3>
 <p>With default path <code class="docutils literal"><span class="pre">~/.passpie</span></code> and a Dropbox shared directory on path
 <code class="docutils literal"><span class="pre">~/Dropbox</span></code></p>
-<div class="highlight-python"><div class="highlight"><pre>mv ~/.passpie ~/Dropbox/passpie    # move passpie db to Dropbox
+<div class="highlight-python"><div class="highlight"><pre><span></span>mv ~/.passpie ~/Dropbox/passpie    # move passpie db to Dropbox
 ln -s ~/Dropbox/passpie ~/.passpie # make a link to the db
 </pre></div>
 </div>
@@ -97,7 +97,7 @@ ln -s ~/Dropbox/passpie ~/.passpie # make a link to the db
 <h3>Google Drive<a class="headerlink" href="#google-drive" title="Permalink to this headline">¶</a></h3>
 <p>With default path <code class="docutils literal"><span class="pre">~/.passpie</span></code> and a Google Drive shared directory on
 path <code class="docutils literal"><span class="pre">~/GoogleDrive</span></code></p>
-<div class="highlight-python"><div class="highlight"><pre>mv ~/.passpie ~/GoogleDrive/passpie   # move passpie db to Google Drive
+<div class="highlight-python"><div class="highlight"><pre><span></span>mv ~/.passpie ~/GoogleDrive/passpie   # move passpie db to Google Drive
 ln -s ~/GoogleDrive/passpie ~.passpie # make a link to the db
 </pre></div>
 </div>
@@ -107,7 +107,7 @@ ln -s ~/GoogleDrive/passpie ~.passpie # make a link to the db
 <h2>Why is it taking so long to initialize a database?<a class="headerlink" href="#why-is-it-taking-so-long-to-initialize-a-database" title="Permalink to this headline">¶</a></h2>
 <p>Sometimes it takes a long time because of entropy on the host machine. It was noticed a long time on an ubuntu server(even more if it is a virtual machine). You could try using <cite>haveged</cite> to generate enough entropy.</p>
 <p>On ubuntu:</p>
-<div class="highlight-python"><div class="highlight"><pre>sudo apt-get install haveged
+<div class="highlight-python"><div class="highlight"><pre><span></span>sudo apt-get install haveged
 </pre></div>
 </div>
 <blockquote>

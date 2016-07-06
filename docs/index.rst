@@ -1,7 +1,7 @@
 Welcome to Passpie
 ==================
 
-.. image:: ../images/passpie2.png
+.. image:: ./images/passpie2.png
     :align: center
     :width: 100%
 
@@ -55,8 +55,8 @@ Features
 .. _GitHub: https://github.com/marcwebbie/passpie
 
 
-Documentation Contents
-----------------------
+Documentation
+-------------
 
 This part of the documentation guides you through all of the passpie usage patterns.
 

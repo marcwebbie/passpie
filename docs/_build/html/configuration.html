@@ -44,143 +44,103 @@
 <p>global passpie configuration files lives in <code class="docutils literal"><span class="pre">~/.passpierc</span></code> while local configuration files lives in database directory as a <code class="docutils literal"><span class="pre">.config</span></code> file.</p>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="full-passpie-configuration-file">
-<h3>Full passpie configuration file<a class="headerlink" href="#full-passpie-configuration-file" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-yaml"><div class="highlight"><pre><span class="l l-Scalar l-Scalar-Plain">path</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">~/.passpie</span>
-<span class="l l-Scalar l-Scalar-Plain">homedir</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">~/.gnupg</span>
-<span class="l l-Scalar l-Scalar-Plain">autopull</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
-<span class="l l-Scalar l-Scalar-Plain">autopush</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
-<span class="l l-Scalar l-Scalar-Plain">copy_timeout</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
-<span class="l l-Scalar l-Scalar-Plain">extension</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">.pass</span>
-<span class="l l-Scalar l-Scalar-Plain">genpass_pattern</span><span class="p p-Indicator">:</span> <span class="s">&quot;[a-z]{5}</span><span class="nv"> </span><span class="s">[-_+=*&amp;%$#]{5}</span><span class="nv"> </span><span class="s">[A-Z]{5}&quot;</span>
-<span class="l l-Scalar l-Scalar-Plain">headers</span><span class="p p-Indicator">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">login</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">password</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">comment</span>
-<span class="l l-Scalar l-Scalar-Plain">aliases</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">st</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">status</span>
-  <span class="l l-Scalar l-Scalar-Plain">rm</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">remove</span>
-  <span class="l l-Scalar l-Scalar-Plain">ls</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">list</span>
-<span class="l l-Scalar l-Scalar-Plain">colors</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">login</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">green</span>
-  <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">yellow</span>
-<span class="l l-Scalar l-Scalar-Plain">key_length</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">4096</span>
-<span class="l l-Scalar l-Scalar-Plain">recipient</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
-<span class="l l-Scalar l-Scalar-Plain">repo</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="l l-Scalar l-Scalar-Plain">status_repeated_passwords_limit</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
-<span class="l l-Scalar l-Scalar-Plain">table_format</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">fancy_grid</span>
+<div class="section" id="full-config-file">
+<h3>Full config file<a class="headerlink" href="#full-config-file" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">COPY_TIMEOUT</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="l l-Scalar l-Scalar-Plain">DATABASE</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">passpie.db</span>
+<span class="l l-Scalar l-Scalar-Plain">GIT</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="l l-Scalar l-Scalar-Plain">HOMEDIR</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/Users/marc/.gnupg</span>
+<span class="l l-Scalar l-Scalar-Plain">KEY_LENGTH</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">4096</span>
+<span class="l l-Scalar l-Scalar-Plain">PASSWORD_PATTERN</span><span class="p p-Indicator">:</span> <span class="s">&#39;[a-zA-Z0-9=+_*!?&amp;%$#</span><span class="nv"> </span><span class="s">]{32}&#39;</span>
+<span class="l l-Scalar l-Scalar-Plain">PUSH</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="l l-Scalar l-Scalar-Plain">RANDOM_PASSWORD</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="l l-Scalar l-Scalar-Plain">RECIPIENT</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="l l-Scalar l-Scalar-Plain">TABLE_FIELDS</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">login</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">password</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">comment</span>
+<span class="l l-Scalar l-Scalar-Plain">TABLE_FORMAT</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">fancy_grid</span>
+<span class="l l-Scalar l-Scalar-Plain">TABLE_HIDDEN_STRING</span><span class="p p-Indicator">:</span> <span class="s">&#39;********&#39;</span>
+<span class="l l-Scalar l-Scalar-Plain">TABLE_STYLE</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">login</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">fg</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">green</span>
+  <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">fg</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">yellow</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="partial-configuration-file">
 <h3>Partial configuration file<a class="headerlink" href="#partial-configuration-file" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-yaml"><div class="highlight"><pre><span class="l l-Scalar l-Scalar-Plain">recipient</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">marcwebbie@example.com</span>
-<span class="l l-Scalar l-Scalar-Plain">copy_timeout</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
-<span class="l l-Scalar l-Scalar-Plain">extension</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">.gpg</span>
-<span class="l l-Scalar l-Scalar-Plain">table_format</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">rst</span>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">RECIPIENT</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">john.doe@example.com</span>
+<span class="l l-Scalar l-Scalar-Plain">COPY_TIMEOUT</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
+<span class="l l-Scalar l-Scalar-Plain">TABLE_FORMAT</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">rst</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="section" id="debugging">
-<h2>Debugging<a class="headerlink" href="#debugging" title="Permalink to this headline">¶</a></h2>
-<p>For debugging, it might be useful to check actual passpie configuration for your commands:</p>
-<div class="highlight-python"><div class="highlight"><pre># Global configuration found on ~/.passpierc
-passpie config global
-
-# Local configuration found on $PASSPIE_DATABASE/.config
-passpie config local
-</pre></div>
-</div>
-<div class="section" id="current-config">
-<h3>Current config<a class="headerlink" href="#current-config" title="Permalink to this headline">¶</a></h3>
-<p>Current configuration with all overriden variables:</p>
-<div class="highlight-python"><div class="highlight"><pre>passpie config current
-</pre></div>
-</div>
-<p>OR:</p>
-<div class="highlight-python"><div class="highlight"><pre>passpie config
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p>If you have pygments installed, to have colored output on the config:</p>
-<div class="last highlight-python"><div class="highlight"><pre>passpie config | pygmentize -l YAML
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="section" id="options">
-<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="path">
-<h2><code class="docutils literal"><span class="pre">path</span></code><a class="headerlink" href="#path" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="database">
+<h2><code class="docutils literal"><span class="pre">DATABASE</span></code><a class="headerlink" href="#database" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
-<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">~/.passpie</span></code></div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">passpie.db</span></code></div>
 <div class="line"><strong>Description:</strong> Path to default database.</div>
 <div class="line"><br /></div>
 </div>
 </div>
 <div class="section" id="homedir">
-<h2><code class="docutils literal"><span class="pre">homedir</span></code><a class="headerlink" href="#homedir" title="Permalink to this headline">¶</a></h2>
+<h2><code class="docutils literal"><span class="pre">HOMEDIR</span></code><a class="headerlink" href="#homedir" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
-<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">~/.gnupg</span></code></div>
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">null</span></code></div>
 <div class="line"><strong>Description:</strong> Path to default gnupg homedir.</div>
 <div class="line"><br /></div>
 </div>
 </div>
-<div class="section" id="autopull">
-<h2><code class="docutils literal"><span class="pre">autopull</span></code><a class="headerlink" href="#autopull" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="push">
+<h2><code class="docutils literal"><span class="pre">PUSH</span></code><a class="headerlink" href="#push" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">null</span></code></div>
-<div class="line"><strong>Description:</strong> Automatically pull changes from remote git repository.</div>
-<div class="line"><br /></div>
-</div>
-</div>
-<div class="section" id="autopush">
-<h2><code class="docutils literal"><span class="pre">autopush</span></code><a class="headerlink" href="#autopush" title="Permalink to this headline">¶</a></h2>
-<div class="line-block">
-<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">null</span></code></div>
-<div class="line"><strong>Description:</strong> Automatically pull changes from remote git repository.</div>
+<div class="line"><strong>Description:</strong> Automatically push changes from remote git repository.</div>
 <div class="line"><br /></div>
 </div>
 </div>
 <div class="section" id="recipient">
-<h2><code class="docutils literal"><span class="pre">recipient</span></code><a class="headerlink" href="#recipient" title="Permalink to this headline">¶</a></h2>
+<h2><code class="docutils literal"><span class="pre">RECIPIENT</span></code><a class="headerlink" href="#recipient" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">null</span></code></div>
 <div class="line"><strong>Description:</strong> GnuPG defaul recipient. This can be a fingerprint/emai/name.</div>
 <div class="line"><br /></div>
 </div>
-</div>
-<div class="section" id="extension">
-<h2><code class="docutils literal"><span class="pre">extension</span></code><a class="headerlink" href="#extension" title="Permalink to this headline">¶</a></h2>
-<div class="line-block">
-<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">.pass</span></code></div>
-<div class="line"><strong>Description:</strong> Password files extension</div>
-<div class="line"><br /></div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If <code class="docutils literal"><span class="pre">RECIPIENT</span></code> is not <code class="docutils literal"><span class="pre">null</span></code> user must also set <code class="docutils literal"><span class="pre">HOMEDIR</span></code></p>
 </div>
 </div>
 <div class="section" id="copy-timeout">
-<h2><code class="docutils literal"><span class="pre">copy_timeout</span></code><a class="headerlink" href="#copy-timeout" title="Permalink to this headline">¶</a></h2>
+<h2><code class="docutils literal"><span class="pre">COPY_TIMEOUT</span></code><a class="headerlink" href="#copy-timeout" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">0</span></code></div>
-<div class="line"><strong>Description:</strong> Automatically clear clipboard after n seconds</div>
+<div class="line"><strong>Description:</strong> Automatically clear clipboard N seconds after copy</div>
 <div class="line"><br /></div>
 </div>
 </div>
-<div class="section" id="genpass-pattern">
-<h2><code class="docutils literal"><span class="pre">genpass_pattern</span></code><a class="headerlink" href="#genpass-pattern" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="password-pattern">
+<h2><code class="docutils literal"><span class="pre">PASSWORD_PATTERN</span></code><a class="headerlink" href="#password-pattern" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">&quot;[a-z]{5}</span> <span class="pre">[-_+=*&amp;%$#]{5}</span> <span class="pre">[A-Z]{5}&quot;</span></code></div>
 <div class="line"><strong>Description:</strong> Regex pattern for password random generation</div>
 <div class="line"><br /></div>
 </div>
 </div>
+<div class="section" id="table-fields">
+<h2><code class="docutils literal"><span class="pre">TABLE_FIELDS</span></code><a class="headerlink" href="#table-fields" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">[&quot;name&quot;,</span> <span class="pre">&quot;login&quot;,</span> <span class="pre">&quot;password&quot;,</span> <span class="pre">&quot;comment&quot;]</span></code></div>
+<div class="line"><strong>Description:</strong> Tables fields to print</div>
+<div class="line"><br /></div>
+</div>
+</div>
 <div class="section" id="table-format">
-<h2><code class="docutils literal"><span class="pre">table_format</span></code><a class="headerlink" href="#table-format" title="Permalink to this headline">¶</a></h2>
+<h2><code class="docutils literal"><span class="pre">TABLE_FORMAT</span></code><a class="headerlink" href="#table-format" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">fancy_grid</span></code></div>
 <div class="line"><strong>Description:</strong> Render table format</div>
@@ -206,70 +166,23 @@ passpie config local
 </ul>
 </div>
 <div class="section" id="headers">
-<h2><code class="docutils literal"><span class="pre">headers</span></code><a class="headerlink" href="#headers" title="Permalink to this headline">¶</a></h2>
+<h2><code class="docutils literal"><span class="pre">HEADERS</span></code><a class="headerlink" href="#headers" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">[name,</span> <span class="pre">login,</span> <span class="pre">password,</span> <span class="pre">comments]</span></code></div>
 <div class="line"><strong>Description:</strong> Column names to show on table</div>
 <div class="line"><br /></div>
 </div>
 </div>
-<div class="section" id="hidden">
-<h2><code class="docutils literal"><span class="pre">hidden</span></code><a class="headerlink" href="#hidden" title="Permalink to this headline">¶</a></h2>
-<div class="line-block">
-<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">[password]</span></code></div>
-<div class="line"><strong>Description:</strong> Column names to hide values when printing. Uses <code class="docutils literal"><span class="pre">hidden_string</span></code> as replaced text</div>
-<div class="line"><br /></div>
-</div>
-</div>
-<div class="section" id="hidden-string">
-<h2><code class="docutils literal"><span class="pre">hidden_string</span></code><a class="headerlink" href="#hidden-string" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="password-hidden-string">
+<h2><code class="docutils literal"><span class="pre">PASSWORD_HIDDEN_STRING</span></code><a class="headerlink" href="#password-hidden-string" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">********</span></code></div>
 <div class="line"><strong>Description:</strong> Text to be used with <code class="docutils literal"><span class="pre">hidden</span></code> as replacement for hidden columns</div>
 <div class="line"><br /></div>
 </div>
 </div>
-<div class="section" id="colors">
-<h2><code class="docutils literal"><span class="pre">colors</span></code><a class="headerlink" href="#colors" title="Permalink to this headline">¶</a></h2>
-<div class="line-block">
-<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">{login:</span> <span class="pre">green,</span> <span class="pre">name:</span> <span class="pre">yellow}</span></code></div>
-<div class="line"><strong>Description:</strong> Table column colors</div>
-</div>
-<p>Supported color names:</p>
-<ul class="simple">
-<li>black (might be a gray)</li>
-<li>red</li>
-<li>green</li>
-<li>yellow (might be an orange)</li>
-<li>blue</li>
-<li>magenta</li>
-<li>cyan</li>
-<li>white (might be light gray)</li>
-<li>reset (reset the color code only)</li>
-</ul>
-</div>
-<div class="section" id="aliases">
-<h2><code class="docutils literal"><span class="pre">aliases</span></code><a class="headerlink" href="#aliases" title="Permalink to this headline">¶</a></h2>
-<div class="line-block">
-<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">{}</span></code></div>
-<div class="line"><strong>Description:</strong> Aliases to commands.</div>
-</div>
-<p>Example configuration:</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span class="l l-Scalar l-Scalar-Plain">aliases</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">st</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">status</span>
-  <span class="l l-Scalar l-Scalar-Plain">rm</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">remove</span>
-  <span class="l l-Scalar l-Scalar-Plain">a</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">add</span>
-  <span class="l l-Scalar l-Scalar-Plain">u</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">update</span>
-  <span class="l l-Scalar l-Scalar-Plain">l</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">log</span>
-</pre></div>
-</div>
-<p>We can then run our configuration with the short commands:</p>
-<div class="highlight-python"><div class="highlight"><pre>passpie rm foo@bar
-</pre></div>
-</div>
-</div>
 <div class="section" id="key-length">
-<h2><code class="docutils literal"><span class="pre">key_length</span></code><a class="headerlink" href="#key-length" title="Permalink to this headline">¶</a></h2>
+<h2><code class="docutils literal"><span class="pre">KEY_LENGTH</span></code><a class="headerlink" href="#key-length" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">4096</span></code></div>
 <div class="line"><strong>Description:</strong> AES encryption key length</div>
@@ -282,19 +195,12 @@ It is recommend to make a 2048 or 4096-bit key.</p>
 <p class="last">Also have a look at <a class="reference external" href="https://www.gnupg.org/gph/en/manual.html#AEN494">GnuPG documentation</a> on keys</p>
 </div>
 </div>
-<div class="section" id="repo">
-<h2><code class="docutils literal"><span class="pre">repo</span></code><a class="headerlink" href="#repo" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="git">
+<h2><code class="docutils literal"><span class="pre">GIT</span></code><a class="headerlink" href="#git" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">true</span></code></div>
 <div class="line"><strong>Description:</strong> Automatically create a git repository in database on initialization</div>
 <div class="line"><br /></div>
-</div>
-</div>
-<div class="section" id="status-repeated-passwords-limit">
-<h2><code class="docutils literal"><span class="pre">status_repeated_passwords_limit</span></code><a class="headerlink" href="#status-repeated-passwords-limit" title="Permalink to this headline">¶</a></h2>
-<div class="line-block">
-<div class="line"><strong>Default:</strong> <code class="docutils literal"><span class="pre">5</span></code></div>
-<div class="line"><strong>Description:</strong> Number of credentials to show on the repeated column of status</div>
 </div>
 </div>
 </div>

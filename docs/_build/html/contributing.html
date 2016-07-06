@@ -58,7 +58,7 @@ published ☺</li>
 </div>
 <div class="section" id="coding">
 <h2>Coding<a class="headerlink" href="#coding" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre>git clone https://github.com/marcwebbie/passpie.git
+<div class="highlight-python"><div class="highlight"><pre><span></span>git clone https://github.com/marcwebbie/passpie.git
 cd passpie
 virtualenv .venv &amp;&amp; source .venv/bin/activate
 make develop
@@ -69,7 +69,7 @@ make
 <div class="section" id="importers">
 <h2>Importers<a class="headerlink" href="#importers" title="Permalink to this headline">¶</a></h2>
 <p>Importers should be independent pluggable code. To add a new importer. Create python module into importers package. If you were writting an importer to a site called <code class="docutils literal"><span class="pre">superpassword</span></code>.</p>
-<div class="highlight-python"><div class="highlight"><pre>touch passpie/importers/superpassword.py
+<div class="highlight-python"><div class="highlight"><pre><span></span>touch passpie/importers/superpassword.py
 </pre></div>
 </div>
 <p>This importer should inherit from <code class="docutils literal"><span class="pre">passpie.importers.BaseImporter</span></code> and override two methods:</p>
@@ -77,7 +77,7 @@ make
 <li><code class="docutils literal"><span class="pre">match</span></code>: This method should check file passed as filepath and see if it is parseable and can be read by importer</li>
 <li><code class="docutils literal"><span class="pre">handle</span></code>: Return parsed credentials from file. The return must be a list of credentials with plain text passwords</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">passpie.importers</span> <span class="kn">import</span> <span class="n">BaseImporter</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">passpie.importers</span> <span class="kn">import</span> <span class="n">BaseImporter</span>
 
 
 <span class="k">class</span> <span class="nc">DefaultImporter</span><span class="p">(</span><span class="n">BaseImporter</span><span class="p">):</span>

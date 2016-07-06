@@ -1,7 +1,7 @@
 :code:`passpie`: Command-line password manager
 *******************************************************
 
-.. image:: https://raw.githubusercontent.com/marcwebbie/passpie/master/images/passpie2.png
+.. image:: https://raw.githubusercontent.com/marcwebbie/passpie/master/docs/images/passpie2.png
     :align: center
     :width: 100%
 

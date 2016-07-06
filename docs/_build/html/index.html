@@ -43,7 +43,7 @@
 <p>Passpie is a command line tool to  manage passwords from the terminal with a colorful and configurable interface. Use a master passphrase to decrypt login credentials, copy passwords to clipboard, syncronize with a git repository, check the state of your passwords, and more.</p>
 <p>Password files are encrypted using <a class="reference external" href="https://www.gnupg.org/">GnuPG</a> and saved into yaml text files. Passpie supports <strong>Linux</strong>, <strong>OSX</strong> and <strong>Windows</strong>.</p>
 <p>What does it look like?  Here is an example of a simple Passpie usage:</p>
-<div class="highlight-python"><div class="highlight"><pre>passpie init
+<div class="highlight-python"><div class="highlight"><pre><span></span>passpie init
 passpie add foo@example.com --random
 passpie add bar@example.com --pattern &quot;[0-9]{5}[a-z]{5}&quot;
 passpie update foo@example --comment &quot;Hello&quot;
@@ -51,7 +51,7 @@ passpie
 </pre></div>
 </div>
 <p>Outputs:</p>
-<div class="highlight-python"><div class="highlight"><pre>╒═════════════╤═════════╤════════════╤═══════════╕
+<div class="highlight-python"><div class="highlight"><pre><span></span>╒═════════════╤═════════╤════════════╤═══════════╕
 │ Name        │ Login   │ Password   │ Comment   │
 ╞═════════════╪═════════╪════════════╪═══════════╡
 │ example.com │ bar     │ *****      │           │
@@ -87,14 +87,15 @@ passpie
 We would love contributions.</p>
 </div>
 </div>
-<div class="section" id="documentation-contents">
-<h2>Documentation Contents<a class="headerlink" href="#documentation-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
 <p>This part of the documentation guides you through all of the passpie usage patterns.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#fullnames-queries">Fullnames queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#configuration">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#random-passwords">Random Passwords</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#searching">Searching</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#clipboard">Clipboard</a></li>
@@ -104,7 +105,6 @@ We would love contributions.</p>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#grouping-credentials">Grouping Credentials</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#shell-completion">Shell Completion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#importing-and-exporting">Importing and Exporting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#database-status">Database status</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#gnupg-keys">GnuPG keys</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#reseting-and-purging-databases">Reseting and Purging Databases</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#debugging">Debugging</a></li>
@@ -112,25 +112,18 @@ We would love contributions.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html#examples">Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#debugging">Debugging</a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#options">Options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#path"><code class="docutils literal"><span class="pre">path</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#homedir"><code class="docutils literal"><span class="pre">homedir</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#autopull"><code class="docutils literal"><span class="pre">autopull</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#autopush"><code class="docutils literal"><span class="pre">autopush</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#recipient"><code class="docutils literal"><span class="pre">recipient</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#extension"><code class="docutils literal"><span class="pre">extension</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#copy-timeout"><code class="docutils literal"><span class="pre">copy_timeout</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#genpass-pattern"><code class="docutils literal"><span class="pre">genpass_pattern</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#table-format"><code class="docutils literal"><span class="pre">table_format</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#headers"><code class="docutils literal"><span class="pre">headers</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#hidden"><code class="docutils literal"><span class="pre">hidden</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#hidden-string"><code class="docutils literal"><span class="pre">hidden_string</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#colors"><code class="docutils literal"><span class="pre">colors</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#aliases"><code class="docutils literal"><span class="pre">aliases</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#key-length"><code class="docutils literal"><span class="pre">key_length</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#repo"><code class="docutils literal"><span class="pre">repo</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#status-repeated-passwords-limit"><code class="docutils literal"><span class="pre">status_repeated_passwords_limit</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#database"><code class="docutils literal"><span class="pre">DATABASE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#homedir"><code class="docutils literal"><span class="pre">HOMEDIR</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#push"><code class="docutils literal"><span class="pre">PUSH</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#recipient"><code class="docutils literal"><span class="pre">RECIPIENT</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#copy-timeout"><code class="docutils literal"><span class="pre">COPY_TIMEOUT</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#password-pattern"><code class="docutils literal"><span class="pre">PASSWORD_PATTERN</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#table-fields"><code class="docutils literal"><span class="pre">TABLE_FIELDS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#table-format"><code class="docutils literal"><span class="pre">TABLE_FORMAT</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#headers"><code class="docutils literal"><span class="pre">HEADERS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#password-hidden-string"><code class="docutils literal"><span class="pre">PASSWORD_HIDDEN_STRING</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#key-length"><code class="docutils literal"><span class="pre">KEY_LENGTH</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#git"><code class="docutils literal"><span class="pre">GIT</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to Passpie</a><ul>
@@ -140,7 +133,6 @@ We would love contributions.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bugs_and_questions.html">Bugs &amp; Questions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bugs_and_questions.html#id1">Mailing list</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bugs_and_questions.html#gitter">Gitter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bugs_and_questions.html#github-issues">Github issues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bugs_and_questions.html#faq">FAQ</a></li>
@@ -161,6 +153,7 @@ We would love contributions.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-4-1">Version 1.4.1</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-4-0">Version 1.4.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-3-1">Version 1.3.1</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-3-0">Version 1.3.0</a></li>

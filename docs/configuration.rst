@@ -8,136 +8,98 @@ global passpie configuration files lives in ``~/.passpierc`` while local configu
 Examples
 --------
 
-Full passpie configuration file
-+++++++++++++++++++++++++++++++
+Full config file
+++++++++++++++++
 
 .. code-block:: yaml
 
-   path: ~/.passpie
-   homedir: ~/.gnupg
-   autopull: null
-   autopush: null
-   copy_timeout: 0
-   extension: .pass
-   genpass_pattern: "[a-z]{5} [-_+=*&%$#]{5} [A-Z]{5}"
-   headers:
-     - name
-     - login
-     - password
-     - comment
-   aliases:
-     st: status
-     rm: remove
-     ls: list
-   colors:
-     login: green
-     name: yellow
-   key_length: 4096
-   recipient: null
-   repo: true
-   status_repeated_passwords_limit: 5
-   table_format: fancy_grid
+    COPY_TIMEOUT: 0
+    DATABASE: passpie.db
+    GIT: true
+    HOMEDIR: /Users/marc/.gnupg
+    KEY_LENGTH: 4096
+    PASSWORD_PATTERN: '[a-zA-Z0-9=+_*!?&%$# ]{32}'
+    PUSH: null
+    RANDOM_PASSWORD: false
+    RECIPIENT: null
+    TABLE_FIELDS:
+    - name
+    - login
+    - password
+    - comment
+    TABLE_FORMAT: fancy_grid
+    TABLE_HIDDEN_STRING: '********'
+    TABLE_STYLE:
+      login:
+        fg: green
+      name:
+        fg: yellow
 
 Partial configuration file
 ++++++++++++++++++++++++++
 
 .. code-block:: yaml
 
-   recipient: marcwebbie@example.com
-   copy_timeout: 10
-   extension: .gpg
-   table_format: rst
+   RECIPIENT: john.doe@example.com
+   COPY_TIMEOUT: 10
+   TABLE_FORMAT: rst
 
-Debugging
----------
 
-For debugging, it might be useful to check actual passpie configuration for your commands::
-
-  # Global configuration found on ~/.passpierc
-  passpie config global
-
-  # Local configuration found on $PASSPIE_DATABASE/.config
-  passpie config local
-
-Current config
-++++++++++++++
-
-Current configuration with all overriden variables::
-
-  passpie config current
-
-OR::
-
-  passpie config
-
-..
-
-.. note::
-
-   If you have pygments installed, to have colored output on the config::
-
-     passpie config | pygmentize -l YAML
-
-Options
--------
-
-``path``
+``DATABASE``
 -----------------------------------
 
-| **Default:** ``~/.passpie``
+| **Default:** ``passpie.db``
 | **Description:** Path to default database.
 |
 
-``homedir``
+``HOMEDIR``
 -----------------------------------
 
-| **Default:** ``~/.gnupg``
+| **Default:** ``null``
 | **Description:** Path to default gnupg homedir.
 |
 
-``autopull``
+``PUSH``
 -----------------------------------
 
 | **Default:** ``null``
-| **Description:** Automatically pull changes from remote git repository.
+| **Description:** Automatically push changes from remote git repository.
 |
 
-``autopush``
------------------------------------
-
-| **Default:** ``null``
-| **Description:** Automatically pull changes from remote git repository.
-|
-
-``recipient``
+``RECIPIENT``
 -----------------------------------
 
 | **Default:** ``null``
 | **Description:** GnuPG defaul recipient. This can be a fingerprint/emai/name.
 |
 
-``extension``
------------------------------------
+.. warning::
 
-| **Default:** ``.pass``
-| **Description:** Password files extension
-|
+   If ``RECIPIENT`` is not ``null`` user must also set ``HOMEDIR``
 
-``copy_timeout``
+
+``COPY_TIMEOUT``
 -----------------------------------
 
 | **Default:** ``0``
-| **Description:** Automatically clear clipboard after n seconds
+| **Description:** Automatically clear clipboard N seconds after copy
 |
 
-``genpass_pattern``
+``PASSWORD_PATTERN``
 -----------------------------------
 
 | **Default:** ``"[a-z]{5} [-_+=*&%$#]{5} [A-Z]{5}"``
 | **Description:** Regex pattern for password random generation
 |
 
-``table_format``
+``TABLE_FIELDS``
+-----------------------------------
+
+| **Default:** ``["name", "login", "password", "comment"]``
+| **Description:** Tables fields to print
+|
+
+``TABLE_FORMAT``
 -----------------------------------
 
 | **Default:** ``fancy_grid``
@@ -162,73 +124,21 @@ Supported table formats:
 - latex_booktabs
 - textile
 
-``headers``
+``HEADERS``
 -----------------------------------
 
 | **Default:** ``[name, login, password, comments]``
 | **Description:** Column names to show on table
 |
 
-
-``hidden``
------------------------------------
-
-| **Default:** ``[password]``
-| **Description:** Column names to hide values when printing. Uses ``hidden_string`` as replaced text
-|
-
-
-``hidden_string``
+``PASSWORD_HIDDEN_STRING``
 -----------------------------------
 
 | **Default:** ``********``
 | **Description:** Text to be used with ``hidden`` as replacement for hidden columns
 |
 
-``colors``
------------------------------------
-
-| **Default:** ``{login: green, name: yellow}``
-| **Description:** Table column colors
-
-Supported color names:
-
-- black (might be a gray)
-- red
-- green
-- yellow (might be an orange)
-- blue
-- magenta
-- cyan
-- white (might be light gray)
-- reset (reset the color code only)
-
-
-
-``aliases``
------------------------------------
-
-| **Default:** ``{}``
-| **Description:** Aliases to commands.
-
-
-Example configuration:
-
-.. code-block:: yaml
-
-    aliases:
-      st: status
-      rm: remove
-      a: add
-      u: update
-      l: log
-
-We can then run our configuration with the short commands::
-
-    passpie rm foo@bar
-
-
-``key_length``
+``KEY_LENGTH``
 -----------------------------------
 
 | **Default:** ``4096``
@@ -242,15 +152,9 @@ We can then run our configuration with the short commands::
 
    Also have a look at `GnuPG documentation <https://www.gnupg.org/gph/en/manual.html#AEN494>`_ on keys
 
-``repo``
+``GIT``
 -----------------------------------
 
 | **Default:** ``true``
 | **Description:** Automatically create a git repository in database on initialization
 |
-
-``status_repeated_passwords_limit``
------------------------------------
-
-| **Default:** ``5``
-| **Description:** Number of credentials to show on the repeated column of status
