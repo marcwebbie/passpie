@@ -1,4 +1,3 @@
-import os
 import sys
 try:
     from shutil import which as _which

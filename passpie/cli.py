@@ -26,7 +26,7 @@ import rstr
 import yaml
 
 from . import importers
-from ._compat import FileExistsError, unicode, basestring
+from ._compat import *
 
 
 #############################
