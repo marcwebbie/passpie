@@ -179,10 +179,6 @@ DEFAULT_CONFIG = {
     'KEY_LENGTH': 4096,
     'HOMEDIR': os.path.join(os.path.expanduser('~/.gnupg')),
     'RECIPIENT': None,
-    'KEYS': {
-        'PUBLIC': "",
-        'PRIVATE': "",
-    },
 
     # Table
     'TABLE_FORMAT': 'fancy_grid',
