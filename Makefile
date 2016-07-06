@@ -7,9 +7,6 @@ all: clean develop lint coverage news
 test:
 	python -W ignore setup.py -q test
 
-integration-test: install
-	bash -x tests/integration.bash
-
 install:
 	pip install -U --editable .
 
@@ -42,10 +39,8 @@ serve: docs
 	cd docs/_build/html && python3 -m http.server
 
 dist:
-	pip install wheel
-	python setup.py -q sdist
-	python setup.py -q bdist_egg
-	python setup.py -q bdist_wheel
+	pip install -U pip wheel
+	python setup.py -q sdist bdist_wheel
 
 	@echo
 	@echo "Build files [dist]:"
@@ -62,7 +57,7 @@ lint:
 	grep -inr "set_trace()" --color=auto $(PACKAGE_TESTS) || true
 
 publish:
-	python setup.py publish
+	python setup.py sdist bdist_wheel upload
 
 tag:
 	python setup.py tag
@@ -94,10 +89,10 @@ ensure-news-minor:
 ensure-news-major:
 	grep 'Version $(shell bumpversion --allow-dirty --dry-run --list major | grep new_version | sed s,"^.*=",,)' NEWS.rst
 
-release-patch: ensure-news-patch lint test bump-patch register publish tag formula
+release-patch: ensure-news-patch lint test bump-patch dist register publish tag formula
 
-release-minor: ensure-news-minor lint test bump-minor register publish tag formula
+release-minor: ensure-news-minor lint test bump-minor dist register publish tag formula
 
-release-major: ensure-news-major lint test bump-major register publish tag formula
+release-major: ensure-news-major lint test bump-major dist register publish tag formula
 
 .PHONY: docs news
