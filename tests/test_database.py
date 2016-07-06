@@ -66,7 +66,7 @@ def test_find_source_path_returns_tar_when_path_is_uncompressed_tarfile(mocker):
 
 def test_find_source_path_returns_gztar_when_path_is_gzipped_tarfile(mocker):
     mocker.patch("passpie.cli.os.path.isdir", return_value=False)
-    mocker.patch("passpie.cli.find_compression_type", return_value="gztar")
+    mocker.patch("passpie.cli.find_compression_type", return_value="gz")
     mocker.patch("passpie.cli.tarfile.is_tarfile", return_value=True)
 
     assert find_source_format("path") is "gztar"
@@ -74,7 +74,7 @@ def test_find_source_path_returns_gztar_when_path_is_gzipped_tarfile(mocker):
 
 def test_find_source_path_returns_bztar_when_path_is_bzipped_tarfile(mocker):
     mocker.patch("passpie.cli.os.path.isdir", return_value=False)
-    mocker.patch("passpie.cli.find_compression_type", return_value="bztar")
+    mocker.patch("passpie.cli.find_compression_type", return_value="bz2")
     mocker.patch("passpie.cli.tarfile.is_tarfile", return_value=True)
 
     assert find_source_format("path") is "bztar"

@@ -4,8 +4,10 @@ from copy import deepcopy
 from collections import namedtuple, OrderedDict
 from subprocess import Popen, PIPE
 from tempfile import mkdtemp, NamedTemporaryFile
+import bz2
 import errno
 import functools
+import gzip
 import json
 import logging
 import os
@@ -451,19 +453,19 @@ def archive(src, dest, format):
 
 
 def find_compression_type(filename):
-    magic_dict = {
-        "\x1f\x8b\x08": "gztar",
-        "\x42\x5a\x68": "bztar",
-        "\x50\x4b\x03\x04": "zip"
-    }
+    with gzip.GzipFile(filename) as gzfile:
+        try:
+            gzfile.read()
+            return "gz"
+        except IOError:
+            pass
 
-    max_len = max(len(x) for x in magic_dict)
-
-    with open(filename) as f:
-        file_start = f.read(max_len)
-    for magic, filetype in magic_dict.items():
-        if file_start.startswith(magic):
-            return filetype
+    with bz2.BZ2File(filename) as bzfile:
+        try:
+            bzfile.read()
+            return "bz2"
+        except IOError:
+            pass
 
 
 def is_git_url(path):
@@ -483,7 +485,13 @@ def find_source_format(path):
         elif os.path.isdir(path):
             return "dir"
         elif tarfile.is_tarfile(path):
-            return find_compression_type(path) or "tar"
+            compression = find_compression_type(path)
+            if compression == "gz":
+                return "gztar"
+            elif compression == "bz2":
+                return "bztar"
+            else:
+                return "tar"
         elif zipfile.is_zipfile(path):
             return "zip"
     except (IOError, TypeError):
