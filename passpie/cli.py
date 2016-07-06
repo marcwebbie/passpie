@@ -209,15 +209,21 @@ def config_create(path, values={}):
         f.write(yaml_dump(values))
 
 
-def config_load(overrides):
+def config_default():
     cfg = deepcopy(DEFAULT_CONFIG)
-    cfg.update(yaml_load(HOME_CONFIG_PATH))
-    cfg.update(overrides)
+    for k in DEFAULT_CONFIG.keys():
+        environ_name = "PASSPIE_{}".format(k.upper())
+        environ_value = os.environ.get(environ_name)
+        if environ_value:
+            cfg[k] = yaml_to_python(environ_value)
     return cfg
 
 
-def config_default():
-    return deepcopy(DEFAULT_CONFIG)
+def config_load(overrides):
+    cfg = config_default()
+    cfg.update(yaml_load(HOME_CONFIG_PATH))
+    cfg.update(overrides)
+    return cfg
 
 
 #############################

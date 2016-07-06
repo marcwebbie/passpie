@@ -1,6 +1,6 @@
 import yaml
 
-from passpie.cli import config_create, config_load
+from passpie.cli import config_create, config_load, config_default
 
 
 def test_config_create_adds_an_empty_dot_config_file_to_path_when_default_false(mocker, mock_open):
@@ -22,3 +22,10 @@ def test_config_load_set_overrides_over_default(mocker):
     cfg = config_load(overrides=overrides)
     assert cfg["PATH"] == "override path"
     assert cfg["PATTERN"] == "override pattern"
+
+
+def test_config_set_value_from_expected_environ_variables(mocker):
+    environ_variables = {"PASSPIE_TABLE_FORMAT": "env-set-table-format"}
+    mocker.patch.dict("passpie.cli.os.environ", environ_variables)
+    cfg = config_default()
+    assert cfg["TABLE_FORMAT"] == "env-set-table-format"
