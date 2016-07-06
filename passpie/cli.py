@@ -174,9 +174,9 @@ HOME = os.path.expanduser("~")
 HOME_CONFIG_PATH = safe_join(HOME, ".passpierc")
 DEFAULT_CONFIG = {
     # Database
-    'PATH': "passpie.db",  # safe_join(HOMEDIR, ".passpie"),
+    'PATH': "passpie.db",
     'GIT': True,
-    'AUTOPUSH': 'origin/master',
+    'PUSH': None,
     'ENCRYPTED_FIELDS': ['password'],
 
     # GPG
@@ -214,6 +214,10 @@ def config_load(overrides):
     cfg.update(yaml_load(HOME_CONFIG_PATH))
     cfg.update(overrides)
     return cfg
+
+
+def config_default():
+    return deepcopy(DEFAULT_CONFIG)
 
 
 #############################
@@ -555,18 +559,17 @@ class Database(TinyDB):
         else:
             super(Database, self).__init__(default_table="credentials", storage=MemoryStorage)
 
-    def archive(self, dest=None, format=None):
-        format = format or find_source_format(self.src) or "gztar"
-        dest = dest or self.src or "passpie.db"
-        config_values = {k: v for k, v in self.config.items()
-                         if k not in ["homedir"] and DEFAULT_CONFIG[k] != v}
-        config_create(safe_join(self.path, "config.yml"), config_values)
-        tfile = NamedTemporaryFile()
-        tpath = shutil.make_archive(tfile.name, format, self.path)
-        shutil.move(tpath, dest)
+    def archive(self):
+        format = find_source_format(self.src)
+        if format in ("gztar", "zip", "bztar", "tar"):
+            archive(src=self.path, dest=self.src, format=format)
 
     def config_set(self, name, value):
         self.config[name] = value
+        with open(safe_join(self.path, "config.yml"), "w") as f:
+            cfg = {k: v for k, v in self.config.items()
+                   if config_default()[k] != self.config[k]}
+            f.write(yaml_dump(cfg))
 
     def ensure_passphrase(self):
         if self.passphrase is None:
@@ -664,10 +667,21 @@ def clone(url, dest=None, depth=None):
 # cli
 #############################
 
-def pass_db(ensure_passphrase=False, confirm_passphrase=False, ensure_exists=True):
+def close_database(db, sync):
+    logging.debug("[closing database]")
+    if sync:
+        logging.debug("[closing database]:archiving to %s" % db.src)
+        db.archive()
+        if db.config["PUSH"]:
+            remote, branch = parse_remote(db.config["PUSH"])
+            logging.debug("[closing database]:pushing to git remote")
+            db.repo.push(remote, branch)
+
+
+def pass_db(ensure_passphrase=False, confirm_passphrase=False, ensure_exists=True, sync=True):
     def decorator(func):
         def ensure_passphrase_wrapper(f):
-            @functools.wraps(f)
+            @functools.wraps(func)
             def new_func(db, *args, **kwargs):
                 if ensure_passphrase:
                     passphrase = db.passphrase
@@ -685,7 +699,9 @@ def pass_db(ensure_passphrase=False, confirm_passphrase=False, ensure_exists=Tru
                 if ensure_exists and db.path is None:
                     raise click.ClickException(
                         "Database not found at path: {}".format(db.src))
-                return f(db, *args, **kwargs)
+                result = f(db, *args, **kwargs)
+                close_database(db, sync)
+                return result
             return new_func
         return click.make_pass_decorator(Database, ensure=True)(
             ensure_passphrase_wrapper(func))
@@ -742,14 +758,6 @@ def cli(ctx, dbsrc, passphrase, autopush):
     else:
         db = Database(config=config, passphrase=passphrase)
         ctx.obj = db
-
-    @ctx.call_on_close
-    def close_database():
-        context = click.get_current_context()
-        db = context.obj
-        if isinstance(db, Database) and db.path is not None:
-            db = context.obj
-            db.archive()
 
 
 @cli.command()
@@ -808,7 +816,7 @@ def init(ctx, path, force, recipient, no_git):
 
 
 @cli.command(name="list")
-@pass_db()
+@pass_db(sync=False)
 def listdb(db):
     """List credentials as table"""
     table = Table(db.config)
@@ -818,20 +826,20 @@ def listdb(db):
 
 @cli.command(name="config")
 @click.argument("name", required=False, type=str)
-@click.argument("value", required=False, type=str)
-@pass_db()
+@click.argument("value", required=False, type=str, callback=validate_yaml_str)
+@pass_db(sync=False)
 def configdb(db, name, value):
     """Configuration settings"""
     name = name.upper() if name else ""
     if name and name in db.config:
         if value:
             db.config_set(name, value)
-            db.archive()
-            return
-        click.echo("{}: {}".format(name, db.config[name]))
-        return
-
-    click.echo(yaml_dump(db.config))
+            db.repo.commit("Set config: {} = {}".format(name, value))
+            close_database(db, sync=True)
+        else:
+            click.echo("{}: {}".format(name, db.config[name]))
+    else:
+        click.echo(yaml_dump(db.config).strip())
 
 
 @cli.command()
@@ -984,7 +992,7 @@ def import_database(db, filepath, importer, cols, force):
 @cli.command(name="export")
 @click.argument("filepath", type=click.File("w"))
 @click.option("--json", "as_json", is_flag=True, help="Export as JSON")
-@pass_db(ensure_passphrase=True)
+@pass_db(ensure_passphrase=True, sync=False)
 def export_database(db, filepath, as_json):
     """Export credentials in plain text"""
     credentials = (db.decrypt(c) for c in db.all())
