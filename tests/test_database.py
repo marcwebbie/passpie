@@ -88,6 +88,13 @@ def test_find_source_path_returns_zip_when_path_is_zipfile(mocker):
     assert find_source_format("path") is "zip"
 
 
+def test_find_source_path_returns_git_when_path_is_git_repo_url(mocker):
+    mock_is_git_url = mocker.patch("passpie.cli.is_git_url", return_value=True)
+
+    assert find_source_format("git@github.com:marcwebbie/passpiedb.git") == "git"
+    mock_is_git_url.assert_called_once_with("git@github.com:marcwebbie/passpiedb.git")
+
+
 def test_setup_path_clones_url_when_source_format_is_git(mocker):
     mocker.patch("passpie.cli.find_source_format", return_value="git")
     mocker.patch("passpie.cli.has_required_database_files", return_value=True)

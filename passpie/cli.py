@@ -464,13 +464,16 @@ def is_git_url(path):
 
 def find_source_format(path):
     try:
-        if os.path.isdir(path):
+        if is_git_url(path):
+            return "git"
+        elif os.path.isdir(path):
             return "dir"
         elif tarfile.is_tarfile(path):
             return find_compression_type(path) or "tar"
         elif zipfile.is_zipfile(path):
             return "zip"
-    except IOError:
+    except (IOError, TypeError):
+        logging.debug("invalide source path: ".format(path))
         return None
 
 
