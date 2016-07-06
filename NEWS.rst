@@ -1,3 +1,7 @@
+Version 1.5.1
+-------------
++ **✔** Repackage broken release
+
 Version 1.5.0
 -------------
 + **✔** Fix an issue with gpg2 (v2.1) where it does not respect --passphrase
