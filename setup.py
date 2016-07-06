@@ -16,16 +16,8 @@ with io.open('README.rst', encoding='utf-8') as readme_file:
     long_description = readme_file.read() + "\n\n"
 
 
-if sys.argv[-1] == 'publish':
-    os.system('python setup.py sdist upload')
-    os.system('python setup.py bdist_wheel upload')
-    sys.exit()
-
-
 if sys.argv[-1] == 'tag':
     os.system("git tag -a v%s -m 'version v%s'" % (__version__, __version__))
-    os.system("git push --tags")
-    os.system("git push")
     sys.exit()
 
 
@@ -37,32 +29,6 @@ requirements = [
     'rstr==2.2.4',
     "pyperclip==1.5.27",
 ]
-
-
-class PyTest(Command):
-    user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
-
-    def initialize_options(self):
-        self.pytest_args = ["-v", "tests/"]
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        import pytest
-        errno = pytest.main(self.pytest_args)
-        sys.exit(errno)
-
-
-class PyTestCoverage(PyTest):
-
-    def initialize_options(self):
-        self.pytest_args = [
-            "-v", "tests",
-            "--cov", 'passpie',
-            "--cov-config", ".coveragerc",
-            "--cov-report", "term-missing",
-        ]
 
 
 setup(
@@ -82,10 +48,9 @@ setup(
         ]
     },
     install_requires=requirements,
-    cmdclass={'test': PyTest, 'coverage': PyTestCoverage},
     test_suite='tests',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: MIT License',
@@ -99,5 +64,6 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Programming Language :: Python',
         'Topic :: Security :: Cryptography',
+        'Topic :: System :: Systems Administration',
     ],
 )
