@@ -16,14 +16,6 @@ except NameError:
     unicode = str
 
 
-def which(binary):
-    path = _which(binary)
-    if path:
-        realpath = os.path.realpath(path)
-        return realpath
-    return None
-
-
 def is_python2():
     return sys.version_info < (3,)
 
