@@ -47,11 +47,10 @@ Or if you are on a mac, install via `Homebrew <http://brew.sh>`_:
 
 
 Learn more
-================
+==========
 
++ Gitter: https://gitter.im/marcwebbie/passpie
 + Documentation: http://passpie.readthedocs.org
-+ Mailing list: https://groups.google.com/d/forum/passpie
-+ Gitter chat: https://gitter.im/marcwebbie/passpie
 + FAQ: http://passpie.readthedocs.org/en/latest/faq.html
 
 
