@@ -62,7 +62,8 @@ lint:
 	grep -inr "set_trace()" --color=auto $(PACKAGE_TESTS) || true
 
 publish:
-	python setup.py publish
+	python setup.py sdist upload
+	python setup.py bdist_wheel upload
 
 tag:
 	python setup.py tag
