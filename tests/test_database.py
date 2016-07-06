@@ -142,7 +142,7 @@ def test_setup_path_raises_runtime_error_when_unreconized_database_format(mocker
     mocker.patch("passpie.cli.find_source_format", return_value="unrecoginized")
     with pytest.raises(RuntimeError) as excinfo:
         path = setup_path("path/to/file")
-    assert excinfo.value.message == "Unrecognized database format: path/to/file"
+        assert excinfo.value.message == "Unrecognized database format: path/to/file"
 
 
 def test_setup_path_raises_runtime_error_when_missing_required_database_files(mocker):
@@ -151,4 +151,4 @@ def test_setup_path_raises_runtime_error_when_missing_required_database_files(mo
 
     with pytest.raises(RuntimeError) as excinfo:
         path = setup_path("path/to/file")
-    assert excinfo.value.message == "Database is missing required files: path/to/file"
+        assert excinfo.value.message == "Database is missing required files: path/to/file"
