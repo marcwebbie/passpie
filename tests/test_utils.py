@@ -2,7 +2,7 @@ import random
 import re
 import pytest
 
-from passpie.cli import genpass, mkdir_open
+from passpie.cli import genpass, mkdir_open, yaml_to_python
 
 
 def test_genpass_generates_a_password_with_length_32(mocker):
@@ -38,3 +38,10 @@ def test_mkdir_open_handle_oserror_for_file_exist(mocker, mock_open):
     with pytest.raises(OSError):
         with mkdir_open(path, "w") as fd:
             pass
+
+
+def test_yaml_to_python_returns_expected_python_object():
+    assert yaml_to_python("null") == None
+    assert yaml_to_python("1") == 1
+    assert yaml_to_python("abcdef") == "abcdef"
+    assert yaml_to_python("[1, 2, 3, 4]") == [1, 2, 3, 4]

@@ -92,6 +92,10 @@ def yaml_dump(data):
     return yaml.safe_dump(data, default_flow_style=False)
 
 
+def yaml_to_python(data):
+    return yaml.safe_load("[%s]" % data)[0]
+
+
 def yaml_load(path, ensure=False):
     yaml_content = {}
     try:
@@ -699,6 +703,14 @@ def validate_cols(ctx, param, value):
             raise click.BadParameter('cols need to be in format col1,col2,col3')
         except AssertionError as e:
             raise click.BadParameter('missing mandatory column: {}'.format(e))
+
+
+def validate_yaml_str(ctx, param, value):
+    if value:
+        try:
+            return yaml_to_python(value)
+        except ValueError:
+            raise click.BadParameter('not a valid yaml string: {}'.format(value))
 
 
 def prompt_update(credential, field, hidden=False):
