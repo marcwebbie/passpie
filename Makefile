@@ -4,9 +4,9 @@ PACKAGE_TESTS=tests
 
 all: clean develop lint coverage news
 
-test:
-	python -W ignore setup.py -q test
-
+#######################
+# Installation
+#######################
 install:
 	pip install -U --editable .
 
@@ -16,6 +16,24 @@ release:
 develop: release install
 	pip install -U -r requirements/test.txt
 
+#######################
+# Tests
+#######################
+test:
+	py.test -v tests
+
+coverage:
+	py.test -v tests --cov passpie --cov-config .coveragerc --cov-report term-missing
+
+lint:
+	flake8
+	grep -inr "set_trace()" --color=auto $(PACKAGE) || true
+	grep -inr "set_trace()" --color=auto $(PACKAGE_TESTS) || true
+
+
+#######################
+# Setup
+#######################
 clean:
 	find $(PACKAGE) -name \*.pyc -delete
 	find $(PACKAGE) -name \*__pycache__ -delete
@@ -28,16 +46,17 @@ clean:
 	rm -rf dist || true
 	rm -rf __pycache__ || true
 
-coverage:
-	python setup.py coverage
-
 docs:
 	$(MAKE) -C docs/ clean
 	$(MAKE) -C docs/ html
 
-serve: docs
+serve-docs: docs
 	cd docs/_build/html && python3 -m http.server
 
+
+#######################
+# Release
+#######################
 dist:
 	pip install -U pip wheel
 	python setup.py -q sdist bdist_wheel
@@ -50,11 +69,6 @@ dist:
 register:
 	pip install pypandoc
 	python setup.py register
-
-lint:
-	flake8
-	grep -inr "set_trace()" --color=auto $(PACKAGE) || true
-	grep -inr "set_trace()" --color=auto $(PACKAGE_TESTS) || true
 
 publish:
 	python setup.py sdist bdist_wheel upload
@@ -81,13 +95,13 @@ news:
 	@git log `git describe --tags --abbrev=0`..HEAD --pretty=format:"+ **✔** %s"
 
 ensure-news-patch:
-	grep 'Version $(shell bumpversion --allow-dirty --dry-run --list patch | grep new_version | sed s,"^.*=",,)' NEWS.rst
+	grep 'Version $(shell bumpversion --allow-dirty --dry-run --list patch | grep new_version | sed s,"^.*=",,)' docs/changelog.rst
 
 ensure-news-minor:
-	grep 'Version $(shell bumpversion --allow-dirty --dry-run --list minor | grep new_version | sed s,"^.*=",,)' NEWS.rst
+	grep 'Version $(shell bumpversion --allow-dirty --dry-run --list minor | grep new_version | sed s,"^.*=",,)' docs/changelog.rst
 
 ensure-news-major:
-	grep 'Version $(shell bumpversion --allow-dirty --dry-run --list major | grep new_version | sed s,"^.*=",,)' NEWS.rst
+	grep 'Version $(shell bumpversion --allow-dirty --dry-run --list major | grep new_version | sed s,"^.*=",,)' docs/changelog.rst
 
 release-patch: ensure-news-patch lint test bump-patch dist register publish tag formula
 
