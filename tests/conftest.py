@@ -158,6 +158,12 @@ WGEg2w==
 =69bD
 -----END PGP PRIVATE KEY BLOCK-----"""
 
+class CliRunnerWithDB(CliRunner):
+    @property
+    def db(self):
+        return Database(config=config_load({}), passphrase="p")
+
+
 
 @pytest.yield_fixture
 def irunner(mocker):
@@ -172,18 +178,13 @@ def irunner(mocker):
 
 
 @pytest.yield_fixture
-def irunner_with_db(irunner):
-    def credentials():
-        with tarfile.open("passpie.db") as tf:
-            member = tf.getmember("./credentials.json")
-            credentials_file = tf.extractfile(member)
-            content = yaml.load(credentials_file.read())
-            return content["credentials"].values()
-
-    irunner.invoke(cli, ["--passphrase", "p", "init"])
-    irunner.db = Database(config=config_load({}), passphrase="p")
-    irunner.credentials = credentials
-    yield irunner
+def irunner_with_db(mocker):
+    mocker.patch("passpie.cli.create_keys", return_value=(MOCK_PUBLIC_KEY, MOCK_PRIVATE_KEY))
+    runner = CliRunnerWithDB()
+    with runner.isolated_filesystem():
+        runner.invoke = partial(runner.invoke, catch_exceptions=False)
+        runner.invoke(cli, ["--passphrase", "p", "init"])
+        yield runner
 
 
 @pytest.fixture

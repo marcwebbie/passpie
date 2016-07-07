@@ -180,7 +180,7 @@ def test_cli_add_credential_with_random_password(irunner_with_db, mocker):
     mocker.patch("passpie.cli.genpass", return_value="randompassword")
     mock_encrypt = mocker.patch("passpie.cli.encrypt", return_value="encryptedrandompassword")
     result = irunner_with_db.invoke(cli, ["add", "foo@bar",  "--random"])
-    credentials = irunner_with_db.credentials()
+    credentials = irunner_with_db.db.all()
     args, _ = mock_encrypt.call_args
 
     assert result.exit_code == 0
@@ -196,7 +196,7 @@ def test_cli_add_credential_with_password_option(irunner_with_db, mocker):
     """
     mock_encrypt = mocker.patch("passpie.cli.encrypt", return_value="encryptedrandompassword")
     result = irunner_with_db.invoke(cli, ["add", "foo@bar",  "--password", "password"])
-    credentials = irunner_with_db.credentials()
+    credentials = irunner_with_db.db.all()
     args, _ = mock_encrypt.call_args
 
     assert result.exit_code == 0
@@ -212,7 +212,7 @@ def test_cli_add_credential_with_comment_option(irunner_with_db, mocker):
     """
     mock_encrypt = mocker.patch("passpie.cli.encrypt", return_value="GPG pwd")
     result = irunner_with_db.invoke(cli, ["add", "foo@bar",  "--random", "--comment", "comment"])
-    credentials = irunner_with_db.credentials()
+    credentials = irunner_with_db.db.all()
 
     assert result.exit_code == 0
     assert any(
@@ -226,7 +226,7 @@ def test_cli_add_multiple_credentials_with_random_passwords(irunner_with_db, moc
     """
     mock_encrypt = mocker.patch("passpie.cli.encrypt", return_value="GPG pwd")
     result = irunner_with_db.invoke(cli, ["add", "foo@bar", "spam@egg", "foozy@bar", "--random"])
-    credentials = irunner_with_db.credentials()
+    credentials = irunner_with_db.db.all()
 
     assert result.exit_code == 0
     assert {"login": "foo", "name": "bar", "password": "GPG pwd", "comment": ""} in credentials
@@ -239,7 +239,7 @@ def test_cli_add_multiple_credentials_with_random_passwords(irunner_with_db, moc
     """
     mock_encrypt = mocker.patch("passpie.cli.encrypt", return_value="GPG pwd")
     result = irunner_with_db.invoke(cli, ["add", "foo@bar", "spam@egg", "foozy@bar", "--random"])
-    credentials = irunner_with_db.credentials()
+    credentials = irunner_with_db.db.all()
 
     assert result.exit_code == 0
     assert {"login": "foo", "name": "bar", "password": "GPG pwd", "comment": ""} in credentials
@@ -290,3 +290,11 @@ def test_cli_config_with_name_lower_case_findsargument_prints_value(irunner_with
     result = irunner_with_db.invoke(cli, ["config", "table_format"])
     assert result.exit_code == 0
     assert "TABLE_FORMAT: new_table_format\n" == result.output
+
+
+def test_cli_remove_all_credentials(irunner_with_db, mocker):
+    irunner_with_db.invoke(cli, ["add", "--random", "foo@bar", "spam@egg"])
+    assert irunner_with_db.db.count(all) == 2
+    result = irunner_with_db.invoke(cli, ["remove", "--all"])
+    assert result.exit_code == 0
+    assert irunner_with_db.db.count(all) == 0
