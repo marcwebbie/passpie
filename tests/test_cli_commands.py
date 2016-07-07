@@ -1,19 +1,3 @@
-"""
-def test_cat():
-    @click.command()
-    @click.argument('f', type=click.File())
-    def cat(f):
-        click.echo(f.read())
-
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        with open('hello.txt', 'w') as f:
-            f.write('Hello World!')
-
-        result = runner.invoke(cat, ['hello.txt'])
-        assert result.exit_code == 0
-        assert result.output == 'Hello World!\n'
-"""
 import os
 import tarfile
 import tempfile
@@ -22,7 +6,7 @@ import click
 import pytest
 import yaml
 
-from passpie.cli import cli
+from passpie.cli import cli, find_source_format
 
 
 def test_cli_init_creates_passpie_db_file(irunner):
@@ -122,6 +106,38 @@ def test_cli_init_create_git_repo_when_config_git_is_true(irunner, mocker):
         assert result.exit_code == 0, result.output
         with tarfile.open("passpie.db") as tf:
             assert "./.git" in tf.getnames()
+
+
+def test_cli_init_create_database_in_format_dir(irunner, mocker):
+    """passpie --passphrase p init database_dir --force --format dir
+    """
+    result = irunner.invoke(
+        cli, ["--passphrase", "p", "init", "--format", "dir", "database_dir"]
+    )
+    assert result.exit_code == 0, result.output
+    assert os.path.isdir("database_dir") is True
+
+
+def test_cli_init_create_database_in_format_gztar(irunner, mocker):
+    """passpie --passphrase p init database.tar.gz --force --format gztar
+    """
+    database_filename = "database.tar.gz"
+    result = irunner.invoke(
+        cli, ["--passphrase", "p", "init", "--format", "gztar", database_filename]
+    )
+    assert result.exit_code == 0, result.output
+    assert find_source_format(database_filename) == "gztar"
+
+
+def test_cli_init_create_database_in_format_bztar(irunner, mocker):
+    """passpie --passphrase p init database.tar.bz2 --force --format bztar
+    """
+    database_filename = "database.tar.bz2"
+    result = irunner.invoke(
+        cli, ["--passphrase", "p", "init", "--format", "bztar", database_filename]
+    )
+    assert result.exit_code == 0, result.output
+    assert find_source_format(database_filename) == "bztar"
 
 
 def test_cli_add_credential_with_random_password(irunner_with_db, mocker):

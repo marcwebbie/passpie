@@ -447,8 +447,11 @@ def find_database_root(path):
 
 
 def archive(src, dest, format):
-    tfile = NamedTemporaryFile()
-    tpath = shutil.make_archive(tfile.name, format, src)
+    if format == "dir":
+        tpath = src
+    else:
+        tfile = NamedTemporaryFile()
+        tpath = shutil.make_archive(tfile.name, format, src)
     shutil.move(tpath, dest)
 
 
@@ -779,8 +782,9 @@ def cli(ctx, dbsrc, passphrase, autopush):
 @click.option("-f", "--force", is_flag=True, help="Force initialization")
 @click.option("-r", "--recipient", help="Keyring recipient")
 @click.option("-ng", "--no-git", is_flag=True, help="Don't initialize a git repo")
+@click.option("-F", "--format", default="gztar", type=click.Choice(["dir", "tar", "zip", "gztar", "bztar"]))
 @click.pass_context
-def init(ctx, path, force, recipient, no_git):
+def init(ctx, path, force, recipient, no_git, format):
     """Initialize database"""
     config = ctx.meta["config"]
     passphrase = ctx.meta["passphrase"]
@@ -826,7 +830,7 @@ def init(ctx, path, force, recipient, no_git):
     else:
         repo = Repo(tempdir)
         repo.init().commit("Initialize database")
-    archive(src=tempdir, dest=path, format="tar")
+    archive(src=tempdir, dest=path, format=format)
 
 
 @cli.command(name="list")
