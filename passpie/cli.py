@@ -498,7 +498,7 @@ def find_source_format(path):
         elif zipfile.is_zipfile(path):
             return "zip"
     except (IOError, TypeError):
-        logging.debug("invalide source path: ".format(path))
+        logging.debug("unrecognized source path: ".format(path))
         return None
 
 
@@ -760,13 +760,20 @@ def prompt_update(credential, field, hidden=False):
 @click.option("-D", "--database", "dbsrc", help="Database path", envvar="PASSPIE_DATABASE")
 @click.option("-P", "--passphrase", help="Database passphrase", envvar="PASSPIE_PASSPHRASE")
 @click.option("-A", "--autopush", help="Autopush git [origin/master]", envvar="PASSPIE_AUTOPUSH")
+@click.option('-v', '--verbose', is_flag=True, help='Activate verbose output', envvar="PASSPIE_VERBOSE")
 @click.pass_context
-def cli(ctx, dbsrc, passphrase, autopush):
+def cli(ctx, dbsrc, passphrase, autopush, verbose):
     config_overrides = {}
     if dbsrc:
         config_overrides["PATH"] = dbsrc
     if autopush:
         config_overrides["AUTOPUSH"] = autopush
+    if verbose is True:
+        logging_level = logging.DEBUG
+        logging.basicConfig(
+            format="%(levelname)s:passpie.%(module)s:%(message)s",
+            level=logging_level)
+
     config = config_load(config_overrides)
 
     if ctx.invoked_subcommand == "init":

@@ -1,3 +1,4 @@
+import logging
 import os
 import tarfile
 import tempfile
@@ -7,6 +8,39 @@ import pytest
 import yaml
 
 from passpie.cli import cli, find_source_format
+
+
+def test_cli_verbose_sets_level_debug_when_true(irunner_with_db, mocker):
+    """passpie -v list
+    """
+    mock_basicConfig = mocker.patch("passpie.cli.logging.basicConfig")
+    result = irunner_with_db.invoke(cli, ["-v", "list"])
+    assert result.exit_code == 0
+    assert mock_basicConfig.called is True
+    _, kwargs = mock_basicConfig.call_args
+    assert kwargs.get("level") == logging.DEBUG
+
+
+def test_cli_verbose_sets_level_critical_when_false(irunner_with_db, mocker):
+    """passpie list
+    """
+    mock_basicConfig = mocker.patch("passpie.cli.logging.basicConfig")
+    result = irunner_with_db.invoke(cli, ["list"])
+    assert result.exit_code == 0
+    assert mock_basicConfig.called is False
+
+
+def test_cli_verbose_sets_level_info_when_verbose_environ_variable_set(irunner_with_db, mocker):
+    """PASSPIE_VERBOSE=true passpie list
+    """
+    environ_variables = {"PASSPIE_VERBOSE": "true"}
+    mocker.patch.dict("passpie.cli.os.environ", environ_variables)
+    mock_basicConfig = mocker.patch("passpie.cli.logging.basicConfig")
+    result = irunner_with_db.invoke(cli, ["list"])
+    assert result.exit_code == 0
+    assert mock_basicConfig.called is True
+    _, kwargs = mock_basicConfig.call_args
+    assert kwargs.get("level") == logging.DEBUG
 
 
 def test_cli_init_creates_passpie_db_file(irunner):
