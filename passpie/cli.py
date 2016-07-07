@@ -842,11 +842,20 @@ def init(ctx, path, force, recipient, no_git, format):
 
 @cli.command(name="list")
 @pass_db(sync=False)
-def listdb(db):
+@click.argument("grep", required=False)
+def listdb(db, grep):
     """List credentials as table"""
-    table = Table(db.config)
-    if len(db):
-        click.echo(table.render(db.all()))
+    if grep:
+        query = (Query().login.search(".*{}.*".format(grep)) |
+                 Query().name.search(".*{}.*".format(grep)) |
+                 Query().comment.search(".*{}.*".format(grep)))
+        credentials = db.search(query)
+    else:
+        credentials = db.all()
+
+    if credentials:
+        table = Table(db.config)
+        click.echo(table.render(credentials))
 
 
 @cli.command(name="config")

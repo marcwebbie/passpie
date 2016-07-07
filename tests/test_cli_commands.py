@@ -298,3 +298,19 @@ def test_cli_remove_all_credentials(irunner_with_db, mocker):
     result = irunner_with_db.invoke(cli, ["remove", "--all"])
     assert result.exit_code == 0
     assert irunner_with_db.db.count(all) == 0
+
+
+def test_cli_list_all_credentials(irunner_with_db, mocker):
+    irunner_with_db.invoke(cli, ["add", "--random", "foo@bar", "spam@egg"])
+    result = irunner_with_db.invoke(cli, ["list"])
+    assert result.exit_code == 0
+    assert "foo" in result.output
+    assert "spam" in result.output
+
+
+def test_cli_list_filter_credentials(irunner_with_db, mocker):
+    irunner_with_db.invoke(cli, ["add", "--random", "foo@bar", "spam@egg"])
+    result = irunner_with_db.invoke(cli, ["list", "foo"])
+    assert result.exit_code == 0
+    assert "foo" in result.output
+    assert "spam" not in result.output
