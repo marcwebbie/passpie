@@ -176,14 +176,13 @@ HOME = os.path.expanduser("~")
 HOME_CONFIG_PATH = safe_join(HOME, ".passpierc")
 DEFAULT_CONFIG = {
     # Database
-    'PATH': "passpie.db",
+    'DATABASE': "passpie.db",
     'GIT': True,
-    'PUSH': None,
-    'ENCRYPTED_FIELDS': ['password'],
+    'GIT_PUSH': None,
 
     # GPG
     'KEY_LENGTH': 4096,
-    'HOMEDIR': os.path.join(os.path.expanduser('~/.gnupg')),
+    'HOMEDIR': None,
     'RECIPIENT': None,
 
     # Table
@@ -198,8 +197,8 @@ DEFAULT_CONFIG = {
 
     # Credentials
     'COPY_TIMEOUT': 0,
-    'PATTERN': "[a-zA-Z0-9=+_*!?&%$# ]{32}",
-    'RANDOM': False,
+    'PASSWORD_PATTERN': "[a-zA-Z0-9=+_*!?&%$# ]{32}",
+    'PASSWORD_RANDOM': False,
 
     # Cli
     'VERBOSE': False,
@@ -560,7 +559,7 @@ class Database(TinyDB):
 
     def __init__(self, config, passphrase=None):
         self.passphrase = passphrase
-        self.src = config["PATH"]
+        self.src = config["DATABASE"]
         self.path = setup_path(self.src)
         self.config = setup_config(self.path, config)
         self.repo = Repo(self.path)
@@ -687,8 +686,8 @@ def close_database(db, sync):
     if sync:
         logging.debug("[closing database]:archiving to %s" % db.src)
         db.archive()
-        if db.config["PUSH"]:
-            remote, branch = parse_remote(db.config["PUSH"])
+        if db.config["GIT_PUSH"]:
+            remote, branch = parse_remote(db.config["GIT_PUSH"])
             logging.debug("[closing database]:pushing to git remote")
             db.repo.push(remote, branch)
 
@@ -755,17 +754,17 @@ def prompt_update(credential, field, hidden=False):
 
 
 @click.group()
-@click.option("-D", "--database", "dbsrc", help="Database path", envvar="PASSPIE_DATABASE")
-@click.option("-P", "--passphrase", help="Database passphrase", envvar="PASSPIE_PASSPHRASE")
-@click.option("-A", "--autopush", help="Autopush git [origin/master]", envvar="PASSPIE_AUTOPUSH")
-@click.option('-v', '--verbose', is_flag=True, help='Activate verbose output', envvar="PASSPIE_VERBOSE")
+@click.option("-D", "--database", help="Database path")
+@click.option("-P", "--passphrase", help="Database passphrase")
+@click.option("-g", "--git-push", help="Autopush git [origin/master]")
+@click.option('-v', '--verbose', is_flag=True, help='Activate verbose output')
 @click.pass_context
-def cli(ctx, dbsrc, passphrase, autopush, verbose):
+def cli(ctx, database, passphrase, git_push, verbose):
     config_overrides = {}
-    if dbsrc:
-        config_overrides["PATH"] = dbsrc
-    if autopush:
-        config_overrides["AUTOPUSH"] = autopush
+    if database:
+        config_overrides["DATABASE"] = database
+    if git_push:
+        config_overrides["GIT_PUSH"] = git_push
     if verbose is True:
         logging_level = logging.DEBUG
         logging.basicConfig(
@@ -802,7 +801,7 @@ def init(ctx, path, force, recipient, no_git, format):
 
     if os.path.exists(path):
         if force and os.path.isdir(path):
-            shutil.rmtree(config["PATH"])
+            shutil.rmtree(config["DATABASE"])
         if force and os.path.isfile(path):
             os.remove(path)
         else:
@@ -884,8 +883,8 @@ def configdb(db, name, value):
 def add(db, fullnames, random, comment, password, force):
     """Insert credential"""
     for fullname in fullnames:
-        if random or db.config["RANDOM"]:
-            password = genpass(db.config["PATTERN"])
+        if random or db.config["PASSWORD_RANDOM"]:
+            password = genpass(db.config["PASSWORD_PATTERN"])
         elif password is None:
             password = click.prompt(
                 "Password", hide_input=True, confirmation_prompt=True)
@@ -954,7 +953,7 @@ def update(db, fullnames, random, pattern, copy, comment, password, name, login,
             if comment:
                 values["comment"] = comment
             if random:
-                values["password"] = genpass(pattern or db.config["PATTERN"])
+                values["password"] = genpass(pattern or db.config["PASSWORD_PATTERN"])
 
             if not values:
                 values["login"] = prompt_update(cred, "login")
