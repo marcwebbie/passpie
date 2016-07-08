@@ -31,7 +31,6 @@ def validate_config(ctx, param, value):
     configuration = {}
     configuration.update(config.DEFAULT)                             # Default configuration
     configuration.update(config.read(config.HOMEDIR, '.passpierc'))  # Global configuration
-    configuration.update(config.read(configuration['path']))         # Local configuration
     if value:
         configuration.update(config.read(value))                     # Options configuration
     configuration.update(overrides)                                  # Command line options
