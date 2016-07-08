@@ -31,6 +31,14 @@ from . import importers
 from ._compat import *
 
 
+logger = logging.getLogger('passpie')
+logger_handler = logging.StreamHandler()
+logger_formatter = logging.Formatter("%(levelname)s:passpie.%(module)s:%(message)s")
+logger_handler.setFormatter(logger_formatter)
+logger.addHandler(logger_handler)
+logger.setLevel(logging.CRITICAL)
+
+
 #############################
 # process
 #############################
@@ -77,11 +85,12 @@ def run(*args, **kwargs):
             pass
         response = Response(cmd, std_out, std_err, returncode)
 
-    if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
+    if logger.getEffectiveLevel() == logging.DEBUG:
+        logger.debug("run(command):%s", " ".join(cmd))
         if std_err and std_err.strip():
-            logging.debug(std_err)
+            logger.debug(std_err)
         if response.returncode != 0:
-            logging.debug("Command error: {}".format(response))
+            logger.debug("run(command):error(%s):%s", response.returncode, response)
     return response
 
 
@@ -107,7 +116,7 @@ def yaml_load(path, ensure=False):
         with open(path) as f:
             yaml_content = yaml.safe_load(f.read())
     except IOError:
-        logging.info(u'YAML file "{}" not found'.format(path))
+        logger.info(u'YAML file "{}" not found'.format(path))
     except yaml.scanner.ScannerError as e:
         raise click.ClickException(u'Malformed YAML file: {}'.format(e))
 
@@ -628,10 +637,10 @@ def ensure_git(repository_exists=True):
         @functools.wraps(f)
         def wrapper(self, *args, **kwargs):
             if not which("git"):
-                logging.info("git not found. -- mocking call --")
+                logger.info("git not found. -- mocking call --")
             elif (repository_exists is True and
                   not os.path.exists(safe_join(self.path, ".git"))):
-                logging.info("git repository not found. -- mocking call --")
+                logger.info("git repository not found. -- mocking call --")
             else:
                 return f(self, *args, **kwargs)
             return self
@@ -682,13 +691,13 @@ def clone(url, dest=None, depth=None):
 #############################
 
 def close_database(db, sync):
-    logging.info("[closing database]")
+    logger.info("[closing database]")
     if sync:
-        logging.info("[closing database]:archiving to %s" % db.src)
+        logger.info("[closing database]:archiving to %s" % db.src)
         db.archive()
         if db.config["GIT_PUSH"]:
             remote, branch = parse_remote(db.config["GIT_PUSH"])
-            logging.info("[closing database]:pushing to git remote")
+            logger.info("[closing database]:pushing to git remote")
             db.repo.push(remote, branch)
 
 
@@ -757,7 +766,7 @@ def prompt_update(credential, field, hidden=False):
 @click.option("-D", "--database", help="Database path")
 @click.option("-P", "--passphrase", help="Database passphrase")
 @click.option("-g", "--git-push", help="Autopush git [origin/master]")
-@click.option('-v', '--verbose', is_flag=True, help='Activate verbose output')
+@click.option('--verbose', is_flag=True, help='Activate verbose output')
 @click.option('--debug', is_flag=True, help='Activate debug output')
 @click.pass_context
 def cli(ctx, database, passphrase, git_push, verbose, debug):
@@ -766,18 +775,13 @@ def cli(ctx, database, passphrase, git_push, verbose, debug):
         config_overrides["DATABASE"] = database
     if git_push:
         config_overrides["GIT_PUSH"] = git_push
-    if verbose is True:
-        logging_level = logging.INFO
-        logging.basicConfig(
-            format="%(levelname)s:passpie.%(module)s:%(message)s",
-            level=logging_level)
-    if debug is True:
-        logging_level = logging.DEBUG
-        logging.basicConfig(
-            format="%(levelname)s:passpie.%(module)s:%(message)s",
-            level=logging_level)
 
     config = config_load(config_overrides)
+
+    if verbose is True or config["VERBOSE"] is True:
+        logger.setLevel(logging.INFO)
+    if debug is True or config["DEBUG"] is True:
+        logger.setLevel(logging.DEBUG)
 
     if ctx.invoked_subcommand == "init":
         ctx.meta["config"] = config
