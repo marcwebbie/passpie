@@ -424,13 +424,11 @@ def split_fullname(fullname):
     elif regex_name_only.match(fullname):
         mobj = regex_name_only.match(fullname)
     else:
-        raise ValueError("Not a valid name")
+        raise ValueError("not a valid fullname: {}".format(fullname))
 
-    if mobj.groupdict().get('at'):
-        login = ""
-    else:
-        login = mobj.groupdict().get('login')
-    name = mobj.groupdict().get("name")
+    match_dict = mobj.groupdict()
+    login = match_dict.get('login', "")
+    name = match_dict.get("name")
 
     return login, name
 
