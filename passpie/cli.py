@@ -531,18 +531,23 @@ def setup_path(path):
         raise RuntimeError("Database is missing required files: {}".format(path))
 
 
-def setup_homedir(path, default=None):
-    if path and os.path.exists(path):
-        keys = yaml_load(safe_join(path, "keys.yml"))
-
+def import_keyring(keyring):
+    homedir = mkdtemp()
+    for keys in keyring:
         if keys.get("PUBLIC") and keys.get("PRIVATE"):
-            homedir = mkdtemp()
             keysfile = NamedTemporaryFile("w")
             with open(keysfile.name, "w") as f:
                 f.write(keys["PUBLIC"])
                 f.write(keys["PRIVATE"])
                 import_keys(keysfile.name, homedir)
-            return homedir
+    return homedir
+
+
+def setup_homedir(path, default=None):
+    if path and os.path.exists(path):
+        keyring = yaml_load(safe_join(path, "keys.yml"))
+        if keyring:
+            return import_keyring(keyring)
     return default
 
 
@@ -801,7 +806,7 @@ def init(ctx, path, force, recipient, no_git, format):
 
     if os.path.exists(path):
         if force and os.path.isdir(path):
-            shutil.rmtree(config["DATABASE"])
+            shutil.rmtree(path)
         if force and os.path.isfile(path):
             os.remove(path)
         else:
@@ -822,7 +827,8 @@ def init(ctx, path, force, recipient, no_git, format):
 
     # Create files: keys.yml, config.yml, .passpie
     with open(safe_join(tempdir, "keys.yml"), "w") as f:
-        f.write(yaml_dump(keyring_values))
+        keys_list = [keyring_values]
+        f.write(yaml_dump(keys_list))
     with open(safe_join(tempdir, "config.yml"), "w") as f:
         f.write(yaml_dump(config_values))
     with open(safe_join(tempdir, ".passpie"), "w"):
