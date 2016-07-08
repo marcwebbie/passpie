@@ -543,12 +543,13 @@ def import_keyring(keyring):
     return homedir
 
 
-def setup_homedir(path, default=None):
-    if path and os.path.exists(path):
+def setup_homedir(path):
+    if os.path.exists(path):
         keyring = yaml_load(safe_join(path, "keys.yml"))
         if keyring:
             return import_keyring(keyring)
-    return default
+    else:
+        raise ValueError("couldn't create homedir ")
 
 
 def setup_config(path, default=None):
@@ -568,9 +569,9 @@ class Database(TinyDB):
         self.path = setup_path(self.src)
         self.config = setup_config(self.path, config)
         self.repo = Repo(self.path)
-        self.homedir = setup_homedir(self.path, self.config["HOMEDIR"])
+        self.homedir = self.config["HOMEDIR"] or setup_homedir(self.path)
         self.recipient = (
-            config["RECIPIENT"] or
+            self.config["RECIPIENT"] or
             get_default_recipient(self.homedir) if self.homedir else None)
         if self.path:
             dbfile_path = safe_join(self.path, "credentials.json")
@@ -797,7 +798,7 @@ def init(ctx, path, force, recipient, no_git, format):
     """Initialize database"""
     config = ctx.meta["config"]
     passphrase = ctx.meta["passphrase"]
-    if not passphrase:
+    if not passphrase and not recipient:
         passphrase = click.prompt(
             "Passphrase",
             hide_input=True,
@@ -817,7 +818,7 @@ def init(ctx, path, force, recipient, no_git, format):
     config_values = {}
     keyring_values = {}
     if recipient:
-        config_values["recipient"] = recipient
+        config_values["RECIPIENT"] = recipient
         keyring_values["PUBLIC"] = None
         keyring_values["PRIVATE"] = None
     else:
