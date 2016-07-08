@@ -78,7 +78,7 @@ def run(*args, **kwargs):
         response = Response(cmd, std_out, std_err, returncode)
 
     if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
-        if std_err.strip():
+        if std_err and std_err.strip():
             logging.debug(std_err)
         if response.returncode != 0:
             logging.debug("Command error: {}".format(response))
@@ -112,7 +112,7 @@ def yaml_load(path, ensure=False):
         raise click.ClickException(u'Malformed YAML file: {}'.format(e))
 
     if not yaml_content and ensure is True:
-        raise RuntimeError("yaml content is empty and ensure is True")
+        raise RuntimeError("YAML content is empty and ensure is True")
     else:
         return yaml_content
 
