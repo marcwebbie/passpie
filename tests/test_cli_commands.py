@@ -11,23 +11,36 @@ from passpie.cli import cli, find_source_format
 
 
 def test_cli_verbose_sets_level_debug_when_true(irunner_with_db, mocker):
-    """passpie -v list
+    """passpie --verbose list
     """
-    mock_basicConfig = mocker.patch("passpie.cli.logging.basicConfig")
-    result = irunner_with_db.invoke(cli, ["-v", "list"])
-    assert result.exit_code == 0
-    assert mock_basicConfig.called is True
-    _, kwargs = mock_basicConfig.call_args
-    assert kwargs.get("level") == logging.DEBUG
+    mock_set_level = mocker.patch("passpie.cli.logger.setLevel")
+    result = irunner_with_db.invoke(cli, ["--verbose", "list"])
+    assert result.exit_code == 0, result.output
+    assert mock_set_level.called is True
+    args, _ = mock_set_level.call_args
+    assert args[0] == logging.INFO
 
 
 def test_cli_verbose_sets_level_critical_when_false(irunner_with_db, mocker):
     """passpie list
     """
-    mock_basicConfig = mocker.patch("passpie.cli.logging.basicConfig")
+    mock_set_level = mocker.patch("passpie.cli.logger.setLevel")
     result = irunner_with_db.invoke(cli, ["list"])
     assert result.exit_code == 0
-    assert mock_basicConfig.called is False
+    assert mock_set_level.called is False
+
+
+def test_cli_debug_sets_level_debug_when_debug_set(irunner_with_db, mocker):
+    """PASSPIE_VERBOSE=true passpie list
+    """
+    environ_variables = {"PASSPIE_DEBUG": "true"}
+    mocker.patch.dict("passpie.cli.os.environ", environ_variables)
+    mock_set_level = mocker.patch("passpie.cli.logger.setLevel")
+    result = irunner_with_db.invoke(cli, ["list"])
+    assert result.exit_code == 0
+    assert mock_set_level.called is True
+    args, _ = mock_set_level.call_args
+    assert args[0] == logging.DEBUG
 
 
 def test_cli_verbose_sets_level_info_when_verbose_environ_variable_set(irunner_with_db, mocker):
@@ -35,111 +48,99 @@ def test_cli_verbose_sets_level_info_when_verbose_environ_variable_set(irunner_w
     """
     environ_variables = {"PASSPIE_VERBOSE": "true"}
     mocker.patch.dict("passpie.cli.os.environ", environ_variables)
-    mock_basicConfig = mocker.patch("passpie.cli.logging.basicConfig")
+    mock_set_level = mocker.patch("passpie.cli.logger.setLevel")
     result = irunner_with_db.invoke(cli, ["list"])
     assert result.exit_code == 0
-    assert mock_basicConfig.called is True
-    _, kwargs = mock_basicConfig.call_args
-    assert kwargs.get("level") == logging.DEBUG
+    assert mock_set_level.called is True
+    args, _ = mock_set_level.call_args
+    assert args[0] == logging.INFO
 
 
 def test_cli_init_creates_passpie_db_file(irunner):
     """passpie --passphrase p init
     """
-    with irunner.isolated_filesystem():
-        result = irunner.invoke(cli, ["--passphrase", "p", "init"])
-        assert "passpie.db" in os.listdir(os.curdir)
-        assert result.exit_code == 0
+    result = irunner.invoke(cli, ["--passphrase", "p", "init"])
+    assert "passpie.db" in os.listdir(os.curdir)
+    assert result.exit_code == 0
 
 
 def test_cli_init_creates_passpie_db_file_with_expected_files(irunner):
     """passpie --passphrase p init
     """
-    with irunner.isolated_filesystem():
-        result = irunner.invoke(cli, ["--passphrase", "p", "init"])
-        tempdir = tempfile.mkdtemp()
-        with tarfile.open("passpie.db") as tf:
-            tf.extractall(tempdir)
+    result = irunner.invoke(cli, ["--passphrase", "p", "init"])
+    tempdir = tempfile.mkdtemp()
+    with tarfile.open("passpie.db") as tf:
+        tf.extractall(tempdir)
 
-        assert ".passpie" in os.listdir(tempdir)
-        assert "config.yml" in os.listdir(tempdir)
-        assert "keys.yml" in os.listdir(tempdir)
-        with open(os.path.join(tempdir, "config.yml")) as f:
-            config_dict = yaml.load(f.read())
-        with open(os.path.join(tempdir, "keys.yml")) as f:
-            keys_dict = yaml.load(f.read())
-        assert "PUBLIC" in keys_dict
-        assert "PRIVATE" in keys_dict
+    assert ".passpie" in os.listdir(tempdir)
+    assert "config.yml" in os.listdir(tempdir)
+    assert "keys.yml" in os.listdir(tempdir)
+    with open(os.path.join(tempdir, "config.yml")) as f:
+        config_dict = yaml.load(f.read())
+    with open(os.path.join(tempdir, "keys.yml")) as f:
+        keys_dict = yaml.load(f.read())
 
 
 def test_cli_init_raise_error_when_passpie_db_exists(irunner):
     """passpie --passphrase p init
     """
-    with irunner.isolated_filesystem():
-        with open("passpie.db", "w"):
-            pass
-        result = irunner.invoke(cli, ["--passphrase", "p", "init"])
-        assert result.exit_code == 1
-        assert result.output == u"Error: Path 'passpie.db' exists [--force] to overwrite\n"
+    with open("passpie.db", "w"):
+        pass
+    result = irunner.invoke(cli, ["--passphrase", "p", "init"])
+    assert result.exit_code == 1
+    assert result.output == u"Error: Path 'passpie.db' exists [--force] to overwrite\n"
 
 
 def test_cli_init_overrides_database_when_passpie_db_exists_and_force_is_passed(irunner):
     """passpie --passphrase p init --force
     """
-    with irunner.isolated_filesystem():
-        with open("passpie.db", "w"):
-            pass
-        result = irunner.invoke(cli, ["--passphrase", "p", "init", "--force"])
-        assert result.exit_code == 0
+    with open("passpie.db", "w"):
+        pass
+    result = irunner.invoke(cli, ["--passphrase", "p", "init", "--force"])
+    assert result.exit_code == 0
 
 
 def test_cli_init_add_recipient_to_config_if_is_passed(irunner):
     """passpie --passphrase p init --recipient jdoe@example.com
     """
-    with irunner.isolated_filesystem():
-        result = irunner.invoke(cli, [
-            "--passphrase", "p", "init", "--recipient", "jdoe@example.com"])
-        assert result.exit_code == 0
-        tempdir = tempfile.mkdtemp()
-        with tarfile.open("passpie.db") as tf:
-            tf.extractall(tempdir)
-        with open(os.path.join(tempdir, "config.yml")) as f:
-            config_dict = yaml.load(f.read())
-        assert config_dict["recipient"] == "jdoe@example.com"
+    result = irunner.invoke(cli, [
+        "--passphrase", "p", "init", "--recipient", "jdoe@example.com"])
+    assert result.exit_code == 0
+    tempdir = tempfile.mkdtemp()
+    with tarfile.open("passpie.db") as tf:
+        tf.extractall(tempdir)
+    with open(os.path.join(tempdir, "config.yml")) as f:
+        config_dict = yaml.load(f.read())
+    assert config_dict["RECIPIENT"] == "jdoe@example.com"
 
 
 def test_cli_init_dont_create_git_repo_if_no_git_is_passed(irunner):
     """passpie --passphrase p init --no-git
     """
-    with irunner.isolated_filesystem():
-        result = irunner.invoke(cli, ["--passphrase", "p", "init", "--no-git"])
-        assert result.exit_code == 0, result.output
-        with tarfile.open("passpie.db") as tf:
-            assert "./.git" not in tf.getnames()
+    result = irunner.invoke(cli, ["--passphrase", "p", "init", "--no-git"])
+    assert result.exit_code == 0, result.output
+    with tarfile.open("passpie.db") as tf:
+        assert "./.git" not in tf.getnames()
 
 
-def test_cli_init_dont_create_git_repo_when_config_git_is_false(irunner, mocker):
+def test_cli_init_dont_create_git_repo_when_config_git_is_false(irunner, mocker, config):
     """passpie --passphrase p init
     """
-    mocker.patch("passpie.cli.config_load", return_value={"GIT": False})
-
-    with irunner.isolated_filesystem():
-        result = irunner.invoke(cli, ["--passphrase", "p", "init"])
-        assert result.exit_code == 0, result.output
-        with tarfile.open("passpie.db") as tf:
-            assert "./.git" not in tf.getnames()
+    config["GIT"] = False
+    result = irunner.invoke(cli, ["--passphrase", "p", "init"])
+    assert result.exit_code == 0, result.output
+    with tarfile.open("passpie.db") as tf:
+        assert "./.git" not in tf.getnames()
 
 
-def test_cli_init_create_git_repo_when_config_git_is_true(irunner, mocker):
+def test_cli_init_create_git_repo_when_config_git_is_true(irunner, mocker, config):
     """passpie --passphrase p init
     """
-    mocker.patch("passpie.cli.config_load", return_value={"GIT": True})
-
-    with irunner.isolated_filesystem():
-        result = irunner.invoke(cli, ["--passphrase", "p", "init"])
-        assert result.exit_code == 0, result.output
-        with tarfile.open("passpie.db") as tf:
-            assert "./.git" in tf.getnames()
+    config["GIT"] = True
+    result = irunner.invoke(cli, ["--passphrase", "p", "init"])
+    assert result.exit_code == 0, result.output
+    with tarfile.open("passpie.db") as tf:
+        assert "./.git" in tf.getnames()
 
 
 def test_cli_init_create_database_in_format_dir(irunner, mocker):
@@ -270,10 +271,10 @@ def test_cli_add_credential_with_no_option_prompts_password(irunner_with_db, moc
     mock_prompt.assert_called_once_with("Password", confirmation_prompt=True, hide_input=True)
 
 
-def test_cli_config_without_arguments_prints_config(irunner_with_db, mocker):
+def test_cli_config_without_arguments_prints_config(irunner_with_db, mocker, config):
     result = irunner_with_db.invoke(cli, ["config"])
     assert result.exit_code == 0
-    assert irunner_with_db.db.config["PATH"] in result.output
+    assert irunner_with_db.db.config["DATABASE"] in result.output
     assert irunner_with_db.db.config["TABLE_FORMAT"] in result.output
 
 

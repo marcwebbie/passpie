@@ -158,11 +158,21 @@ WGEg2w==
 =69bD
 -----END PGP PRIVATE KEY BLOCK-----"""
 
+
+@pytest.yield_fixture
+def config(mocker):
+    mock_config_dict = config_load({})
+    mock_config_load = mocker.patch(
+        "passpie.cli.config_load",
+        return_value=mock_config_dict
+    )
+    yield mock_config_dict
+
+
 class CliRunnerWithDB(CliRunner):
     @property
     def db(self):
         return Database(config=config_load({}), passphrase="p")
-
 
 
 @pytest.yield_fixture
@@ -170,7 +180,7 @@ def irunner(mocker):
     """
     Instance of `click.testing.CliRunner` with automagically `isolated_filesystem()` called.
     """
-    mocker.patch("passpie.cli.create_keys", return_value=(MOCK_PUBLIC_KEY, MOCK_PRIVATE_KEY))
+    mocker.patch("passpie.cli.create_keys", return_value=MOCK_PUBLIC_KEY + MOCK_PRIVATE_KEY)
     runner = CliRunner()
     with runner.isolated_filesystem():
         runner.invoke = partial(runner.invoke, catch_exceptions=False)
@@ -179,7 +189,7 @@ def irunner(mocker):
 
 @pytest.yield_fixture
 def irunner_with_db(mocker):
-    mocker.patch("passpie.cli.create_keys", return_value=(MOCK_PUBLIC_KEY, MOCK_PRIVATE_KEY))
+    mocker.patch("passpie.cli.create_keys", return_value=MOCK_PUBLIC_KEY + MOCK_PRIVATE_KEY)
     runner = CliRunnerWithDB()
     with runner.isolated_filesystem():
         runner.invoke = partial(runner.invoke, catch_exceptions=False)
