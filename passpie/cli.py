@@ -565,7 +565,7 @@ def setup_config(path, default=None):
 
 
 class Database(TinyDB):
-    REQUIRED_FILES = ("config.yml", ".passpie",)
+    REQUIRED_FILES = (".passpie",)
 
     def __init__(self, config, passphrase=None):
         self.passphrase = passphrase
