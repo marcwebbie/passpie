@@ -77,8 +77,11 @@ def run(*args, **kwargs):
             pass
         response = Response(cmd, std_out, std_err, returncode)
 
-    if response.returncode != 0:
-        logging.debug("Command error: {}".format(response))
+    if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
+        if std_err.strip():
+            logging.debug(std_err)
+        if response.returncode != 0:
+            logging.debug("Command error: {}".format(response))
     return response
 
 
@@ -104,7 +107,7 @@ def yaml_load(path, ensure=False):
         with open(path) as f:
             yaml_content = yaml.safe_load(f.read())
     except IOError:
-        logging.debug(u'YAML file "{}" not found'.format(path))
+        logging.info(u'YAML file "{}" not found'.format(path))
     except yaml.scanner.ScannerError as e:
         raise click.ClickException(u'Malformed YAML file: {}'.format(e))
 
@@ -202,6 +205,7 @@ DEFAULT_CONFIG = {
 
     # Cli
     'VERBOSE': False,
+    'DEBUG': False,
 }
 
 
@@ -495,7 +499,7 @@ def find_source_format(path):
         elif zipfile.is_zipfile(path):
             return "zip"
     except (IOError, TypeError):
-        logging.debug("unrecognized source path: ".format(path))
+        logging.info("unrecognized source path: ".format(path))
         return None
 
 
@@ -634,10 +638,10 @@ def ensure_git(repository_exists=True):
         @functools.wraps(f)
         def wrapper(self, *args, **kwargs):
             if not which("git"):
-                logging.debug("git not found. -- mocking call --")
+                logging.info("git not found. -- mocking call --")
             elif (repository_exists is True and
                   not os.path.exists(safe_join(self.path, ".git"))):
-                logging.debug("git repository not found. -- mocking call --")
+                logging.info("git repository not found. -- mocking call --")
             else:
                 return f(self, *args, **kwargs)
             return self
@@ -688,13 +692,13 @@ def clone(url, dest=None, depth=None):
 #############################
 
 def close_database(db, sync):
-    logging.debug("[closing database]")
+    logging.info("[closing database]")
     if sync:
-        logging.debug("[closing database]:archiving to %s" % db.src)
+        logging.info("[closing database]:archiving to %s" % db.src)
         db.archive()
         if db.config["GIT_PUSH"]:
             remote, branch = parse_remote(db.config["GIT_PUSH"])
-            logging.debug("[closing database]:pushing to git remote")
+            logging.info("[closing database]:pushing to git remote")
             db.repo.push(remote, branch)
 
 
@@ -764,14 +768,20 @@ def prompt_update(credential, field, hidden=False):
 @click.option("-P", "--passphrase", help="Database passphrase")
 @click.option("-g", "--git-push", help="Autopush git [origin/master]")
 @click.option('-v', '--verbose', is_flag=True, help='Activate verbose output')
+@click.option('--debug', is_flag=True, help='Activate debug output')
 @click.pass_context
-def cli(ctx, database, passphrase, git_push, verbose):
+def cli(ctx, database, passphrase, git_push, verbose, debug):
     config_overrides = {}
     if database:
         config_overrides["DATABASE"] = database
     if git_push:
         config_overrides["GIT_PUSH"] = git_push
     if verbose is True:
+        logging_level = logging.INFO
+        logging.basicConfig(
+            format="%(levelname)s:passpie.%(module)s:%(message)s",
+            level=logging_level)
+    if debug is True:
         logging_level = logging.DEBUG
         logging.basicConfig(
             format="%(levelname)s:passpie.%(module)s:%(message)s",
