@@ -129,16 +129,17 @@ def genpass(pattern):
         raise ValueError(str(e))
 
 
-def which(binary):
+def which(*binaries):
     try:
         from shutil import which as _which
     except ImportError:
         from distutils.spawn import find_executable as _which
 
-    path = _which(binary)
-    if path:
-        realpath = os.path.realpath(path)
-        return realpath
+    for binary in binaries:
+        path = _which(binary)
+        if path:
+            realpath = os.path.realpath(path)
+            return realpath
     return None
 
 
@@ -216,7 +217,7 @@ def config_create(path, values={}):
 
 def config_default():
     cfg = deepcopy(DEFAULT_CONFIG)
-    for k in DEFAULT_CONFIG.keys():
+    for k in cfg.keys():
         environ_name = "PASSPIE_{}".format(k.upper())
         environ_value = os.environ.get(environ_name)
         if environ_value:
@@ -305,11 +306,12 @@ def make_key_input(passphrase, key_length):
 
 def import_keys(keys_path, homedir):
     command = [
-        which('gpg2') or which('gpg'),
+        which('gpg2', 'gpg'),
         '--no-tty',
         '--batch',
         '--no-secmem-warning',
         '--no-permission-warning',
+        '--allow-secret-key-import',
         '--no-mdc-warning',
         '--homedir', homedir,
         '--import', keys_path
@@ -320,7 +322,7 @@ def import_keys(keys_path, homedir):
 
 def export_keys(homedir, private=False):
     command = [
-        which('gpg2') or which('gpg'),
+        which('gpg2', 'gpg'),
         '--no-version',
         '--batch',
         '--homedir', homedir,
@@ -335,7 +337,7 @@ def export_keys(homedir, private=False):
 def create_keys(passphrase, key_length=4096):
     homedir = mkdtemp()
     command = [
-        which('gpg2') or which('gpg'),
+        which('gpg2', 'gpg'),
         '--batch',
         '--no-tty',
         '--no-secmem-warning',
@@ -346,12 +348,12 @@ def create_keys(passphrase, key_length=4096):
     ]
     key_input = make_key_input(passphrase, key_length)
     run(command, data=key_input)
-    return export_keys(homedir), export_keys(homedir, private=True)
+    return export_keys(homedir) + export_keys(homedir, private=True)
 
 
 def get_default_recipient(homedir, secret=False):
     command = [
-        which('gpg2') or which('gpg'),
+        which('gpg2', 'gpg'),
         '--no-tty',
         '--batch',
         '--no-secmem-warning',
@@ -374,7 +376,7 @@ def get_default_recipient(homedir, secret=False):
 
 def encrypt(data, recipient, homedir):
     command = [
-        which('gpg2') or which('gpg'),
+        which('gpg2', 'gpg'),
         '--batch',
         '--no-tty',
         '--always-trust',
@@ -389,7 +391,7 @@ def encrypt(data, recipient, homedir):
 
 def decrypt(data, recipient, homedir, passphrase):
     command = [
-        which('gpg2') or which('gpg'),
+        which('gpg2', 'gpg'),
         '--batch',
         '--no-tty',
         '--always-trust',
@@ -402,16 +404,6 @@ def decrypt(data, recipient, homedir, passphrase):
     ]
     response = run(command, data=data)
     return response.std_out
-
-
-def create_homedir(public_key, private_key):
-    homedir = mkdtemp()
-    keysfile = NamedTemporaryFile("w")
-    with open(keysfile.name, "w") as f:
-        f.write(public_key)
-        f.write(private_key)
-    import_keys(keysfile.name, homedir)
-    return homedir
 
 
 #############################
@@ -499,7 +491,7 @@ def find_source_format(path):
         elif zipfile.is_zipfile(path):
             return "zip"
     except (IOError, TypeError):
-        logging.info("unrecognized source path: ".format(path))
+        logger.info("unrecognized source path: ".format(path))
         return None
 
 
