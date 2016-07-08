@@ -1,3 +1,8 @@
+Version 1.5.2
+-------------
++ **✔** Remove loading config from ".passpie/.config" if database path set
++ **✔** Fix pinentry-mode error #107
+
 Version 1.5.1
 -------------
 + **✔** Repackage broken release
