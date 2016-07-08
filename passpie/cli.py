@@ -818,7 +818,7 @@ def init(ctx, path, force, recipient, no_git, format):
     if os.path.exists(path):
         if force and os.path.isdir(path):
             shutil.rmtree(path)
-        if force and os.path.isfile(path):
+        elif force and os.path.isfile(path):
             os.remove(path)
         else:
             msg = "Path '{}' exists [--force] to overwrite".format(path)
