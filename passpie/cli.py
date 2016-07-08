@@ -538,12 +538,10 @@ def setup_path(path):
 def import_keyring(keyring):
     homedir = mkdtemp()
     for keys in keyring:
-        if keys.get("PUBLIC") and keys.get("PRIVATE"):
-            keysfile = NamedTemporaryFile("w")
-            with open(keysfile.name, "w") as f:
-                f.write(keys["PUBLIC"])
-                f.write(keys["PRIVATE"])
-                import_keys(keysfile.name, homedir)
+        keysfile = NamedTemporaryFile("w")
+        with open(keysfile.name, "w") as f:
+            f.write(keys)
+        import_keys(keysfile.name, homedir)
     return homedir
 
 
@@ -826,20 +824,16 @@ def init(ctx, path, force, recipient, no_git, format):
 
     tempdir = mkdtemp()
     config_values = {}
-    keyring_values = {}
+    keys = {}
     if recipient:
         config_values["RECIPIENT"] = recipient
-        keyring_values["PUBLIC"] = None
-        keyring_values["PRIVATE"] = None
     else:
-        public_key, private_key = create_keys(passphrase)
-        keyring_values["PUBLIC"] = public_key
-        keyring_values["PRIVATE"] = private_key
+        keys = create_keys(passphrase)
 
     # Create files: keys.yml, config.yml, .passpie
     with open(safe_join(tempdir, "keys.yml"), "w") as f:
-        keys_list = [keyring_values]
-        f.write(yaml_dump(keys_list))
+        keyring = [keys]
+        f.write(yaml_dump(keyring))
     with open(safe_join(tempdir, "config.yml"), "w") as f:
         f.write(yaml_dump(config_values))
     with open(safe_join(tempdir, ".passpie"), "w"):
