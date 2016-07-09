@@ -14,7 +14,7 @@ def test_split_fullname_raises_value_error_when_invalid_name(mocker):
     error_message = "not a valid fullname: {}".format(invalid_fullname)
     with pytest.raises(ValueError) as excinfo:
         split_fullname(invalid_fullname)
-    assert excinfo.value.message == error_message
+        assert "{}".format(excinfo.value) == error_message
 
 
 def test_split_fullname_returns_expected_login_and_name(mocker):
