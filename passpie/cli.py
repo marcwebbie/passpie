@@ -1063,10 +1063,10 @@ def git(db, command):
     run(cmd, cwd=db.path, pipe=False)
 
 
-@cli.command(name="gpg", context_settings={"ignore_unknown_options": True})
+@cli.command(context_settings={"ignore_unknown_options": True})
 @click.argument("command", nargs=-1)
 @pass_db()
-def gpgcmd(db, command):
+def gpg(db, command):
     """GPG commands"""
     cmd = [which("gpg2", "gpg"), "--homedir", db.homedir] + list(command)
     run(cmd, cwd=db.path, pipe=False)
