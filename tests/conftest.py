@@ -216,6 +216,7 @@ def mock_open():
 def tempdir():
     return mkdtemp()
 
+
 @pytest.fixture
 def tempdir_with_git(tempdir):
     mkdir(safe_join(tempdir, ".git"))
