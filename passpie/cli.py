@@ -573,12 +573,10 @@ def import_keyring(keyring):
 
 
 def setup_homedir(path):
-    if os.path.exists(path):
+    if path and os.path.exists(path):
         keyring = yaml_load(safe_join(path, "keys.yml"))
         if keyring:
             return import_keyring(keyring)
-    else:
-        raise ValueError("couldn't create homedir ")
 
 
 def setup_config(path, default=None):
