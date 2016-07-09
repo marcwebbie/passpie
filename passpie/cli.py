@@ -1115,8 +1115,21 @@ def git(db, command):
 
 @cli.command(context_settings={"ignore_unknown_options": True})
 @click.argument("command", nargs=-1)
+@click.option("--gen-key", is_flag=True, help="Generate keys")
 @pass_db()
-def gpg(db, command):
+def gpg(db, command, gen_key):
     """GPG commands"""
-    cmd = [which("gpg2", "gpg"), "--homedir", db.homedir] + list(command)
-    run(cmd, cwd=db.path, pipe=False)
+    if gen_key:
+        values = {
+            "key_length": click.prompt("Key length", default=4096),
+            "name": click.prompt("Name"),
+            "email": click.prompt("Email"),
+            "comment": click.prompt("Comment", default=""),
+            "passphrase": click.prompt("Passphrase", hide_input=True, confirmation_prompt=True),
+            "expire_date": click.prompt("Expire date", default=0),
+        }
+        homedir = db.homedir
+        generate_key(homedir, values)
+    else:
+        cmd = [which("gpg2", "gpg"), "--homedir", db.homedir] + list(command)
+        run(cmd, cwd=db.path, pipe=False)
