@@ -7,7 +7,7 @@ from click.testing import CliRunner
 import pytest
 import yaml
 
-from passpie.cli import cli, Database, config_load, mkdir, safe_join
+from passpie.cli import cli, Database, config_load, mkdir, safe_join, import_keyring
 
 
 MOCK_PUBLIC_KEY = """-----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -158,6 +158,7 @@ WGEg2w==
 =69bD
 -----END PGP PRIVATE KEY BLOCK-----"""
 
+HOMEDIR = import_keyring([MOCK_PUBLIC_KEY + MOCK_PRIVATE_KEY])
 
 @pytest.yield_fixture
 def config(mocker):
@@ -180,7 +181,7 @@ def irunner(mocker):
     """
     Instance of `click.testing.CliRunner` with automagically `isolated_filesystem()` called.
     """
-    mocker.patch("passpie.cli.create_keys", return_value=MOCK_PUBLIC_KEY + MOCK_PRIVATE_KEY)
+    mocker.patch("passpie.cli.create_keys", return_value=HOMEDIR)
     runner = CliRunner()
     with runner.isolated_filesystem():
         runner.invoke = partial(runner.invoke, catch_exceptions=False)
@@ -189,7 +190,7 @@ def irunner(mocker):
 
 @pytest.yield_fixture
 def irunner_with_db(mocker):
-    mocker.patch("passpie.cli.create_keys", return_value=MOCK_PUBLIC_KEY + MOCK_PRIVATE_KEY)
+    mocker.patch("passpie.cli.create_keys", return_value=HOMEDIR)
     runner = CliRunnerWithDB()
     with runner.isolated_filesystem():
         runner.invoke = partial(runner.invoke, catch_exceptions=False)
