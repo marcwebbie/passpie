@@ -56,6 +56,8 @@ class Repo(object):
 
     @ensure_git()
     def commit(self, message):
+        run(["git", "config", "--local", "user.name", "Passpie"], cwd=self.path)
+        run(["git", "config", "--local", "user.email", "passpie@localhost"], cwd=self.path)
         run(["git", "add", "."], cwd=self.path)
         run(["git", "commit", "-m", message], cwd=self.path)
         return self
