@@ -1,9 +1,10 @@
 from passpie.cli import cli
+from passpie.utils import yaml_dump
 
 
 def test_cli_config_without_arguments_prints_config(irunner, mocker):
     result = irunner.run(cli, "config")
-    config_content = yaml_dump(dict(db.config)).strip()
+    config_content = yaml_dump(dict(irunner.db.config)).strip()
     assert result.exit_code == 0
     assert irunner.db.config["DATABASE"] in result.output
     assert irunner.db.config["TABLE_FORMAT"] in result.output
