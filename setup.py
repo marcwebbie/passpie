@@ -28,6 +28,7 @@ requirements = [
     'tinydb==3.2.1',
     'rstr==2.2.4',
     "pyperclip==1.5.27",
+    "fake-factory==0.5.9",
 ]
 
 
