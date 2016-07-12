@@ -14,8 +14,8 @@ from .gpg import GPG
 class CredentialFactory(dict):
     def __init__(self, **kwargs):
         faker = Faker()
-        fullname = kwargs.pop("fullname")
-        if fullname:
+        fullname = kwargs.pop("fullname", None)
+        if fullname is not None:
             login, name = split_fullname(fullname)
             kwargs["login"] = login
             kwargs["name"] = name
