@@ -102,9 +102,12 @@ def pass_database(ensure_passphrase=False, confirm_passphrase=False, ensure_exis
                     confirmation_prompt=confirm_passphrase,
                 )
             database_path = config["DATABASE"]
-            with auto_archive(database_path) as archive:
-                with Database(archive, passphrase) as db:
-                    return command(db, *args, **kwargs)
+            try:
+                with auto_archive(database_path) as archive:
+                    with Database(archive, passphrase) as db:
+                        return command(db, *args, **kwargs)
+            except IOError as exception:
+                raise click.ClickException("{}".format(exception))
         return wrapper
     return decorator
 

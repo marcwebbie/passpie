@@ -158,9 +158,8 @@ def is_git_url(path):
 
 
 def get_archive_format(path):
-    if not path:
-        if not os.path.exists(path):
-            raise IOError("archive path not found: %s" % path)
+    if not path or not os.path.exists(path):
+        raise IOError("path not found: %s" % path)
     elif os.path.isdir(path):
         return "dir"
     elif is_git_url(path):
