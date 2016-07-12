@@ -86,7 +86,7 @@ def export_keys(homedir, fingerprint=""):
     return ret.std_out + ret_secret.std_out
 
 
-def generate_key(homedir, values):
+def generate_keys(homedir, values):
     command = [
         which('gpg2', 'gpg'),
         '--batch',

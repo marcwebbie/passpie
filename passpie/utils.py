@@ -13,9 +13,12 @@ import tempfile
 import time
 import zipfile
 
+from faker import Faker
+from tinydb.storages import touch as _touch
 import pyperclip
 import rstr
 import yaml
+
 
 
 HOME = os.path.expanduser("~")
@@ -45,6 +48,10 @@ def yaml_to_python(data):
     return yaml.safe_load("[%s]" % data)[0]
 
 
+def touch(path):
+    return _touch(path)
+
+
 def yaml_load(path, ensure=False):
     yaml_content = {}
     try:
@@ -61,16 +68,16 @@ def yaml_load(path, ensure=False):
         return yaml_content
 
 
-def genpass(pattern):
-    """generates a password with random chararcters
-    examples:
-      cat /dev/urandom | strings
-
+def genpass(pattern=None, length=32):
+    """Generate random password
     """
-    try:
-        return rstr.xeger(pattern)
-    except re.error as e:
-        raise ValueError(str(e))
+    if pattern:
+        try:
+            return rstr.xeger(pattern)
+        except re.error as e:
+            raise ValueError(str(e))
+    else:
+        return Faker().password(length=length)
 
 
 def which(*binaries):

@@ -23,7 +23,7 @@ from .database import (
     split_fullname,
     make_fullname
 )
-from .gpg import generate_key, export_keys
+from .gpg import generate_keys, export_keys
 from .proc import run
 from .utils import (
     auto_archive,
@@ -200,7 +200,7 @@ def init(ctx, path, force, recipient, no_git, key_length, expire_date, format):
             "expire_date": expire_date or 0,
         }
         homedir = mkdtemp()
-        keys_data = generate_key(homedir, key_values)
+        keys_data = generate_keys(homedir, key_values)
         keys_content = export_keys(homedir, keys_data["email"])
         keys_file_path = safe_join(tempdir, "keys.yml")
         yaml_dump([keys_content], keys_file_path)
@@ -462,7 +462,7 @@ def gpg(db, command, gen_key):
             "passphrase": click.prompt("Passphrase", hide_input=True, confirmation_prompt=True),
             "expire_date": click.prompt("Expire date", default=0),
         }
-        generate_key(db.gpg.homedir, values)
+        generate_keys(db.gpg.homedir, values)
     else:
         cmd = [which("gpg2", "gpg"), "--homedir", db.gpg.homedir] + list(command)
         run(cmd, cwd=db.path, pipe=False)

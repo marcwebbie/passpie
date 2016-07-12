@@ -7,7 +7,10 @@ from click.testing import CliRunner
 import pytest
 import yaml
 
-from passpie.cli import cli, Database, config_load, mkdir, safe_join, import_keyring
+from passpie.cli import cli
+from passpie.config import Config
+from passpie.database import Database
+from passpie.utils import mkdir, safe_join, Archive
 
 
 MOCK_PUBLIC_KEY = """-----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -158,44 +161,38 @@ WGEg2w==
 =69bD
 -----END PGP PRIVATE KEY BLOCK-----"""
 
-HOMEDIR = import_keyring([MOCK_PUBLIC_KEY + MOCK_PRIVATE_KEY])
+MOCK_KEYPAIR = MOCK_PUBLIC_KEY + MOCK_PRIVATE_KEY
+
+# HOMEDIR = import_keyring([MOCK_PUBLIC_KEY + MOCK_PRIVATE_KEY])
+
+class CliRunnerWithDB(CliRunner):
+
+    def run(self, cmd, args):
+        return self.invoke(cmd, args.split(), catch_exceptions=False)
+
 
 @pytest.yield_fixture
 def config(mocker):
-    mock_config_dict = config_load({})
-    mock_config_load = mocker.patch(
-        "passpie.cli.config_load",
-        return_value=mock_config_dict
-    )
-    yield mock_config_dict
-
-
-class CliRunnerWithDB(CliRunner):
-    @property
-    def db(self):
-        return Database(config=config_load({}), passphrase="p")
+    yield Config.DEFAULT
 
 
 @pytest.yield_fixture
 def irunner(mocker):
-    """
-    Instance of `click.testing.CliRunner` with automagically `isolated_filesystem()` called.
-    """
-    mocker.patch("passpie.cli.create_keys", return_value=HOMEDIR)
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        runner.invoke = partial(runner.invoke, catch_exceptions=False)
-        yield runner
+    from passpie.utils import yaml_dump, make_archive, touch, auto_archive, mkdir
 
-
-@pytest.yield_fixture
-def irunner_with_db(mocker):
-    mocker.patch("passpie.cli.create_keys", return_value=HOMEDIR)
+    mocker.patch("passpie.cli.generate_keys")
+    mocker.patch("passpie.cli.export_keys", return_value=MOCK_KEYPAIR)
     runner = CliRunnerWithDB()
     with runner.isolated_filesystem():
-        runner.invoke = partial(runner.invoke, catch_exceptions=False)
-        runner.invoke(cli, ["--passphrase", "p", "init"])
-        yield runner
+        mkdir("passpie.db")
+        yaml_dump([MOCK_KEYPAIR], safe_join("passpie.db", "keys.yml"))
+        yaml_dump({}, safe_join("passpie.db", "config.yml"))
+        touch(safe_join("passpie.db", ".passpie"))
+        make_archive("passpie.db", "passpie.db", "gztar")
+        with auto_archive("passpie.db") as archive:
+            with Database(archive, passphrase="k") as database:
+                runner.db = database
+                yield runner
 
 
 @pytest.fixture

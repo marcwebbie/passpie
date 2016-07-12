@@ -31,7 +31,7 @@ class Config(dict):
 
         # Credentials
         'COPY_TIMEOUT': 0,
-        'PASSWORD_PATTERN': "[a-zA-Z0-9=+_*!?&%$# ]{32}",
+        'PASSWORD_PATTERN': None,
         'PASSWORD_RANDOM': False,
 
         # Cli
