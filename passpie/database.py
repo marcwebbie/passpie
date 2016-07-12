@@ -14,6 +14,11 @@ from .gpg import GPG
 class CredentialFactory(dict):
     def __init__(self, **kwargs):
         faker = Faker()
+        fullname = kwargs.pop("fullname")
+        if fullname:
+            login, name = split_fullname(fullname)
+            kwargs["login"] = login
+            kwargs["name"] = name
         values = {
             "login": kwargs.get('login', faker.user_name()),
             "name": kwargs.get('name', faker.domain_name()),

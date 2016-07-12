@@ -15,12 +15,12 @@ def test_cli_remove_all_credentials(irunner):
 def test_cli_remove_one_credential_by_fullname(irunner, mocker):
     mocker.patch("passpie.cli.click.confirm", return_value=True)
     credentials = [
-        CredentialFactory(login="foo", name="bar"),
-        CredentialFactory(login="spam", name="egg"),
+        CredentialFactory(fullname="foo@bar"),
+        CredentialFactory(fullname="spam@egg"),
     ]
     irunner.db.insert_multiple(credentials)
     result = irunner.run(cli, "remove foo@bar")
 
     assert len(irunner.db) == 1, result.output
-    assert irunner.db.search((Query().login == "spam") & (Query().name == "egg"))
-    assert not irunner.db.search((Query().login == "foo") & (Query().name == "bar"))
+    assert irunner.db.search(irunner.db.query("spam@egg"))
+    assert not irunner.db.search(irunner.db.query("foo@bar"))
