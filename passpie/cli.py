@@ -39,6 +39,9 @@ from .utils import (
 from .git import Repo
 
 
+__version__ = "2.0"
+
+
 #############################
 # table
 #############################
@@ -144,6 +147,7 @@ def prompt_update(credential, field, hidden=False):
 @click.option("-g", "--git-push", help="Autopush git [origin/master]")
 @click.option('-v', '--verbose', count=True, help='Activate verbose output')
 @click.option('--debug', is_flag=True, help='Activate debug output')
+@click.version_option(__version__)
 @click.pass_context
 def cli(ctx, database, passphrase, git_push, verbose, debug):
     config_overrides = {}
