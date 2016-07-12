@@ -6,6 +6,8 @@ from passpie.cli import (
     is_git_url,
     find_source_format,
     setup_path,
+    Database,
+    DatabaseInitError,
 )
 
 
@@ -97,6 +99,75 @@ def test_find_source_path_returns_git_when_path_is_git_repo_url(mocker):
     assert find_source_format("git@github.com:marcwebbie/passpiedb.git") == "git"
     mock_is_git_url.assert_called_once_with("git@github.com:marcwebbie/passpiedb.git")
 
+def test_database_setup_keys_raises_error_when_homedir_is_set_but_path_is_not_a_dir(mocker):
+    config = {
+        "DATABASE": "path/exist",
+        "HOMEDIR": "path/exist",
+        "RECIPIENT": "passpie@localhost",
+    }
+
+    mocker.patch("passpie.cli.os.path.isdir", return_value=False)
+    MockDatabase = mocker.patch("passpie.cli.Database", autospec=True)
+    instance = MockDatabase(config=config)
+    instance.config = config
+    expected_error_message = "HOMEDIR is set and is not a dir: path/exist"
+
+    with pytest.raises(DatabaseInitError) as excinfo:
+        Database.setup_homedir(instance)
+    assert "{}".format(excinfo.value) == expected_error_message
+
+
+def test_database_setup_keys_raises_error_when_homedir_path_is_dir_and_no_keys_are_found(mocker):
+    config = {
+        "DATABASE": "path/exist",
+        "HOMEDIR": "path/exist",
+        "RECIPIENT": "passpie@localhost",
+    }
+
+    mocker.patch("passpie.cli.os.path.isdir", return_value=True)
+    mocker.patch("passpie.cli.yaml_load", return_value=[])
+    MockDatabase = mocker.patch("passpie.cli.Database", autospec=True)
+    instance = MockDatabase(config=config)
+    instance.config = config
+    expected_error_message = "HOMEDIR is set and is not a dir: path/exist"
+
+    with pytest.raises(DatabaseInitError) as excinfo:
+        Database.setup_homedir(instance)
+    assert "{}".format(excinfo.value) == expected_error_message
+
+
+def test_database_setup__raises_error_when_recipient_is_set_but_is_not_found_in_homedir(mocker):
+    config = {
+        "DATABASE": "path/exist",
+        "HOMEDIR": "path/exist",
+        "RECIPIENT": "passpie@localhost",
+    }
+
+    mocker.patch("passpie.cli.os.path.isdir", return_value=False)
+    MockDatabase = mocker.patch("passpie.cli.Database", autospec=True)
+    instance = MockDatabase(config=config)
+    instance.config = config
+    expected_error_message = "HOMEDIR is set and is not a dir: path/exist"
+
+    with pytest.raises(DatabaseInitError) as excinfo:
+        Database.setup_homedir(instance)
+    assert "{}".format(excinfo.value) == expected_error_message
+
+
+def test_database_setup_keys_returns_recipient_when_is_set_and_found_in_homedir(mocker):
+    config = {
+        "DATABASE": "path/exist",
+        "HOMEDIR": "path/exist",
+        "RECIPIENT": "passpie@localhost",
+    }
+    mock_list_keys = mocker.patch("passpie.cli.list_keys", return_value=[config["RECIPIENT"]])
+    MockDatabase = mocker.patch("passpie.cli.Database", autospec=True)
+    instance = MockDatabase(config=config)
+    instance.config = config
+    recipient = Database.setup_recipient(instance, homedir=config["HOMEDIR"])
+
+    assert recipient == config["RECIPIENT"]
+    mock_list_keys.assert_called_once_with(config["HOMEDIR"], emails=True)
 
 def test_setup_path_clones_url_when_source_format_is_git(mocker):
     mocker.patch("passpie.cli.find_source_format", return_value="git")
