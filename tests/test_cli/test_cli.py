@@ -173,11 +173,3 @@ def test_cli_init_create_database_in_format_bztar(irunner, mocker):
     )
     assert result.exit_code == 0, result.output
     assert find_source_format(database_filename) == "bztar"
-
-
-def test_cli_remove_all_credentials(irunner_with_db, mocker):
-    irunner_with_db.invoke(cli, ["add", "--random", "foo@bar", "spam@egg"])
-    assert irunner_with_db.db.count(all) == 2
-    result = irunner_with_db.invoke(cli, ["remove", "--all"])
-    assert result.exit_code == 0
-    assert irunner_with_db.db.count(all) == 0
