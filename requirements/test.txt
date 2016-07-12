@@ -7,3 +7,4 @@ mock
 flake8
 pudb
 pdbpp
+factory-boy==2.7.0

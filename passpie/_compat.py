@@ -1,8 +1,4 @@
 import sys
-try:
-    from shutil import which as _which
-except ImportError:
-    from distutils.spawn import find_executable as _which
 
 try:
     basestring

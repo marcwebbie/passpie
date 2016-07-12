@@ -1,0 +1,18 @@
+** Homedir and Recipient
+
+| HOMEDIR         | RECIPIENT         | Result homedir         | Result recipient          |
+|-----------------+-------------------+------------------------+---------------------------|
+| null            | null              | imported from keys.yml | first from result homedir |
+| null            | email@example.com | imported from keys.yml | RECIPIENT                 |
+| path/to/homedir | null              | HOMEDIR                | first from HOMEDIR        |
+| path/to/homedir | email@example.com | HOMEDIR                | RECIPIENT                 |
+
+** Database
+
+| field      | description                   |
+|------------+-------------------------------|
+| source     |                               |
+| format     |                               |
+| path       |                               |
+| homedir    |                               |
+| passphrase | Used to decrypted credentials |

@@ -1,4 +1,4 @@
-from .cli import make_fullname, split_fullname, Database
+from .database import make_fullname, split_fullname, Database
 
 
 __all__ = [
