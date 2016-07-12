@@ -2,7 +2,7 @@ import re
 
 from tinydb import Storage, TinyDB, Query
 from tinydb.storages import touch
-import factory
+from faker import Faker
 import yaml
 
 from .git import Repo
@@ -11,14 +11,16 @@ from .config import Config
 from .gpg import GPG
 
 
-class CredentialFactory(factory.Factory):
-    class Meta:
-        model = dict
-
-    login = factory.Faker('user_name')
-    name = factory.Faker('domain_name')
-    password = factory.Faker('password', length=32)
-    comment = factory.Faker('sentence', nb_words=2)
+class CredentialFactory(dict):
+    def __init__(self, **kwargs):
+        faker = Faker()
+        values = {
+            "login": kwargs.get('login', faker.user_name()),
+            "name": kwargs.get('name', faker.domain_name()),
+            "password": kwargs.get('password', faker.password()),
+            "comment": kwargs.get('comment', faker.sentence(nb_words=3)),
+        }
+        super(CredentialFactory, self).__init__(**values)
 
 
 def split_fullname(fullname):

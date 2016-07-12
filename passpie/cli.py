@@ -23,16 +23,19 @@ from .database import (
     split_fullname,
     make_fullname
 )
-from .gpg import generate_key
+from .gpg import generate_key, export_keys
 from .proc import run
 from .utils import (
     auto_archive,
-    safe_join,
     copy_to_clipboard,
     genpass,
+    logger,
+    make_archive,
+    safe_join,
     which,
-    logger
+    yaml_dump,
 )
+from .git import Repo
 
 
 #############################
@@ -161,10 +164,12 @@ def cli(ctx, database, passphrase, git_push, verbose, debug):
 @click.argument("path", default="passpie.db")
 @click.option("-f", "--force", is_flag=True, help="Force initialization")
 @click.option("-r", "--recipient", help="Keyring recipient")
+@click.option("--key-length", type=click.Choice([1024, 2048, 4096]), help="Key length")
+@click.option("--expire-date", type=int, help="Key expiration date")
 @click.option("-ng", "--no-git", is_flag=True, help="Don't initialize a git repo")
 @click.option("-F", "--format", default="gztar", type=click.Choice(["dir", "tar", "zip", "gztar", "bztar"]))
 @click.pass_context
-def init(ctx, path, force, recipient, no_git, format):
+def init(ctx, path, force, recipient, no_git, key_length, expire_date, format):
     """Initialize database"""
     config = ctx.meta["config"]
     passphrase = ctx.meta["passphrase"]
@@ -189,20 +194,29 @@ def init(ctx, path, force, recipient, no_git, format):
     if recipient:
         config_values["RECIPIENT"] = recipient
     else:
-        homedir_path = create_keys(
-            passphrase=passphrase, key_length=config['KEY_LENGTH'])
-        homedir = Homedir(homedir_path)
-        homedir.write(safe_join(tempdir, "keys.yml"))
+        key_values = {
+            "key_length": key_length or 4096,
+            "passphrase": passphrase,
+            "expire_date": expire_date or 0,
+        }
+        homedir = mkdtemp()
+        keys_data = generate_key(homedir, key_values)
+        keys_content = export_keys(homedir, keys_data["email"])
+        keys_file_path = safe_join(tempdir, "keys.yml")
+        yaml_dump([keys_content], keys_file_path)
 
-    config.write(safe_join(tempdir, "config.yml"))
-    touch(safe_join(tempdir, ".passpie"))
+    dot_passpie_file_path = safe_join(tempdir, ".passpie")
+    touch(dot_passpie_file_path)
+
+    config_file_path = safe_join(tempdir, "config.yml")
+    yaml_dump(config_values, config_file_path)
 
     if no_git or config["GIT"] is False:
         pass  # Don't create a git repo
     else:
         repo = Repo(tempdir)
         repo.init().commit("Initialize database")
-    archive(src=tempdir, dest=path, format=format)
+    make_archive(src=tempdir, dest=path, dest_format=format)
 
 
 @cli.command(name="list")
@@ -252,13 +266,11 @@ def configdb(db, name, value):
 def add(db, fullnames, random, comment, password, force, fake):
     """Insert credential"""
     if fake:
-        credential = CredentialFactory()
-        db.insert(db.encrypt(credential))
-        inserted_fullname = make_fullname(credential["login"], credential["name"])
-        click.echo("Inserted credential: {}".format(inserted_fullname))
-        return
-
-    if random or db.config["PASSWORD_RANDOM"]:
+        fake_cred = CredentialFactory()
+        db.insert(db.encrypt(fake_cred))
+        fullname = make_fullname(fake_cred["login"], fake_cred["name"])
+        db.repo.commit("Add fake credential '{}'".format(fullname))
+    elif random or db.config["PASSWORD_RANDOM"]:
         password = genpass(db.config["PASSWORD_PATTERN"])
     elif password is None:
         password = click.prompt(
@@ -279,8 +291,8 @@ def add(db, fullnames, random, comment, password, force, fake):
                 raise click.ClickException(msg)
         else:
             db.insert(db.encrypt(credential))
-    else:
-        db.repo.commit("Add credentials '{}'".format((", ").join(fullnames)))
+
+    db.repo.commit("Add credentials '{}'".format((", ").join(fullnames)))
 
 
 @cli.command()

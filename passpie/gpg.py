@@ -35,7 +35,7 @@ def make_key_input(**kwargs):
         kwargs["email"],
         kwargs["expire_date"],
     )
-    return key_input
+    return key_input, kwargs
 
 
 def list_keys(homedir, emails=False):
@@ -62,7 +62,7 @@ def list_keys(homedir, emails=False):
     return keys
 
 
-def export_keys(homedir, fingerprint):
+def export_keys(homedir, fingerprint=""):
     command = [
         which('gpg2', 'gpg'),
         '--no-tty',
@@ -86,20 +86,6 @@ def export_keys(homedir, fingerprint):
     return ret.std_out + ret_secret.std_out
 
 
-def create_keys(passphrase, key_length=4096):
-    homedir = mkdtemp()
-    command = [
-        which('gpg2', 'gpg'),
-        '--batch',
-        '--no-tty',
-        '--homedir', homedir,
-        '--gen-key',
-    ]
-    key_input = make_key_input(passphrase=passphrase, key_length=key_length)
-    run(command, data=key_input)
-    return export_keys(homedir, DEFAULT_RECIPIENT)
-
-
 def generate_key(homedir, values):
     command = [
         which('gpg2', 'gpg'),
@@ -108,8 +94,9 @@ def generate_key(homedir, values):
         '--homedir', homedir,
         '--gen-key',
     ]
-    key_input = make_key_input(**values)
+    key_input, key_data = make_key_input(**values)
     run(command, data=key_input)
+    return key_data
 
 
 def encrypt_data(data, recipient, homedir):
