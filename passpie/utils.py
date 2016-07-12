@@ -39,9 +39,13 @@ def safe_join(*paths):
     return os.path.join(*[os.path.expanduser(p) for p in paths])
 
 
-def yaml_dump(data, path):
-    with open(path, "w") as f:
-        f.write(yaml.safe_dump(data, default_flow_style=False))
+def yaml_dump(data, path=None):
+    content = yaml.safe_dump(data, default_flow_style=False)
+    if path:
+        with open(path, "w") as f:
+            f.write(content)
+    else:
+        return content
 
 
 def yaml_to_python(data):

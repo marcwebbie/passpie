@@ -174,27 +174,6 @@ def test_cli_init_create_database_in_format_bztar(irunner, mocker):
     assert result.exit_code == 0, result.output
     assert find_source_format(database_filename) == "bztar"
 
-def test_cli_config_without_arguments_prints_config(irunner_with_db, mocker, config):
-    result = irunner_with_db.invoke(cli, ["config"])
-    assert result.exit_code == 0
-    assert irunner_with_db.db.config["DATABASE"] in result.output
-    assert irunner_with_db.db.config["TABLE_FORMAT"] in result.output
-
-
-def test_cli_config_with_name_and_value_arguments_sets_config(irunner_with_db, mocker):
-    set_result = irunner_with_db.invoke(cli, ["config", "TABLE_FORMAT", "new_table_format"])
-    result = irunner_with_db.invoke(cli, ["config","TABLE_FORMAT"])
-    assert set_result.exit_code == 0
-    assert result.exit_code == 0
-    assert "TABLE_FORMAT: new_table_format\n" == result.output
-
-
-def test_cli_config_with_name_lower_case_findsargument_prints_value(irunner_with_db, mocker):
-    irunner_with_db.invoke(cli, ["config", "TABLE_FORMAT", "new_table_format"])
-    result = irunner_with_db.invoke(cli, ["config", "table_format"])
-    assert result.exit_code == 0
-    assert "TABLE_FORMAT: new_table_format\n" == result.output
-
 
 def test_cli_remove_all_credentials(irunner_with_db, mocker):
     irunner_with_db.invoke(cli, ["add", "--random", "foo@bar", "spam@egg"])

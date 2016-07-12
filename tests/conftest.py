@@ -191,6 +191,7 @@ def irunner(mocker):
         make_archive("passpie.db", "passpie.db", "gztar")
         with auto_archive("passpie.db") as archive:
             with Database(archive, passphrase="k") as database:
+                database.repo = mocker.MagicMock()
                 runner.db = database
                 yield runner
 

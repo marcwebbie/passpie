@@ -34,6 +34,7 @@ from .utils import (
     safe_join,
     which,
     yaml_dump,
+    yaml_to_python,
 )
 from .git import Repo
 
@@ -246,13 +247,13 @@ def configdb(db, name, value):
     name = name.upper() if name else ""
     if name and name in db.config:
         if value:
-            db.config_set(name, value)
+            db.config[name] = value
             db.repo.commit("Set config: {} = {}".format(name, value))
-            close_database(db, sync=True)
         else:
-            click.echo("{}: {}".format(name, db.config[name]))
+            click.echo("{}".format(db.config[name]))
     else:
-        click.echo(yaml_dump(db.config).strip())
+        config_content = yaml_dump(dict(db.config)).strip()
+        click.echo(config_content)
 
 
 @cli.command()
