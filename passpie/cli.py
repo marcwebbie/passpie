@@ -306,10 +306,10 @@ def add(db, fullnames, random, comment, password, force, fake):
 
 @cli.command()
 @click.argument("fullnames", nargs=-1, callback=lambda ctx, param, val: list(val))
-@click.option("-y", "--yes", is_flag=True, help="Skip confirmation prompt")
+@click.option("-f", "--force", is_flag=True, help="Skip confirmation prompt")
 @click.option("-A", "--all", "purge", is_flag=True, help="Purge all credentials")
 @pass_database()
-def remove(db, fullnames, yes, purge):
+def remove(db, fullnames, force, purge):
     """Remove credential"""
     if purge:
         db.purge()
@@ -318,7 +318,7 @@ def remove(db, fullnames, yes, purge):
         removed = False
         fulnames = [f for f in fullnames if db.contains(db.query(f))]
         for fullname in fulnames:
-            if yes or click.confirm("Remove {}".format(fullname)):
+            if force or click.confirm("Remove {}".format(fullname)):
                 db.remove(db.query(fullname))
                 removed = True
         if removed is True:
