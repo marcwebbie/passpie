@@ -12,19 +12,27 @@ import shutil
 from tabulate import tabulate
 from tinydb.storages import touch
 import click
-
 import yaml
 
 from . import importers
 from ._compat import *
 from .config import Config
-from .database import (Database,
-                       CredentialFactory,
-                       split_fullname,
-                       make_fullname)
-from .gpg import GPG, generate_key
+from .database import (
+    Database,
+    CredentialFactory,
+    split_fullname,
+    make_fullname
+)
+from .gpg import generate_key
 from .proc import run
-from .utils import auto_archive, safe_join, copy_to_clipboard, genpass, which
+from .utils import (
+    auto_archive,
+    safe_join,
+    copy_to_clipboard,
+    genpass,
+    which,
+    logger
+)
 
 
 #############################
@@ -126,10 +134,11 @@ def prompt_update(credential, field, hidden=False):
 
 
 @click.group()
+@click.option("-P", "--passphrase", help="Database passphrase",
+              envvar="PASSPIE_PASSPHRASE")
 @click.option("-D", "--database", help="Database path")
-@click.option("-P", "--passphrase", help="Database passphrase")
 @click.option("-g", "--git-push", help="Autopush git [origin/master]")
-@click.option('--verbose', is_flag=True, help='Activate verbose output')
+@click.option('-v', '--verbose', count=True, help='Activate verbose output')
 @click.option('--debug', is_flag=True, help='Activate debug output')
 @click.pass_context
 def cli(ctx, database, passphrase, git_push, verbose, debug):
@@ -142,9 +151,9 @@ def cli(ctx, database, passphrase, git_push, verbose, debug):
     ctx.meta["config"] = config
     ctx.meta["passphrase"] = passphrase
 
-    if verbose is True or config["VERBOSE"] is True:
+    if verbose is 1 or config["VERBOSE"]:
         logger.setLevel(logging.INFO)
-    if debug is True or config["DEBUG"] is True:
+    if debug is True or config["DEBUG"] is True or verbose > 1:
         logger.setLevel(logging.DEBUG)
 
 
