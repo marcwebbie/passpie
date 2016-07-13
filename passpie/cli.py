@@ -331,44 +331,47 @@ def remove(db, fullnames, force, purge):
 @click.option("-r", "--random", is_flag=True, help="Random password generation")
 @click.option("-P", "--pattern", help="Random password pattern")
 @click.option("-C", "--copy", is_flag=True, help="Copy passwor to clipboard")
-@click.option("-y", "--yes", is_flag=True, help="Skip confirmation prompt")
+@click.option("-i", "--interactive", is_flag=True, help="Interactive confirm updates")
 @click.option("-c", "--comment", help="Credentials comment")
 @click.option("-p", "--password", help="Credentials password")
 @click.option("-l", "--login", help="Credentials login")
 @click.option("-n", "--name", help="Credentials name")
 @pass_database(ensure_passphrase=True)
-def update(db, fullnames, random, pattern, copy, comment, password, name, login, yes):
+def update(db, fullnames, random, pattern, copy, comment, password, name, login, interactive):
     """Update credential"""
     updated = []
     for fullname in [f for f in fullnames if db.contains(db.query(f))]:
-        if yes is True or click.confirm("Update {}".format(fullname)):
-            cred = db.get(db.query(fullname))
-            values = {}
-            if login:
-                values["login"] = login
-            if name:
-                values["name"] = name
-            if password:
-                values["password"] = password
-            if comment:
-                values["comment"] = comment
-            if random:
-                values["password"] = genpass(pattern or db.config["PASSWORD_PATTERN"])
+        if interactive is True and not click.confirm("Update {}".format(fullname)):
+            # Don't update
+            continue
+        cred = db.get(db.query(fullname))
+        values = {}
+        if login:
+            values["login"] = login
+        if name:
+            values["name"] = name
+        if password:
+            values["password"] = db.gpg.encrypt(password)
+        if comment:
+            values["comment"] = comment
+        if random:
+            values["password"] = genpass(pattern or db.config["PASSWORD_PATTERN"])
 
-            if not values:
-                values["login"] = prompt_update(cred, "login")
-                values["name"] = prompt_update(cred, "name")
-                values["password"] = prompt_update(cred, "password", hidden=True)
-                values["comment"] = prompt_update(cred, "comment")
+        if not values:
+            values["login"] = prompt_update(cred, "login")
+            values["name"] = prompt_update(cred, "name")
+            values["password"] = prompt_update(cred, "password", hidden=True)
+            values["comment"] = prompt_update(cred, "comment")
 
-            db.update(values, db.query(fullname))
-            updated.append(fullname)
+        db.update(values, db.query(fullname))
+        updated.append(fullname)
 
     if updated:
         db.repo.commit("Update credentials '{}'".format((", ").join(fullnames)))
 
         if copy:
-            copy_to_clipboard(cred["password"], db.config["COPY_TIMEOUT"])
+            password = db.gpg.decrypt(cred["password"])
+            copy_to_clipboard(password, db.config["COPY_TIMEOUT"])
 
 
 @cli.command()
