@@ -37,8 +37,8 @@ def validate_config(ctx, param, value):
 
     if config.is_repo_url(configuration['path']) is True:
         temporary_path = clone(configuration['path'], depth="1")
-        configuration.update(config.read(temporary_path))  # Read cloned config
         configuration['path'] = temporary_path
 
+    configuration.update(config.read(configuration['path']))
     configuration = config.setup_crypt(configuration)
     return configuration
