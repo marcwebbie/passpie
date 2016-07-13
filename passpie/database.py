@@ -22,7 +22,7 @@ class CredentialFactory(dict):
         values = {
             "login": kwargs.get('login', faker.user_name()),
             "name": kwargs.get('name', faker.domain_name()),
-            "password": kwargs.get('password', faker.password()),
+            "password": kwargs.get('password', faker.password(length=32)),
             "comment": kwargs.get('comment', faker.sentence(nb_words=3)),
         }
         super(CredentialFactory, self).__init__(**values)
