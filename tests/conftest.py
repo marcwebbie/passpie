@@ -167,8 +167,9 @@ MOCK_KEYPAIR = MOCK_PUBLIC_KEY + MOCK_PRIVATE_KEY
 
 class CliRunnerWithDB(CliRunner):
 
-    def run(self, cmd, args):
-        return self.invoke(cmd, args.split(), catch_exceptions=False)
+    def run(self, cmd, params, *args, **kwargs):
+        kwargs.setdefault("catch_exceptions", False)
+        return self.invoke(cmd, params.split(), *args, **kwargs)
 
 
 @pytest.yield_fixture
