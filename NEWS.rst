@@ -1,3 +1,7 @@
+Version 1.5.3
+-------------
++ **✔** Fix load config from local db config file
+
 Version 1.5.2
 -------------
 + **✔** Remove loading config from ".passpie/.config" if database path set
