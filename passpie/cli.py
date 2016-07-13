@@ -435,14 +435,14 @@ def export_database(db, filepath, as_json):
     credentials = (db.decrypt(c) for c in db.all())
     dict_content = OrderedDict()
     dict_content["handler"] = "passpie"
-    dict_content["version"] = 1.0
+    dict_content["version"] = 2.0
     dict_content["credentials"] = [dict(x) for x in credentials]
 
     if as_json:
         content = json.dumps(dict_content, indent=2)
     else:
         dict_content = dict(dict_content)
-        content = yaml.safe_dump(dict_content, default_flow_style=False)
+        content = yaml_dump(dict_content)
 
     filepath.write(content)
 
