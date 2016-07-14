@@ -437,18 +437,11 @@ def import_database(db, filepath, importer, cols, force):
 @pass_database(ensure_passphrase=True, sync=False)
 def export_database(db, filepath, as_json):
     """Export credentials in plain text"""
-    credentials = (db.decrypt(c) for c in db.all())
-    dict_content = OrderedDict()
-    dict_content["handler"] = "passpie"
-    dict_content["version"] = 2.0
-    dict_content["credentials"] = [dict(x) for x in credentials]
-
+    credentials = [dict(db.decrypt(c)) for c in db.all()]
     if as_json:
-        content = json.dumps(dict_content, indent=2)
+        content = json.dumps(credentials, indent=2)
     else:
-        dict_content = dict(dict_content)
-        content = yaml_dump(dict_content)
-
+        content = yaml_dump(credentials)
     filepath.write(content)
 
 
