@@ -40,7 +40,7 @@ def make_key_input(**kwargs):
 
 def list_keys(homedir, emails=False):
     command = [
-        "gpg",
+        which("gpg2", "gpg"),
         '--no-tty',
         "--batch",
         '--fixed-list-mode',
@@ -132,7 +132,7 @@ def decrypt_data(data, recipient, homedir, passphrase):
 
 def import_keys(keyspath, homedir):
     cmd = (
-        "gpg",
+        which("gpg2", "gpg"),
         "--no-tty",
         "--batch",
         "--homedir", homedir,
