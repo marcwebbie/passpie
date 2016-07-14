@@ -173,8 +173,8 @@ def cli(ctx, database, passphrase, git_push, verbose, debug):
 @click.argument("path", default="passpie.db")
 @click.option("-f", "--force", is_flag=True, help="Force initialization")
 @click.option("-r", "--recipient", help="Keyring recipient")
-@click.option("--key-length", type=click.Choice([1024, 2048, 4096]), help="Key length")
-@click.option("--expire-date", type=int, help="Key expiration date")
+@click.option("--key-length", type=click.Choice(["1024", "2048", "4096"]), help="Key length")
+@click.option("--expire-date", help="Key expiration date")
 @click.option("-ng", "--no-git", is_flag=True, help="Don't initialize a git repo")
 @click.option("-F", "--format", default="gztar", type=click.Choice(["dir", "tar", "zip", "gztar", "bztar"]))
 @click.pass_context

@@ -10,7 +10,7 @@ import yaml
 from passpie.cli import cli
 from passpie.config import Config
 from passpie.database import Database
-from passpie.utils import mkdir, safe_join, Archive
+from passpie.utils import mkdir, safe_join, Archive, extract
 
 
 MOCK_PUBLIC_KEY = """-----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -167,14 +167,37 @@ MOCK_KEYPAIR = MOCK_PUBLIC_KEY + MOCK_PRIVATE_KEY
 
 class CliRunnerWithDB(CliRunner):
 
+    db_path = None
+
     def run(self, cmd, params, *args, **kwargs):
         kwargs.setdefault("catch_exceptions", False)
         return self.invoke(cmd, params.split(), *args, **kwargs)
+
+    def passpie(self, params, *args, **kwargs):
+        from passpie.cli import cli
+        return self.run(cli, params, *args, **kwargs)
+
+    @property
+    def db_extracted_path(self):
+        if self.db_path:
+            return self.db_path
+        else:
+            self.db_path = extract("passpie.db", "gztar")
+            return self.db_path
 
 
 @pytest.yield_fixture
 def config(mocker):
     yield Config.DEFAULT
+
+
+@pytest.yield_fixture
+def irunner_empty(mocker):
+    mocker.patch("passpie.cli.generate_keys")
+    mocker.patch("passpie.cli.export_keys", return_value=MOCK_KEYPAIR)
+    runner = CliRunnerWithDB()
+    with runner.isolated_filesystem():
+        yield runner
 
 
 @pytest.yield_fixture
