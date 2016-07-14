@@ -13,7 +13,6 @@ from tabulate import tabulate
 from tinydb.storages import touch
 from tinydb import Query
 import click
-import yaml
 
 from . import importers
 from ._compat import *
