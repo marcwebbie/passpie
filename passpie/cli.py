@@ -15,7 +15,6 @@ from tinydb import Query
 import click
 
 from . import importers
-from ._compat import *
 from .config import Config
 from .database import (
     Database,

@@ -2,7 +2,7 @@ from tempfile import mkdtemp
 import functools
 import os
 
-from ._compat import FileExistsError
+from .compat import FileExistsError
 from .utils import logger, safe_join, which
 from .proc import run
 

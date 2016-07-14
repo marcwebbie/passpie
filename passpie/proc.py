@@ -7,7 +7,6 @@ import logging
 import os
 
 
-from ._compat import *
 from .utils import logger
 
 
@@ -20,7 +19,7 @@ class Proc(Popen):
     """Wrapper on Subprocess.POPEN"""
 
     def communicate(self, **kwargs):
-        if kwargs.get('input') and isinstance(kwargs['input'], basestring):
+        if kwargs.get('input'):
             kwargs['input'] = kwargs['input'].encode('utf-8')
         return super(Proc, self).communicate(**kwargs)
 

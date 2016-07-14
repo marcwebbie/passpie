@@ -148,7 +148,7 @@ def create_homedir(keys, fallback):
         homedir = mkdtemp()
         for key in keys:
             keysfile = NamedTemporaryFile(delete=False, dir=homedir, suffix=".asc")
-            keysfile.write(key)
+            keysfile.write(key.encode("utf-8"))
             import_keys(keysfile.name, homedir)
         return homedir
     elif not fallback:

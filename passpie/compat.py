@@ -1,18 +1,18 @@
 import sys
 
-try:
-    basestring
-except NameError:
-    basestring = str
 
-try:
-    unicode = unicode
-except NameError:
-    unicode = str
+if sys.version_info < (3,):
+    # python 2
+    bytes = str
+    str = unicode
 
 
-def is_python2():
-    return sys.version_info < (3,)
+class unicode_str(str):
+    pass
+
+
+class bytes_str(bytes):
+    pass
 
 
 class FileNotFoundError(OSError):
