@@ -41,7 +41,10 @@ def test_import_csv_keepass_credential(irunner, mocker):
     mocker.patch("passpie.cli.GPG.decrypt", return_value="decrypted")
     credential = CredentialFactory(fullname="foo@bar")
     with open("keepass.csv", "w") as f:
-        f.write(EXPORTED_PLAIN_TEXT_KEEPASS_CSV.encode("utf-8"))
+        try:
+            f.write(EXPORTED_PLAIN_TEXT_KEEPASS_CSV.encode("utf-8"))
+        except TypeError:
+            f.write(EXPORTED_PLAIN_TEXT_KEEPASS_CSV)
     result = irunner.passpie('import --skip-lines 1 --csv ",,login,password,name,comment" keepass.csv')
 
     assert result.exit_code == 0, result.output
