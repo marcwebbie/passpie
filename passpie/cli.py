@@ -149,18 +149,22 @@ def prompt_update(credential, field, hidden=False):
 @click.group()
 @click.option("-P", "--passphrase", help="Database passphrase",
               envvar="PASSPIE_PASSPHRASE")
+@click.option("-R", "--recipient", help="Database passphrase",
+              envvar="PASSPIE_GPG_RECIPIENT")
 @click.option("-D", "--database", help="Database path")
 @click.option("-g", "--git-push", help="Autopush git [origin/master]")
 @click.option('-v', '--verbose', count=True, help='Activate verbose output')
 @click.option('--debug', is_flag=True, help='Activate debug output')
 @click.version_option(__version__)
 @click.pass_context
-def cli(ctx, database, passphrase, git_push, verbose, debug):
+def cli(ctx, database, passphrase, recipient, git_push, verbose, debug):
     config_overrides = {}
     if database:
         config_overrides["DATABASE"] = database
     if git_push:
         config_overrides["GIT_PUSH"] = git_push
+    if recipient:
+        config_overrides["GPG_RECIPIENT"] = recipient
     config = Config.get_global(config_overrides)
     ctx.meta["config"] = config
     ctx.meta["passphrase"] = passphrase

@@ -168,7 +168,7 @@ class GPG(object):
         self.recipient = recipient or self.get_default_recipient()
 
     def write(self):
-        if not self.is_fallback and self.is_modified:
+        if not self.is_fallback() and self.is_modified:
             return yaml_dump(self.export(), self.path)
 
     def is_fallback(self):
