@@ -16,7 +16,7 @@ def test_csv_importer_with_empty_reader_raises_value_error(mocker, mock_open):
     importer = CSVImporter()
 
     with pytest.raises(ValueError):
-        importer.handle('filepath', cols=[])
+        importer.handle('filepath', params={"cols": "", "skip_lines": 1})
 
 
 def test_csv_importer_returns_list_of_credentials(mocker, mock_open):
@@ -35,5 +35,5 @@ def test_csv_importer_returns_list_of_credentials(mocker, mock_open):
     mocker.patch('passpie.importers.csv_importer.csv.reader', return_value=iter(rows))
     importer = CSVImporter()
 
-    credentials = importer.handle('filepath', cols=cols)
+    credentials = importer.handle('filepath', params={"cols": cols, "skip_lines": 1})
     assert credentials == expected_credentials

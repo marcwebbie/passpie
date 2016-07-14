@@ -164,7 +164,15 @@ WGEg2w==
 
 MOCK_KEYPAIR = MOCK_PUBLIC_KEY + MOCK_PRIVATE_KEY
 
-# HOMEDIR = import_keyring([MOCK_PUBLIC_KEY + MOCK_PRIVATE_KEY])
+
+@pytest.yield_fixture
+def mock_open():
+    try:
+        from mock import mock_open as mopen
+    except:
+        from unittest.mock import mock_open as mopen
+    yield mopen()
+
 
 class CliRunnerWithDB(CliRunner):
 

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import re
 
 from tinydb import Storage, TinyDB, Query
@@ -45,7 +46,7 @@ def split_fullname(fullname):
 
 
 def make_fullname(login, name):
-    fullname = "{}@{}".format("" if login is None else login, name)
+    fullname = u"{}@{}".format("" if login is None else login, name)
     return fullname
 
 
@@ -103,8 +104,8 @@ class Database(TinyDB):
 
     def encrypt(self, credential):
         credential["password"] = self.gpg.encrypt(credential["password"])
-        return credential
+        return dict(credential)
 
     def decrypt(self, credential):
         credential["password"] = self.gpg.decrypt(credential["password"])
-        return credential
+        return dict(credential)

@@ -110,6 +110,7 @@ def pass_database(ensure_passphrase=False, confirm_passphrase=False, ensure_exis
                     with Database(archive, cfg, gpg) as db:
                         return command(db, *args, **kwargs)
             except (IOError, ValueError) as exception:
+                raise
                 raise click.ClickException("{}".format(exception))
         return wrapper
     return decorator
@@ -400,22 +401,23 @@ def copy(db, fullname, dest, timeout):
 @click.argument("filepath", type=click.Path(readable=True, exists=True))
 @click.option("-I", "--importer", type=click.Choice(importers.get_names()),
               help="Specify an importer")
-@click.option("--cols", help="CSV expected columns", callback=validate_cols)
+@click.option("--csv", help="CSV expected columns", callback=validate_cols)
+@click.option("--skip-lines", type=int, help="Number of lines to skip")
 @click.option("-f", "--force", is_flag=True, help="Force importing credentials")
 @pass_database()
-def import_database(db, filepath, importer, cols, force):
+def import_database(db, filepath, importer, csv, force, skip_lines):
     """Import credentials from path"""
-    if cols:
+    if csv:
         importer = importers.get(name='csv')
-        kwargs = {'cols': cols}
+        params = {'cols': csv, 'skip_lines': skip_lines}
     else:
         importer = importers.find_importer(filepath)
-        kwargs = {}
+        params = {}
 
-    imported = False
     if importer:
-        credentials = [db.encrypt(c) for c in importer.handle(filepath, **kwargs)]
-        for credential in credentials:
+        imported = False
+        credentials = importer.handle(filepath, params=params)
+        for credential in [db.encrypt(c) for c in credentials]:
             fullname = make_fullname(credential["login"], credential["name"])
             if db.contains(db.query(fullname)):
                 if force is False and not click.confirm("Update {}".format(fullname)):
@@ -427,8 +429,8 @@ def import_database(db, filepath, importer, cols, force):
                 db.insert(credential)
                 imported = True
 
-    if imported is True:
-        db.repo.commit(message=u'Imported credentials from {}'.format(filepath))
+        if imported is True:
+            db.repo.commit(message=u'Imported credentials from {}'.format(filepath))
 
 
 @cli.command(name="export")
