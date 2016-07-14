@@ -37,7 +37,7 @@ def test_init_with_force_ovewrite_existing_database_passpie_dot_db(irunner_empty
 
 
 def test_init_with_format_creates_file_with_expected_format_zip(irunner_empty):
-    result_zip = irunner_empty.passpie("--passphrase pwd init --format zip")
+    result = irunner_empty.passpie("--passphrase pwd init --format zip")
     assert result.exit_code == 0
     assert get_archive_format("passpie.db") == "zip"
 
