@@ -20,7 +20,6 @@ import rstr
 import yaml
 
 
-
 HOME = os.path.expanduser("~")
 
 logger = logging.getLogger('passpie')
@@ -105,9 +104,8 @@ def copy_to_clipboard(text, timeout):
             sys.stdout.write(dot)
             sys.stdout.flush()
             time.sleep(1)
-        else:
-            pyperclip.copy("\b")
-            print("")
+        pyperclip.copy("\b")
+        sys.stdout.write("\n")
 
 
 def mkdir(path):

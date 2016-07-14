@@ -34,19 +34,6 @@ def test_make_fullname_returns_expected_fullname(mocker):
     assert make_fullname("", "bar") == "@bar"
 
 
-def test_path_is_git_url(mocker):
-    assert is_git_url('https://foo@example.com/user/repo.git') is True
-    assert is_git_url('https://github.com/marcwebbie/passpiedb.git') is True
-    assert is_git_url('git@github.com:marcwebbie/passpiedb.git') is True
-
-    # Not a repo
-    assert is_git_url('http://example.com') is False
-    assert is_git_url('https://github.com/marcwebbie/passpiedb') is False
-    assert is_git_url(None) is False
-    assert is_git_url('') is False
-    assert is_git_url('++++++++++++++') is False
-
-
 def test_find_source_path_returns_none_when_not_path(mocker):
     mocker.patch("passpie.cli.os.path.isdir", return_value=False)
     mocker.patch("passpie.cli.tarfile.is_tarfile", return_value=False)
