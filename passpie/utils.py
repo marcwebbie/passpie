@@ -79,8 +79,11 @@ def genpass(pattern=None, length=32):
             return rstr.xeger(pattern)
         except re.error as e:
             raise ValueError(str(e))
-    else:
-        return Faker().password(length=length)
+        except KeyError:
+            # Error in python 3.5, rstr does not support
+            pass
+
+    return Faker().password(length=length)
 
 
 def which(*binaries):
