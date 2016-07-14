@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
-from collections import OrderedDict
 from tempfile import mkdtemp
 import functools
 import json
