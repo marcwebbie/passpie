@@ -29,7 +29,7 @@ def test_update_credential_comment_from_command_option(irunner, mocker):
 
 
 def test_update_credential_comment_from_command_option(irunner, mocker):
-    mock_encrypt = mocker.patch("passpie.database.GPG.encrypt", return_value="encrypted")
+    mock_encrypt = mocker.patch("passpie.cli.GPG.encrypt", return_value="encrypted")
     irunner.db.insert(CredentialFactory(fullname="foo@bar"))
     result = irunner.run(cli, "--passphrase k update foo@bar --password s3cr3t")
 
@@ -59,7 +59,7 @@ def test_update_credential_without_options_prompts_update_for_each_field(irunner
 
 
 def test_update_credential_with_copy_call_copy_to_clipboard_with_decrypted_password(irunner, mocker):
-    mocker.patch("passpie.database.GPG.decrypt", return_value="s3cr3t")
+    mocker.patch("passpie.cli.GPG.decrypt", return_value="s3cr3t")
     mock_copy_to_clipboard = mocker.patch("passpie.cli.copy_to_clipboard")
     irunner.db.insert(CredentialFactory(fullname="foo@bar"))
     result = irunner.run(cli, "--passphrase k update foo@bar --password s3cr3t --copy")
@@ -69,7 +69,7 @@ def test_update_credential_with_copy_call_copy_to_clipboard_with_decrypted_passw
 
 
 def test_update_credential_commit_changes_when_updated(irunner, mocker):
-    mocker.patch("passpie.database.GPG.decrypt", return_value="s3cr3t")
+    mocker.patch("passpie.cli.GPG.decrypt", return_value="s3cr3t")
     mock_commit = mocker.patch("passpie.database.Repo.commit")
     irunner.db.insert(CredentialFactory(fullname="foo@bar"))
     result = irunner.run(cli, "--passphrase k update foo@bar --password s3cr3t")

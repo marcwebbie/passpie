@@ -24,7 +24,7 @@ from .database import (
     split_fullname,
     make_fullname
 )
-from .gpg import generate_keys, export_keys
+from .gpg import generate_keys, export_keys, GPG
 from .proc import run
 from .utils import (
     auto_archive,
@@ -100,14 +100,18 @@ def pass_database(ensure_passphrase=False, confirm_passphrase=False, ensure_exis
                 passphrase = click.prompt(
                     "Passphrase",
                     hide_input=True,
-                    confirmation_prompt=confirm_passphrase,
-                )
+                    confirmation_prompt=confirm_passphrase)
             database_path = config["DATABASE"]
             try:
                 with auto_archive(database_path) as archive:
-                    with Database(archive, passphrase) as db:
+                    cfg = Config(archive.path)
+                    gpg = GPG(archive.path,
+                              passphrase,
+                              cfg["GPG_HOMEDIR"],
+                              cfg["GPG_RECIPIENT"])
+                    with Database(archive, cfg, gpg) as db:
                         return command(db, *args, **kwargs)
-            except IOError as exception:
+            except (IOError, ValueError) as exception:
                 raise click.ClickException("{}".format(exception))
         return wrapper
     return decorator

@@ -16,8 +16,8 @@ class Config(dict):
 
         # GPG
         'KEY_LENGTH': 4096,
-        'HOMEDIR': None,
-        'RECIPIENT': None,
+        'GPG_HOMEDIR': safe_join("~", ".gnupg"),
+        'GPG_RECIPIENT': None,
 
         # Table
         'TABLE_FORMAT': 'fancy_grid',
@@ -40,7 +40,7 @@ class Config(dict):
     }
 
     def __init__(self, path):
-        self.path = path
+        self.path = safe_join(path, "config.yml")
         self.inital_data = yaml_load(self.path)
         self.data = self.get_global(self.inital_data)
         super(Config, self).__init__(**self.data)

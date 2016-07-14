@@ -3,7 +3,7 @@ import re
 import os
 
 from .proc import run
-from .utils import which, yaml_dump, yaml_load
+from .utils import which, yaml_dump, yaml_load, safe_join
 
 
 GPG_HOMEDIR = os.path.expanduser('~/.gnupg')
@@ -143,27 +143,39 @@ def import_keys(keyspath, homedir):
     return response
 
 
-def create_homedir(keys):
-    homedir = mkdtemp()
-    for key in keys:
-        keysfile = NamedTemporaryFile(delete=False, dir=homedir, suffix=".asc")
-        keysfile.write(key)
-        import_keys(keysfile.name, homedir)
-    return homedir
+def create_homedir(keys, fallback):
+    if keys:
+        homedir = mkdtemp()
+        for key in keys:
+            keysfile = NamedTemporaryFile(delete=False, dir=homedir, suffix=".asc")
+            keysfile.write(key)
+            import_keys(keysfile.name, homedir)
+        return homedir
+    elif not fallback:
+        raise ValueError("Homedir not set and keys not found, set PASSPIE_HOMEDIR")
+    else:
+        return fallback
 
 
 class GPG(object):
 
-    def __init__(self, path, passphrase, recipient=None):
-        self.path = path
-        self.keys = yaml_load(self.path)
-        self.homedir = create_homedir(self.keys)
+    def __init__(self, path, passphrase, homedir, recipient):
+        self.path = safe_join(path, "keys.yml")
         self.passphrase = passphrase
+        self.keys = yaml_load(self.path)
+        self.fallback_homedir = homedir
+        self.homedir = create_homedir(self.keys, self.fallback_homedir)
         self.recipient = recipient or self.get_default_recipient()
 
     def write(self):
-        if len(self.list_keys()) != len(self.keys):
+        if not self.is_fallback and self.is_modified:
             return yaml_dump(self.export(), self.path)
+
+    def is_fallback(self):
+        return self.homedir == self.fallback_homedir
+
+    def is_modified(self):
+        return len(self.list_keys()) != len(self.keys) and self.homedir
 
     def get_default_recipient(self):
         return self.list_keys()[0]

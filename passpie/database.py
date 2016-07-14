@@ -7,8 +7,6 @@ import yaml
 
 from .git import Repo
 from .utils import safe_join
-from .config import Config
-from .gpg import GPG
 
 
 class CredentialFactory(dict):
@@ -76,11 +74,12 @@ class YAMLStorage(Storage):
 
 class Database(TinyDB):
 
-    def __init__(self, archive, passphrase):
+    def __init__(self, archive, config, gpg):
         self.archive = archive
         self.path = archive.path
-        self.gpg = GPG(safe_join(archive.path, "keys.yml"), passphrase)
-        self.config = Config(safe_join(archive.path, "config.yml"))
+        self.config = config
+        self.gpg = gpg
+        self.passphrase = gpg.passphrase
         self.repo = Repo(self.path)
         super(Database, self).__init__(
             safe_join(self.path, "credentials.yml"), storage=YAMLStorage)

@@ -9,6 +9,7 @@ import yaml
 
 from passpie.cli import cli
 from passpie.config import Config
+from passpie.gpg import GPG
 from passpie.database import Database
 from passpie.utils import mkdir, safe_join, Archive, extract
 
@@ -213,8 +214,14 @@ def irunner(mocker):
         yaml_dump({}, safe_join("passpie.db", "config.yml"))
         touch(safe_join("passpie.db", ".passpie"))
         make_archive("passpie.db", "passpie.db", "gztar")
+        passphrase = "k"
         with auto_archive("passpie.db") as archive:
-            with Database(archive, passphrase="k") as database:
+            cfg = Config(archive.path)
+            gpg = GPG(archive.path,
+                      passphrase,
+                      cfg["GPG_HOMEDIR"],
+                      cfg["GPG_RECIPIENT"])
+            with Database(archive, cfg, gpg) as database:
                 database.repo = mocker.MagicMock()
                 runner.db = database
                 yield runner

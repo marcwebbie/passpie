@@ -3,7 +3,7 @@ from passpie.cli import cli
 
 def test_cli_add_credential_with_random_password(irunner, mocker):
     mock_genpass = mocker.patch("passpie.cli.genpass", return_value="password")
-    mocker.patch("passpie.database.GPG.encrypt", return_value="encrypted")
+    mocker.patch("passpie.cli.GPG.encrypt", return_value="encrypted")
     expected_credential = {
         "login": "foo",
         "name": "bar",
@@ -20,7 +20,7 @@ def test_cli_add_credential_with_random_password(irunner, mocker):
 
 
 def test_cli_add_credential_with_password_option(irunner, mocker):
-    mock_encrypt = mocker.patch("passpie.database.GPG.encrypt", return_value="encrypted")
+    mock_encrypt = mocker.patch("passpie.cli.GPG.encrypt", return_value="encrypted")
     expected_credential = {
         "login": "foo",
         "name": "bar",
@@ -37,7 +37,7 @@ def test_cli_add_credential_with_password_option(irunner, mocker):
 
 
 def test_cli_add_credential_with_comment_option(irunner, mocker):
-    mocker.patch("passpie.database.GPG.encrypt", return_value="encrypted")
+    mocker.patch("passpie.cli.GPG.encrypt", return_value="encrypted")
     expected_credential = {
         "login": "foo",
         "name": "bar",
@@ -53,7 +53,7 @@ def test_cli_add_credential_with_comment_option(irunner, mocker):
 
 
 def test_cli_add_multiple_credentials_with_random_passwords(irunner, mocker):
-    mocker.patch("passpie.database.GPG.encrypt", return_value="encrypted")
+    mocker.patch("passpie.cli.GPG.encrypt", return_value="encrypted")
 
     result = irunner.run(cli, "add foo@bar spam@egg foozy@bar --random")
     credentials = irunner.db.all()
@@ -65,7 +65,7 @@ def test_cli_add_multiple_credentials_with_random_passwords(irunner, mocker):
 
 
 def test_cli_add_multiple_credentials_with_random_passwords(irunner, mocker):
-    mocker.patch("passpie.database.GPG.encrypt", return_value="encrypted")
+    mocker.patch("passpie.cli.GPG.encrypt", return_value="encrypted")
 
     result = irunner.invoke(cli, ["add", "foo@bar", "spam@egg", "foozy@bar", "--random"])
     credentials = irunner.db.all()
@@ -77,7 +77,7 @@ def test_cli_add_multiple_credentials_with_random_passwords(irunner, mocker):
 
 
 def test_cli_add_existing_credential_errors_asking_for_force_option(irunner, mocker):
-    mocker.patch("passpie.database.GPG.encrypt", return_value="encrypted")
+    mocker.patch("passpie.cli.GPG.encrypt", return_value="encrypted")
 
     irunner.invoke(cli, ["add", "foo@bar", "--random"])
     result = irunner.invoke(cli, ["add", "foo@bar", "--random"])
@@ -87,7 +87,7 @@ def test_cli_add_existing_credential_errors_asking_for_force_option(irunner, moc
 
 
 def test_cli_add_credential_with_no_option_prompts_password(irunner, mocker):
-    mocker.patch("passpie.database.GPG.encrypt", return_value="encrypted")
+    mocker.patch("passpie.cli.GPG.encrypt", return_value="encrypted")
     mock_prompt = mocker.patch("passpie.cli.click.prompt")
 
     result = irunner.invoke(cli, ["add", "foo@bar"], input="password\n")
