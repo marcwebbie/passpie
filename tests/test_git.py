@@ -2,7 +2,12 @@ from functools import partial
 import random
 
 import pytest
-from passpie.cli import Repo, clone, parse_remote, ensure_git, mkdir, safe_join
+from passpie.git import Repo, clone, parse_remote, ensure_git, safe_join
+
+
+@pytest.fixture
+def mock_run(mocker):
+    return mocker.patch('passpie.git.run')
 
 
 def test_git_init_creates_a_repository_on_path(mocker, mock_run):
@@ -15,7 +20,7 @@ def test_git_init_creates_a_repository_on_path(mocker, mock_run):
 
 
 def test_git_clone_calls_expected_command_with_repository_url(mocker, mock_run):
-    mock_tempdir = mocker.patch('passpie.cli.mkdtemp', return_value='tempdir')
+    mock_tempdir = mocker.patch('passpie.git.mkdtemp', return_value='tempdir')
     dest = 'tempdir'
     url = 'https://foo@example.com/user/repo.git'
     cmd = ['git', 'clone', url, dest]
@@ -26,7 +31,7 @@ def test_git_clone_calls_expected_command_with_repository_url(mocker, mock_run):
 
 
 def test_git_clone_calls_expected_command_with_repository_url_and_destination(mocker, mock_run):
-    mock_tempdir = mocker.patch('passpie.cli.mkdtemp', return_value='tempdir')
+    mock_tempdir = mocker.patch('passpie.git.mkdtemp', return_value='tempdir')
     url = 'https://foo@example.com/user/repo.git'
     dest = "some/path"
     cmd = ['git', 'clone', url, dest]
@@ -37,7 +42,7 @@ def test_git_clone_calls_expected_command_with_repository_url_and_destination(mo
 
 
 def test_git_clone_calls_expected_command_with_repository_url_and_depth(mocker, mock_run):
-    mock_tempdir = mocker.patch('passpie.cli.mkdtemp', return_value='tempdir')
+    mock_tempdir = mocker.patch('passpie.git.mkdtemp', return_value='tempdir')
     url = 'https://foo@example.com/user/repo.git'
     dest = "some/path"
     cmd = ['git', 'clone', url, dest, "--depth", 1]
@@ -48,7 +53,7 @@ def test_git_clone_calls_expected_command_with_repository_url_and_depth(mocker, 
 
 
 def test_git_push_calls_expected_command(mocker, mock_run, tempdir_with_git):
-    cmd = ['git', 'push', 'origin', 'master']
+    cmd = ['git', 'push', 'origin', 'HEAD']
     repo = Repo(tempdir_with_git)
     repo.push()
 
@@ -69,16 +74,18 @@ def test_git_commit_creates_commit_with_message(mocker, mock_run, tempdir_with_g
     repo = Repo(tempdir_with_git)
     repo.commit(message)
 
-    call_to_add = ((['git', 'add', '.'],), {'cwd': tempdir_with_git})
-    call_to_commit = ((['git', 'commit', '-m', message],), {'cwd': tempdir_with_git})
-    assert mock_run.call_args_list[0] == call_to_add
-    assert mock_run.call_args_list[1] == call_to_commit
+    mock_run.assert_any_call(
+        ["git", "add", "."], cwd=tempdir_with_git)
+    mock_run.assert_any_call(
+        ["git", "commit", "-m", message], cwd=tempdir_with_git)
 
 
 def test_parse_remote_returns_tuple():
     result = parse_remote("origin/master")
     assert type(result) == tuple
     assert len(result) == 2
+    assert result[0] == "origin"
+    assert result[1] == "master"
 
 
 def test_parse_remote_returns_origin_and_branch_values():
