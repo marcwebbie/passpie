@@ -22,6 +22,9 @@ develop: release install
 test:
 	py.test -v tests
 
+test-all:
+	tox
+
 coverage:
 	py.test -v tests --cov passpie --cov-config .coveragerc --cov-report term-missing
 
