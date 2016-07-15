@@ -1,3 +1,7 @@
+"""
+General utilities
+"""
+
 from contextlib import contextmanager
 from collections import namedtuple
 import bz2
@@ -23,11 +27,10 @@ import yaml
 HOME = os.path.expanduser("~")
 
 logger = logging.getLogger('passpie')
-logger = logging.getLogger('passpie')
-logger_handler = logging.StreamHandler()
-logger_formatter = logging.Formatter("%(levelname)s:passpie.%(module)s:%(message)s")
-logger_handler.setFormatter(logger_formatter)
-logger.addHandler(logger_handler)
+LOGGER_HANDLER = logging.StreamHandler()
+LOGGER_FORMATTER = logging.Formatter("%(levelname)s:passpie.%(module)s:%(message)s")
+LOGGER_HANDLER.setFormatter(LOGGER_FORMATTER)
+logger.addHandler(LOGGER_HANDLER)
 logger.setLevel(logging.CRITICAL)
 
 
@@ -41,8 +44,8 @@ def safe_join(*paths):
 def yaml_dump(data, path=None):
     content = yaml.safe_dump(data, default_flow_style=False)
     if path:
-        with open(path, "w") as f:
-            f.write(content)
+        with open(path, "w") as yamlfile:
+            yamlfile.write(content)
     else:
         return content
 
@@ -58,12 +61,12 @@ def touch(path):
 def yaml_load(path, ensure=False):
     yaml_content = {}
     try:
-        with open(path) as f:
-            yaml_content = yaml.safe_load(f.read())
+        with open(path) as yamlfile:
+            yaml_content = yaml.safe_load(yamlfile.read())
     except IOError:
-        logger.info(u'YAML file "{}" not found'.format(path))
-    except yaml.scanner.ScannerError as e:
-        raise ValueError(u'Malformed YAML file: {}'.format(e))
+        logger.info(u'YAML file "%s" not found', path)
+    except yaml.scanner.ScannerError as exc:
+        raise ValueError(u'Malformed YAML file: {}'.format(exc))
 
     if not yaml_content and ensure is True:
         raise RuntimeError("YAML content is empty and ensure is True")
@@ -77,8 +80,8 @@ def genpass(pattern=None, length=32):
     if pattern:
         try:
             return rstr.xeger(pattern)
-        except re.error as e:
-            raise ValueError(str(e))
+        except re.error as exc:
+            raise ValueError(str(exc))
         except KeyError:
             # Error in python 3.5, rstr does not support
             pass
@@ -152,10 +155,7 @@ def is_git_url(path):
     regex = re.compile(
         r'((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?'
     )
-    if path and regex.match(path):
-        return True
-    else:
-        return False
+    return bool(path and regex.match(path))
 
 
 def get_archive_format(path):
@@ -182,23 +182,23 @@ def get_archive_format(path):
 
 def extract(src, src_format):
     from .git import clone
-    if src_format in ("dir"):
+    if src_format in ["dir"]:
         dest = src
-    if src_format in ("git"):
+    if src_format in ["git"]:
         dest = clone(src)
     elif src_format in ("tar", "gztar", "bztar", "zip"):
         dest = tempfile.mkdtemp()
         if src_format == "zip":
-            with zipfile.ZipFile(src) as zf:
-                zf.extractall(dest)
-        with tarfile.open(src) as tf:
-            tf.extractall(dest)
+            with zipfile.ZipFile(src) as zipf:
+                zipf.extractall(dest)
+        with tarfile.open(src) as tarf:
+            tarf.extractall(dest)
     return dest
 
 
 def cat(path):
-    with open(path) as f:
-        return f.read()
+    with open(path) as catfile:
+        return catfile.read()
 
 
 def find_db_root(path):
