@@ -225,7 +225,7 @@ def irunner(mocker):
         passphrase = "k"
         with auto_archive("passpie.db") as archive:
             cfg = Config(safe_join(archive.path, "config.yml"))
-            gpg = GPG(archive.path,
+            gpg = GPG(safe_join(archive.path, "keys.yml"),
                       passphrase,
                       cfg["GPG_HOMEDIR"],
                       cfg["GPG_RECIPIENT"])

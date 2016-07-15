@@ -102,8 +102,9 @@ def pass_database(ensure_passphrase=False, confirm_passphrase=False, ensure_exis
             try:
                 with auto_archive(database_path) as archive:
                     config_path = safe_join(archive.path, "config.yml")
+                    keys_path = safe_join(archive.path, "keys.yml")
                     cfg = Config(config_path)
-                    gpg = GPG(archive.path,
+                    gpg = GPG(keys_path,
                               passphrase,
                               cfg["GPG_HOMEDIR"],
                               cfg["GPG_RECIPIENT"])

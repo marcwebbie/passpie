@@ -3,7 +3,7 @@ import re
 import os
 
 from .proc import run
-from .utils import which, yaml_dump, yaml_load, safe_join
+from .utils import which, yaml_dump, yaml_load
 
 
 GPG_HOMEDIR = os.path.expanduser('~/.gnupg')
@@ -160,7 +160,7 @@ def setup_homedir(homedir, keys):
 class GPG(object):
 
     def __init__(self, path, passphrase, homedir, recipient):
-        self.path = safe_join(path, "keys.yml")
+        self.path = path
         self.passphrase = passphrase
         self.keys = yaml_load(self.path)
         self.default_homedir = homedir
