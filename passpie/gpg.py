@@ -3,7 +3,7 @@ import re
 import os
 
 from .proc import run
-from .utils import which, yaml_dump, yaml_load
+from .utils import which, yaml_load
 
 
 DEFAULT_GPG_HOMEDIR = os.path.expanduser('~/.gnupg')
