@@ -12,3 +12,10 @@ script:
 after_success:
   - pip install codecov
   - codecov
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/31fad9fd8b2ed3e42c7e
+    on_success: change
+    on_failure: change
+    on_start: never
