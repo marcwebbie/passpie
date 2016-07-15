@@ -6,7 +6,7 @@ from .proc import run
 from .utils import which, yaml_dump, yaml_load
 
 
-GPG_HOMEDIR = os.path.expanduser('~/.gnupg')
+DEFAULT_GPG_HOMEDIR = os.path.expanduser('~/.gnupg')
 DEVNULL = open(os.devnull, 'w')
 DEFAULT_RECIPIENT = "passpie@localhost"
 KEY_INPUT = u"""Key-Type: RSA
@@ -168,21 +168,25 @@ class GPG(object):
         self.recipient = recipient or self.get_default_recipient()
 
     def write(self):
-        if not self.default_homedir and self.is_modified():
-            return yaml_dump(self.export(), self.path)
+        # if not self.default_homedir and self.is_modified():
+        #     return yaml_dump(self.export(), self.path)
+        pass
 
     def is_modified(self):
         return len(self.list_keys()) != len(self.keys) and self.homedir
 
     def get_default_recipient(self):
-        return self.list_keys()[0]
+        try:
+            return self.list_keys()[0]
+        except IndexError:
+            raise ValueError("no recipients found in homedir: {}".format(self.homedir))
 
     def list_keys(self, emails=True):
         return list_keys(self.homedir, emails=emails)
 
     def export(self):
         keys = []
-        for fingerprint in self.list_keys():
+        for fingerprint in self.list_keys(emails=False):
             keyasc = export_keys(self.homedir, fingerprint)
             keys.append(keyasc)
         return keys

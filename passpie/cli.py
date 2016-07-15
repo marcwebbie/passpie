@@ -91,19 +91,20 @@ def pass_database(ensure_passphrase=False, confirm_passphrase=False, ensure_exis
         @functools.wraps(command)
         def wrapper(*args, **kwargs):
             context = click.get_current_context()
-            config = context.meta["config"]
+            config_overrides = context.meta["config_overrides"]
             passphrase = context.meta["passphrase"]
             if ensure_passphrase and not passphrase:
                 passphrase = click.prompt(
                     "Passphrase",
                     hide_input=True,
                     confirmation_prompt=confirm_passphrase)
-            database_path = config["DATABASE"]
+            database_path = config_overrides.get(
+                "DATABASE", Config.DEFAULT["DATABASE"])
             try:
                 with auto_archive(database_path) as archive:
                     config_path = safe_join(archive.path, "config.yml")
                     keys_path = safe_join(archive.path, "keys.yml")
-                    cfg = Config(config_path)
+                    cfg = Config(config_path, config_overrides)
                     gpg = GPG(keys_path,
                               passphrase,
                               cfg["GPG_HOMEDIR"],
@@ -133,7 +134,8 @@ def validate_cols(ctx, param, value):
 def validate_yaml_str(ctx, param, value):
     if value:
         try:
-            yaml_to_python(value)
+            yaml_to_python(
+                value)
             return value
         except ValueError:
             raise click.BadParameter('not a valid yaml string: {}'.format(value))
@@ -154,8 +156,8 @@ def prompt_update(credential, field, hidden=False):
 @click.option("-R", "--recipient", help="Database recipient")
 @click.option("-D", "--database", help="Database path")
 @click.option("-g", "--git-push", help="Autopush git [origin/master]")
-@click.option('-v', '--verbose', count=True, help='Activate verbose output')
-@click.option('--debug', is_flag=True, help='Activate debug output')
+@click.option('-v', '--verbose', count=True, help='Activate verbose output', envvar="PASSPIE_VERBOSE")
+@click.option('--debug', is_flag=True, help='Activate debug output', envvar="PASSPIE_DEBUG")
 @click.version_option(__version__)
 @click.pass_context
 def cli(ctx, database, passphrase, recipient, git_push, verbose, debug):
@@ -166,13 +168,12 @@ def cli(ctx, database, passphrase, recipient, git_push, verbose, debug):
         config_overrides["GIT_PUSH"] = git_push
     if recipient:
         config_overrides["GPG_RECIPIENT"] = recipient
-    config = Config(Config.GLOBAL_PATH, config_overrides)
-    ctx.meta["config"] = config
+    ctx.meta["config_overrides"] = config_overrides
     ctx.meta["passphrase"] = passphrase
 
-    if verbose is 1 or config["VERBOSE"]:
+    if verbose is 1:
         logger.setLevel(logging.INFO)
-    if debug is True or config["DEBUG"] is True or verbose > 1:
+    if debug is True or verbose > 1:
         logger.setLevel(logging.DEBUG)
 
 
@@ -187,7 +188,7 @@ def cli(ctx, database, passphrase, recipient, git_push, verbose, debug):
 @click.pass_context
 def init(ctx, path, force, recipient, no_git, key_length, expire_date, format):
     """Initialize database"""
-    config = ctx.meta["config"]
+    config = Config(Config.GLOBAL_PATH, ctx.meta["config_overrides"])
     passphrase = ctx.meta["passphrase"]
     if not passphrase and not recipient:
         passphrase = click.prompt(
@@ -483,7 +484,9 @@ def gpg(db, command, gen_key):
             "passphrase": "p",
             "expire_date": 0,
         }
-        generate_keys(db.gpg.homedir, values)
+        keys_data = generate_keys(db.gpg.homedir, values)
+        keys_content = export_keys(db.gpg.homedir, keys_data["email"])
+        yaml_dump(db.gpg.keys + [keys_content], db.gpg.path)
     else:
         cmd = [which("gpg2", "gpg"), "--homedir", db.gpg.homedir] + list(command)
         run(cmd, cwd=db.path, pipe=False)

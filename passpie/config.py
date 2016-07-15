@@ -52,7 +52,9 @@ class Config(object):
     def __init__(self, path, overrides={}):
         self.path = path
         self.custom = yaml_load(path)
-        self.data = self.get_global(self.custom)
+        self.overrides = overrides
+        self.overrides.update(deepcopy(self.custom))
+        self.data = self.get_global(self.overrides)
 
     def __getitem__(self, key):
         return self.data[key]
