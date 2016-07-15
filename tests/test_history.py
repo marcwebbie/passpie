@@ -138,7 +138,7 @@ def test_git_commit_creates_commit_with_message(mocker, mock_process):
     repo.commit(message)
 
     repo.add.assert_called_once_with(all=True)
-    mock_process.call.assert_called_once_with(cmd, cwd=repo.path)
+    mock_process.call.assert_any_call(cmd, cwd=repo.path)
 
 
 def test_git_commit_calls_push_when_autopush_set(mocker, mock_process):
