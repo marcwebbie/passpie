@@ -38,8 +38,8 @@ def test_cli_debug_sets_level_debug_when_debug_set(irunner, mocker):
 
 
 def test_cli_verbose_sets_level_info_when_verbose_environ_variable_set(irunner, mocker):
-    environ_variables = {"PASSPIE_VERBOSE": 1}
-    mocker.patch.dict("passpie.os.environ", environ_variables)
+    environ_variables = {"PASSPIE_VERBOSE": "1"}
+    mocker.patch.dict("passpie.cli.os.environ", environ_variables)
     mock_set_level = mocker.patch("passpie.cli.logger.setLevel")
     result = irunner.invoke(cli, ["list"])
     assert result.exit_code == 0
