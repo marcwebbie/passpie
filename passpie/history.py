@@ -66,6 +66,8 @@ class Repository(object):
 
     @ensure_git()
     def commit(self, message, add=True):
+        process.call(["git", "config", "--local", "user.name", "Passpie"], cwd=self.path)
+        process.call(["git", "config", "--local", "user.email", "passpie@localhost"], cwd=self.path)
         if add:
             self.add(all=True)
         cmd = ['git', 'commit', '-m', message]
