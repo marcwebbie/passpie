@@ -6,4 +6,5 @@ pytest-faker
 mock
 flake8
 pudb
+tox
 factory-boy==2.7.0
