@@ -101,7 +101,8 @@ def pass_database(ensure_passphrase=False, confirm_passphrase=False, ensure_exis
             database_path = config["DATABASE"]
             try:
                 with auto_archive(database_path) as archive:
-                    cfg = Config(archive.path)
+                    config_path = safe_join(archive.path, "config.yml")
+                    cfg = Config(config_path)
                     gpg = GPG(archive.path,
                               passphrase,
                               cfg["GPG_HOMEDIR"],
@@ -131,7 +132,8 @@ def validate_cols(ctx, param, value):
 def validate_yaml_str(ctx, param, value):
     if value:
         try:
-            return yaml_to_python(value)
+            yaml_to_python(value)
+            return value
         except ValueError:
             raise click.BadParameter('not a valid yaml string: {}'.format(value))
 
@@ -147,10 +149,8 @@ def prompt_update(credential, field, hidden=False):
 
 
 @click.group()
-@click.option("-P", "--passphrase", help="Database passphrase",
-              envvar="PASSPIE_PASSPHRASE")
-@click.option("-R", "--recipient", help="Database passphrase",
-              envvar="PASSPIE_GPG_RECIPIENT")
+@click.option("-P", "--passphrase", help="Database passphrase")
+@click.option("-R", "--recipient", help="Database recipient")
 @click.option("-D", "--database", help="Database path")
 @click.option("-g", "--git-push", help="Autopush git [origin/master]")
 @click.option('-v', '--verbose', count=True, help='Activate verbose output')
@@ -165,7 +165,7 @@ def cli(ctx, database, passphrase, recipient, git_push, verbose, debug):
         config_overrides["GIT_PUSH"] = git_push
     if recipient:
         config_overrides["GPG_RECIPIENT"] = recipient
-    config = Config.get_global(config_overrides)
+    config = Config(Config.GLOBAL_PATH, config_overrides)
     ctx.meta["config"] = config
     ctx.meta["passphrase"] = passphrase
 
@@ -256,17 +256,17 @@ def listdb(db, grep):
 @click.argument("name", required=False, type=str)
 @click.argument("value", required=False, type=str, callback=validate_yaml_str)
 @pass_database(sync=False)
-def configdb(db, name, value):
+def config_database(db, name, value):
     """Configuration settings"""
     name = name.upper() if name else ""
-    if name and name in db.config:
+    if name and name in db.config.keys():
         if value:
-            db.config[name] = value
+            db.config[name] = yaml_to_python(value)
             db.repo.commit("Set config: {} = {}".format(name, value))
         else:
             click.echo("{}".format(db.config[name]))
     else:
-        config_content = yaml_dump(dict(db.config)).strip()
+        config_content = yaml_dump(dict(db.config.data)).strip()
         click.echo(config_content)
 
 
@@ -466,13 +466,21 @@ def git(db, command):
 def gpg(db, command, gen_key):
     """GPG commands"""
     if gen_key:
+        # values = {
+        #     "key_length": click.prompt("Key length", default=4096),
+        #     "name": click.prompt("Name"),
+        #     "email": click.prompt("Email"),
+        #     "comment": click.prompt("Comment", default=""),
+        #     "passphrase": click.prompt("Passphrase", hide_input=True, confirmation_prompt=True),
+        #     "expire_date": click.prompt("Expire date", default=0),
+        # }
         values = {
-            "key_length": click.prompt("Key length", default=4096),
-            "name": click.prompt("Name"),
-            "email": click.prompt("Email"),
-            "comment": click.prompt("Comment", default=""),
-            "passphrase": click.prompt("Passphrase", hide_input=True, confirmation_prompt=True),
-            "expire_date": click.prompt("Expire date", default=0),
+            "key_length": 4096,
+            "name": "name",
+            "email": "email@example",
+            "comment": "comment",
+            "passphrase": "p",
+            "expire_date": 0,
         }
         generate_keys(db.gpg.homedir, values)
     else:

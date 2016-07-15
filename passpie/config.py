@@ -4,7 +4,17 @@ import os
 from .utils import safe_join, yaml_to_python, yaml_dump, yaml_load
 
 
-class Config(dict):
+def with_environ(dictionary, prefix):
+    dictionary = deepcopy(dictionary)
+    for key in dictionary.keys():
+        variable_name = "{}{}".format(prefix, key)
+        environ_value = os.environ.get(variable_name)
+        if environ_value:
+            dictionary[key] = yaml_to_python(environ_value)
+    return dictionary
+
+
+class Config(object):
 
     GLOBAL_PATH = safe_join("~", ".passpierc")
 
@@ -16,7 +26,7 @@ class Config(dict):
 
         # GPG
         'KEY_LENGTH': 4096,
-        'GPG_HOMEDIR': safe_join("~", ".gnupg"),
+        'GPG_HOMEDIR': None,
         'GPG_RECIPIENT': None,
 
         # Table
@@ -39,30 +49,31 @@ class Config(dict):
         'DEBUG': False,
     }
 
-    def __init__(self, path):
-        self.path = safe_join(path, "config.yml")
-        self.inital_data = yaml_load(self.path)
-        self.data = self.get_global(self.inital_data)
-        super(Config, self).__init__(**self.data)
+    def __init__(self, path, overrides={}):
+        self.path = path
+        self.custom = yaml_load(path)
+        self.data = self.get_global(self.custom)
 
-    def write(self):
-        return yaml_dump(self.get_local(), self.path)
+    def __getitem__(self, key):
+        return self.data[key]
 
-    @classmethod
-    def get_global(cls, overrides={}):
-        global_config = deepcopy(cls.DEFAULT)
-        global_config.update(yaml_load(Config.GLOBAL_PATH))
-        for k in global_config.keys():
-            environ_name = "PASSPIE_{}".format(k.upper())
-            environ_value = os.environ.get(environ_name)
-            if environ_value:
-                global_config[k] = yaml_to_python(environ_value)
-        global_config.update(overrides)
-        return global_config
+    def __setitem__(self, key, value):
+        self.data[key] = value
+        self.custom[key] = value
+
+    def keys(self):
+        return self.data.keys()
+
+    def get_global(self, overrides={}):
+        cfg = deepcopy(self.DEFAULT)
+        cfg.update(yaml_load(self.GLOBAL_PATH))
+        cfg.update(deepcopy(overrides))
+        cfg.update(with_environ(cfg, "PASSPIE_"))
+        return cfg
 
     def get_local(self):
-        modified_values = {}
-        for key, value in self.items():
-            if self.get(key) != self.DEFAULT.get(key):
-                modified_values[key] = value
-        return modified_values
+        return {key: self.data[key] for key in self.custom.keys()}
+
+    def write(self, path=None):
+        path = path if path else self.path
+        yaml_dump(self.get_local(), path)

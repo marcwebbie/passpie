@@ -143,18 +143,18 @@ def import_keys(keyspath, homedir):
     return response
 
 
-def create_homedir(keys, fallback):
-    if keys:
+def setup_homedir(homedir, keys):
+    if homedir:
+        return homedir
+    elif keys:
         homedir = mkdtemp()
         for key in keys:
             keysfile = NamedTemporaryFile(delete=False, dir=homedir, suffix=".asc")
             keysfile.write(key.encode("utf-8"))
             import_keys(keysfile.name, homedir)
         return homedir
-    elif not fallback:
-        raise ValueError("Homedir not set and keys not found, set PASSPIE_HOMEDIR")
     else:
-        return fallback
+        raise ValueError("Homedir not set and keys not found, set PASSPIE_GPG_HOMEDIR")
 
 
 class GPG(object):
@@ -163,16 +163,13 @@ class GPG(object):
         self.path = safe_join(path, "keys.yml")
         self.passphrase = passphrase
         self.keys = yaml_load(self.path)
-        self.fallback_homedir = homedir
-        self.homedir = create_homedir(self.keys, self.fallback_homedir)
+        self.default_homedir = homedir
+        self.homedir = setup_homedir(self.default_homedir, self.keys)
         self.recipient = recipient or self.get_default_recipient()
 
     def write(self):
-        if not self.is_fallback() and self.is_modified:
+        if not self.default_homedir and self.is_modified():
             return yaml_dump(self.export(), self.path)
-
-    def is_fallback(self):
-        return self.homedir == self.fallback_homedir
 
     def is_modified(self):
         return len(self.list_keys()) != len(self.keys) and self.homedir
