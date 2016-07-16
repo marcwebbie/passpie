@@ -59,6 +59,7 @@ Commands
 ========
 
 ::
+
    Usage: passpie [OPTIONS] COMMAND [ARGS]...
 
    Options:
