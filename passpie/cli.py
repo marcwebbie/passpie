@@ -153,7 +153,7 @@ def check_config(db, level):
         configuration = db.config
 
     if configuration:
-        click.echo(yaml.dump(configuration, default_flow_style=False))
+        click.echo(yaml.safe_dump(configuration, default_flow_style=False))
 
 
 @cli.command(help="Initialize new passpie database")
