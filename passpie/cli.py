@@ -288,7 +288,8 @@ def add(db, fullnames, random, comment, password, force, fake):
         fullname = make_fullname(fake_cred["login"], fake_cred["name"])
         db.repo.commit("Add fake credential '{}'".format(fullname))
     elif random or db.config["PASSWORD_RANDOM"]:
-        password = genpass(db.config["PASSWORD_PATTERN"])
+        password = genpass(db.config["PASSWORD_PATTERN"],
+                           db.config["PASSWORD_RANDOM_LENGTH"])
     elif password is None:
         password = click.prompt(
             "Password", hide_input=True, confirmation_prompt=True)

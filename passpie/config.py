@@ -43,6 +43,7 @@ class Config(object):
         'COPY_TIMEOUT': 0,
         'PASSWORD_PATTERN': None,
         'PASSWORD_RANDOM': False,
+        'PASSWORD_RANDOM_LENGTH': 32,
 
         # Cli
         'VERBOSE': False,

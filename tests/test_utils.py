@@ -22,6 +22,11 @@ def test_genpass_raises_value_error_when_regex_pattern_error(mocker):
         genpass("\w{32}")
 
 
+def test_genpass_generates_password_with_expected_length(mocker):
+    password = genpass(pattern=None, length=80)
+    assert len(password) == 80
+
+
 def test_when_python_3_5_use_faker_instead_of_xeger(mocker):
     mocker.patch('passpie.utils.rstr.xeger', side_effect=KeyError)
     mock_faker = mocker.patch('passpie.utils.Faker')
