@@ -5,6 +5,7 @@ import functools
 import json
 import logging
 import os
+import sys
 import shutil
 
 
@@ -95,10 +96,19 @@ def pass_database(ensure_passphrase=False, confirm_passphrase=False, ensure_exis
             global_config = Config.get_global()
             if ensure_passphrase:
                 if not passphrase:
-                    passphrase = click.prompt(
-                        "Passphrase",
-                        hide_input=True,
-                        confirmation_prompt=confirm_passphrase)
+                    stdin_text = None
+                    if not sys.stdin.isatty():
+                        with click.get_binary_stream("stdin") as stdinfd:
+                            stdin_text = stdinfd.read().strip()
+
+                    if stdin_text:
+                        passphrase = stdin_text
+                    else:
+                        passphrase = click.prompt(
+                            "Passphrase",
+                            hide_input=True,
+                            confirmation_prompt=confirm_passphrase)
+
             try:
                 with auto_archive(global_config["DATABASE"]) as archive:
                     config_path = safe_join(archive.path, "config.yml")
