@@ -2,7 +2,7 @@ PACKAGE=passpie
 PACKAGE_TESTS=tests
 
 
-all: clean develop lint coverage news
+all: clean develop lint test-all news
 
 #######################
 # Installation
