@@ -1,3 +1,8 @@
+Version 1.5.4
+-------------
++ **✔** Add yaml.safe_dump to config command
++ **✔** Add author flag to git commit in passpie.history
+
 Version 1.5.3
 -------------
 + **✔** Fix load config from local db config file
