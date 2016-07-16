@@ -1,7 +1,8 @@
 from passpie.cli import cli
 
 
-def test_cli_add_credential_with_random_password(irunner, mocker):
+def test_cli_add_credential_with_random_password_with_expected_length(irunner, mocker, config):
+    config["PASSWORD_RANDOM_LENGTH"] = 20
     mock_genpass = mocker.patch("passpie.cli.genpass", return_value="password")
     mocker.patch("passpie.cli.GPG.encrypt", return_value="encrypted")
     expected_credential = {
@@ -16,7 +17,7 @@ def test_cli_add_credential_with_random_password(irunner, mocker):
 
     assert result.exit_code == 0
     assert expected_credential in credentials, credentials
-    mock_genpass.assert_called_once_with(None)
+    mock_genpass.assert_called_once_with(None, 20)
 
 
 def test_cli_add_credential_with_password_option(irunner, mocker):

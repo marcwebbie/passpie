@@ -21,7 +21,7 @@ from .database import (
     split_fullname,
     make_fullname
 )
-from .gpg import generate_keys, export_keys, GPG
+from .gpg import generate_keys, GPG
 from .proc import run
 from .utils import (
     auto_archive,
@@ -91,28 +91,28 @@ def pass_database(ensure_passphrase=False, confirm_passphrase=False, ensure_exis
         @functools.wraps(command)
         def wrapper(*args, **kwargs):
             context = click.get_current_context()
-            config_overrides = context.meta["config_overrides"]
             passphrase = context.meta["passphrase"]
-            if ensure_passphrase and not passphrase:
-                passphrase = click.prompt(
-                    "Passphrase",
-                    hide_input=True,
-                    confirmation_prompt=confirm_passphrase)
-            database_path = config_overrides.get(
-                "DATABASE", Config.DEFAULT["DATABASE"])
+            global_config = Config.get_global()
+            if ensure_passphrase:
+                if not passphrase:
+                    passphrase = click.prompt(
+                        "Passphrase",
+                        hide_input=True,
+                        confirmation_prompt=confirm_passphrase)
             try:
-                with auto_archive(database_path) as archive:
+                with auto_archive(global_config["DATABASE"]) as archive:
                     config_path = safe_join(archive.path, "config.yml")
                     keys_path = safe_join(archive.path, "keys.yml")
-                    cfg = Config(config_path, config_overrides)
+                    cfg = Config(config_path)
                     gpg = GPG(keys_path,
                               passphrase,
                               cfg["GPG_HOMEDIR"],
                               cfg["GPG_RECIPIENT"])
                     with Database(archive, cfg, gpg) as db:
+                        if ensure_passphrase:
+                            db.gpg.ensure()
                         return command(db, *args, **kwargs)
             except (IOError, ValueError) as exception:
-                raise
                 raise click.ClickException("{}".format(exception))
         return wrapper
     return decorator
@@ -161,14 +161,12 @@ def prompt_update(credential, field, hidden=False):
 @click.version_option(__version__)
 @click.pass_context
 def cli(ctx, database, passphrase, recipient, git_push, verbose, debug):
-    config_overrides = {}
     if database:
-        config_overrides["DATABASE"] = database
+        os.environ["PASSPIE_DATABASE"] = database
     if git_push:
-        config_overrides["GIT_PUSH"] = git_push
+        os.environ["PASSPIE_GIT_PUSH"] = git_push
     if recipient:
-        config_overrides["GPG_RECIPIENT"] = recipient
-    ctx.meta["config_overrides"] = config_overrides
+        os.environ["GPG_RECIPIENT"] = recipient
     ctx.meta["passphrase"] = passphrase
 
     if verbose is 1:
@@ -188,7 +186,7 @@ def cli(ctx, database, passphrase, recipient, git_push, verbose, debug):
 @click.pass_context
 def init(ctx, path, force, recipient, no_git, key_length, expire_date, format):
     """Initialize database"""
-    config = Config(Config.GLOBAL_PATH, ctx.meta["config_overrides"])
+    config = Config.get_global()
     passphrase = ctx.meta["passphrase"]
     if not passphrase and not recipient:
         passphrase = click.prompt(
@@ -216,9 +214,7 @@ def init(ctx, path, force, recipient, no_git, key_length, expire_date, format):
             "passphrase": passphrase,
             "expire_date": expire_date or 0,
         }
-        homedir = mkdtemp()
-        keys_data = generate_keys(homedir, key_values)
-        keys_content = export_keys(homedir, keys_data["email"])
+        keys_content = generate_keys(key_values)
         keys_file_path = safe_join(tempdir, "keys.yml")
         yaml_dump([keys_content], keys_file_path)
 
@@ -259,7 +255,7 @@ def listdb(db, grep):
 @click.argument("value", required=False, type=str, callback=validate_yaml_str)
 @pass_database(sync=False)
 def config_database(db, name, value):
-    """Configuration settings"""
+    """Print configuration"""
     name = name.upper() if name else ""
     if name and name in db.config.keys():
         if value:
@@ -480,24 +476,21 @@ def git(db, command):
 def gpg(db, command, gen_key):
     """GPG commands"""
     if gen_key:
+        # for debbuging values
         # values = {
-        #     "key_length": click.prompt("Key length", default=4096),
-        #     "name": click.prompt("Name"),
-        #     "email": click.prompt("Email"),
-        #     "comment": click.prompt("Comment", default=""),
-        #     "passphrase": click.prompt("Passphrase", hide_input=True, confirmation_prompt=True),
-        #     "expire_date": click.prompt("Expire date", default=0),
+        #     "name": "Debugger",
+        #     "email": "debugger@example.com",
+        #     "passphrase": "passphrase2",
         # }
         values = {
-            "key_length": 4096,
-            "name": "name",
-            "email": "email@example",
-            "comment": "comment",
-            "passphrase": "p",
-            "expire_date": 0,
+            "key_length": click.prompt("Key length", default=4096),
+            "name": click.prompt("Name"),
+            "email": click.prompt("Email"),
+            "comment": click.prompt("Comment", default=""),
+            "passphrase": click.prompt("Passphrase", hide_input=True, confirmation_prompt=True),
+            "expire_date": click.prompt("Expire date", default=0),
         }
-        keys_data = generate_keys(db.gpg.homedir, values)
-        keys_content = export_keys(db.gpg.homedir, keys_data["email"])
+        keys_content = generate_keys(values)
         yaml_dump(db.gpg.keys + [keys_content], db.gpg.path)
     else:
         cmd = [which("gpg2", "gpg"), "--homedir", db.gpg.homedir] + list(command)

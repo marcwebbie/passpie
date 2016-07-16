@@ -2,6 +2,7 @@ from copy import deepcopy
 import os
 
 from .utils import safe_join, yaml_to_python, yaml_dump, yaml_load
+from .gpg import DEFAULT_EMAIL
 
 
 def with_environ(dictionary, prefix):
@@ -27,7 +28,7 @@ class Config(object):
         # GPG
         'KEY_LENGTH': 4096,
         'GPG_HOMEDIR': None,
-        'GPG_RECIPIENT': None,
+        'GPG_RECIPIENT': DEFAULT_EMAIL,
 
         # Table
         'TABLE_FORMAT': 'fancy_grid',
@@ -67,9 +68,10 @@ class Config(object):
     def keys(self):
         return self.data.keys()
 
-    def get_global(self, overrides={}):
-        cfg = deepcopy(self.DEFAULT)
-        cfg.update(yaml_load(self.GLOBAL_PATH))
+    @classmethod
+    def get_global(cls, overrides={}):
+        cfg = deepcopy(cls.DEFAULT)
+        cfg.update(yaml_load(cls.GLOBAL_PATH))
         cfg.update(deepcopy(overrides))
         cfg.update(with_environ(cfg, "PASSPIE_"))
         return cfg

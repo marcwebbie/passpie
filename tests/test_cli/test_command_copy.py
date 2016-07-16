@@ -5,7 +5,7 @@ from passpie.database import CredentialFactory
 def test_copy_writes_to_stdout_when_path_is_dash(irunner, mocker):
     mocker.patch("passpie.cli.GPG.decrypt", return_value="decrypted")
     irunner.db.insert(CredentialFactory(fullname="foo@bar"))
-    result = irunner.run(cli, "--passphrase k copy foo@bar -")
+    result = irunner.invoke(cli, ["--passphrase", "k", "copy", "foo@bar", "-"])
 
     assert result.exit_code == 0, result.output
     assert result.output == "decrypted"
