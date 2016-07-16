@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
-from tempfile import mkdtemp
+from tempfile import mkdtemp, NamedTemporaryFile
 import functools
 import json
 import logging
@@ -404,7 +404,7 @@ def copy(db, fullname, dest, timeout):
 
 
 @cli.command(name="import")
-@click.argument("filepath", type=click.Path(readable=True, exists=True))
+@click.argument("filepath", required=False, type=click.Path(readable=True, exists=True, allow_dash=True))
 @click.option("-I", "--importer", type=click.Choice(importers.get_names()),
               help="Specify an importer")
 @click.option("--csv", help="CSV expected columns", callback=validate_cols)
@@ -412,7 +412,14 @@ def copy(db, fullname, dest, timeout):
 @click.option("-f", "--force", is_flag=True, help="Force importing credentials")
 @pass_database()
 def import_database(db, filepath, importer, csv, force, skip_lines):
-    """Import credentials from path"""
+    """Import credentials in plain text"""
+    tempfile = None
+    if filepath is None or filepath == "-":
+        tempfile = NamedTemporaryFile()
+        with open(tempfile.name, "w") as stdinfile:
+            stdinfile.write(click.get_text_stream('stdin').read())
+        filepath = tempfile.name
+
     if csv:
         importer = importers.get(name='csv')
         params = {'cols': csv, 'skip_lines': skip_lines}
@@ -436,7 +443,11 @@ def import_database(db, filepath, importer, csv, force, skip_lines):
                 imported = True
 
         if imported is True:
-            db.repo.commit(message=u'Imported credentials from {}'.format(filepath))
+            if tempfile:
+                message = 'Imported credentials from stdin'
+            else:
+                message = u'Imported credentials from {}'.format(filepath)
+            db.repo.commit(message=message)
 
 
 @cli.command(name="export")
