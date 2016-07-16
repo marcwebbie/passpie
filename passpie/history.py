@@ -38,6 +38,7 @@ class Repository(object):
         self.path = path
         self.autopush = autopush
         self.autopull = autopull
+        self.author = "Passpie <passpie@localhost>"
         if autopull:
             self.pull_rebase(*autopull)
 
@@ -66,11 +67,10 @@ class Repository(object):
 
     @ensure_git()
     def commit(self, message, add=True):
-        process.call(["git", "config", "--local", "user.name", "Passpie"], cwd=self.path)
-        process.call(["git", "config", "--local", "user.email", "passpie@localhost"], cwd=self.path)
+        author_option = "--author={}".format(self.author)
         if add:
             self.add(all=True)
-        cmd = ['git', 'commit', '-m', message]
+        cmd = ['git', 'commit', author_option, '-m', message]
         process.call(cmd, cwd=self.path)
         if self.autopush:
             self.push()

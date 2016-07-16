@@ -131,9 +131,9 @@ def test_git_sha_list_has_call_with_expected_command(mocker, mock_process):
 
 def test_git_commit_creates_commit_with_message(mocker, mock_process):
     message = 'Initial commit'
-    cmd = ['git', 'commit', '-m', message]
     repo = Repository('path')
     mocker.patch.object(repo, 'add')
+    cmd = ['git', 'commit', '--author={}'.format(repo.author), '-m', message]
 
     repo.commit(message)
 
