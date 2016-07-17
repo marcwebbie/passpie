@@ -162,12 +162,15 @@ def is_git_url(path):
 
 
 def get_archive_format(path):
-    if not path or not os.path.exists(path):
+    if not path:
+        raise IOError("path not set")
+    elif is_git_url(path):
+        return "git"
+    elif not os.path.exists(path):
         raise IOError("path not found: %s" % path)
     elif os.path.isdir(path):
         return "dir"
-    elif is_git_url(path):
-        return "git"
+
     try:
         if tarfile.is_tarfile(path):
             compression = find_compression_type(path)
@@ -181,6 +184,8 @@ def get_archive_format(path):
             return "zip"
     except (IOError, TypeError):
         raise IOError("unrecognized source path: %s" % path)
+    finally:
+        raise IOError("couldn't get archive format for path: %s" % path)
 
 
 def extract(src, src_format):
