@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
 from tempfile import mkdtemp, NamedTemporaryFile
+import csv
 import functools
 import json
 import logging
@@ -457,17 +458,31 @@ def import_database(db, filepath, importer, csv, force, skip_lines):
 
 
 @cli.command(name="export")
-@click.argument("filepath", type=click.File("w"))
+@click.argument("exportfile", type=click.File("w"))
 @click.option("--json", "as_json", is_flag=True, help="Export as JSON")
+@click.option("--csv", "as_csv", is_flag=True, help="Export as CSV")
 @pass_database(ensure_passphrase=True, sync=False)
-def export_database(db, filepath, as_json):
+def export_database(db, exportfile, as_json, as_csv):
     """Export credentials in plain text"""
     credentials = [dict(db.decrypt(c)) for c in db.all()]
-    if as_json:
+    if as_csv:
+        writer = csv.writer(exportfile)
+        writer.writerow(["name", "login", "password", "comment"])
+        for cred in credentials:
+            row = [cred["name"],
+                   cred["login"],
+                   cred["password"],
+                   cred["comment"]]
+            try:
+                writer.writerow(row)
+            except UnicodeEncodeError:
+                writer.writerow([cell.encode("utf-8") for cell in row])
+    elif as_json:
         content = json.dumps(credentials, indent=2)
+        exportfile.write(content)
     else:
         content = yaml_dump(credentials)
-    filepath.write(content)
+        exportfile.write(content)
 
 
 @cli.command(context_settings={"ignore_unknown_options": True})
