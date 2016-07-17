@@ -23,7 +23,7 @@ class Config(object):
         # Database
         'DATABASE': "passpie.db",
         'GIT': True,
-        'GIT_PUSH': None,
+        'GIT_PUSH': True,
 
         # GPG
         'KEY_LENGTH': 4096,
