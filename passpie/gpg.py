@@ -44,7 +44,7 @@ def make_key_input(**kwargs):
 
 def list_keys(homedir, emails=False):
     command = [
-        which("", "gpg"),
+        which("gpg2", "gpg"),
         '--no-tty',
         "--batch",
         '--fixed-list-mode',
@@ -68,7 +68,7 @@ def list_keys(homedir, emails=False):
 
 def export_keys(homedir, fingerprint=""):
     command = [
-        which('gpg', 'gpg'),
+        which('gpg2', 'gpg'),
         '--no-tty',
         '--batch',
         '--homedir', homedir,
@@ -77,7 +77,7 @@ def export_keys(homedir, fingerprint=""):
         fingerprint,
     ]
     command_secret = [
-        which('gpg', 'gpg'),
+        which('gpg2', 'gpg'),
         '--no-tty',
         '--batch',
         '--homedir', homedir,
@@ -93,7 +93,7 @@ def export_keys(homedir, fingerprint=""):
 def generate_keys(values):
     homedir = mkdtemp()
     command = [
-        which('gpg', 'gpg'),
+        which('gpg2', 'gpg'),
         '--batch',
         '--no-tty',
         '--homedir', homedir,
@@ -107,7 +107,7 @@ def generate_keys(values):
 
 def encrypt_data(data, recipient, homedir):
     command = [
-        which('gpg', 'gpg'),
+        which('gpg2', 'gpg'),
         '--batch',
         '--no-tty',
         '--always-trust',
@@ -122,7 +122,7 @@ def encrypt_data(data, recipient, homedir):
 
 def decrypt_data(data, recipient, homedir, passphrase):
     command = [
-        which('gpg', 'gpg'),
+        which('gpg2', 'gpg'),
         '--batch',
         '--no-tty',
         '--always-trust',
@@ -138,7 +138,7 @@ def decrypt_data(data, recipient, homedir, passphrase):
 
 def import_keys(keyspath, homedir):
     cmd = (
-        which("gpg", "gpg"),
+        which("gpg2", "gpg"),
         "--no-tty",
         "--batch",
         "--homedir", homedir,
@@ -198,7 +198,6 @@ class GPG(object):
         return decrypt_data(data, self.recipient, self.homedir, self.passphrase)
 
     def ensure(self):
-        pass
         # Test recipient
         if self.recipient not in (self.list_keys() + self.list_keys(False)):
             message = "Recipient '{}' not found in homedir".format(self.recipient)
