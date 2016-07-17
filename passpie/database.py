@@ -98,7 +98,6 @@ class Database(TinyDB):
             return (Query().name == name)
 
     def write(self):
-        self.gpg.write()
         self.config.write()
         if self.archive.format == "git" and self.config["GIT_PUSH"]:
             self.repo.push()

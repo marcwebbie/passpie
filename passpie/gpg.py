@@ -164,6 +164,7 @@ def setup_homedir(homedir, keys):
 
 
 class GPG(object):
+    """Class to hold gpg encryption, decryption and handle keys in homedir"""
 
     def __init__(self, path, passphrase, homedir, recipient):
         self.path = path
@@ -173,18 +174,12 @@ class GPG(object):
         self.passphrase = passphrase
         self.recipient = recipient
 
-    def write(self):
-        # if not self.default_homedir and self.is_modified():
-        #     return yaml_dump(self.export(), self.path)
-        pass
-
-    def is_modified(self):
-        return len(self.list_keys()) != len(self.keys) and self.homedir
-
     def list_keys(self, emails=True):
+        """List keys in self.homedir"""
         return list_keys(self.homedir, emails=emails)
 
     def export(self):
+        """Export key in self.homedir as a list of armored strings"""
         keys = []
         for fingerprint in self.list_keys(emails=False):
             keyasc = export_keys(self.homedir, fingerprint)
@@ -192,12 +187,15 @@ class GPG(object):
         return keys
 
     def encrypt(self, data):
+        """Encrypt data using recipient and homedir set"""
         return encrypt_data(data, self.recipient, self.homedir)
 
     def decrypt(self, data):
+        """Decrypt data using recipient and homedir set"""
         return decrypt_data(data, self.recipient, self.homedir, self.passphrase)
 
     def ensure(self):
+        """Check if values are set as expected"""
         # Test recipient
         if self.recipient not in (self.list_keys() + self.list_keys(False)):
             message = "Recipient '{}' not found in homedir".format(self.recipient)
