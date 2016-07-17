@@ -184,7 +184,7 @@ def get_archive_format(path):
             return "zip"
     except (IOError, TypeError):
         raise IOError("unrecognized source path: %s" % path)
-    finally:
+    else:
         raise IOError("couldn't get archive format for path: %s" % path)
 
 
