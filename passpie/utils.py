@@ -51,7 +51,10 @@ def yaml_dump(data, path=None):
 
 
 def yaml_to_python(data):
-    return yaml.safe_load("[%s]" % data)[0]
+    try:
+        return yaml.safe_load("[%s]" % data)[0]
+    except yaml.scanner.ScannerError:
+        return "{}".format(data)
 
 
 def touch(path):
