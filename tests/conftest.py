@@ -175,6 +175,7 @@ def mock_open():
 class CliRunnerWithDB(CliRunner):
 
     db_path = None
+    echo_stdin = True
 
     def run(self, cmd, params, *args, **kwargs):
         kwargs.setdefault("catch_exceptions", False)
