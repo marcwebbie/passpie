@@ -5,6 +5,7 @@ import os
 from .exceptions import FileExistsError
 from .utils import logger, safe_join, which
 from .proc import run
+from .gpg import DEFAULT_EMAIL, DEFAULT_NAME
 
 
 def ensure_git(repository_exists=True):
@@ -43,6 +44,7 @@ class Repo(object):
 
     def __init__(self, path):
         self.path = path
+        self.author = "{} <{}>".format(DEFAULT_NAME, DEFAULT_EMAIL)
 
     @ensure_git(repository_exists=False)
     def init(self):
@@ -56,8 +58,6 @@ class Repo(object):
 
     @ensure_git()
     def commit(self, message):
-        run(["git", "config", "--local", "user.name", "Passpie"], cwd=self.path)
-        run(["git", "config", "--local", "user.email", "passpie@localhost"], cwd=self.path)
         run(["git", "add", "."], cwd=self.path)
-        run(["git", "commit", "-m", message], cwd=self.path)
+        run(["git", "commit", "--author", self.author, "-m", message], cwd=self.path)
         return self
