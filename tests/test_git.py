@@ -71,13 +71,15 @@ def test_git_push_calls_expected_command_when_remote_branch_is_passed(mocker, mo
 def test_git_commit_creates_commit_with_message(mocker, mock_run, tempdir_with_git):
     message = 'Initial commit'
     cmd = ['git', 'commit', '-m', message]
+    author = "Passpie <passpie@localhost>"
     repo = Repo(tempdir_with_git)
     repo.commit(message)
 
     mock_run.assert_any_call(
         ["git", "add", "."], cwd=tempdir_with_git)
     mock_run.assert_any_call(
-        ["git", "commit", "-m", message], cwd=tempdir_with_git)
+        ["git", "commit", "--author", author, "-m", message],
+        cwd=tempdir_with_git)
 
 
 def test_parse_remote_returns_tuple():
