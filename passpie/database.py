@@ -74,6 +74,7 @@ class YAMLStorage(Storage):
 
 
 class Database(TinyDB):
+    """Credentials database class"""
 
     def __init__(self, archive, config, gpg):
         self.archive = archive
@@ -83,7 +84,10 @@ class Database(TinyDB):
         self.passphrase = gpg.passphrase
         self.repo = Repo(self.path)
         super(Database, self).__init__(
-            safe_join(self.path, "credentials.yml"), storage=YAMLStorage)
+            safe_join(self.path, "credentials.yml"),
+            storage=YAMLStorage,
+            default_table="credentials"
+        )
 
     @classmethod
     def query(cls, fullname):
