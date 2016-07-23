@@ -2,11 +2,14 @@ from contextlib import contextmanager
 import errno
 import os
 import re
+from random import SystemRandom
 import tempfile
 
-import rstr
+from rstr import Rstr
 
 from ._compat import which
+
+rstr = Rstr(SystemRandom())
 
 
 import_module = __import__
