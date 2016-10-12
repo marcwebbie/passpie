@@ -30,6 +30,7 @@ def ensure_commands(commands):
 
 
 def clean(command, delay):
+    print('Password copied to clipboard. Waiting for {}s to clear clipboard'.format(delay))
     for dot in ['.' for _ in range(delay)]:
         sys.stdout.write(dot)
         sys.stdout.flush()
