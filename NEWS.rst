@@ -1,3 +1,8 @@
+Version 1.5.5
+-------------
++ **✔** Add message indicating how long the password will live in the clipboard
++ **✔** Use SystemRandom() CSPRNG for password generation
+
 Version 1.5.4
 -------------
 + **✔** Add yaml.safe_dump to config command
