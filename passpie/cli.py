@@ -30,6 +30,7 @@ from .utils import (
     copy_to_clipboard,
     genpass,
     logger,
+    mkdir,
     make_archive,
     safe_join,
     which,
@@ -87,6 +88,21 @@ class Table(object):
 # cli
 #############################
 
+def prompt_passphrase(confirm):
+    stdin_text = None
+    if not sys.stdin.isatty():
+        with click.get_binary_stream("stdin") as stdinfd:
+            stdin_text = stdinfd.read().strip()
+
+    if stdin_text:
+        passphrase = stdin_text
+    else:
+        passphrase = click.prompt(
+            "Passphrase",
+            hide_input=True,
+            confirmation_prompt=confirm)
+    return passphrase
+
 
 def pass_database(ensure_passphrase=False, confirm_passphrase=False, ensure_exists=True, sync=True):
     def decorator(command):
@@ -95,26 +111,13 @@ def pass_database(ensure_passphrase=False, confirm_passphrase=False, ensure_exis
             context = click.get_current_context()
             passphrase = context.meta["passphrase"]
             global_config = Config.get_global()
-            if ensure_passphrase:
-                if not passphrase:
-                    stdin_text = None
-                    if not sys.stdin.isatty():
-                        with click.get_binary_stream("stdin") as stdinfd:
-                            stdin_text = stdinfd.read().strip()
-
-                    if stdin_text:
-                        passphrase = stdin_text
-                    else:
-                        passphrase = click.prompt(
-                            "Passphrase",
-                            hide_input=True,
-                            confirmation_prompt=confirm_passphrase)
-
             try:
                 with auto_archive(global_config["DATABASE"]) as archive:
                     config_path = safe_join(archive.path, "config.yml")
                     keys_path = safe_join(archive.path, "keys.yml")
                     cfg = Config(config_path)
+                    if not passphrase and (ensure_passphrase or cfg["PRIVATE"] is True):
+                        passphrase = prompt_passphrase(confirm=confirm_passphrase)
                     gpg = GPG(keys_path,
                               passphrase,
                               cfg["GPG_HOMEDIR"],
@@ -124,6 +127,8 @@ def pass_database(ensure_passphrase=False, confirm_passphrase=False, ensure_exis
                             db.gpg.ensure()
                         return command(db, *args, **kwargs)
             except (IOError, ValueError) as exception:
+                if logger.getEffectiveLevel() == logger.DEBUG:
+                    raise
                 raise click.ClickException("{}".format(exception))
         return wrapper
     return decorator
@@ -187,18 +192,18 @@ def cli(ctx, database, passphrase, recipient, git_push, verbose, debug):
 
 
 @cli.command()
-@click.argument("path", default="passpie.db")
+@click.argument("path", default=".passpie")
+@click.option("-P", "--passphrase", help="Database passphrase")
 @click.option("-f", "--force", is_flag=True, help="Force initialization")
 @click.option("-r", "--recipient", help="Keyring recipient")
-@click.option("--key-length", type=click.Choice(["1024", "2048", "4096"]), help="Key length")
-@click.option("--expire-date", help="Key expiration date")
+@click.option("--key-length", default="4096", type=click.Choice(["1024", "2048", "4096"]), help="Key length")
+@click.option("--expire-date", default='0', help="Key expiration date")
 @click.option("-ng", "--no-git", is_flag=True, help="Don't initialize a git repo")
-@click.option("-F", "--format", default="gztar", type=click.Choice(["dir", "tar", "zip", "gztar", "bztar"]))
 @click.pass_context
-def init(ctx, path, force, recipient, no_git, key_length, expire_date, format):
+def init(ctx, path, passphrase, force, recipient, no_git, key_length, expire_date):
     """Initialize database"""
     config = Config.get_global()
-    passphrase = ctx.meta["passphrase"]
+    # passphrase = ctx.meta["passphrase"]
     if not passphrase and not recipient:
         passphrase = click.prompt(
             "Passphrase",
@@ -215,32 +220,28 @@ def init(ctx, path, force, recipient, no_git, key_length, expire_date, format):
             msg = "Path '{}' exists [--force] to overwrite".format(path)
             raise click.ClickException(msg)
 
-    tempdir = mkdtemp()
     config_values = {}
+    mkdir(path)
     if recipient:
         config_values["RECIPIENT"] = recipient
     else:
         key_values = {
-            "key_length": key_length or 4096,
+            "key_length": key_length,
             "passphrase": passphrase,
-            "expire_date": expire_date or 0,
+            "expire_date": expire_date,
         }
         keys_content = generate_keys(key_values)
-        keys_file_path = safe_join(tempdir, "keys.yml")
+        keys_file_path = safe_join(path, "keys.yml")
         yaml_dump([keys_content], keys_file_path)
 
-    dot_passpie_file_path = safe_join(tempdir, ".passpie")
-    touch(dot_passpie_file_path)
-
-    config_file_path = safe_join(tempdir, "config.yml")
+    config_file_path = safe_join(path, "config.yml")
     yaml_dump(config_values, config_file_path)
 
     if no_git or config["GIT"] is False:
         pass  # Don't create a git repo
     else:
-        repo = Repo(tempdir)
+        repo = Repo(path)
         repo.init().commit("Initialize database")
-    make_archive(src=tempdir, dest=path, dest_format=format)
 
 
 @cli.command(name="list")
