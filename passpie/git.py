@@ -48,16 +48,19 @@ class Repo(object):
 
     @ensure_git(repository_exists=False)
     def init(self):
+        logger.info("runnint git init")
         run(["git", "init"], cwd=self.path)
         return self
 
     @ensure_git()
     def push(self, remote="origin", branch="HEAD"):
+        logger.info("git pushing")
         run(["git", "push", remote, branch], cwd=self.path)
         return self
 
     @ensure_git()
     def commit(self, message):
+        logger.info("git commiting in repo")
         run(["git", "add", "."], cwd=self.path)
         run(["git", "commit", "--author", self.author, "-m", message], cwd=self.path)
         return self

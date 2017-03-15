@@ -21,19 +21,23 @@ class Config(object):
 
     DEFAULT = {
         # Database
-        'DATABASE': "passpie.db",
+        'DATABASE': ".passpie",
+        'CONFIG_PATH': ".passpie/config.yml",
+        'CREDENTIALS_PATH': ".passpie/credentials.yml",
+        'KEYS_PATH': ".passpie/keys.yml",
+        'PRIVATE': True,
         'GIT': True,
         'GIT_PUSH': True,
 
         # GPG
         'KEY_LENGTH': 4096,
-        'GPG_HOMEDIR': None,
+        'GPG_HOMEDIR': "~/.gnupg",
         'GPG_RECIPIENT': DEFAULT_EMAIL,
 
         # Table
         'TABLE_FORMAT': 'fancy_grid',
         'TABLE_SHOW_PASSWORD': False,
-        'TABLE_HIDDEN_STRING': u'********',
+        'TABLE_HIDDEN_STRING': '********',
         'TABLE_FIELDS': ('name', 'login', 'password', 'comment'),
         'TABLE_STYLE': {
             'login': {"fg": 'green'},
@@ -53,7 +57,7 @@ class Config(object):
 
     def __init__(self, path, overrides={}):
         self.path = path
-        self.custom = yaml_load(path)
+        self.custom = yaml_load(self.path)
         self.overrides = overrides
         self.overrides.update(deepcopy(self.custom))
         self.data = self.get_global(self.overrides)
@@ -64,6 +68,12 @@ class Config(object):
     def __setitem__(self, key, value):
         self.data[key] = value
         self.custom[key] = value
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return "{}".format(self.data)
 
     def keys(self):
         return self.data.keys()

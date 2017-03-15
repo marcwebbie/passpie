@@ -3,7 +3,7 @@ import re
 import os
 
 from .proc import run
-from .utils import which, yaml_load
+from .utils import which, yaml_load, logger
 
 
 DEFAULT_GPG_HOMEDIR = os.path.expanduser('~/.gnupg')
@@ -138,7 +138,7 @@ def decrypt_data(data, recipient, homedir, passphrase):
 
 def import_keys(keyspath, homedir):
     cmd = (
-        which("gpg2", "gpg"),
+        which('gpg2', 'gpg'),
         "--no-tty",
         "--batch",
         "--homedir", homedir,
@@ -150,49 +150,74 @@ def import_keys(keyspath, homedir):
 
 
 def setup_homedir(homedir, keys):
-    if homedir:
-        return homedir
-    elif keys:
+    if keys:
         homedir = mkdtemp()
         for key in keys:
             keysfile = NamedTemporaryFile(delete=False, dir=homedir, suffix=".asc")
             keysfile.write(key.encode("utf-8"))
             import_keys(keysfile.name, homedir)
-        return homedir
+        is_temp = True
+    elif homedir:
+        is_temp = False
     else:
         raise ValueError("Homedir not set and keys not found, set PASSPIE_GPG_HOMEDIR")
+    return homedir, is_temp
+
+
+def load_keys(keys_path):
+    try:
+        homedir = mkdtemp()
+        import_keys(keys_path, homedir)
+        return homedir
+    except ValueError:
+        return None
 
 
 class GPG(object):
     """Class to hold gpg encryption, decryption and handle keys in homedir"""
 
-    def __init__(self, path, passphrase, homedir, recipient):
-        self.path = path
-        self.keys = yaml_load(self.path)
-        self.default_homedir = homedir
-        self.homedir = setup_homedir(self.default_homedir, self.keys)
-        self.passphrase = passphrase
+    def __init__(self, keys_path, recipient, default_homedir):
+        self.keys_path = keys_path
         self.recipient = recipient
+        self.default_homedir = default_homedir
+        self.temp_homedir = load_keys(self.keys_path)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    @property
+    def path(self):
+        homedir = self.temp_homedir or self.default_homedir
+        if not homedir:
+            raise RuntimeError("Homedir not set and keys not found, set PASSPIE_GPG_HOMEDIR")
+        elif os.path.exists(homedir) is False:
+            raise RuntimeError(
+                "Homedir path not found at '{}', set PASSPIE_GPG_HOMEDIR".format(homedir)
+            )
+        return homedir
 
     def list_keys(self, emails=True):
         """List keys in self.homedir"""
-        return list_keys(self.homedir, emails=emails)
+        return list_keys(self.path, emails=emails)
 
     def export(self):
-        """Export key in self.homedir as a list of armored strings"""
+        """Export key in self.path as a list of armored strings"""
         keys = []
         for fingerprint in self.list_keys(emails=False):
-            keyasc = export_keys(self.homedir, fingerprint)
+            keyasc = export_keys(self.path, fingerprint)
             keys.append(keyasc)
         return keys
 
     def encrypt(self, data):
         """Encrypt data using recipient and homedir set"""
-        return encrypt_data(data, self.recipient, self.homedir)
+        return encrypt_data(data, self.recipient, self.path)
 
-    def decrypt(self, data):
+    def decrypt(self, data, passphrase):
         """Decrypt data using recipient and homedir set"""
-        return decrypt_data(data, self.recipient, self.homedir, self.passphrase)
+        return decrypt_data(data, self.recipient, self.path, passphrase)
 
     def ensure(self):
         """Check if values are set as expected"""

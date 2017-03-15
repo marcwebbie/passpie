@@ -4,6 +4,7 @@ import os
 import tarfile
 
 from click.testing import CliRunner
+import click
 import pytest
 import yaml
 
@@ -174,8 +175,7 @@ def mock_open():
 
 class CliRunnerWithDB(CliRunner):
 
-    db_path = None
-    echo_stdin = True
+    echo_stdin = False
 
     def run(self, cmd, params, *args, **kwargs):
         kwargs.setdefault("catch_exceptions", False)
@@ -186,17 +186,19 @@ class CliRunnerWithDB(CliRunner):
         return self.run(cli, params, *args, **kwargs)
 
     @property
-    def db_extracted_path(self):
-        if self.db_path:
-            return self.db_path
-        else:
-            self.db_path = extract("passpie.db", "gztar")
-            return self.db_path
+    def path(self):
+        return os.path.abspath(os.curdir)
+
 
 
 @pytest.yield_fixture
 def config(mocker):
     yield Config.DEFAULT
+
+
+@pytest.yield_fixture
+def prompt(mocker):
+    yield mocker.patch("passpie.cli.click.prompt", return_value=MOCK_KEYPAIR)
 
 
 @pytest.yield_fixture
@@ -211,7 +213,7 @@ def irunner_empty(mocker):
 
 @pytest.yield_fixture
 def irunner(mocker):
-    from passpie.utils import yaml_dump, make_archive, touch, auto_archive, mkdir
+    from passpie.utils import yaml_dump, touch, mkdir
 
     mocker.patch("passpie.gpg.export_keys", return_value=MOCK_KEYPAIR)
     mocker.patch("passpie.cli.generate_keys", return_value=MOCK_KEYPAIR)
@@ -219,23 +221,8 @@ def irunner(mocker):
     passphrase = "k"
     runner = CliRunnerWithDB()
     with runner.isolated_filesystem():
-        mkdir("passpie.db")
-        yaml_dump([MOCK_KEYPAIR], safe_join("passpie.db", "keys.yml"))
-        yaml_dump({}, safe_join("passpie.db", "config.yml"))
-        touch(safe_join("passpie.db", ".passpie"))
-        make_archive("passpie.db", "passpie.db", "gztar")
-
-        with auto_archive("passpie.db") as archive:
-            cfg = Config(safe_join(archive.path, "config.yml"))
-            gpg = GPG(safe_join(archive.path, "keys.yml"),
-                      passphrase,
-                      cfg["GPG_HOMEDIR"],
-                      cfg["GPG_RECIPIENT"])
-            with Database(archive, cfg, gpg) as database:
-                database.repo = mocker.MagicMock()
-                runner.db = database
-                runner.db.gpg.ensure = mocker.MagicMock()
-                yield runner
+        runner.passpie("init --passphrase {}".format(passphrase))
+        yield runner
 
 
 @pytest.fixture

@@ -118,16 +118,13 @@ def pass_database(ensure_passphrase=False, confirm_passphrase=False, ensure_exis
                     cfg = Config(config_path)
                     if not passphrase and (ensure_passphrase or cfg["PRIVATE"] is True):
                         passphrase = prompt_passphrase(confirm=confirm_passphrase)
-                    gpg = GPG(keys_path,
-                              passphrase,
-                              cfg["GPG_HOMEDIR"],
-                              cfg["GPG_RECIPIENT"])
+                    gpg = GPG(keys_path, passphrase, cfg["GPG_HOMEDIR"], cfg["GPG_RECIPIENT"])
                     with Database(archive, cfg, gpg) as db:
                         if ensure_passphrase:
                             db.gpg.ensure()
                         return command(db, *args, **kwargs)
             except (IOError, ValueError) as exception:
-                if logger.getEffectiveLevel() == logger.DEBUG:
+                if logger.getEffectiveLevel() == logging.DEBUG:
                     raise
                 raise click.ClickException("{}".format(exception))
         return wrapper
@@ -203,7 +200,6 @@ def cli(ctx, database, passphrase, recipient, git_push, verbose, debug):
 def init(ctx, path, passphrase, force, recipient, no_git, key_length, expire_date):
     """Initialize database"""
     config = Config.get_global()
-    # passphrase = ctx.meta["passphrase"]
     if not passphrase and not recipient:
         passphrase = click.prompt(
             "Passphrase",
@@ -231,11 +227,17 @@ def init(ctx, path, passphrase, force, recipient, no_git, key_length, expire_dat
             "expire_date": expire_date,
         }
         keys_content = generate_keys(key_values)
-        keys_file_path = safe_join(path, "keys.yml")
-        yaml_dump([keys_content], keys_file_path)
+        keys_file_path = safe_join(path, "keys.asc")
+        with click.open_file(keys_file_path, "w") as f:
+            f.write(keys_content)
 
     config_file_path = safe_join(path, "config.yml")
-    yaml_dump(config_values, config_file_path)
+    with click.open_file(config_file_path, "w") as f:
+        f.write(yaml_dump(config_values))
+
+    credentials_file_path = safe_join(path, "credentials.yml")
+    with click.open_file(credentials_file_path, "w") as f:
+        f.write(yaml_dump({}))
 
     if no_git or config["GIT"] is False:
         pass  # Don't create a git repo
@@ -245,21 +247,21 @@ def init(ctx, path, passphrase, force, recipient, no_git, key_length, expire_dat
 
 
 @cli.command(name="list")
-@pass_database(sync=False)
 @click.argument("grep", required=False)
-def listdb(db, grep):
+def listdb(grep):
     """List credentials as table"""
-    if grep:
-        query = (Query().login.search(".*{}.*".format(grep)) |
-                 Query().name.search(".*{}.*".format(grep)) |
-                 Query().comment.search(".*{}.*".format(grep)))
-        credentials = db.search(query)
-    else:
-        credentials = db.all()
+    with Database(path=".passpie") as db:
+        if grep:
+            query = (Query().login.search(".*{}.*".format(grep)) |
+                     Query().name.search(".*{}.*".format(grep)) |
+                     Query().comment.search(".*{}.*".format(grep)))
+            credentials = db.search(query)
+        else:
+            credentials = db.all()
 
-    if credentials:
-        table = Table(db.config)
-        click.echo(table.render(credentials))
+        if credentials:
+            table = Table(db.cfg)
+            click.echo(table.render(credentials))
 
 
 @cli.command(name="config")
@@ -286,37 +288,32 @@ def config_database(db, name, value):
 @click.option("-c", "--comment", default="", help="Credentials comment")
 @click.option("-p", "--password", help="Credentials password")
 @click.option("-f", "--force", is_flag=True, help="Force overwrite existing credential")
-@click.option("--fake", is_flag=True, help="Add fake credential")
-@pass_database()
-def add(db, fullnames, random, comment, password, force, fake):
+def add(fullnames, random, comment, password, force):
     """Insert credential"""
-    if fake:
-        fake_cred = CredentialFactory()
-        db.insert(db.encrypt(fake_cred))
-        fullname = make_fullname(fake_cred["login"], fake_cred["name"])
-        db.repo.commit("Add fake credential '{}'".format(fullname))
-    elif random or db.config["PASSWORD_RANDOM"]:
-        password = genpass(db.config["PASSWORD_PATTERN"],
-                           db.config["PASSWORD_RANDOM_LENGTH"])
-    elif password is None:
-        password = click.prompt(
-            "Password", hide_input=True, confirmation_prompt=True)
-    for fullname in fullnames:
-        login, name = split_fullname(fullname)
-        credential = {
-            "name": name,
-            "login": login,
-            "password": password,
-            "comment": comment,
-        }
-        if db.contains(db.query(fullname)):
-            if force:
-                db.update(db.encrypt(credential), db.query(fullname))
+    with Database(path=".passpie") as db:
+        if random or db.cfg["PASSWORD_RANDOM"]:
+            password = genpass(db.cfg["PASSWORD_PATTERN"],
+                               db.cfg["PASSWORD_RANDOM_LENGTH"])
+        elif password is None:
+            password = click.prompt(
+                "Password", hide_input=True, confirmation_prompt=True)
+        for fullname in fullnames:
+            login, name = split_fullname(fullname)
+            credential = {
+                "name": name,
+                "login": login,
+                "password": password,
+                "comment": comment,
+            }
+            if db.contains(db.query(fullname)):
+                if force:
+                    db.update(db.gpg.encrypt(credential), db.query(fullname))
+                else:
+                    msg = "Credential {} exists. `--force` to overwrite".format(fullname)
+                    raise click.ClickException(msg)
             else:
-                msg = "Credential {} exists. `--force` to overwrite".format(fullname)
-                raise click.ClickException(msg)
-        else:
-            db.insert(db.encrypt(credential))
+                credential['password'] = db.gpg.encrypt(credential['password'])
+                db.insert(credential)
 
     db.repo.commit("Add credentials '{}'".format((", ").join(fullnames)))
 
@@ -488,11 +485,10 @@ def export_database(db, exportfile, as_json, as_csv):
 
 @cli.command(context_settings={"ignore_unknown_options": True})
 @click.argument("command", nargs=-1)
-@pass_database()
-def git(db, command):
+def git(command):
     """Git commands"""
     cmd = ["git"] + list(command)
-    run(cmd, cwd=db.path, pipe=False)
+    run(cmd, cwd=".passpie", pipe=False)
 
 
 @cli.command(context_settings={"ignore_unknown_options": True})
