@@ -7,11 +7,13 @@ from passpie.utils import extract, yaml_load, touch, get_archive_format, mkdir
 def test_init_database_creates_expected_files(irunner_empty):
     result = irunner_empty.passpie("init --passphrase pwd")
     db_path = os.path.join(irunner_empty.path, ".passpie")
-    assert result.exit_code == 0, result.output
-    assert len(os.listdir(db_path)) == 3
+
+    assert result.exit_code == 0
+    assert len(os.listdir(db_path)) == 4
     assert ".git" in os.listdir(db_path)
-    assert "keys.yml" in os.listdir(db_path)
+    assert "credentials.yml" in os.listdir(db_path)
     assert "config.yml" in os.listdir(db_path)
+    assert "keys.asc" in os.listdir(db_path)
 
 
 def test_init_database_creates_with_recipient_adds_expected_recipient_to_config(irunner_empty):
@@ -19,8 +21,9 @@ def test_init_database_creates_with_recipient_adds_expected_recipient_to_config(
     result = irunner_empty.passpie("init --passphrase pwd --recipient passpie@example.com")
     db_path = os.path.join(irunner_empty.path, ".passpie")
     config_path = os.path.join(db_path, "config.yml")
+
     assert result.exit_code == 0
-    assert "keys.yml" not in os.listdir(db_path)
+    assert "keys.asc" not in os.listdir(db_path)
     assert yaml_load(config_path) == expected_config
 
 
