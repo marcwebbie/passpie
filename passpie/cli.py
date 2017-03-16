@@ -88,7 +88,7 @@ class Table(object):
 # cli
 #############################
 
-def prompt_passphrase(db, confirm):
+def prompt_passphrase(db, confirm=False):
     stdin_text = None
     if not sys.stdin.isatty():
         with click.get_binary_stream("stdin") as stdinfd:
@@ -102,7 +102,7 @@ def prompt_passphrase(db, confirm):
             hide_input=True,
             confirmation_prompt=confirm)
     try:
-        db.gpg.ensure()
+        db.gpg.ensure(passphrase)
     except ValueError:
         raise click.ClickException("Wrong passphrase")
     return passphrase
@@ -395,7 +395,7 @@ def update(ctx, passphrase, fullnames, random, pattern, copy, comment, password,
 
             if copy:
                 if not passphrase:
-                    passphrase = prompt_passphrase()
+                    passphrase = prompt_passphrase(db)
                 password = db.gpg.decrypt(values["password"], passphrase)
                 copy_to_clipboard(password, db.cfg["COPY_TIMEOUT"])
 
@@ -412,7 +412,7 @@ def copy(passphrase, fullname, dest, timeout):
         timeout = timeout or db.cfg["COPY_TIMEOUT"]
 
         if not passphrase:
-            passphrase = prompt_passphrase("Passphrase", hide_input=True)
+            passphrase = prompt_passphrase(db)
 
         if credential:
             password = db.gpg.decrypt(credential['password'], passphrase)
@@ -472,30 +472,39 @@ def import_database(filepath, importer, csv, force, skip_lines):
 
 @cli.command(name="export")
 @click.argument("exportfile", type=click.File("w"))
+@click.option("-P", "--passphrase", callback=passphrase_callback)
 @click.option("--json", "as_json", is_flag=True, help="Export as JSON")
 @click.option("--csv", "as_csv", is_flag=True, help="Export as CSV")
-@pass_database(ensure_passphrase=True, sync=False)
-def export_database(db, exportfile, as_json, as_csv):
+def export_database(passphrase, exportfile, as_json, as_csv):
     """Export credentials in plain text"""
-    credentials = [dict(db.decrypt(c)) for c in db.all()]
-    if as_csv:
-        writer = csv.writer(exportfile)
-        writer.writerow(["name", "login", "password", "comment"])
-        for cred in credentials:
-            row = [cred["name"],
-                   cred["login"],
-                   cred["password"],
-                   cred["comment"]]
-            try:
-                writer.writerow(row)
-            except UnicodeEncodeError:
-                writer.writerow([cell.encode("utf-8") for cell in row])
-    elif as_json:
-        content = json.dumps(credentials, indent=2)
-        exportfile.write(content)
-    else:
-        content = yaml_dump(credentials)
-        exportfile.write(content)
+    with Database('.passpie') as db:
+        if not passphrase:
+            passphrase = prompt_passphrase(db)
+        else:
+            db.gpg.ensure(passphrase)
+
+        credentials = db.all()
+        for credential in credentials:
+            credential['password'] = db.gpg.decrypt(
+                credential['password'], passphrase)
+        if as_csv:
+            writer = csv.writer(exportfile)
+            writer.writerow(["name", "login", "password", "comment"])
+            for cred in credentials:
+                row = [cred["name"],
+                       cred["login"],
+                       cred["password"],
+                       cred["comment"]]
+                try:
+                    writer.writerow(row)
+                except UnicodeEncodeError:
+                    writer.writerow([cell.encode("utf-8") for cell in row])
+        elif as_json:
+            content = json.dumps(credentials, indent=2)
+            exportfile.write(content)
+        else:
+            content = yaml_dump([dict(c) for c in credentials])
+            exportfile.write(content)
 
 
 @cli.command(context_settings={"ignore_unknown_options": True})

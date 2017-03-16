@@ -1,60 +1,78 @@
 # -*- coding: utf-8 -*-
+import csv
 import json
+import os
 import yaml
 
 from passpie.cli import cli
-from passpie.database import CredentialFactory
+from passpie.database import Database
 
 
 def test_export_writes_to_stdout_when_path_is_dash(irunner, mocker):
+    irunner.run("passpie add foo@bar spam@egg --random")
     mocker.patch("passpie.cli.GPG.decrypt", return_value="decrypted")
-    credential = CredentialFactory(fullname="foo@bar")
-    irunner.db.insert(credential)
-    result = irunner.passpie("--passphrase k export -")
-    expected_output = [dict(irunner.db.decrypt(credential))]
+    db = Database('.passpie')
+    decrypted_credentials = [dict(c) for c in db.all()]
+    for cred in decrypted_credentials:
+        cred['password'] = 'decrypted'
 
-    assert result.exit_code == 0, result.output
-    assert yaml.safe_load(result.output) == yaml.safe_load(yaml.safe_dump(expected_output))
+    result = irunner.passpie(
+        "--passphrase passphrase export -"
+    )
+
+    assert result.exit_code == 0
+    assert len(yaml.safe_load(result.output)) == len(decrypted_credentials)
+    assert yaml.safe_load(result.output) == decrypted_credentials
 
 
 def test_export_writes_json_to_stdout_when_path_is_dash_and_option_json_is_passed(irunner, mocker):
+    irunner.run("passpie add foo@bar spam@egg --random")
     mocker.patch("passpie.cli.GPG.decrypt", return_value="decrypted")
-    credential = CredentialFactory(fullname="foo@bar")
-    irunner.db.insert(credential)
-    result = irunner.passpie("--passphrase k export --json -")
-    expected_output = [dict(irunner.db.decrypt(credential))]
+    db = Database('.passpie')
+    decrypted_credentials = [dict(c) for c in db.all()]
+    for cred in decrypted_credentials:
+        cred['password'] = 'decrypted'
 
-    assert result.exit_code == 0, result.output
-    assert json.loads(result.output) == json.loads(json.dumps(expected_output))
+    result = irunner.passpie(
+        "--passphrase k export --json -"
+    )
+
+    assert result.exit_code == 0
+    assert len(json.loads(result.output)) == len(decrypted_credentials)
+    assert json.loads(result.output) == decrypted_credentials
 
 
 def test_export_writes_csv_to_stdout_when_path_is_dash_and_option_csv_is_passed(irunner, mocker):
+    irunner.run("passpie add foo@bar spam@egg --random")
     mocker.patch("passpie.cli.GPG.decrypt", return_value="decrypted")
-    credential = CredentialFactory(fullname="foo@bar")
-    irunner.db.insert(credential)
-    result = irunner.passpie("--passphrase k export --csv -")
-    decrypted_credential = dict(irunner.db.decrypt(credential))
-    row_header = ["name", "login", "password", "comment"]
-    row_credential = [
-        decrypted_credential["name"],
-        decrypted_credential["login"],
-        decrypted_credential["password"],
-        decrypted_credential["comment"],
-    ]
-    expected_output = "{}\n{}\n".format(
-        ",".join(row_header),
-        ",".join(row_credential))
+    db = Database('.passpie')
+    decrypted_credentials = [dict(c) for c in db.all()]
+    for cred in decrypted_credentials:
+        cred['password'] = 'decrypted'
 
-    assert result.exit_code == 0, result.output
-    assert result.output == expected_output
+    result = irunner.passpie(
+        "--passphrase k export --csv credentials.csv"
+    )
+
+    assert result.exit_code == 0
+    assert "credentials.csv" in os.listdir(".")
+    with open('credentials.csv', 'rb') as csvfile:
+        reader = csv.reader(csvfile)
+        next(reader, None)
+        for row in reader:
+            cred = {
+                "name": row[0],
+                "login": row[1],
+                "password": row[2],
+                "comment": row[3],
+            }
+            assert cred in decrypted_credentials
 
 
 def test_export_writes_csv_handles_unicode(irunner, mocker):
+    irunner.run(u"passpie add foo@bar spam@egg --random --comment l'éphémère")
     mocker.patch("passpie.cli.GPG.decrypt", return_value="decrypted")
-    credential = CredentialFactory(comment=u"l'éphémère")
-    irunner.db.insert(credential)
     result = irunner.passpie("--passphrase k export --csv -")
-    decrypted_credential = dict(irunner.db.decrypt(credential))
 
     assert result.exit_code == 0, result.output
     assert u"l'éphémère" in result.output

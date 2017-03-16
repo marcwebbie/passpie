@@ -188,7 +188,11 @@ class CliRunnerWithDB(CliRunner):
 
     def run(self, params, *args, **kwargs):
         kwargs.setdefault("catch_exceptions", False)
-        cmd_params = shlex.split(params)
+        try:
+            cmd_params = shlex.split(params)
+        except UnicodeEncodeError:
+            cmd_params = params.split()
+
         if cmd_params[0] == 'passpie':
             cmd_params = cmd_params[1:]
         return self.invoke(cli, cmd_params, *args, **kwargs)

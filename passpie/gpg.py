@@ -219,7 +219,7 @@ class GPG(object):
         """Decrypt data using recipient and homedir set"""
         return decrypt_data(data, self.recipient, self.path, passphrase)
 
-    def ensure(self):
+    def ensure(self, passphrase):
         """Check if values are set as expected"""
         # Test recipient
         if self.recipient not in (self.list_keys() + self.list_keys(False)):
@@ -228,7 +228,7 @@ class GPG(object):
 
         # Test passphrase
         if passphrase:
-            if not self.decrypt(self.encrypt("OK")) == "OK":
+            if not self.decrypt(self.encrypt("OK"), passphrase) == "OK":
                 raise ValueError("Wrong passphrase")
         else:
             raise ValueError("Passphrase not set")
