@@ -1,6 +1,8 @@
 from copy import deepcopy
 import os
 
+import click
+
 from .utils import safe_join, yaml_to_python, yaml_dump, yaml_load
 from .gpg import DEFAULT_EMAIL
 
@@ -91,4 +93,5 @@ class Config(object):
 
     def write(self, path=None):
         path = path if path else self.path
-        yaml_dump(self.get_local(), path)
+        with click.open_file(path, "w") as f:
+            f.write(yaml_dump(self.get_local()))

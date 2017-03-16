@@ -117,6 +117,10 @@ class Database(TinyDB):
             default_table="credentials",
         )
 
+    def close(self):
+        self.cfg.write()
+        super(Database, self).close()
+
     @classmethod
     def query(cls, fullname):
         """Generate a search query spliting fullname into

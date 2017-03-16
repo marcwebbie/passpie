@@ -267,19 +267,19 @@ def listdb(grep):
 @cli.command(name="config")
 @click.argument("name", required=False, type=str)
 @click.argument("value", required=False, type=str, callback=validate_yaml_str)
-@pass_database(sync=False)
-def config_database(db, name, value):
+def config_database(name, value):
     """Print configuration"""
-    name = name.upper() if name else ""
-    if name and name in db.config.keys():
-        if value:
-            db.config[name] = yaml_to_python(value)
-            db.repo.commit("Set config: {} = {}".format(name, value))
+    with Database(path=".passpie") as db:
+        name = name.upper() if name else ""
+        if name and name in db.cfg.keys():
+            if value:
+                db.cfg[name] = yaml_to_python(value)
+                db.repo.commit("Set config: {} = {}".format(name, value))
+            else:
+                click.echo("{}".format(db.cfg[name]))
         else:
-            click.echo("{}".format(db.config[name]))
-    else:
-        config_content = yaml_dump(dict(db.config.data)).strip()
-        click.echo(config_content)
+            config_content = yaml_dump(dict(db.cfg.data)).strip()
+            click.echo(config_content)
 
 
 @cli.command()

@@ -1,6 +1,7 @@
 from functools import partial
 from tempfile import mkdtemp
 import os
+import shlex
 import tarfile
 
 from click.testing import CliRunner
@@ -175,15 +176,23 @@ def mock_open():
 
 class CliRunnerWithDB(CliRunner):
 
-    echo_stdin = False
+    echo_stdin = True
 
-    def run(self, cmd, params, *args, **kwargs):
+    def execute(self, cmd, params, *args, **kwargs):
         kwargs.setdefault("catch_exceptions", False)
         return self.invoke(cmd, params.split(), *args, **kwargs)
 
     def passpie(self, params, *args, **kwargs):
         from passpie.cli import cli
-        return self.run(cli, params, *args, **kwargs)
+        return self.execute(cli, params, *args, **kwargs)
+
+    def run(self, params, *args, **kwargs):
+        kwargs.setdefault("catch_exceptions", False)
+        cmd_params = shlex.split(params)
+        if cmd_params[0] == 'passpie':
+            cmd_params = cmd_params[1:]
+        return self.invoke(cli, cmd_params, *args, **kwargs)
+
 
     @property
     def path(self):
