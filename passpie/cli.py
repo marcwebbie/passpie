@@ -108,6 +108,10 @@ def prompt_passphrase(db, confirm):
     return passphrase
 
 
+def passphrase_callback(ctx, param, val):
+    return ctx.meta['passphrase'] or val
+
+
 def pass_database(ensure_passphrase=False, confirm_passphrase=False, ensure_exists=True, sync=True):
     def decorator(command):
         @functools.wraps(command)
@@ -344,10 +348,6 @@ def remove(fullnames, force, purge):
                 db.repo.commit(msg)
 
 
-def passphrase_callback(ctx, param, val):
-    return ctx.meta['passphrase'] or val
-
-
 @cli.command()
 @click.argument("fullnames", nargs=-1, callback=lambda ctx, param, val: list(val))
 @click.option("-r", "--random", is_flag=True, help="Random password generation")
@@ -395,29 +395,33 @@ def update(ctx, passphrase, fullnames, random, pattern, copy, comment, password,
 
             if copy:
                 if not passphrase:
-                    passphrase = click.prompt("Passphrase", hide_input=True)
-                password = db.gpg.decrypt(cred["password"], passphrase)
+                    passphrase = prompt_passphrase()
+                password = db.gpg.decrypt(values["password"], passphrase)
                 copy_to_clipboard(password, db.cfg["COPY_TIMEOUT"])
 
 
 @cli.command()
 @click.argument("fullname")
 @click.argument("dest", type=click.File("w"), required=False)
+@click.option("-P", "--passphrase", callback=passphrase_callback)
 @click.option("-t", "--timeout", type=int, default=0, help="Timeout to clear clipboard")
-@pass_database(ensure_passphrase=True)
-def copy(db, fullname, dest, timeout):
+def copy(passphrase, fullname, dest, timeout):
     """Copy credential password"""
-    credential = db.get(db.query(fullname))
-    timeout = timeout or db.config["COPY_TIMEOUT"]
-    if credential:
-        credential = db.decrypt(credential)
-        password = credential["password"]
-        if dest:
-            dest.write(password)
+    with Database(".passpie") as db:
+        credential = db.get(db.query(fullname))
+        timeout = timeout or db.cfg["COPY_TIMEOUT"]
+
+        if not passphrase:
+            passphrase = prompt_passphrase("Passphrase", hide_input=True)
+
+        if credential:
+            password = db.gpg.decrypt(credential['password'], passphrase)
+            if dest:
+                dest.write(password)
+            else:
+                copy_to_clipboard(password, timeout)
         else:
-            copy_to_clipboard(password, timeout)
-    else:
-        raise click.ClickException("{} not found".format(fullname))
+            raise click.ClickException("{} not found".format(fullname))
 
 
 @cli.command(name="import")
@@ -427,8 +431,7 @@ def copy(db, fullname, dest, timeout):
 @click.option("--csv", help="CSV expected columns", callback=validate_cols)
 @click.option("--skip-lines", type=int, help="Number of lines to skip")
 @click.option("-f", "--force", is_flag=True, help="Force importing credentials")
-@pass_database()
-def import_database(db, filepath, importer, csv, force, skip_lines):
+def import_database(filepath, importer, csv, force, skip_lines):
     """Import credentials in plain text"""
     tempfile = None
     if filepath is None or filepath == "-":
