@@ -322,22 +322,22 @@ def add(fullnames, random, comment, password, force):
 @click.argument("fullnames", nargs=-1, callback=lambda ctx, param, val: list(val))
 @click.option("-f", "--force", is_flag=True, help="Skip confirmation prompt")
 @click.option("-A", "--all", "purge", is_flag=True, help="Purge all credentials")
-@pass_database()
-def remove(db, fullnames, force, purge):
+def remove(fullnames, force, purge):
     """Remove credential"""
-    if purge:
-        db.purge()
-        db.repo.commit("Purge credentials")
-    else:
-        removed = False
-        fulnames = [f for f in fullnames if db.contains(db.query(f))]
-        for fullname in fulnames:
-            if force or click.confirm("Remove {}".format(fullname)):
-                db.remove(db.query(fullname))
-                removed = True
-        if removed is True:
-            msg = "Remove credentials '{}'".format((", ").join(fullnames))
-            db.repo.commit(msg)
+    with Database(path=".passpie") as db:
+        if purge:
+            db.purge()
+            db.repo.commit("Purge credentials")
+        else:
+            removed = False
+            fulnames = [f for f in fullnames if db.contains(db.query(f))]
+            for fullname in fulnames:
+                if force or click.confirm("Remove {}".format(fullname)):
+                    db.remove(db.query(fullname))
+                    removed = True
+            if removed is True:
+                msg = "Remove credentials '{}'".format((", ").join(fullnames))
+                db.repo.commit(msg)
 
 
 @cli.command()
@@ -350,7 +350,6 @@ def remove(db, fullnames, force, purge):
 @click.option("-p", "--password", help="Credentials password")
 @click.option("-l", "--login", help="Credentials login")
 @click.option("-n", "--name", help="Credentials name")
-@pass_database(ensure_passphrase=True)
 def update(db, fullnames, random, pattern, copy, comment, password, name, login, interactive):
     """Update credential"""
     updated = []
