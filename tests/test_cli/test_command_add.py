@@ -10,7 +10,7 @@ def test_cli_add_credential_with_random_password_with_expected_length(irunner, m
     mock_genpass = mocker.patch("passpie.cli.genpass", return_value="password")
     mocker.patch("passpie.cli.GPG.encrypt", return_value="encrypted")
 
-    result = irunner.passpie("add foo@bar --random")
+    result = irunner.run("passpie add foo@bar --random")
     db = Database(".passpie")
 
     assert result.exit_code == 0
@@ -31,7 +31,7 @@ def test_cli_add_credential_with_password_option(irunner, mocker):
         "comment": "",
     }
 
-    result = irunner.passpie("add foo@bar --password password")
+    result = irunner.run("passpie add foo@bar --password password")
     db = Database(".passpie")
 
     assert result.exit_code == 0
@@ -52,7 +52,7 @@ def test_cli_add_credential_with_comment_option(irunner, mocker):
 def test_cli_add_multiple_credentials_with_random_passwords(irunner, mocker):
     mocker.patch("passpie.cli.GPG.encrypt", return_value="encrypted")
 
-    result = irunner.passpie("add foo@bar spam@egg foozy@bar --random")
+    result = irunner.run("passpie add foo@bar spam@egg foozy@bar --random")
     db = Database(".passpie")
     credentials = db.all()
 
@@ -64,8 +64,8 @@ def test_cli_add_multiple_credentials_with_random_passwords(irunner, mocker):
 
 
 def test_cli_add_existing_credential_errors_asking_for_force_option(irunner, mocker):
-    result_first = irunner.passpie("add foo@bar --random")
-    result_second = irunner.passpie("add foo@bar --random")
+    result_first = irunner.run("passpie add foo@bar --random")
+    result_second = irunner.run("passpie add foo@bar --random")
 
     assert result_first.exit_code == 0
     assert result_second.exit_code != 0
@@ -76,7 +76,7 @@ def test_cli_add_credential_with_no_option_prompts_password(irunner, mocker):
     mocker.patch("passpie.cli.GPG.encrypt", return_value="encrypted")
     mock_prompt = mocker.patch("passpie.cli.click.prompt")
 
-    result = irunner.passpie("add foo@bar", input="password\n")
+    result = irunner.run("passpie add foo@bar", input="password\n")
 
     assert result.exit_code == 0
     assert mock_prompt.called
