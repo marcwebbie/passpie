@@ -88,7 +88,7 @@ class Table(object):
 # cli
 #############################
 
-def prompt_passphrase(confirm):
+def prompt_passphrase(db, confirm):
     stdin_text = None
     if not sys.stdin.isatty():
         with click.get_binary_stream("stdin") as stdinfd:
@@ -101,6 +101,10 @@ def prompt_passphrase(confirm):
             "Passphrase",
             hide_input=True,
             confirmation_prompt=confirm)
+    try:
+        db.gpg.ensure()
+    except ValueError:
+        raise click.ClickException("Wrong passphrase")
     return passphrase
 
 
@@ -340,6 +344,10 @@ def remove(fullnames, force, purge):
                 db.repo.commit(msg)
 
 
+def passphrase_callback(ctx, param, val):
+    return ctx.meta['passphrase'] or val
+
+
 @cli.command()
 @click.argument("fullnames", nargs=-1, callback=lambda ctx, param, val: list(val))
 @click.option("-r", "--random", is_flag=True, help="Random password generation")
@@ -350,41 +358,46 @@ def remove(fullnames, force, purge):
 @click.option("-p", "--password", help="Credentials password")
 @click.option("-l", "--login", help="Credentials login")
 @click.option("-n", "--name", help="Credentials name")
-def update(db, fullnames, random, pattern, copy, comment, password, name, login, interactive):
+@click.option("-P", "--passphrase", callback=passphrase_callback)
+@click.pass_context
+def update(ctx, passphrase, fullnames, random, pattern, copy, comment, password, name, login, interactive):
     """Update credential"""
-    updated = []
-    for fullname in [f for f in fullnames if db.contains(db.query(f))]:
-        if interactive is True and not click.confirm("Update {}".format(fullname)):
-            # Don't update
-            continue
-        cred = db.get(db.query(fullname))
-        values = {}
-        if login:
-            values["login"] = login
-        if name:
-            values["name"] = name
-        if password:
-            values["password"] = db.gpg.encrypt(password)
-        if comment:
-            values["comment"] = comment
-        if random:
-            values["password"] = genpass(pattern or db.config["PASSWORD_PATTERN"])
+    with Database(".passpie") as db:
+        updated = []
+        for fullname in [f for f in fullnames if db.contains(db.query(f))]:
+            if interactive is True and not click.confirm("Update {}".format(fullname)):
+                # Don't update
+                continue
+            cred = db.get(db.query(fullname))
+            values = {}
+            if login:
+                values["login"] = login
+            if name:
+                values["name"] = name
+            if password:
+                values["password"] = db.gpg.encrypt(password)
+            if comment:
+                values["comment"] = comment
+            if random:
+                values["password"] = genpass(pattern or db.config["PASSWORD_PATTERN"])
 
-        if not values:
-            values["login"] = prompt_update(cred, "login")
-            values["name"] = prompt_update(cred, "name")
-            values["password"] = prompt_update(cred, "password", hidden=True)
-            values["comment"] = prompt_update(cred, "comment")
+            if not values:
+                values["login"] = prompt_update(cred, "login")
+                values["name"] = prompt_update(cred, "name")
+                values["password"] = prompt_update(cred, "password", hidden=True)
+                values["comment"] = prompt_update(cred, "comment")
 
-        db.update(values, db.query(fullname))
-        updated.append(fullname)
+            db.update(values, db.query(fullname))
+            updated.append(fullname)
 
-    if updated:
-        db.repo.commit("Update credentials '{}'".format((", ").join(fullnames)))
+        if updated:
+            db.repo.commit("Update credentials '{}'".format((", ").join(fullnames)))
 
-        if copy:
-            password = db.gpg.decrypt(cred["password"])
-            copy_to_clipboard(password, db.config["COPY_TIMEOUT"])
+            if copy:
+                if not passphrase:
+                    passphrase = click.prompt("Passphrase", hide_input=True)
+                password = db.gpg.decrypt(cred["password"], passphrase)
+                copy_to_clipboard(password, db.cfg["COPY_TIMEOUT"])
 
 
 @cli.command()

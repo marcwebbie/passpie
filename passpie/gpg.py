@@ -227,7 +227,7 @@ class GPG(object):
             raise ValueError(message)
 
         # Test passphrase
-        if self.passphrase:
+        if passphrase:
             if not self.decrypt(self.encrypt("OK")) == "OK":
                 raise ValueError("Wrong passphrase")
         else:
