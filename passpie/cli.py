@@ -88,7 +88,7 @@ class Table(object):
 # cli
 #############################
 
-def prompt_passphrase(db, confirm=False):
+def prompt_passphrase(confirm=False):
     stdin_text = None
     if not sys.stdin.isatty():
         with click.get_binary_stream("stdin") as stdinfd:
@@ -101,11 +101,17 @@ def prompt_passphrase(db, confirm=False):
             "Passphrase",
             hide_input=True,
             confirmation_prompt=confirm)
+
+    return passphrase
+
+
+def ensure_passphrase(db, passphrase):
+    if not passphrase:
+        passphrase = prompt_passphrase(db)
     try:
         db.gpg.ensure(passphrase)
     except ValueError:
         raise click.ClickException("Wrong passphrase")
-    return passphrase
 
 
 def passphrase_callback(ctx, param, val):
@@ -358,9 +364,7 @@ def remove(fullnames, force, purge):
 @click.option("-p", "--password", help="Credentials password")
 @click.option("-l", "--login", help="Credentials login")
 @click.option("-n", "--name", help="Credentials name")
-@click.option("-P", "--passphrase", callback=passphrase_callback)
-@click.pass_context
-def update(ctx, passphrase, fullnames, random, pattern, copy, comment, password, name, login, interactive):
+def update(fullnames, random, pattern, copy, comment, password, name, login, interactive):
     """Update credential"""
     with Database(".passpie") as db:
         updated = []
@@ -368,7 +372,11 @@ def update(ctx, passphrase, fullnames, random, pattern, copy, comment, password,
             if interactive is True and not click.confirm("Update {}".format(fullname)):
                 # Don't update
                 continue
+
             cred = db.get(db.query(fullname))
+            if not cred:
+                continue
+
             values = {}
             if login:
                 values["login"] = login
@@ -386,6 +394,7 @@ def update(ctx, passphrase, fullnames, random, pattern, copy, comment, password,
                 values["name"] = prompt_update(cred, "name")
                 values["password"] = prompt_update(cred, "password", hidden=True)
                 values["comment"] = prompt_update(cred, "comment")
+                password = values['password']
 
             db.update(values, db.query(fullname))
             updated.append(fullname)
@@ -394,9 +403,6 @@ def update(ctx, passphrase, fullnames, random, pattern, copy, comment, password,
             db.repo.commit("Update credentials '{}'".format((", ").join(fullnames)))
 
             if copy:
-                if not passphrase:
-                    passphrase = prompt_passphrase(db)
-                password = db.gpg.decrypt(values["password"], passphrase)
                 copy_to_clipboard(password, db.cfg["COPY_TIMEOUT"])
 
 
@@ -410,9 +416,7 @@ def copy(passphrase, fullname, dest, timeout):
     with Database(".passpie") as db:
         credential = db.get(db.query(fullname))
         timeout = timeout or db.cfg["COPY_TIMEOUT"]
-
-        if not passphrase:
-            passphrase = prompt_passphrase(db)
+        passphrase = ensure_passphrase(db, passphrase)
 
         if credential:
             password = db.gpg.decrypt(credential['password'], passphrase)
@@ -478,10 +482,7 @@ def import_database(filepath, importer, csv, force, skip_lines):
 def export_database(passphrase, exportfile, as_json, as_csv):
     """Export credentials in plain text"""
     with Database('.passpie') as db:
-        if not passphrase:
-            passphrase = prompt_passphrase(db)
-        else:
-            db.gpg.ensure(passphrase)
+        passphrase = ensure_passphrase(db, passphrase)
 
         credentials = db.all()
         for credential in credentials:
