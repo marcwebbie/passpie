@@ -54,7 +54,7 @@ register:
 	pip install pypandoc
 	python setup.py register
 
-lint:
+lint: clean
 	flake8
 	grep -inr "set_trace()" --color=auto $(PACKAGE) || true
 	grep -inr "set_trace()" --color=auto $(PACKAGE_TESTS) || true
