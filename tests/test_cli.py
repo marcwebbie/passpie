@@ -79,10 +79,8 @@ def test_cli_sets_logging_verbose_level_to_info_when_passing_one_v(mocker, mock_
     with mock_config(configuration):
         result = irunner.invoke(cli.cli, ['-v'])
 
-    assert mock_logging.basicConfig.called
-    _, kwargs = mock_logging.basicConfig.call_args
-    assert kwargs['level'] == mock_logging.INFO
     assert result.exit_code == 0
+    mock_logging.getLogger().setLevel.assert_called_once_with(mock_logging.INFO)
 
 
 def test_cli_sets_logging_verbose_level_to_debug_when_passing_two_v(mocker, mock_config):
@@ -93,9 +91,7 @@ def test_cli_sets_logging_verbose_level_to_debug_when_passing_two_v(mocker, mock
         result = runner.invoke(cli.cli, ['-vv'], catch_exceptions=False)
 
     assert result.exit_code == 0
-    assert mock_logging.basicConfig.called
-    _, kwargs = mock_logging.basicConfig.call_args
-    assert kwargs['level'] == mock_logging.DEBUG
+    mock_logging.getLogger().setLevel.assert_called_once_with(mock_logging.DEBUG)
 
 
 def test_cli_sets_logging_verbose_level_to_critical_when_no_verbose_passed(mocker, mock_config):
@@ -106,10 +102,7 @@ def test_cli_sets_logging_verbose_level_to_critical_when_no_verbose_passed(mocke
         result = runner.invoke(cli.cli, [], catch_exceptions=False)
 
     assert result.exit_code == 0
-    assert mock_logging.basicConfig.called
-    _, kwargs = mock_logging.basicConfig.call_args
-    assert kwargs['level'] == mock_logging.CRITICAL
-
+    mock_logging.getLogger().setLevel.assert_called_once_with(mock_logging.CRITICAL)
 
 
 def test_validate_cols_returns_dict_with_col_position(mocker):

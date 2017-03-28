@@ -9,6 +9,7 @@ from passpie.crypt import (
     DEVNULL,
     make_key_input,
     export_keys,
+    export_secret_keys,
     import_keys,
     create_keys,
 )
@@ -42,27 +43,53 @@ def test_crypt_make_key_input_handles_unicode_encode_error(mocker):
     assert key_input is not None
 
 
-def test_crypt_export_keys_calls_gpg_command_on_export_keys(mocker):
+def test_crypt_export_secret_keys_calls_fallback_gpg_command_on_export_keys_when_error(mocker):
     output = 'command output'
-    mock_call = mocker.patch('passpie.crypt.process.call', return_value=(output, ''))
+    mock_call = mocker.patch('passpie.crypt.process.call',
+                             return_value=(output, 'error'))
     mocker.patch('passpie.crypt.which', return_value='gpg')
     homedir = 'mock_homedir'
 
-    secret = False
     command = [
         'gpg',
         '--no-version',
-        '--batch',
+        '--no-tty',
         '--homedir', homedir,
-        '--export-secret-keys' if secret else '--export',
+        '--export-secret-keys',
+        '--armor',
+        '-o', '-',
+    ]
+    result = export_secret_keys(homedir, 'passphrase')
+
+    assert mock_call.called is True
+    assert mock_call.call_count == 2
+    assert result == output
+    mock_call.assert_any_call(command)
+
+
+def test_crypt_export_secret_keys_calls_gpg_command_on_export_keys(mocker):
+    output = 'command output'
+    mock_call = mocker.patch('passpie.crypt.process.call',
+                             return_value=(output, ''))
+    mocker.patch('passpie.crypt.which', return_value='gpg')
+    homedir = 'mock_homedir'
+
+    command = [
+        'gpg',
+        '--no-version',
+        '--no-tty',
+        '--pinentry-mode', 'loopback',
+        '--passphrase-fd', '0',
+        '--homedir', 'mock_homedir',
+        '--export-secret-keys',
         '--armor',
         '-o', '-'
     ]
-    result = export_keys(homedir)
+    result = export_secret_keys(homedir, 'passphrase')
 
     assert mock_call.called is True
     assert result == output
-    mock_call.assert_called_once_with(command)
+    mock_call.assert_called_once_with(command, input='passphrase')
 
 
 def test_create_keys_export_public_and_secret_keys_into_stdout(mocker):
@@ -80,9 +107,6 @@ def test_create_keys_export_public_and_secret_keys_into_stdout(mocker):
         'gpg',
         '--batch',
         '--no-tty',
-        '--no-secmem-warning',
-        '--no-permission-warning',
-        '--no-mdc-warning',
         '--homedir', homedir,
         '--gen-key',
     ]
@@ -97,7 +121,8 @@ def test_create_keys_export_public_and_secret_keys_into_stdout(mocker):
 def test_create_keys_if_path_is_passed_create_file_homedir(mocker, mock_call, mock_open):
     mock_call.return_value = ('', '')
     mock_tempdir = mocker.patch('passpie.crypt.tempdir', mock_open(), create=True)
-    mocker.patch('passpie.crypt.export_keys', side_effect=['PUBLIC', 'PRIVATE'])
+    mocker.patch('passpie.crypt.export_keys', side_effect=['PUBLIC'])
+    mocker.patch('passpie.crypt.export_secret_keys', side_effect=['PRIVATE'])
     mock_open = mocker.patch("passpie.crypt.open", mock_open(), create=True)
     mock_keysfile = mock_open().__enter__()
     mock_tempdir().__enter__().return_value = 'create_keys'
@@ -138,23 +163,25 @@ def test_decrypt_calls_gpg_encrypt_expected_command(mocker, mock_call):
     data = '--GPG ENCRYPTED--'
     mock_call.return_value = ('s3cr3t', None)
     mocker.patch('passpie.crypt.which', return_value='gpg')
+    mock_tempfile = mocker.patch('passpie.crypt.NamedTemporaryFile')
+    mock_tempfile().__enter__().name = "fake.path.txt"
     command = [
         'gpg',
-        '--batch',
+        '--no-version',
         '--no-tty',
+        '--pinentry-mode',
+        'loopback',
+        '--passphrase-fd', '0',
         '--always-trust',
-        '--recipient', recipient,
-        '--homedir', homedir,
-        '--passphrase', passphrase,
-        '--emit-version',
-        '-o', '-',
-        '-d', '-',
+        '--homedir', 'homedir',
+        '--armor',
+        '--decrypt', 'fake.path.txt'
     ]
     result = passpie.crypt.decrypt(data, recipient, passphrase, homedir)
 
     assert result is not None
     assert mock_call.called
-    mock_call.assert_called_once_with(command, input=data)
+    mock_call.assert_called_once_with(command, input=passphrase)
 
 
 def test_default_recipient_returns_first_matched_fingerprint(mocker, mock_call):
