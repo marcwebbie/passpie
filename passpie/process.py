@@ -38,6 +38,7 @@ def call(*args, **kwargs):
     kwargs_input = kwargs.pop('input', None)
 
     with Proc(*args, **kwargs) as proc:
+        logging.debug(" ".join(args[0]))
         output, error = proc.communicate(input=kwargs_input)
         try:
             output = output.decode('utf-8')

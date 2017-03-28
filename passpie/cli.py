@@ -19,6 +19,7 @@ from .validators import validate_config, validate_cols, validate_remote
 
 __version__ = "1.5.5"
 pass_db = click.make_pass_decorator(Database, ensure=False)
+logging.basicConfig(format="[%(levelname)s:passpie.%(module)s]: %(message)s")
 
 
 def ensure_passphrase(passphrase, config):
@@ -97,13 +98,12 @@ def cli(ctx, path, autopull, autopush, configuration, verbose):
 
     # Verbose
     if verbose == 1:
-        logging_level = logging.INFO
+        logging.getLogger().setLevel(logging.INFO)
     elif verbose > 1:
-        logging_level = logging.DEBUG
+        click.secho("Verbose level set to debug, sensitive data might be logged", fg="yellow")
+        logging.getLogger().setLevel(logging.DEBUG)
     else:
-        logging_level = logging.CRITICAL
-    logging.basicConfig(format="%(levelname)s:passpie.%(module)s:%(message)s",
-                        level=logging_level)
+        logging.getLogger().setLevel(logging.CRITICAL)
 
     if ctx.invoked_subcommand is None:
         ctx.invoke(cli.commands['list'])
