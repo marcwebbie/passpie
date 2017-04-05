@@ -1,3 +1,7 @@
+Version 1.6.0
+-------------
++ **✔** Fix support for GPG 2.1.X. #112
+
 Version 1.5.5
 -------------
 + **✔** Add message indicating how long the password will live in the clipboard
