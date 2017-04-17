@@ -78,14 +78,17 @@ SHELLS = ['zsh', 'fish', 'bash']
 
 def script(shell_name, config_path, commands):
     text = ''
+    
     if shell_name == 'zsh':
-        text = ZSH.replace('{commands}', '\n'.join(commands))
-        text = text.replace('{config_path}', config_path)
-    elif shell_name == 'fish':
-        text = FISH.replace('{commands}', ' '.join(commands))
-        text = text.replace('{config_path}', config_path)
-    elif shell_name == 'bash':
-        text = BASH.replace('{commands}', ' '.join(commands))
-        text = text.replace('{config_path}', config_path)
+        seperator = '\n'
+    elif shell_name == 'fish' or
+         shell_name == 'bash':
+        seperator = ' '
+    else:
+        return text
+        
+    pair = {shell_name : globals()[shell_name.upper()]}
+    text = pair[shell_name].replace('{commands}', seperator.join(commands))
+    text = text.replace('{config_path}', config_path)
 
     return text
