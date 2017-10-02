@@ -45,4 +45,4 @@ def call(*args, **kwargs):
             error = error.decode('utf-8')
         except AttributeError:
             pass
-        return output, error
+        return output, error or proc.returncode != 0

@@ -65,3 +65,18 @@ def test_call_output_and_error_doesnt_decode_in_case_of_unicode(mocker, mock_pop
 
     assert result_output == output
     assert result_error == error
+
+
+def test_call_error_true_on_non_zero_status(mocker, mock_popen):
+    MockProc = mocker.patch('passpie.process.Proc')
+    output = mocker.MagicMock()
+    error = mocker.MagicMock()
+    output.decode.return_value = ''
+    error.decode.return_value = ''
+    MockProc().__enter__.return_value.communicate.return_value = (output, error)
+    MockProc().__enter__.return_value.returncode = 2
+
+    result_output, result_error = call(['echo', 'hello'])
+
+    assert result_output == ''
+    assert result_error == True
