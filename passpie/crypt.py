@@ -66,7 +66,7 @@ def export_secret_keys(homedir, passphrase):
         '-o', '-'
     ]
     output, error = process.call(command, input=passphrase)
-    if error:
+    if not output or error:
         # Fallback command in case that GPG version < 2.1
         # with versions lower than 2.1 it was possible to
         # export secret keys without passphrase
@@ -173,7 +173,7 @@ def decrypt(data, recipient, passphrase, homedir):
         ]
 
     output, error = process.call(command, input=passphrase)
-    if error:
+    if not output or error:
         # Fallback command in case that GPG version < 2.1
         # with versions lower than 2.1 it was possible to
         # decrypt armored data with passphrase as an option
