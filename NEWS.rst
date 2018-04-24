@@ -1,3 +1,7 @@
+Version 1.6.1
+-------------
++ **✔** Fix decrypting, exporting secret keys gpg command. #114 and #118
+
 Version 1.6.0
 -------------
 + **✔** Fix support for GPG 2.1.X. #112
