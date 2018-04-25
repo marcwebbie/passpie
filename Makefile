@@ -41,7 +41,7 @@ docs:
 serve: docs
 	cd docs/_build/html && python3 -m http.server
 
-dist:
+package:
 	pip install -U pip wheel
 	python setup.py -q sdist bdist_wheel
 
@@ -49,10 +49,6 @@ dist:
 	@echo "Build files [dist]:"
 	@echo "--------------------------"
 	@ls -l ./dist/
-
-register:
-	pip install pypandoc
-	python setup.py register
 
 lint: clean
 	flake8
@@ -92,10 +88,10 @@ ensure-news-minor:
 ensure-news-major:
 	grep 'Version $(shell bumpversion --allow-dirty --dry-run --list major | grep new_version | sed s,"^.*=",,)' NEWS.rst
 
-release-patch: ensure-news-patch lint test bump-patch dist register publish tag formula
+release-patch: ensure-news-patch lint test bump-patch package publish tag formula
 
-release-minor: ensure-news-minor lint test bump-minor dist register publish tag formula
+release-minor: ensure-news-minor lint test bump-minor package publish tag formula
 
-release-major: ensure-news-major lint test bump-major dist register publish tag formula
+release-major: ensure-news-major lint test bump-major package publish tag formula
 
 .PHONY: docs news

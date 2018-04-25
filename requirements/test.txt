@@ -5,3 +5,4 @@ pytest-mock
 pytest-faker
 mock
 flake8
+pypandoc
