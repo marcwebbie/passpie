@@ -18,8 +18,8 @@ def test_genpass_generates_a_password_with_length_32(mocker):
 
 
 def test_genpass_raises_value_error_when_regex_pattern_error(mocker):
-    mocker.patch('passpie.utils.rstr.xeger', side_effect=re.error)
-    with pytest.raises(ValueError):
+    mocker.patch('passpie.utils.rstr.xeger', side_effect=re.error("Expected"))
+    with pytest.raises(ValueError, match="Expected"):
         genpass("\w{32}")
 
 

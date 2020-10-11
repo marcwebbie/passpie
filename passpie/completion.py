@@ -1,4 +1,4 @@
-BASH = """
+BASH = r"""
 function _passpie()
 {
     COMPREPLY=()
@@ -17,7 +17,7 @@ function _passpie()
 complete -F _passpie 'passpie'
 """
 
-FISH = """
+FISH = r"""
 function _passpie_credentials
   grep -EhriIo '[A-Z0-9._%+-]+@[A-Z0-9.-]+(@[A-Z0-9_\-\.]+)?' {config_path}
 end
@@ -51,7 +51,7 @@ complete -f -c passpie -n '_passpie_using_command {commands}' -a '(_passpie_cred
                                                                   (_passpie_credential_names)' --description 'Credential'
 """
 
-ZSH = """
+ZSH = r"""
 if [[ ! -o interactive ]]; then
     return
 fi
