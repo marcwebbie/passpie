@@ -96,7 +96,7 @@ def runner(request, mocker):
     mocker.patch('passpie.cli.ensure_dependencies')
     mocker.patch('passpie.database.Repository')
     init_kwargs = {}
-    marker = request.node.get_marker('runner_setup')
+    marker = request.node.get_closest_marker('runner_setup')
     if marker:
         init_kwargs = marker.kwargs
     return CliRunner(**init_kwargs)
