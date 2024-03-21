@@ -46,7 +46,7 @@ def read(path, filename='.config'):
             path = os.path.join(path, '.config')
         with open(path) as config_file:
             content = config_file.read()
-        configuration = yaml.load(content)
+        configuration = yaml.full_load(content)
     except IOError:
         logging.debug(u'config file "{}" not found'.format(path))
         return {}

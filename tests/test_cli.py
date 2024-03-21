@@ -225,6 +225,7 @@ def test_update_credentials_with_interactive_open_cred_in_editor(mocker, creds, 
         assert mock_click_edit.called is True
         mock_click_edit.assert_called_once_with(filename=filename)
 
+
 def test_update_credentials_encrypt_password(mocker, creds, mock_config, irunner):
     credentials = creds.make(2)
     fullname = credentials[0]['fullname']
