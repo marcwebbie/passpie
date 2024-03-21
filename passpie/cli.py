@@ -17,7 +17,7 @@ from .history import clone
 from .validators import validate_config, validate_cols, validate_remote
 
 
-__version__ = "1.6.1"
+__version__ = "1.6.2"
 pass_db = click.make_pass_decorator(Database, ensure=False)
 logging.basicConfig(format="[%(levelname)s:passpie.%(module)s]: %(message)s")
 
