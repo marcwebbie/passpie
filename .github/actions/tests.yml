@@ -1,5 +1,6 @@
 name: Tests python 3.10
 on:
+  workflow_call:
   push:
     branches:
       - master
@@ -25,4 +26,9 @@ jobs:
           pip install -e . -r requirements/tests.txt
       - name: Run tests with coverage
         run: |
-          pytest --cov=. --color=yes
+          pytest --cov=. --cov-report=term --cov-report=xml:coverage.xml --color=yes
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: coverage.xml
