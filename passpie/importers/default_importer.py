@@ -15,7 +15,7 @@ class DefaultImporter(BaseImporter):
             return False
 
         try:
-            dict_content = yaml.load(file_content)
+            dict_content = yaml.full_load(file_content)
         except (ReaderError, ScannerError):
             return False
 
@@ -30,6 +30,6 @@ class DefaultImporter(BaseImporter):
     def handle(self, filepath):
         with open(filepath) as fp:
             file_content = fp.read()
-        dict_content = yaml.load(file_content)
+        dict_content = yaml.full_load(file_content)
         credentials = dict_content.get('credentials')
         return credentials

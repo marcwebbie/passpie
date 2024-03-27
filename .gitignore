@@ -31,3 +31,5 @@
 /Vagrantfile
 /.vagrant/*
 /.pytest_cache/*
+/venv/
+/venv_test/

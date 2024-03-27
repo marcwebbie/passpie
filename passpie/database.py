@@ -37,7 +37,7 @@ class PasspieStorage(Storage):
             for filename in filenames:
                 docpath = os.path.join(rootdir, filename)
                 with open(docpath) as f:
-                    elements.append(yaml.load(f.read()))
+                    elements.append(yaml.full_load(f.read()))
 
         return {"_default":
                 {idx: elem for idx, elem in enumerate(elements, start=1)}}
@@ -73,11 +73,11 @@ class Database(TinyDB):
 
     def credential(self, fullname):
         login, name = split_fullname(fullname)
-        Credential = Query()
+        credential = Query()
         if login is None:
-            creds = self.get(Credential.name == name)
+            creds = self.get(credential.name == name)
         else:
-            creds = self.get((Credential.login == login) & (Credential.name == name))
+            creds = self.get((credential.login == login) & (credential.name == name))
         return creds
 
     def add(self, fullname, password, comment):
@@ -98,33 +98,33 @@ class Database(TinyDB):
         login, name = split_fullname(fullname)
         values['fullname'] = make_fullname(values["login"], values["name"])
         values['modified'] = datetime.now()
-        Credential = Query()
+        credential = Query()
         if login is None:
-            query = (Credential.name == name)
+            query = (credential.name == name)
         else:
-            query = ((Credential.login == login) & (Credential.name == name))
-        self.table().update(values, query)
+            query = ((credential.login == login) & (credential.name == name))
+        self.table(self.default_table_name).update(values, query)
 
     def credentials(self, fullname=None):
         if fullname:
             login, name = split_fullname(fullname)
-            Credential = Query()
+            credential = Query()
             if login is None:
-                creds = self.search(Credential.name == name)
+                creds = self.search(credential.name == name)
             else:
-                creds = self.search((Credential.login == login) & (Credential.name == name))
+                creds = self.search((credential.login == login) & (credential.name == name))
         else:
             creds = self.all()
         return sorted(creds, key=lambda x: x["name"] + x["login"])
 
     def remove(self, fullname):
-        self.table().remove(where('fullname') == fullname)
+        self.table(self.default_table_name).remove(where('fullname') == fullname)
 
     def matches(self, regex):
-        Credential = Query()
+        credential = Query()
         credentials = self.search(
-            Credential.name.matches(regex) |
-            Credential.login.matches(regex) |
-            Credential.comment.matches(regex)
+            credential.name.matches(regex) |
+            credential.login.matches(regex) |
+            credential.comment.matches(regex)
         )
         return sorted(credentials, key=lambda x: x["name"] + x["login"])

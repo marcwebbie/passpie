@@ -7,8 +7,8 @@ def test_config_read_opens_path_and_load_yaml_content(mocker, mock_open):
     mock_yaml = mocker.patch('passpie.config.yaml')
 
     passpie.config.read('path')
-    assert mock_yaml.load.called
-    mock_yaml.load.assert_called_once_with(config_file().__enter__().read())
+    assert mock_yaml.full_load.called
+    mock_yaml.full_load.assert_called_once_with(config_file().__enter__().read())
 
 
 def test_config_read_logs_debug_when_config_file_not_found_and_returns_empty(mocker):
