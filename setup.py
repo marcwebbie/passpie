@@ -28,6 +28,7 @@ requirements = [
     'tabulate==0.9.0',
     'tinydb==4.8.0',
     'rstr==3.2.2',
+    'setuptools',
 ]
 
 
