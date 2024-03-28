@@ -57,8 +57,7 @@ jobs:
           pip install coveralls
       - name: Run tests
         run: |
-          coverage run -m pytest
-          coveralls
+          pytest --color=yes
       # - name: Coveralls
       #   uses: coverallsapp/github-action@master
       #   with:
