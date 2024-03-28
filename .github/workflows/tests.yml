@@ -32,40 +32,6 @@ jobs:
       - name: Run tests
         run: |
           pytest --color=yes
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: coverage.xml
-
-  tests-with-coverage-3-5:
-    name: Run tests on Ubuntu 20.04 py3.5
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Install depedencies
-        run: |
-          sudo apt-get install -y gnupg2 python-setuptools
-      - name: Setup Python 3.5.4
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.5.4"
-          cache: "pip"
-          cache-dependency-path: '**/setup.py'
-      - name: Install requirements
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e . -r requirements/test.txt
-      - name: Run tests with coverage
-        run: |
-          pytest --color=yes
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: coverage.xml
 
   tests-with-coverage-mac:
     name: Run tests on macos 11 py3.12
@@ -88,10 +54,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e . -r requirements/test.txt
-          pip install toml coverage-lcov
+          pip install coveralls
       - name: Run tests
         run: |
-          pytest --cov=. --cov-report=term --cov-report=xml:coverage.xml --color=yes && coverage-lcov
+          coverage run -m pytest
+          coveralls
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:
