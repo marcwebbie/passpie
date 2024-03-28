@@ -1,4 +1,4 @@
-name: Tests python 3.10
+name: Run tests in Ubuntu and Mac
 on:
   workflow_call:
   push:
@@ -16,10 +16,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install depedencies
-        # the curl fix ModuleNotFoundError: No module named 'pkg_resources'
+        # python-setuptools fix ModuleNotFoundError: No module named 'pkg_resources'
         run: |
-          sudo apt-get install -y gnupg2
-          curl https://bootstrap.pypa.io/ez_setup.py | python
+          sudo apt-get install -y gnupg2 python-setuptools
       - name: Setup Python 3.12.2
         uses: actions/setup-python@v5
         with:
@@ -48,8 +47,7 @@ jobs:
           fetch-depth: 0
       - name: Install depedencies
         run: |
-          sudo apt-get install -y gnupg2
-          curl https://bootstrap.pypa.io/ez_setup.py | python
+          sudo apt-get install -y gnupg2 python-setuptools
       - name: Setup Python 3.5.4
         uses: actions/setup-python@v5
         with:
@@ -77,10 +75,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install depedencies
-        # the curl fix ModuleNotFoundError: No module named 'pkg_resources'
         run: |
           brew install gnupg
-          curl https://bootstrap.pypa.io/ez_setup.py | python
+          sudo pip3 install setuptools
       - name: Setup Python 3.12.2
         uses: actions/setup-python@v5
         with:
